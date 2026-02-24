@@ -1,4 +1,4 @@
-name: Claude Code Review
+name: Claude PR Review
 
 on:
   pull_request:
@@ -7,59 +7,72 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  id-token: write
 
 jobs:
   claude-review:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
 
-      - name: Get PR diff
-        id: diff
-        run: |
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          git diff origin/${{ github.event.pull_request.base.ref }}...HEAD > pr_diff.txt
+      - name: Claude Review
+        id: review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
 
-      - name: Get changed files
-        id: files
-        run: |
-          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...HEAD > changed_files.txt
+            You are reviewing this pull request. Operate in PR Review mode.
 
-      - name: Run Claude Review
+            ## Setup
+
+            1. Read `CLAUDE.md` for critical rules and operating context.
+            2. Read `documentation/PR_REVIEW_GUIDE.md` for the full review checklist.
+            3. Run `gh pr diff ${{ github.event.pull_request.number }}` to get the full diff.
+            4. Run `gh pr view ${{ github.event.pull_request.number }}` to get the PR description.
+            5. For any changed files under `src/hexagon/`, read the `BOUNDARIES.md` in that layer directory.
+
+            ## Review
+
+            Walk through every section of the PR Review Guide checklist (sections 1-8).
+            For each section, assess whether the PR satisfies the criteria.
+            Note any issues found, using the severity prefixes defined in section 8:
+            - **Blocking**: Must fix before merge
+            - **Suggestion**: Nice to have, not blocking
+            - **Question**: Asking for clarification
+
+            ## Output
+
+            1. Post **inline comments** on specific lines where you find issues, using the inline comment tool.
+            2. Post **one summary PR comment** via `gh pr comment` that includes:
+               - Your decision: Approve or Request Changes
+               - A brief rationale for the decision
+               - A list of any blocking issues found
+               - A list of any suggestions or questions
+            3. Return your structured decision via the required JSON output.
+
+            Only post GitHub comments — do not submit review text as messages.
+          claude_args: |
+            --allowedTools "Read,Grep,Glob,mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+            --json-schema '{"type":"object","properties":{"decision":{"type":"string","enum":["approve","request_changes"]},"summary":{"type":"string"},"blocking_issues":{"type":"array","items":{"type":"string"}}},"required":["decision","summary"]}'
+
+      - name: Enforce Review Decision
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_DESCRIPTION: ${{ github.event.pull_request.body }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REVIEW_OUTPUT: ${{ steps.review.outputs.structured_output }}
         run: |
-          python3 .github/scripts/claude_review.py
-
-      - name: Post Review Comment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const review = JSON.parse(fs.readFileSync('review_result.json', 'utf8'));
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: review.comment
-            });
-
-            // Set output for next step
-            core.setOutput('decision', review.decision);
-
-      - name: Check Review Decision
-        run: |
-          DECISION=$(jq -r '.decision' review_result.json)
-          echo "Review decision: $DECISION"
+          if [ -z "$REVIEW_OUTPUT" ]; then
+            echo "::error::Claude review produced no structured output — the review step may have failed."
+            exit 1
+          fi
+          DECISION=$(echo "$REVIEW_OUTPUT" | jq -r '.decision')
+          SUMMARY=$(echo "$REVIEW_OUTPUT" | jq -r '.summary')
+          echo "Decision: $DECISION"
+          echo "Summary: $SUMMARY"
           if [ "$DECISION" = "request_changes" ]; then
-            echo "::warning::Claude requested changes on this PR"
+            echo "::error::Claude review requested changes: $SUMMARY"
             exit 1
           fi
