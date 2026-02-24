@@ -1,38 +1,30 @@
-import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
+import { useAllQuizGroups } from '@application/queries/useAllQuizGroups';
 import { useMemo } from 'react';
-
 export interface UseSearchByQuizFilterParams {
-  courseCode: string;
+  quizGroupId: number | undefined;
 }
 
 export function useSearchByQuizFilter({
-  courseCode,
+  quizGroupId,
 }: UseSearchByQuizFilterParams) {
   const {
     quizGroups,
-    officialQuizRecords,
-    isLoading: officialQuizzesLoading,
+    isLoading: isLoadingQuizGroups,
     error,
-  } = useOfficialQuizzesQuery();
+  } = useAllQuizGroups();
 
   // quizOptions are the quizzes for the selected course
   const quizOptions = useMemo(() => {
-    if (!officialQuizRecords || officialQuizzesLoading || error) {
+    if (!quizGroups || isLoadingQuizGroups || error) {
       return [];
     }
-    const quizGroup = quizGroups?.find((group) => group.urlSlug === courseCode);
+    const quizGroup = quizGroups?.find((group) => group.id === quizGroupId);
     return quizGroup?.quizzes ?? [];
-  }, [
-    courseCode,
-    quizGroups,
-    error,
-    officialQuizzesLoading,
-    officialQuizRecords,
-  ]);
+  }, [quizGroupId, quizGroups, isLoadingQuizGroups, error]);
 
   return {
     quizOptions,
-    isLoading: officialQuizzesLoading,
+    isLoading: isLoadingQuizGroups,
     error,
   };
 }

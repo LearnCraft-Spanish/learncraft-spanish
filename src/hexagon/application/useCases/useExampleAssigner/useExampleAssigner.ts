@@ -4,10 +4,10 @@ import type {
   Flashcard,
 } from '@learncraft-spanish/shared';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+import { useAllQuizGroups } from '@application/queries/useAllQuizGroups';
 import { useFlashcardsQuery } from '@application/queries/useFlashcardsQuery';
-import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
 import { useQuizExampleMutations } from '@application/queries/useQuizExampleMutations';
-import { useQuizExamplesQuery } from '@application/queries/useQuizExamplesQuery';
+import { useQuizExamples } from '@application/queries/useQuizExamples';
 import { useSelectedExamples } from '@application/units/ExampleSearchInterface/useSelectedExamples';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { getUnassignedExamples } from '@application/useCases/useExampleAssigner/helpers';
@@ -26,19 +26,20 @@ export interface StudentSelectionProps {
 }
 
 export interface QuizSelectionProps {
-  selectedCourseCode: string;
-  onCourseCodeChange: (code: string) => void;
+  selectedQuizGroupId: number | undefined;
+  onQuizGroupIdChange: (id: number | undefined) => void;
   selectedQuizRecordId: number | undefined;
   onQuizRecordIdChange: (id: number | undefined) => void;
   availableQuizzes:
     | Array<{
-        recordId: number;
-        quizNickname?: string;
+        id: number;
+        published: boolean;
+        quizTitle?: string;
         quizNumber?: number;
-        courseCode: string;
+        relatedQuizGroupId: number | null;
       }>
     | undefined;
-  courseOptions: Array<{ code: string; name: string }>;
+  quizGroupOptions: Array<{ id: number; name: string }>;
 }
 
 export interface AssignedStudentFlashcardsProps {
@@ -102,7 +103,9 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   // Assignment type state
   const [assignmentType, setAssignmentType] =
     useState<AssignmentType>('students');
-  const [selectedCourseCode, setSelectedCourseCode] = useState<string>('none');
+  const [selectedQuizGroupId, setSelectedQuizGroupId] = useState<
+    number | undefined
+  >(undefined);
   const [selectedQuizRecordId, setSelectedQuizRecordId] = useState<
     number | undefined
   >(undefined);
@@ -114,56 +117,42 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   // Get active student
   const { appUser, isLoading: isLoadingActiveStudent } = useActiveStudent();
 
-  // Get official quizzes
-  const {
-    quizGroups,
-    officialQuizRecords,
-    isLoading: isLoadingQuizzes,
-  } = useOfficialQuizzesQuery();
+  // get all quiz groups
+  const { quizGroups, isLoading: isLoadingQuizGroups } = useAllQuizGroups();
 
   // Filter quizzes by selected course
   const availableQuizzes = useMemo(() => {
-    if (!officialQuizRecords || selectedCourseCode === 'none') return undefined;
+    if (!quizGroups || selectedQuizGroupId === undefined) return undefined;
     const quizGroup = quizGroups?.find(
-      (group) => group.urlSlug === selectedCourseCode,
+      (group) => group.id === selectedQuizGroupId,
     );
 
-    return (
-      quizGroup?.quizzes.map((quiz) => ({
-        recordId: quiz.id,
-        quizNickname: quiz.quizTitle,
-        quizNumber: quiz.quizNumber,
-        courseCode: quizGroup.urlSlug,
-      })) ?? []
-    );
-  }, [quizGroups, selectedCourseCode, officialQuizRecords]);
+    return quizGroup?.quizzes ?? [];
+  }, [quizGroups, selectedQuizGroupId]);
+
+  const selectedQuizGroup = useMemo(() => {
+    if (!quizGroups || selectedQuizGroupId === undefined) return undefined;
+    return quizGroups?.find((group) => group.id === selectedQuizGroupId);
+  }, [quizGroups, selectedQuizGroupId]);
 
   // Get selected quiz record
   const selectedQuizRecord = useMemo(() => {
     if (
       assignmentType !== 'quiz' ||
-      !selectedCourseCode ||
-      selectedCourseCode === 'none' ||
+      !selectedQuizGroupId ||
       !selectedQuizRecordId ||
       !availableQuizzes
     ) {
       return undefined;
     }
-
-    const quiz = availableQuizzes.find(
-      (q) => q.recordId === selectedQuizRecordId,
-    );
-    if (!quiz || !quiz.quizNumber) return undefined;
-
-    return {
-      courseCode: quiz.courseCode,
-      quizNumber: quiz.quizNumber,
-      recordId: quiz.recordId,
-      quizNickname: quiz.quizNickname,
-    };
+    const quiz = availableQuizzes.find((q) => q.id === selectedQuizRecordId);
+    if (!quiz) {
+      return undefined;
+    }
+    return quiz;
   }, [
     assignmentType,
-    selectedCourseCode,
+    selectedQuizGroupId,
     selectedQuizRecordId,
     availableQuizzes,
   ]);
@@ -179,14 +168,13 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
 
   // Query quiz examples when a quiz is selected (even if not in quiz mode, to show current state)
   const {
-    quizExamples,
+    data: quizExamples,
     isLoading: isLoadingQuizExamples,
     isFetching: isFetchingQuizExamples,
     error: quizExamplesError,
-  } = useQuizExamplesQuery({
-    courseCode: selectedQuizRecord?.courseCode || '',
-    quizNumber: selectedQuizRecord?.quizNumber || 0,
-    ignoreCache: true,
+  } = useQuizExamples({
+    quizId: selectedQuizRecord?.id ?? 0,
+    vocabularyComplete: undefined,
   });
 
   // Query flashcards when a student is active (always enabled to show current state)
@@ -241,7 +229,8 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       }
       const exampleIds = selectedExamples.map((ex) => ex.id);
       const addExamplesToQuizPromise = addExamplesToQuiz({
-        courseCode: selectedQuizRecord.courseCode,
+        quizId: selectedQuizRecord.id,
+        courseCode: selectedQuizGroup?.urlSlug || '',
         quizNumber: selectedQuizRecord.quizNumber,
         exampleIds,
       });
@@ -256,6 +245,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     selectedExamples,
     assignmentType,
     appUser?.recordId,
+    selectedQuizGroup,
     selectedQuizRecord,
     createFlashcards,
     addExamplesToQuiz,
@@ -265,19 +255,10 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     setAssignmentType(type);
     // Reset quiz selection when switching
     if (type === 'students') {
-      setSelectedCourseCode('none');
+      setSelectedQuizGroupId(undefined);
       setSelectedQuizRecordId(undefined);
     }
   }, []);
-
-  // Map quiz groups to course options (code and name format)
-  const courseOptions = useMemo(() => {
-    if (!quizGroups) return [];
-    return quizGroups.map((group) => ({
-      code: group.urlSlug,
-      name: group.name,
-    }));
-  }, [quizGroups]);
 
   // Determine target name for display
   const targetName = useMemo(() => {
@@ -285,7 +266,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       return appUser?.name || 'Student';
     }
     return (
-      selectedQuizRecord?.quizNickname ||
+      selectedQuizRecord?.quizTitle ||
       (selectedQuizRecord?.quizNumber
         ? `Quiz ${selectedQuizRecord.quizNumber}`
         : 'Quiz')
@@ -304,7 +285,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       !isFetchingFlashcards &&
       !isLoadingQuizExamples &&
       !isFetchingQuizExamples &&
-      !isLoadingQuizzes,
+      !isLoadingQuizGroups,
     [
       selectedExamples.length,
       unassignedExamples.length,
@@ -316,7 +297,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       isFetchingFlashcards,
       isLoadingQuizExamples,
       isFetchingQuizExamples,
-      isLoadingQuizzes,
+      isLoadingQuizGroups,
     ],
   );
 
@@ -338,20 +319,21 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
 
   const quizSelectionProps = useMemo<QuizSelectionProps>(
     () => ({
-      selectedCourseCode,
-      onCourseCodeChange: setSelectedCourseCode,
+      selectedQuizGroupId,
+      onQuizGroupIdChange: setSelectedQuizGroupId,
       selectedQuizRecordId,
       onQuizRecordIdChange: setSelectedQuizRecordId,
       availableQuizzes,
-      courseOptions,
+      quizGroupOptions:
+        quizGroups?.map((group) => ({ id: group.id, name: group.name })) ?? [],
     }),
     [
-      selectedCourseCode,
-      setSelectedCourseCode,
+      selectedQuizGroupId,
+      setSelectedQuizGroupId,
       selectedQuizRecordId,
       setSelectedQuizRecordId,
       availableQuizzes,
-      courseOptions,
+      quizGroups,
     ],
   );
 
@@ -385,7 +367,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     return {
       examples: quizExamples,
       isLoading:
-        isLoadingQuizExamples || isLoadingQuizzes || isFetchingQuizExamples,
+        isLoadingQuizExamples || isLoadingQuizGroups || isFetchingQuizExamples,
       error: quizExamplesError,
       targetName,
       studentFlashcards,
@@ -395,7 +377,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     assignmentType,
     quizExamples,
     isLoadingQuizExamples,
-    isLoadingQuizzes,
+    isLoadingQuizGroups,
     isFetchingQuizExamples,
     quizExamplesError,
     targetName,
@@ -435,7 +417,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       canAssign,
       activeStudentName: appUser?.name,
       quizName:
-        selectedQuizRecord?.quizNickname ||
+        selectedQuizRecord?.quizTitle ||
         (selectedQuizRecord?.quizNumber
           ? `Quiz ${selectedQuizRecord.quizNumber}`
           : null),

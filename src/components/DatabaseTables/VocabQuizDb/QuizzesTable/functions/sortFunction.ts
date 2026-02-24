@@ -1,12 +1,20 @@
 import type { SortConfig } from 'src/components/Table/types';
-import type { Quiz } from 'src/types/interfaceDefinitions';
+import type { QbQuiz } from 'src/types/DatabaseTables';
 
-export default function sortFunction(data: Quiz[], sortConfig: SortConfig) {
+export default function sortFunction(data: QbQuiz[], sortConfig: SortConfig) {
   if (sortConfig.key === 'Quiz Nickname') {
     return [...data].sort((a, b) => {
       return sortConfig.direction === 'ascending'
         ? a.quizNickname.localeCompare(b.quizNickname)
         : b.quizNickname.localeCompare(a.quizNickname);
+    });
+  }
+
+  if (sortConfig.key === 'Published') {
+    return [...data].sort((a, b) => {
+      return sortConfig.direction === 'ascending'
+        ? Number(a.published) - Number(b.published)
+        : Number(b.published) - Number(a.published);
     });
   }
   return [...data];

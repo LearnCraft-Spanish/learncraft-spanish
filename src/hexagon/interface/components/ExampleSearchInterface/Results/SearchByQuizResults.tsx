@@ -2,19 +2,16 @@ import { useSearchByQuizResults } from '@application/units/ExampleSearchInterfac
 import { BaseResultsComponent } from '@interface/components/ExampleSearchInterface/Results/BaseResultsComponent';
 
 export interface SearchByQuizResultsProps {
-  courseCode: string;
-  quizNumber: number | undefined;
+  quizId: number | undefined;
   vocabularyComplete?: boolean;
 }
 export function SearchByQuizResults({
-  courseCode,
-  quizNumber,
+  quizId,
   vocabularyComplete,
 }: SearchByQuizResultsProps) {
   const { examples, isLoading, error, paginationState } =
     useSearchByQuizResults({
-      courseCode,
-      quizNumber,
+      quizId,
       vocabularyComplete,
     });
 

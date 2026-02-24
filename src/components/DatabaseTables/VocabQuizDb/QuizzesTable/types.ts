@@ -4,6 +4,7 @@ export type EditableQuiz = Quiz;
 
 export interface QuizObjForUpdate {
   quizNickname: string;
+  published: boolean;
   recordId: number;
 }
 
@@ -11,4 +12,5 @@ export interface QuizObjForUpdate {
 
 export interface NewQuiz {
   quizNickname: string;
+  published: boolean;
 }
