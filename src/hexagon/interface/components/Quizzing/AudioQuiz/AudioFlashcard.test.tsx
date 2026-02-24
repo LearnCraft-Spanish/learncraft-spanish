@@ -28,6 +28,8 @@ function AudioFlashcardAutoplayOn() {
         nextStep={incrementCurrentStep}
         autoplay
         progressStatus={0.5}
+        isBufferVisible={false}
+        bufferProgress={0}
         pause={pausePlayback}
         play={resumePlayback}
         isPlaying
@@ -56,6 +58,8 @@ function AudioFlashcardAutoplayOff() {
         nextStep={incrementCurrentStep}
         autoplay={false}
         progressStatus={0.5}
+        isBufferVisible={false}
+        bufferProgress={0}
         pause={pausePlayback}
         play={resumePlayback}
         isPlaying
@@ -85,6 +89,8 @@ function AudioFlashcardPlaying() {
         nextStep={incrementCurrentStep}
         autoplay
         progressStatus={0.5}
+        isBufferVisible={false}
+        bufferProgress={0}
         pause={pausePlayback}
         play={resumePlayback}
         isPlaying
@@ -113,6 +119,8 @@ function AudioFlashcardPaused() {
         nextStep={incrementCurrentStep}
         autoplay
         progressStatus={0.5}
+        isBufferVisible={false}
+        bufferProgress={0}
         pause={pausePlayback}
         play={resumePlayback}
         isPlaying={false}
@@ -173,6 +181,33 @@ describe('component AudioFlashcard', () => {
         screen.getAllByLabelText('Play/Pause')[0].click();
         expect(resumePlayback).toHaveBeenCalledOnce();
       });
+    });
+  });
+
+  describe('buffer UI', () => {
+    it('when autoplay and isBufferVisible are true, renders buffer element', () => {
+      render(
+        <MockAllProviders>
+          <AudioFlashcardComponent
+            currentExampleText="currentExampleText"
+            currentStep={AudioQuizStep.Question}
+            nextStep={incrementCurrentStep}
+            autoplay
+            progressStatus={0}
+            isBufferVisible
+            bufferProgress={0.5}
+            pause={pausePlayback}
+            play={resumePlayback}
+            isPlaying={false}
+            vocabComplete={false}
+            vocabulary={[]}
+            getHelpIsOpen={false}
+            setGetHelpIsOpen={() => {}}
+            addPendingRemoveProps={undefined}
+          />
+        </MockAllProviders>,
+      );
+      expect(document.querySelector('.audioQuizBuffer')).toBeInTheDocument();
     });
   });
 });

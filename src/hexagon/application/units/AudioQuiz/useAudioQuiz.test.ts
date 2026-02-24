@@ -75,6 +75,8 @@ describe('useAudioQuiz', () => {
       expect(result.current.isQuizComplete).toBe(false);
       expect(result.current.autoplay).toBe(false);
       expect(result.current.audioQuizType).toBe(AudioQuizType.Speaking);
+      expect(result.current.isBufferVisible).toBe(false);
+      expect(result.current.bufferProgress).toBe(0);
     });
 
     // Note: Empty examples array test removed - exposes a bug in useAudioQuiz.ts
@@ -360,6 +362,114 @@ describe('useAudioQuiz', () => {
       expect(result.current.isQuizComplete).toBe(false);
       expect(result.current.getHelpIsOpen).toBe(false);
       expect(mockAudioAdapter.cleanupAudio).toHaveBeenCalled();
+    });
+  });
+
+  describe('autoplay 2-second buffer', () => {
+    function getOnEndedFromAdapter(): () => void {
+      const calls = (
+        mockAudioAdapter.changeCurrentAudio as ReturnType<typeof vi.fn>
+      ).mock.calls;
+      const last = calls[calls.length - 1];
+      if (!last?.[0]?.onEnded) {
+        throw new Error('changeCurrentAudio was not called with onEnded');
+      }
+      return last[0].onEnded;
+    }
+
+    it('when audio ends on Question step, starts 2s buffer then advances to Guess', async () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: true }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+
+      const onEnded = getOnEndedFromAdapter();
+      vi.useFakeTimers();
+
+      try {
+        act(() => {
+          onEnded();
+        });
+        expect(result.current.isBufferVisible).toBe(true);
+
+        act(() => {
+          vi.advanceTimersByTime(2000);
+        });
+        expect(result.current.currentStep).toBe(AudioQuizStep.Guess);
+        expect(result.current.isBufferVisible).toBe(false);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('when audio ends on Guess step, advances immediately (no buffer)', async () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: true }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+
+      act(() => {
+        result.current.nextStep(); // Question → Guess
+      });
+      expect(result.current.currentStep).toBe(AudioQuizStep.Guess);
+
+      const onEnded = getOnEndedFromAdapter();
+      act(() => {
+        onEnded();
+      });
+
+      expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
+      expect(result.current.isBufferVisible).toBe(false);
+    });
+
+    it('direct step navigation clears buffer', async () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: true }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+
+      const onEnded = getOnEndedFromAdapter();
+      act(() => {
+        onEnded();
+      });
+      expect(result.current.isBufferVisible).toBe(true);
+
+      act(() => {
+        result.current.goToQuestion();
+      });
+      expect(result.current.isBufferVisible).toBe(false);
+    });
+
+    it('pause does nothing while buffer is active', async () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: true }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+
+      const onEnded = getOnEndedFromAdapter();
+      act(() => {
+        onEnded();
+      });
+      expect(result.current.isBufferVisible).toBe(true);
+
+      (mockAudioAdapter.pause as ReturnType<typeof vi.fn>).mockClear();
+      act(() => {
+        result.current.pause();
+      });
+      expect(mockAudioAdapter.pause).not.toHaveBeenCalled();
     });
   });
 

@@ -127,6 +127,8 @@ export function createMockAudioQuizReturn(
     previousExampleReady: false,
     progressStatus: 0,
     isPlaying: false,
+    isBufferVisible: false,
+    bufferProgress: 0,
     pause: vi.fn<() => void>(),
     play: vi.fn<() => void>(),
     nextStep: vi.fn<() => void>(),

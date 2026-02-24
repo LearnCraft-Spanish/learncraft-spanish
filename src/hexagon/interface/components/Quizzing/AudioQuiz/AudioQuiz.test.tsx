@@ -38,11 +38,15 @@ function MockAudioQuizWrapper({
   audioQuizType,
   autoplay,
   customCleanup,
+  isBufferVisible = false,
+  bufferProgress = 0,
 }: {
   examplesToQuiz: ExampleWithVocabulary[];
   audioQuizType: AudioQuizType;
   autoplay: boolean;
   customCleanup?: () => void;
+  isBufferVisible?: boolean;
+  bufferProgress?: number;
 }) {
   const [currentExampleIndex, setCurrentExampleIndex] = React.useState(0);
   const [currentStep, setCurrentStep] = React.useState(AudioQuizStep.Question);
@@ -119,6 +123,8 @@ function MockAudioQuizWrapper({
     previousExampleReady: currentExampleIndex > 0,
     progressStatus: 0,
     isPlaying,
+    isBufferVisible,
+    bufferProgress,
     pause,
     play,
     nextStep,
@@ -271,6 +277,27 @@ describe('component AudioQuiz', () => {
       });
     });
   });
+  describe('buffer UI', () => {
+    it('renders buffer element when isBufferVisible is true', async () => {
+      render(
+        <AudioEngineProvider>
+          <MockAudioQuizWrapper
+            examplesToQuiz={unknownAudioExamples}
+            audioQuizType={AudioQuizType.Speaking}
+            autoplay
+            isBufferVisible
+            bufferProgress={0.5}
+          />
+        </AudioEngineProvider>,
+        { wrapper: MockAllProviders },
+      );
+      await waitFor(() => {
+        expect(screen.queryByText(/Playing English/i)).toBeInTheDocument();
+      });
+      expect(document.querySelector('.audioQuizBuffer')).toBeInTheDocument();
+    });
+  });
+
   describe('autoplay', () => {
     it('autoplay is true, 2nd step is guess', async () => {
       render(
