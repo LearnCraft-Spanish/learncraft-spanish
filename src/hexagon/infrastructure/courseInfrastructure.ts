@@ -4,6 +4,7 @@ import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
 
 import { createHttpClient } from '@infrastructure/http/client';
 import {
+  getAllCoursesWithLessonsEndpoint,
   getLessonRangeVocabRequiredEndpoint,
   getLessonsByVocabularyEndpoint,
   getLessonVocabKnownEndpoint,
@@ -21,6 +22,14 @@ export function createCourseInfrastructure(
       const response = await httpClient.get<CourseWithLessons[]>(
         getPublishedCoursesWithLessonsEndpoint.path,
         getPublishedCoursesWithLessonsEndpoint.requiredScopes,
+      );
+      return response;
+    },
+
+    getAllCoursesWithLessons: async (): Promise<CourseWithLessons[]> => {
+      const response = await httpClient.get<CourseWithLessons[]>(
+        getAllCoursesWithLessonsEndpoint.path,
+        getAllCoursesWithLessonsEndpoint.requiredScopes,
       );
       return response;
     },

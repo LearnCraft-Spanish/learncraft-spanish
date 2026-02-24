@@ -58,7 +58,9 @@ export function useExampleSearch() {
   });
 
   // Get course data for lesson calculations
-  const { data: coursesWithLessons } = useCoursesWithLessons();
+  const { data: coursesWithLessons } = useCoursesWithLessons(
+    filtersForUI.includeUnpublished,
+  );
 
   // Extract values needed for useEffect to avoid dependency issues
   const courseId = filtersForUI.courseId;
@@ -207,6 +209,7 @@ export function useExampleSearch() {
         excludeSpanglish: filtersForUI.excludeSpanglish,
         audioOnly: filtersForUI.audioOnly,
         lessonRanges: filtersForUI.filterState.lessonRanges,
+        includeUnpublished: filtersForUI.includeUnpublished,
       },
       quizResultsProps: {
         quizId,
@@ -229,6 +232,7 @@ export function useExampleSearch() {
       filtersForUI.excludeSpanglish,
       filtersForUI.audioOnly,
       filtersForUI.filterState.lessonRanges,
+      filtersForUI.includeUnpublished,
       quizId,
       spanishInput,
       englishInput,

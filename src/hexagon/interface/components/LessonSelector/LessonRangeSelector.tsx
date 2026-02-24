@@ -17,6 +17,7 @@ export default function LessonRangeSelector(): React.JSX.Element {
     updateUserSelectedCourseId,
     updateToLessonNumber,
     updateFromLessonNumber,
+    includeUnpublished,
   } = useSelectedCourseAndLessons();
 
   const fromLessons = useMemo((): ExtendedLesson[] => {
@@ -73,6 +74,7 @@ export default function LessonRangeSelector(): React.JSX.Element {
         onChange={(value: string) =>
           updateUserSelectedCourseId(Number.parseInt(value))
         }
+        includeUnpublished={includeUnpublished}
       />
       <div>
         {course?.lessons && (

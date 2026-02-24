@@ -101,6 +101,7 @@ export const useExampleQuery = (
           limit: currentPageSize,
           seed: seed!,
           disableCache,
+          includeUnpublished: filterState.includeUnpublished,
         },
       );
       return { examples, totalCount };
@@ -109,6 +110,7 @@ export const useExampleQuery = (
       exampleAdapter,
       skillTags,
       filterState.lessonRanges,
+      filterState.includeUnpublished,
       excludeSpanglish,
       audioOnly,
       page,

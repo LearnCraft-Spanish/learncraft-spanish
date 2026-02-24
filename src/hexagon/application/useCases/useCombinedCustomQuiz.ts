@@ -1,5 +1,6 @@
 import type { AudioQuizProps } from '@application/units/AudioQuiz/useAudioQuiz';
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
@@ -41,7 +42,7 @@ export interface UseCombinedCustomQuizReturn {
 
 export function useCombinedCustomQuiz(): UseCombinedCustomQuizReturn {
   const QUERY_PAGE_SIZE = 150;
-
+  const { isCoach, isAdmin } = useAuthAdapter();
   // Local state
   const [quizType, setQuizType] = useState<CombinedCustomQuizType>(
     CombinedCustomQuizType.Text,
@@ -65,7 +66,7 @@ export function useCombinedCustomQuiz(): UseCombinedCustomQuizReturn {
     totalCount,
     error: errorExamples,
     updatePageSize,
-  } = useExampleQuery(QUERY_PAGE_SIZE, audioRequired);
+  } = useExampleQuery(QUERY_PAGE_SIZE, audioRequired, isCoach || isAdmin);
 
   // Update the ref when we successfully get data
   if (totalCount !== null && !hasLoadedDataBefore.current) {

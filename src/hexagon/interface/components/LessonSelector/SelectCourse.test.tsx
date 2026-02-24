@@ -1,12 +1,12 @@
 import SelectCourse from '@interface/components/LessonSelector/SelectCourse';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { createRealisticCourseWithLessonsList } from '@testing/factories/courseFactory';
-import { vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+const mockUseCoursesWithLessons = vi.fn();
 vi.mock('@application/queries/useCoursesWithLessons', () => ({
-  useCoursesWithLessons: () => ({
-    data: createRealisticCourseWithLessonsList(),
-  }),
+  useCoursesWithLessons: (includeUnpublished?: boolean) =>
+    mockUseCoursesWithLessons(includeUnpublished),
 }));
 
 const mockProps = {
@@ -19,6 +19,12 @@ const courseNames = createRealisticCourseWithLessonsList().map(
 );
 
 describe('component SelectCourse', () => {
+  beforeEach(() => {
+    mockUseCoursesWithLessons.mockReturnValue({
+      data: createRealisticCourseWithLessonsList(),
+    });
+  });
+
   it('should render with label and select', () => {
     render(<SelectCourse {...mockProps} />);
     expect(screen.getByText('Course:')).toBeInTheDocument();
@@ -41,5 +47,15 @@ describe('component SelectCourse', () => {
       });
     });
     expect(mockProps.onChange).toHaveBeenCalledWith('2');
+  });
+
+  it('calls useCoursesWithLessons with false when includeUnpublished is not passed', () => {
+    render(<SelectCourse {...mockProps} />);
+    expect(mockUseCoursesWithLessons).toHaveBeenCalledWith(false);
+  });
+
+  it('calls useCoursesWithLessons with true when includeUnpublished is true', () => {
+    render(<SelectCourse {...mockProps} includeUnpublished />);
+    expect(mockUseCoursesWithLessons).toHaveBeenCalledWith(true);
   });
 });

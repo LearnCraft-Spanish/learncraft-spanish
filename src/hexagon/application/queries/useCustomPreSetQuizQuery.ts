@@ -1,9 +1,10 @@
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
+import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useSkillTags } from '@application/queries/useSkillTags';
 import { transformToLessonRanges } from '@domain/coursePrerequisites';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { use, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 export function useCustomPreSetQuizQuery({
@@ -15,6 +16,8 @@ export function useCustomPreSetQuizQuery({
 }) {
   const exampleAdapter = useExampleAdapter();
   const { course, toLesson, fromLesson } = useSelectedCourseAndLessons();
+  const { exampleFilters } = use(ExampleFilterContext);
+  const includeUnpublished = exampleFilters.includeUnpublished ?? false;
 
   const skillTags = useSkillTags();
 
@@ -34,7 +37,7 @@ export function useCustomPreSetQuizQuery({
   }, [course, fromLesson, toLesson]);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['customPreSetQuiz', quizTitle, lessonRanges],
+    queryKey: ['customPreSetQuiz', quizTitle, lessonRanges, includeUnpublished],
     queryFn: () =>
       exampleAdapter.getFilteredExamples({
         lessonRanges,
@@ -44,6 +47,7 @@ export function useCustomPreSetQuizQuery({
         page: 1,
         limit: 150,
         seed: uuidv4(),
+        includeUnpublished,
       }),
     enabled: !!course && !!toLesson,
   });

@@ -37,6 +37,7 @@ export function createExampleInfrastructure(
       limit: number;
       seed: string;
       disableCache?: boolean;
+      includeUnpublished?: boolean;
     }): Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }> => {
       // Always use lesson ranges - no more backward compatibility
       const filters = {

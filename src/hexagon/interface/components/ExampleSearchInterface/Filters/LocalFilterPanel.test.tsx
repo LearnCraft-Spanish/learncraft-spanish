@@ -19,6 +19,7 @@ vi.mock(
         defaultFromLesson: 1,
         defaultToLesson: 10,
       })),
+      includeUnpublished: false,
     })),
   }),
 );

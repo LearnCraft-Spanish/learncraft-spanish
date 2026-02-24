@@ -13,6 +13,7 @@ export interface ExampleFilters {
   excludeSpanglish?: boolean;
   audioOnly?: boolean;
   skillTags?: SkillTag[];
+  includeUnpublished?: boolean;
 }
 
 export interface ExamplePort {
@@ -26,6 +27,7 @@ export interface ExamplePort {
     limit,
     seed,
     disableCache,
+    includeUnpublished,
   }: {
     lessonRanges: LessonRange[]; // Always required - no more single course params
     excludeSpanglish?: boolean;
@@ -35,6 +37,7 @@ export interface ExamplePort {
     limit: number;
     seed: string;
     disableCache?: boolean;
+    includeUnpublished?: boolean;
   }) => Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }>;
   getExamplesByIds: (ids: number[]) => Promise<ExampleWithVocabulary[]>;
   // Returns more traits for editing

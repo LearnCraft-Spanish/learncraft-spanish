@@ -48,12 +48,17 @@ export function LocalFilterPanel({
   onFromLessonChange,
   onToLessonChange,
 }: LocalFilterPanelProps) {
-  const { course, fromLessons, toLessons, getDefaultLessonsForCourse } =
-    useLocalFilterPanelLogic({
-      selectedCourseId,
-      fromLessonNumber,
-      toLessonNumber,
-    });
+  const {
+    course,
+    fromLessons,
+    toLessons,
+    getDefaultLessonsForCourse,
+    includeUnpublished,
+  } = useLocalFilterPanelLogic({
+    selectedCourseId,
+    fromLessonNumber,
+    toLessonNumber,
+  });
 
   const handleCourseChange = (courseId: number) => {
     onCourseChange(courseId);
@@ -74,6 +79,7 @@ export function LocalFilterPanel({
                 handleCourseChange(Number.parseInt(value))
               }
               required
+              includeUnpublished={includeUnpublished}
             />
             <div>
               {course?.lessons && (

@@ -7,12 +7,14 @@ export interface LocalFilterPanelResultsProps {
   excludeSpanglish: boolean;
   audioOnly: boolean;
   lessonRanges: LessonRange[];
+  includeUnpublished?: boolean;
 }
 export function LocalFilterPanelResults({
   skillTags,
   excludeSpanglish,
   audioOnly,
   lessonRanges,
+  includeUnpublished,
 }: LocalFilterPanelResultsProps) {
   const { examples, isLoading, error, paginationState } =
     useLocalFilterPanelResults({
@@ -20,6 +22,7 @@ export function LocalFilterPanelResults({
       excludeSpanglish,
       audioOnly,
       lessonRanges,
+      includeUnpublished,
     });
 
   return (

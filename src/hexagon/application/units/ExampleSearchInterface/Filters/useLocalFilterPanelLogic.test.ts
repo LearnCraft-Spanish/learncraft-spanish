@@ -1,3 +1,5 @@
+import type { ExampleFilterContextType } from '@application/coordinators/contexts/ExampleFilterContext';
+import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
 import {
   overrideMockUseCoursesWithLessons,
   resetMockUseCoursesWithLessons,
@@ -5,6 +7,7 @@ import {
 import { useLocalFilterPanelLogic } from '@application/units/ExampleSearchInterface/Filters/useLocalFilterPanelLogic';
 import { renderHook } from '@testing-library/react';
 import { createMockCourseWithLessons } from '@testing/factories/courseFactory';
+import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the useCoursesWithLessons hook
@@ -305,5 +308,46 @@ describe('useLocalFilterPanelLogic', () => {
     // Should default to virtual lesson (negative number)
     expect(defaults.defaultFromLesson).toBeLessThan(0);
     expect(defaults.defaultToLesson).toBe(2); // Last lesson of the course
+  });
+
+  it('returns includeUnpublished from ExampleFilterContext when true', () => {
+    const contextValue: ExampleFilterContextType = {
+      exampleFilters: {
+        excludeSpanglish: false,
+        audioOnly: false,
+        skillTagKeys: [],
+        includeUnpublished: true,
+      },
+      updateExampleFilters: vi.fn(),
+    };
+    const wrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(
+        ExampleFilterContext.Provider,
+        { value: contextValue },
+        children,
+      );
+
+    const { result } = renderHook(
+      () =>
+        useLocalFilterPanelLogic({
+          selectedCourseId: 0,
+          fromLessonNumber: 0,
+          toLessonNumber: 0,
+        }),
+      { wrapper },
+    );
+
+    expect(result.current.includeUnpublished).toBe(true);
+  });
+
+  it('returns includeUnpublished false when context has includeUnpublished false', () => {
+    const { result } = renderHook(() =>
+      useLocalFilterPanelLogic({
+        selectedCourseId: 0,
+        fromLessonNumber: 0,
+        toLessonNumber: 0,
+      }),
+    );
+    expect(result.current.includeUnpublished).toBe(false);
   });
 });
