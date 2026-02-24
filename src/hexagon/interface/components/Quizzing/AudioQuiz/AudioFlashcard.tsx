@@ -14,6 +14,10 @@ interface AudioFlashcardProps {
   nextStep: () => void;
   autoplay: boolean;
   progressStatus: number;
+  /** True when the buffer should be shown (Question, Hint, Answer only – from hook) */
+  isBufferVisible: boolean;
+  /** 0–1 progress of the buffer (for countdown bar) */
+  bufferProgress: number;
   pause: () => void;
   play: () => void;
   isPlaying: boolean;
@@ -30,6 +34,8 @@ export default function AudioFlashcardComponent({
   nextStep,
   autoplay,
   progressStatus,
+  isBufferVisible,
+  bufferProgress,
   pause,
   play,
   isPlaying,
@@ -95,6 +101,28 @@ export default function AudioFlashcardComponent({
             }}
           />
         )}
+      {autoplay && isBufferVisible && (
+        <div className="audioQuizBuffer" aria-live="polite">
+          <svg
+            className="audioQuizBufferCircle"
+            viewBox="0 0 24 24"
+            aria-hidden
+          >
+            <circle
+              className="audioQuizBufferCircleStroke"
+              cx="12"
+              cy="12"
+              r="10"
+              fill="none"
+              strokeDasharray={2 * Math.PI * 10}
+              strokeDashoffset={
+                2 * Math.PI * 10 * Math.min(bufferProgress / 0.9, 1)
+              }
+              style={{ transition: 'stroke-dashoffset 0.02s linear' }}
+            />
+          </svg>
+        </div>
+      )}
       {addPendingRemoveProps && currentStep === AudioQuizStep.Answer && (
         <div className="AddPendingRemoveButtons">
           <AddToMyFlashcardsButtons

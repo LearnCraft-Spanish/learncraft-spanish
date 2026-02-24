@@ -78,6 +78,29 @@ button:disabled {
 
 .progressStatus {
   z-index: 1;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.audioQuizBuffer {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.audioQuizBufferCircle {
+  width: 44px;
+  height: 44px;
+  transform: rotate(-90deg); /* start countdown from top */
+}
+
+.audioQuizBufferCircleStroke {
+  stroke: var(--brand);
+  stroke-width: 3;
 }
 
 .getHelpContainer {

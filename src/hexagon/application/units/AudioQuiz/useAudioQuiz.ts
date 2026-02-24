@@ -44,6 +44,10 @@ export interface AudioQuizReturn {
   previousExampleReady: boolean;
   progressStatus: number;
   isPlaying: boolean;
+  /** True when the 2s buffer is active and we're on a step that shows it (Question, Hint, Answer only – not Guess) */
+  isBufferVisible: boolean;
+  /** 0–1 progress of the 2-second buffer (for UI) */
+  bufferProgress: number;
   pause: () => void;
   play: () => void;
   nextStep: () => void;
@@ -119,8 +123,8 @@ export function useAudioQuiz({
   cleanupFunction, // Function to clean up the quiz
 }: AudioQuizProps): AudioQuizReturn {
   const {
-    play,
-    pause,
+    play: playAudio,
+    pause: pauseAudio,
     isPlaying,
     currentTime,
     changeCurrentAudio,
@@ -190,7 +194,27 @@ export function useAudioQuiz({
   // State to trigger audio restart without changing step or example
   const [restartTrigger, setRestartTrigger] = useState<number>(0);
 
-  // The current example number (1-indexed for UI purposes)
+  // 2-second buffer between steps in autoplay (gives users time to guess)
+  const BUFFER_MS = 2000;
+  const BUFFER_TICK_MS = 25;
+  const [isBufferActive, setIsBufferActive] = useState<boolean>(false);
+  const [bufferProgress, setBufferProgress] = useState<number>(0);
+  const bufferTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bufferIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const clearBufferTimers = useCallback(() => {
+    if (bufferTimeoutRef.current) {
+      clearTimeout(bufferTimeoutRef.current);
+      bufferTimeoutRef.current = null;
+    }
+    if (bufferIntervalRef.current) {
+      clearInterval(bufferIntervalRef.current);
+      bufferIntervalRef.current = null;
+    }
+    setIsBufferActive(false);
+    setBufferProgress(0);
+  }, []);
+
   // Used only in export for UI, should not be referenced for stateful logic
   const currentExampleNumber = currentExampleIndex + 1; // 1-indexed
 
@@ -363,6 +387,7 @@ export function useAudioQuiz({
 
   // Simple utility functions to increment and decrement the example index
   const nextExample = useCallback(() => {
+    clearBufferTimers();
     if (nextExampleReady) {
       setSelectedExampleIndex(currentExampleIndex + 1);
       setCurrentStep(AudioQuizStep.Question);
@@ -381,9 +406,11 @@ export function useAudioQuiz({
     safeExamples.length,
     setSelectedExampleIndex,
     nextExampleReady,
+    clearBufferTimers,
   ]);
 
   const previousExample = useCallback(() => {
+    clearBufferTimers();
     if (previousExampleReady) {
       // Go to the previous example if it is ready
       setSelectedExampleIndex(currentExampleIndex - 1);
@@ -392,10 +419,16 @@ export function useAudioQuiz({
       // Reset the previous step ref to null so progress animation works immediately on new example
       previousStepRef.current = null;
     }
-  }, [currentExampleIndex, setSelectedExampleIndex, previousExampleReady]);
+  }, [
+    currentExampleIndex,
+    setSelectedExampleIndex,
+    previousExampleReady,
+    clearBufferTimers,
+  ]);
 
   // Resets the quiz to the initial state, called on menu and end of autoplay
   const restartQuiz = useCallback(() => {
+    clearBufferTimers();
     setSelectedExampleIndex(0);
     setCurrentStep(AudioQuizStep.Question);
     previousStepRef.current = null;
@@ -409,10 +442,11 @@ export function useAudioQuiz({
     if (getHelpIsOpen) {
       setGetHelpIsOpen(false);
     }
-  }, [cleanupAudio, getHelpIsOpen]);
+  }, [cleanupAudio, getHelpIsOpen, clearBufferTimers]);
 
   // Steps the quiz forward
   const nextStep = useCallback(() => {
+    clearBufferTimers();
     switch (currentStep) {
       case AudioQuizStep.Question:
         if (autoplay) {
@@ -435,7 +469,7 @@ export function useAudioQuiz({
       default:
         console.error('Invalid currentStep value: ', currentStep);
     }
-  }, [autoplay, currentStep, nextExample]);
+  }, [autoplay, currentStep, nextExample, clearBufferTimers]);
 
   // Get the values related to the current step
   const currentStepValue = useMemo(() => {
@@ -507,41 +541,86 @@ export function useAudioQuiz({
     currentExampleIndex,
   ]);
 
-  // What to do when the audio ends - simplified since concatenated audio handles padding
+  // What to do when the audio ends - 2s buffer only after Question, Hint, Answer (not after Guess)
   const onEndedCallback = useCallback(() => {
     if (!autoplay) {
       return;
     }
 
-    // No need for complex padding logic - concatenated audio handles it seamlessly
-    nextStep();
-  }, [autoplay, nextStep]);
+    if (currentStep === AudioQuizStep.Guess) {
+      nextStep();
+      return;
+    }
+
+    // Start 2-second buffer before advancing from Question, Hint, or Answer
+    clearBufferTimers();
+    setIsBufferActive(true);
+    setBufferProgress(0);
+
+    let elapsed = 0;
+    bufferIntervalRef.current = setInterval(() => {
+      elapsed += BUFFER_TICK_MS;
+      const progress = Math.min(elapsed / BUFFER_MS, 1);
+      setBufferProgress(progress);
+    }, BUFFER_TICK_MS);
+
+    bufferTimeoutRef.current = setTimeout(() => {
+      clearBufferTimers();
+      nextStep();
+    }, BUFFER_MS);
+  }, [autoplay, currentStep, nextStep, clearBufferTimers]);
+
+  // Single display flag: buffer is shown only on Question, Hint, Answer (not Guess)
+  const isBufferVisible = useMemo(
+    () =>
+      isBufferActive &&
+      (currentStep === AudioQuizStep.Question ||
+        currentStep === AudioQuizStep.Hint ||
+        currentStep === AudioQuizStep.Answer),
+    [isBufferActive, currentStep],
+  );
 
   const goToQuestion = useCallback(() => {
+    clearBufferTimers();
     setCurrentStep(AudioQuizStep.Question);
     // Let the main useEffect handle audio changes for consistency
-  }, []);
+  }, [clearBufferTimers]);
 
   const goToGuess = useCallback(() => {
+    clearBufferTimers();
     setCurrentStep(AudioQuizStep.Guess);
     // Let the main useEffect handle audio changes for consistency
-  }, []);
+  }, [clearBufferTimers]);
 
   const goToHint = useCallback(() => {
+    clearBufferTimers();
     setCurrentStep(AudioQuizStep.Hint);
     // Let the main useEffect handle audio changes for consistency
-  }, []);
+  }, [clearBufferTimers]);
 
   const goToAnswer = useCallback(() => {
+    clearBufferTimers();
     setCurrentStep(AudioQuizStep.Answer);
     // Let the main useEffect handle audio changes for consistency
-  }, []);
+  }, [clearBufferTimers]);
 
   const restartCurrentStep = useCallback(() => {
+    clearBufferTimers();
     // Trigger a restart by incrementing the restart trigger
     // This will cause the audio effect to restart without changing step or example
     setRestartTrigger((prev) => prev + 1);
-  }, []);
+  }, [clearBufferTimers]);
+
+  const pause = useCallback(() => {
+    if (isBufferActive) return;
+    clearBufferTimers();
+    pauseAudio();
+  }, [isBufferActive, clearBufferTimers, pauseAudio]);
+
+  const play = useCallback(() => {
+    if (isBufferActive) return;
+    playAudio();
+  }, [isBufferActive, playAudio]);
 
   // Effect to parse the audio examples when the current example is ready
   useEffect(() => {
@@ -600,6 +679,7 @@ export function useAudioQuiz({
 
     // check if quiz ended, end current audio
     if (isQuizComplete) {
+      clearBufferTimers();
       cleanupAudio();
       return;
     }
@@ -647,6 +727,7 @@ export function useAudioQuiz({
     currentStepValue,
     restartTrigger,
     isQuizComplete,
+    clearBufferTimers,
     cleanupAudio,
     changeCurrentAudio,
     onEndedCallback,
@@ -655,9 +736,10 @@ export function useAudioQuiz({
   // Cleanup audio when the quiz component unmounts or cleanupFunction is called
   useEffect(() => {
     return () => {
+      clearBufferTimers();
       cleanupAudio();
     };
-  }, [cleanupAudio]);
+  }, [cleanupAudio, clearBufferTimers]);
 
   // for getHelp
   const vocabComplete = useMemo(() => {
@@ -739,6 +821,8 @@ export function useAudioQuiz({
     nextExampleReady, // Whether the next example is ready to be played
     previousExampleReady, // Whether the previous example is ready to be played
     isPlaying,
+    isBufferVisible,
+    bufferProgress,
     pause, // Pauses the current audio
     play,
     nextStep,

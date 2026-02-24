@@ -91,6 +91,8 @@ export default function AudioQuiz({
     currentStep,
     autoplay,
     audioQuizType,
+    isBufferVisible,
+    bufferProgress,
     cleanupFunction,
     isQuizComplete,
     restartQuiz,
@@ -186,6 +188,8 @@ export default function AudioQuiz({
               nextStep={nextStep}
               autoplay={autoplay}
               progressStatus={progressStatus}
+              isBufferVisible={isBufferVisible}
+              bufferProgress={bufferProgress}
               pause={pause}
               play={play}
               isPlaying={isPlaying}
