@@ -92,6 +92,16 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
     queryKey: ['flashcards', userId],
     queryFn: () => getFlashcards(),
     enabled: hasAccess && appUser !== null && userId !== undefined,
+    select: (data) =>
+      [...data].sort((a, b) => {
+        const timeA = a.dateCreated
+          ? new Date(a.dateCreated).getTime()
+          : 0;
+        const timeB = b.dateCreated
+          ? new Date(b.dateCreated).getTime()
+          : 0;
+        return timeB - timeA;
+      }),
     ...queryDefaults.entityData,
   });
 

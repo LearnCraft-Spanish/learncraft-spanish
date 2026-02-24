@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 export interface PaginationState {
   totalItems: number;
@@ -24,14 +24,9 @@ export function usePagination({
   totalItems,
 }: UsePaginationParams): PaginationState {
   const [selectedPageNumber, setSelectedPageNumber] = useState(1);
-  const previousTotalItems = useRef(0);
   const maxPage = Math.ceil(totalItems / itemsPerPage);
 
   const safePageNumber = useMemo(() => {
-    if (previousTotalItems.current !== totalItems) {
-      previousTotalItems.current = totalItems;
-      return 1;
-    }
     if (selectedPageNumber > maxPage) {
       return maxPage;
     }
@@ -39,7 +34,7 @@ export function usePagination({
       return 1;
     }
     return selectedPageNumber;
-  }, [selectedPageNumber, maxPage, totalItems]);
+  }, [selectedPageNumber, maxPage]);
 
   const startIndex = useMemo(() => {
     return (safePageNumber - 1) * itemsPerPage;
