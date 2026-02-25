@@ -67,6 +67,9 @@ export interface AudioQuizReturn {
   addPendingRemoveProps: AddPendingRemoveProps | undefined;
 }
 
+// Autoplay buffer: extra time after hint/answer audio ends (seconds)
+const AUDIO_QUIZ_BUFFER_SECONDS = 2;
+
 /**
  * Audio Quiz Orchestration Hook
  * =============================
@@ -190,8 +193,6 @@ export function useAudioQuiz({
   // State to trigger audio restart without changing step or example
   const [restartTrigger, setRestartTrigger] = useState<number>(0);
 
-  // Autoplay buffer: extra time after hint/answer audio ends (seconds)
-  const BUFFER_SECONDS = 2;
   const stepHasBuffer =
     autoplay &&
     (currentStep === AudioQuizStep.Hint ||
@@ -536,7 +537,7 @@ export function useAudioQuiz({
 
     const duration = currentStepValue.duration;
     const effectiveDuration = stepHasBuffer
-      ? duration + BUFFER_SECONDS
+      ? duration + AUDIO_QUIZ_BUFFER_SECONDS
       : duration;
     let progress: number;
     if (isInBufferRef.current) {
@@ -587,7 +588,7 @@ export function useAudioQuiz({
           bufferPausedElapsedRef.current +
           (Date.now() - bufferStartTimeRef.current) / 1000;
         setBufferTimeElapsed(elapsed);
-        if (elapsed >= BUFFER_SECONDS) {
+        if (elapsed >= AUDIO_QUIZ_BUFFER_SECONDS) {
           cleanupBuffer();
           nextStep();
         }
@@ -650,7 +651,7 @@ export function useAudioQuiz({
           bufferPausedElapsedRef.current +
           (Date.now() - bufferStartTimeRef.current) / 1000;
         setBufferTimeElapsed(elapsed);
-        if (elapsed >= BUFFER_SECONDS) {
+        if (elapsed >= AUDIO_QUIZ_BUFFER_SECONDS) {
           cleanupBuffer();
           nextStep();
         }
