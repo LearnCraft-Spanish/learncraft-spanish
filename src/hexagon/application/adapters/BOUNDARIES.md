@@ -31,32 +31,12 @@ Enforcing boundaries between infrastructure and application:
 - **NO classes or OOP** (functions/hooks only)
 - **NO direct HTTP calls** (use infrastructure)
 
-## Adapter Pattern
-
-**This is a central pattern for adapting hexagonal architecture to React.** Adapters are boundary enforcers that do basically nothing - just call infrastructure and ensure it matches the port:
-
-```typescript
-export function useVocabularyAdapter(): VocabularyPort {
-  const apiUrl = config.backendDomain;
-  const auth = useAuthAdapter();
-  return createVocabularyInfrastructure(apiUrl, auth);
-}
-```
-
-The adapter:
-
-1. Gets dependencies (config, auth adapter)
-2. Calls infrastructure factory or hook with those dependencies
-3. Returns the infrastructure implementation (which matches the port)
-
-**The infrastructure is the real adapter** (adapting external services). The adapter in `application/adapters/` exists **for the boundaries** - to enforce architectural separation and ensure type safety.
-
 ## Dependency Rules
 
 **Adapters can depend on:**
 
 - ✅ `application/ports/` - Port interfaces to implement
-- ✅ `infrastructure/` - Concrete implementations to wrap
+- ✅ `infrastructure/` - Concrete implementations to wrap (exception - see DECISIONS.md)
 - ✅ React hooks (for React-specific concerns like config/context)
 - ❌ Cannot import from `application/useCases/` or `application/units/` (would create circular dependency)
 - ❌ Cannot import from `interface/` or `composition/`

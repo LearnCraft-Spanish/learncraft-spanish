@@ -1,54 +1,39 @@
 # LearnCraft Spanish
 
-This is a web application for learning Spanish vocabulary.
+A web application for learning Spanish, built with React, TypeScript, and hexagonal architecture.
 
-## Development
+---
 
-```bash
-# Install dependencies
-npm install
+## Overview
 
-# Start development server
-npm run dev
-```
+**LearnCraft Spanish** helps English speakers learn Spanish through interactive vocabulary practice, customizable quizzes, spaced repetition flashcards, and course progression tracking. Supports Student, Coach, and Admin roles.
 
-## Testing
+**Tech stack**: React 19, TypeScript, Vite, TanStack Query, Auth0, Vitest, ESLint, Prettier, Netlify.
 
-This project uses Vitest for testing. There are two separate test configurations:
+---
 
-### Main Tests
+## Quick Start
 
 ```bash
-# Run all tests with the default configuration
-npm test
-
-# Run specific tests
-npm test -- path/to/test.ts
+git clone <repository-url>
+cd learncraft-spanish
+pnpm install:local
+cp .env.development .env   # edit with your Auth0/API credentials
+pnpm start                 # http://localhost:5173
 ```
 
-### Hexagon Tests
+**Prerequisites**: Node.js >= 16, pnpm >= 7, Git.
 
-Hexagon tests use a special configuration that sets up the proper test environment with mocks.
+---
 
-```bash
-# Run all hexagon tests
-npm test -- src/hexagon/**/*.test.ts --config vitest.config-hexagon.ts
+## Documentation
 
-# Run specific hexagon tests
-npm test -- src/hexagon/path/to/test.ts --config vitest.config-hexagon.ts
-```
+Start with [`documentation/ONBOARDING.md`](./documentation/ONBOARDING.md) — it walks through setup, engineering principles, architecture, and all project documentation in the right order.
 
-> **Important:** When running hexagon tests, always specify the hexagon config file using `--config vitest.config-hexagon.ts`. This ensures the proper test setup and mock initialization.
+For AI agents: [`CLAUDE.md`](./CLAUDE.md).
 
-## Architecture
+---
 
-This project uses a hexagonal architecture approach with:
+## License
 
-- Interface layer: Components and UI logic
-- Application layer: Use cases and business logic
-- Domain layer: Core business entities and rules
-- Adapter layer: External services integration
-
-## Contributing
-
-Please make sure to write tests for new features and ensure all tests pass before submitting pull requests.
+ISC
