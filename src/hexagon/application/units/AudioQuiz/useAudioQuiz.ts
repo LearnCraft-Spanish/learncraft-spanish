@@ -151,9 +151,7 @@ export function useAudioQuiz({
 
   const [isBuffering, setIsBuffering] = useState(false);
   const [bufferProgress, setBufferProgress] = useState(0);
-  const bufferIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
-    null,
-  );
+  const bufferIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Examples that have bad audio and should be skipped
   const [badAudioExamples, setBadAudioExamples] = useState<number[]>([]);
