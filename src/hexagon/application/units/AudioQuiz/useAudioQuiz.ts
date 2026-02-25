@@ -563,6 +563,21 @@ export function useAudioQuiz({
   lastCurrentTimeRef.current = currentTime;
   lastStepDurationRef.current = currentStepValue?.duration ?? 0;
 
+  const startBufferInterval = useCallback((): ReturnType<
+    typeof setInterval
+  > => {
+    return setInterval(() => {
+      const elapsed =
+        bufferPausedElapsedRef.current +
+        (Date.now() - bufferStartTimeRef.current) / 1000;
+      setBufferTimeElapsed(elapsed);
+      if (elapsed >= AUDIO_QUIZ_BUFFER_SECONDS) {
+        cleanupBuffer();
+        nextStep();
+      }
+    }, 50);
+  }, [cleanupBuffer, nextStep]);
+
   // What to do when the audio ends - simplified since concatenated audio handles padding
   const onEndedCallback = useCallback((): void => {
     if (!autoplay) {
@@ -583,20 +598,11 @@ export function useAudioQuiz({
         return;
       }
 
-      bufferIntervalRef.current = setInterval(() => {
-        const elapsed =
-          bufferPausedElapsedRef.current +
-          (Date.now() - bufferStartTimeRef.current) / 1000;
-        setBufferTimeElapsed(elapsed);
-        if (elapsed >= AUDIO_QUIZ_BUFFER_SECONDS) {
-          cleanupBuffer();
-          nextStep();
-        }
-      }, 50);
+      bufferIntervalRef.current = startBufferInterval();
     } else {
       nextStep();
     }
-  }, [autoplay, nextStep, stepHasBuffer, cleanupBuffer]);
+  }, [autoplay, nextStep, stepHasBuffer, startBufferInterval]);
 
   const goToQuestion = useCallback(() => {
     setCurrentStep(AudioQuizStep.Question);
@@ -646,21 +652,12 @@ export function useAudioQuiz({
     if (isInBufferRef.current) {
       bufferStartTimeRef.current = Date.now();
       setVisualIsPlaying(true);
-      bufferIntervalRef.current = setInterval(() => {
-        const elapsed =
-          bufferPausedElapsedRef.current +
-          (Date.now() - bufferStartTimeRef.current) / 1000;
-        setBufferTimeElapsed(elapsed);
-        if (elapsed >= AUDIO_QUIZ_BUFFER_SECONDS) {
-          cleanupBuffer();
-          nextStep();
-        }
-      }, 50);
+      bufferIntervalRef.current = startBufferInterval();
       return;
     }
     await play();
     setVisualIsPlaying(true);
-  }, [play, cleanupBuffer, nextStep]);
+  }, [play, startBufferInterval]);
 
   // Effect to parse the audio examples when the current example is ready
   useEffect(() => {
