@@ -398,6 +398,7 @@ export function useAudioQuiz({
   // Simple utility functions to increment and decrement the example index
   const nextExample = useCallback(() => {
     cleanupBuffer();
+    userRequestedPauseRef.current = false;
     if (nextExampleReady) {
       setSelectedExampleIndex(currentExampleIndex + 1);
       setCurrentStep(AudioQuizStep.Question);
@@ -421,6 +422,7 @@ export function useAudioQuiz({
 
   const previousExample = useCallback(() => {
     cleanupBuffer();
+    userRequestedPauseRef.current = false;
     if (previousExampleReady) {
       // Go to the previous example if it is ready
       setSelectedExampleIndex(currentExampleIndex - 1);
@@ -439,6 +441,7 @@ export function useAudioQuiz({
   // Resets the quiz to the initial state, called on menu and end of autoplay
   const restartQuiz = useCallback(() => {
     cleanupBuffer();
+    userRequestedPauseRef.current = false;
     setVisualIsPlaying(false);
     setSelectedExampleIndex(0);
     setCurrentStep(AudioQuizStep.Question);
@@ -455,31 +458,60 @@ export function useAudioQuiz({
     }
   }, [cleanupAudio, cleanupBuffer, getHelpIsOpen]);
 
+  const goToQuestion = useCallback(() => {
+    userRequestedPauseRef.current = false;
+    setCurrentStep(AudioQuizStep.Question);
+    // Let the main useEffect handle audio changes for consistency
+  }, []);
+
+  const goToGuess = useCallback(() => {
+    userRequestedPauseRef.current = false;
+    setCurrentStep(AudioQuizStep.Guess);
+    // Let the main useEffect handle audio changes for consistency
+  }, []);
+
+  const goToHint = useCallback(() => {
+    userRequestedPauseRef.current = false;
+    setCurrentStep(AudioQuizStep.Hint);
+    // Let the main useEffect handle audio changes for consistency
+  }, []);
+
+  const goToAnswer = useCallback(() => {
+    userRequestedPauseRef.current = false;
+    setCurrentStep(AudioQuizStep.Answer);
+    // Let the main useEffect handle audio changes for consistency
+  }, []);
+
+  const restartCurrentStep = useCallback(() => {
+    userRequestedPauseRef.current = false;
+    // Trigger a restart by incrementing the restart trigger
+    // This will cause the audio effect to restart without changing step or example
+    setRestartTrigger((prev) => prev + 1);
+  }, []);
+
   // Steps the quiz forward
   const nextStep = useCallback(() => {
     switch (currentStep) {
       case AudioQuizStep.Question:
         if (autoplay) {
-          setCurrentStep(AudioQuizStep.Guess);
+          goToGuess();
         } else {
-          setCurrentStep(AudioQuizStep.Hint);
+          goToHint();
         }
         break;
       case AudioQuizStep.Guess:
-        setCurrentStep(AudioQuizStep.Hint);
-
+        goToHint();
         break;
       case AudioQuizStep.Hint:
-        setCurrentStep(AudioQuizStep.Answer);
+        goToAnswer();
         break;
       case AudioQuizStep.Answer:
         nextExample();
-        // Proceed to next question
         break;
       default:
         console.error('Invalid currentStep value: ', currentStep);
     }
-  }, [autoplay, currentStep, nextExample]);
+  }, [autoplay, currentStep, goToGuess, goToHint, goToAnswer, nextExample]);
 
   // Get the values related to the current step
   const currentStepValue = useMemo(() => {
@@ -603,32 +635,6 @@ export function useAudioQuiz({
       nextStep();
     }
   }, [autoplay, nextStep, stepHasBuffer, startBufferInterval]);
-
-  const goToQuestion = useCallback(() => {
-    setCurrentStep(AudioQuizStep.Question);
-    // Let the main useEffect handle audio changes for consistency
-  }, []);
-
-  const goToGuess = useCallback(() => {
-    setCurrentStep(AudioQuizStep.Guess);
-    // Let the main useEffect handle audio changes for consistency
-  }, []);
-
-  const goToHint = useCallback(() => {
-    setCurrentStep(AudioQuizStep.Hint);
-    // Let the main useEffect handle audio changes for consistency
-  }, []);
-
-  const goToAnswer = useCallback(() => {
-    setCurrentStep(AudioQuizStep.Answer);
-    // Let the main useEffect handle audio changes for consistency
-  }, []);
-
-  const restartCurrentStep = useCallback(() => {
-    // Trigger a restart by incrementing the restart trigger
-    // This will cause the audio effect to restart without changing step or example
-    setRestartTrigger((prev) => prev + 1);
-  }, []);
 
   const wrappedPause = useCallback(async (): Promise<void> => {
     if (isInBufferRef.current) {
