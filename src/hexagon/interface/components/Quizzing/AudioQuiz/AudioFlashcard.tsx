@@ -116,7 +116,7 @@ export default function AudioFlashcardComponent({
               fill="none"
               strokeDasharray={2 * Math.PI * 10}
               strokeDashoffset={
-                2 * Math.PI * 10 * Math.min(bufferProgress / 0.9, 1)
+                -2 * Math.PI * 10 * Math.min(bufferProgress / 0.9, 1)
               }
               style={{ transition: 'stroke-dashoffset 0.02s linear' }}
             />
