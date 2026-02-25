@@ -194,7 +194,8 @@ export function useAudioQuiz({
   const BUFFER_SECONDS = 2;
   const stepHasBuffer =
     autoplay &&
-    (currentStep === AudioQuizStep.Hint || currentStep === AudioQuizStep.Answer);
+    (currentStep === AudioQuizStep.Hint ||
+      currentStep === AudioQuizStep.Answer);
 
   // Buffer state: visual progress continues after audio ends on hint/answer
   const isInBufferRef = useRef(false);
@@ -427,7 +428,12 @@ export function useAudioQuiz({
       // Reset the previous step ref to null so progress animation works immediately on new example
       previousStepRef.current = null;
     }
-  }, [currentExampleIndex, setSelectedExampleIndex, previousExampleReady, cleanupBuffer]);
+  }, [
+    currentExampleIndex,
+    setSelectedExampleIndex,
+    previousExampleReady,
+    cleanupBuffer,
+  ]);
 
   // Resets the quiz to the initial state, called on menu and end of autoplay
   const restartQuiz = useCallback(() => {
