@@ -16,7 +16,12 @@ import { useAudioAdapter } from '@application/adapters/audioAdapter';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useAudioQuizMapper } from '@application/units/useAudioQuizMapper';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
+import {
+  AudioQuizStep,
+  AudioQuizType,
+  STEP_BUFFER_DURATION_MS,
+  STEP_BUFFER_TICK_MS,
+} from '@domain/audioQuizzing';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export interface AudioQuizProps {
@@ -63,6 +68,9 @@ export interface AudioQuizReturn {
   setGetHelpIsOpen: (getHelpIsOpen: boolean) => void;
   vocabComplete: boolean;
   vocabulary: Vocabulary[];
+  // Step buffer (autoplay)
+  isBuffering: boolean;
+  bufferProgress: number;
   // Add/Pending/Remove Button
   addPendingRemoveProps: AddPendingRemoveProps | undefined;
 }
@@ -140,6 +148,12 @@ export function useAudioQuiz({
 
   const [getHelpIsOpen, setGetHelpIsOpen] = useState(false);
   const [isQuizComplete, setIsQuizComplete] = useState(false);
+
+  const [isBuffering, setIsBuffering] = useState(false);
+  const [bufferProgress, setBufferProgress] = useState(0);
+  const bufferIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
 
   // Examples that have bad audio and should be skipped
   const [badAudioExamples, setBadAudioExamples] = useState<number[]>([]);
@@ -411,8 +425,34 @@ export function useAudioQuiz({
     }
   }, [cleanupAudio, getHelpIsOpen]);
 
-  // Steps the quiz forward
-  const nextStep = useCallback(() => {
+  const clearBuffer = useCallback(() => {
+    if (bufferIntervalRef.current) {
+      clearInterval(bufferIntervalRef.current);
+      bufferIntervalRef.current = null;
+    }
+    setIsBuffering(false);
+    setBufferProgress(0);
+  }, []);
+
+  const startBuffer = useCallback(
+    (onComplete: () => void) => {
+      setIsBuffering(true);
+      setBufferProgress(0);
+      let elapsed = 0;
+      bufferIntervalRef.current = setInterval(() => {
+        elapsed += STEP_BUFFER_TICK_MS;
+        if (elapsed >= STEP_BUFFER_DURATION_MS) {
+          clearBuffer();
+          onComplete();
+        } else {
+          setBufferProgress(elapsed / STEP_BUFFER_DURATION_MS);
+        }
+      }, STEP_BUFFER_TICK_MS);
+    },
+    [clearBuffer],
+  );
+
+  const advanceStep = useCallback(() => {
     switch (currentStep) {
       case AudioQuizStep.Question:
         if (autoplay) {
@@ -423,19 +463,23 @@ export function useAudioQuiz({
         break;
       case AudioQuizStep.Guess:
         setCurrentStep(AudioQuizStep.Hint);
-
         break;
       case AudioQuizStep.Hint:
         setCurrentStep(AudioQuizStep.Answer);
         break;
       case AudioQuizStep.Answer:
         nextExample();
-        // Proceed to next question
         break;
       default:
         console.error('Invalid currentStep value: ', currentStep);
     }
   }, [autoplay, currentStep, nextExample]);
+
+  // Steps the quiz forward, clearing any active buffer first
+  const nextStep = useCallback(() => {
+    clearBuffer();
+    advanceStep();
+  }, [clearBuffer, advanceStep]);
 
   // Get the values related to the current step
   const currentStepValue = useMemo(() => {
@@ -507,15 +551,15 @@ export function useAudioQuiz({
     currentExampleIndex,
   ]);
 
-  // What to do when the audio ends - simplified since concatenated audio handles padding
   const onEndedCallback = useCallback(() => {
     if (!autoplay) {
       return;
     }
 
-    // No need for complex padding logic - concatenated audio handles it seamlessly
-    nextStep();
-  }, [autoplay, nextStep]);
+    startBuffer(() => {
+      advanceStep();
+    });
+  }, [autoplay, startBuffer, advanceStep]);
 
   const goToQuestion = useCallback(() => {
     setCurrentStep(AudioQuizStep.Question);
@@ -652,12 +696,12 @@ export function useAudioQuiz({
     onEndedCallback,
   ]);
 
-  // Cleanup audio when the quiz component unmounts or cleanupFunction is called
   useEffect(() => {
     return () => {
       cleanupAudio();
+      clearBuffer();
     };
-  }, [cleanupAudio]);
+  }, [cleanupAudio, clearBuffer]);
 
   // for getHelp
   const vocabComplete = useMemo(() => {
@@ -759,6 +803,8 @@ export function useAudioQuiz({
     setGetHelpIsOpen,
     vocabComplete,
     vocabulary,
+    isBuffering,
+    bufferProgress,
     addPendingRemoveProps,
   };
 }

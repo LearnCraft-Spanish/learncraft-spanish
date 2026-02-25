@@ -100,6 +100,8 @@ export default function AudioQuiz({
     vocabComplete,
     vocabulary,
 
+    isBuffering,
+    bufferProgress,
     addPendingRemoveProps,
   } = audioQuizReturn;
 
@@ -189,6 +191,8 @@ export default function AudioQuiz({
               pause={pause}
               play={play}
               isPlaying={isPlaying}
+              isBuffering={isBuffering}
+              bufferProgress={bufferProgress}
               // Get Help
               getHelpIsOpen={getHelpIsOpen}
               setGetHelpIsOpen={setGetHelpIsOpen}

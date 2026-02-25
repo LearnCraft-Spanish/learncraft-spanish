@@ -119,6 +119,8 @@ function MockAudioQuizWrapper({
     previousExampleReady: currentExampleIndex > 0,
     progressStatus: 0,
     isPlaying,
+    isBuffering: false,
+    bufferProgress: 0,
     pause,
     play,
     nextStep,

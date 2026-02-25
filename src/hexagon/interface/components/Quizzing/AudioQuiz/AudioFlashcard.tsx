@@ -17,6 +17,8 @@ interface AudioFlashcardProps {
   pause: () => void;
   play: () => void;
   isPlaying: boolean;
+  isBuffering: boolean;
+  bufferProgress: number;
   getHelpIsOpen: boolean;
   setGetHelpIsOpen: (getHelpIsOpen: boolean) => void;
   addPendingRemoveProps: AddPendingRemoveProps | undefined;
@@ -33,6 +35,8 @@ export default function AudioFlashcardComponent({
   pause,
   play,
   isPlaying,
+  isBuffering,
+  bufferProgress,
   getHelpIsOpen,
   setGetHelpIsOpen,
   addPendingRemoveProps,
@@ -95,6 +99,20 @@ export default function AudioFlashcardComponent({
             }}
           />
         )}
+      {isBuffering && (
+        <div
+          className="progressStatus bufferProgressBar"
+          data-testid="buffer-progress-bar"
+          style={{
+            width: `${bufferProgress * 100}%`,
+            transition:
+              bufferProgress < 0.015 || bufferProgress > 0.985
+                ? 'none'
+                : 'width 0.05s linear',
+            backgroundColor: 'var(--theme-light, #aaa)',
+          }}
+        />
+      )}
       {addPendingRemoveProps && currentStep === AudioQuizStep.Answer && (
         <div className="AddPendingRemoveButtons">
           <AddToMyFlashcardsButtons

@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+export const STEP_BUFFER_DURATION_MS = 2000;
+export const STEP_BUFFER_TICK_MS = 50;
+
 export enum AudioQuizStep {
   Question = 'question',
   Guess = 'guess',

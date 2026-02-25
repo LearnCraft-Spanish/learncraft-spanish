@@ -144,6 +144,8 @@ export function createMockAudioQuizReturn(
     getHelpIsOpen: false,
     setGetHelpIsOpen: vi.fn<() => void>(),
     vocabComplete: false,
+    isBuffering: false,
+    bufferProgress: 0,
     vocabulary: [],
     addPendingRemoveProps: undefined,
   };

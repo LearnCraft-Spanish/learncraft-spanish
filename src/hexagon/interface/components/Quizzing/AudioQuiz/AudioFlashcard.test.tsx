@@ -19,59 +19,42 @@ const removeFlashcard = vi.fn(() => {});
   isStudent: boolean;
   currentStep: string;
 */
+const defaultProps = {
+  currentExampleText: 'currentExampleText',
+  currentStep: AudioQuizStep.Question,
+  nextStep: incrementCurrentStep,
+  autoplay: true,
+  progressStatus: 0.5,
+  pause: pausePlayback,
+  play: resumePlayback,
+  isPlaying: true,
+  vocabComplete: false,
+  vocabulary: [] as never[],
+  getHelpIsOpen: false,
+  setGetHelpIsOpen: () => {},
+  isBuffering: false,
+  bufferProgress: 0,
+  addPendingRemoveProps: {
+    addFlashcard,
+    removeFlashcard,
+    isAdding: false,
+    isRemoving: false,
+    isCollected: false,
+    isCustom: false,
+  },
+};
+
 function AudioFlashcardAutoplayOn() {
   return (
     <MockAllProviders>
-      <AudioFlashcardComponent
-        currentExampleText="currentExampleText"
-        currentStep={AudioQuizStep.Question}
-        nextStep={incrementCurrentStep}
-        autoplay
-        progressStatus={0.5}
-        pause={pausePlayback}
-        play={resumePlayback}
-        isPlaying
-        vocabComplete={false}
-        vocabulary={[]}
-        getHelpIsOpen={false}
-        setGetHelpIsOpen={() => {}}
-        addPendingRemoveProps={{
-          addFlashcard,
-          removeFlashcard,
-          isAdding: false,
-          isRemoving: false,
-          isCollected: false,
-          isCustom: false,
-        }}
-      />
+      <AudioFlashcardComponent {...defaultProps} />
     </MockAllProviders>
   );
 }
 function AudioFlashcardAutoplayOff() {
   return (
     <MockAllProviders>
-      <AudioFlashcardComponent
-        currentExampleText="currentExampleText"
-        currentStep={AudioQuizStep.Question}
-        nextStep={incrementCurrentStep}
-        autoplay={false}
-        progressStatus={0.5}
-        pause={pausePlayback}
-        play={resumePlayback}
-        isPlaying
-        vocabComplete={false}
-        vocabulary={[]}
-        getHelpIsOpen={false}
-        setGetHelpIsOpen={() => {}}
-        addPendingRemoveProps={{
-          addFlashcard,
-          removeFlashcard,
-          isAdding: false,
-          isRemoving: false,
-          isCollected: false,
-          isCustom: false,
-        }}
-      />
+      <AudioFlashcardComponent {...defaultProps} autoplay={false} />
     </MockAllProviders>
   );
 }
@@ -79,56 +62,14 @@ function AudioFlashcardAutoplayOff() {
 function AudioFlashcardPlaying() {
   return (
     <MockAllProviders>
-      <AudioFlashcardComponent
-        currentExampleText="currentExampleText"
-        currentStep={AudioQuizStep.Question}
-        nextStep={incrementCurrentStep}
-        autoplay
-        progressStatus={0.5}
-        pause={pausePlayback}
-        play={resumePlayback}
-        isPlaying
-        vocabComplete={false}
-        vocabulary={[]}
-        getHelpIsOpen={false}
-        setGetHelpIsOpen={() => {}}
-        addPendingRemoveProps={{
-          addFlashcard,
-          removeFlashcard,
-          isAdding: false,
-          isRemoving: false,
-          isCollected: false,
-          isCustom: false,
-        }}
-      />
+      <AudioFlashcardComponent {...defaultProps} isPlaying />
     </MockAllProviders>
   );
 }
 function AudioFlashcardPaused() {
   return (
     <MockAllProviders>
-      <AudioFlashcardComponent
-        currentExampleText="currentExampleText"
-        currentStep={AudioQuizStep.Question}
-        nextStep={incrementCurrentStep}
-        autoplay
-        progressStatus={0.5}
-        pause={pausePlayback}
-        play={resumePlayback}
-        isPlaying={false}
-        vocabComplete={false}
-        vocabulary={[]}
-        getHelpIsOpen={false}
-        setGetHelpIsOpen={() => {}}
-        addPendingRemoveProps={{
-          addFlashcard,
-          removeFlashcard,
-          isAdding: false,
-          isRemoving: false,
-          isCollected: false,
-          isCustom: false,
-        }}
-      />
+      <AudioFlashcardComponent {...defaultProps} isPlaying={false} />
     </MockAllProviders>
   );
 }
@@ -173,6 +114,48 @@ describe('component AudioFlashcard', () => {
         screen.getAllByLabelText('Play/Pause')[0].click();
         expect(resumePlayback).toHaveBeenCalledOnce();
       });
+    });
+  });
+
+  describe('buffer progress bar', () => {
+    it('renders when isBuffering is true', () => {
+      render(
+        <MockAllProviders>
+          <AudioFlashcardComponent
+            {...defaultProps}
+            isBuffering
+            bufferProgress={0.5}
+          />
+        </MockAllProviders>,
+      );
+      expect(screen.getByTestId('buffer-progress-bar')).toBeTruthy();
+    });
+
+    it('does not render when isBuffering is false', () => {
+      render(
+        <MockAllProviders>
+          <AudioFlashcardComponent
+            {...defaultProps}
+            isBuffering={false}
+            bufferProgress={0}
+          />
+        </MockAllProviders>,
+      );
+      expect(screen.queryByTestId('buffer-progress-bar')).toBeNull();
+    });
+
+    it('reflects bufferProgress as width', () => {
+      render(
+        <MockAllProviders>
+          <AudioFlashcardComponent
+            {...defaultProps}
+            isBuffering
+            bufferProgress={0.75}
+          />
+        </MockAllProviders>,
+      );
+      const bar = screen.getByTestId('buffer-progress-bar');
+      expect(bar.style.width).toBe('75%');
     });
   });
 });

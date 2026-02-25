@@ -10,7 +10,12 @@ import {
   resetMockUseAudioQuizMapper,
 } from '@application/units/useAudioQuizMapper.mock';
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
-import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
+import {
+  AudioQuizStep,
+  AudioQuizType,
+  STEP_BUFFER_DURATION_MS,
+  STEP_BUFFER_TICK_MS,
+} from '@domain/audioQuizzing';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -360,6 +365,186 @@ describe('useAudioQuiz', () => {
       expect(result.current.isQuizComplete).toBe(false);
       expect(result.current.getHelpIsOpen).toBe(false);
       expect(mockAudioAdapter.cleanupAudio).toHaveBeenCalled();
+    });
+  });
+
+  describe('step buffer - autoplay mode', () => {
+    function getLastOnEndedCallback(): (() => void) | undefined {
+      const calls = (
+        mockAudioAdapter.changeCurrentAudio as ReturnType<typeof vi.fn>
+      ).mock.calls;
+      if (calls.length === 0) return undefined;
+      const lastCall = calls[calls.length - 1];
+      return lastCall[0]?.onEnded;
+    }
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should initialize with isBuffering=false and bufferProgress=0', () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: true }),
+      );
+
+      expect(result.current.isBuffering).toBe(false);
+      expect(result.current.bufferProgress).toBe(0);
+    });
+
+    it('should enter buffering state when audio ends in autoplay', async () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: true }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+
+      vi.useFakeTimers();
+
+      const onEnded = getLastOnEndedCallback();
+      expect(onEnded).toBeDefined();
+
+      act(() => {
+        onEnded!();
+      });
+
+      expect(result.current.isBuffering).toBe(true);
+      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+    });
+
+    it('should NOT enter buffering state when audio ends in manual mode', async () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: false }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+
+      expect(result.current.isBuffering).toBe(false);
+    });
+
+    it('should advance step after buffer duration completes', async () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: true }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+
+      vi.useFakeTimers();
+
+      const onEnded = getLastOnEndedCallback();
+
+      act(() => {
+        onEnded!();
+      });
+
+      expect(result.current.isBuffering).toBe(true);
+      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+
+      act(() => {
+        vi.advanceTimersByTime(STEP_BUFFER_DURATION_MS);
+      });
+
+      expect(result.current.isBuffering).toBe(false);
+      expect(result.current.currentStep).toBe(AudioQuizStep.Guess);
+    });
+
+    it('should update bufferProgress over time', async () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: true }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+
+      vi.useFakeTimers();
+
+      const onEnded = getLastOnEndedCallback();
+
+      act(() => {
+        onEnded!();
+      });
+
+      expect(result.current.bufferProgress).toBe(0);
+
+      act(() => {
+        vi.advanceTimersByTime(STEP_BUFFER_DURATION_MS / 2);
+      });
+
+      expect(result.current.bufferProgress).toBeGreaterThan(0.4);
+      expect(result.current.bufferProgress).toBeLessThan(0.6);
+
+      act(() => {
+        vi.advanceTimersByTime(STEP_BUFFER_DURATION_MS / 2);
+      });
+
+      expect(result.current.isBuffering).toBe(false);
+      expect(result.current.bufferProgress).toBe(0);
+    });
+
+    it('should skip buffer when nextStep is called during buffering', async () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: true }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+
+      vi.useFakeTimers();
+
+      const onEnded = getLastOnEndedCallback();
+
+      act(() => {
+        onEnded!();
+      });
+
+      expect(result.current.isBuffering).toBe(true);
+
+      act(() => {
+        vi.advanceTimersByTime(STEP_BUFFER_TICK_MS);
+      });
+
+      expect(result.current.isBuffering).toBe(true);
+
+      act(() => {
+        result.current.nextStep();
+      });
+
+      expect(result.current.isBuffering).toBe(false);
+      expect(result.current.bufferProgress).toBe(0);
+      expect(result.current.currentStep).toBe(AudioQuizStep.Guess);
+    });
+
+    it('should clean up buffer timer on unmount', async () => {
+      const { result, unmount } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: true }),
+      );
+
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+
+      vi.useFakeTimers();
+
+      const onEnded = getLastOnEndedCallback();
+
+      act(() => {
+        onEnded!();
+      });
+
+      expect(result.current.isBuffering).toBe(true);
+
+      unmount();
+
+      act(() => {
+        vi.advanceTimersByTime(STEP_BUFFER_DURATION_MS);
+      });
     });
   });
 
