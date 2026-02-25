@@ -4,12 +4,16 @@ export default function SelectCourse({
   value,
   onChange,
   required,
+  includeUnpublished,
 }: {
   value: string;
   onChange: (value: string) => void;
   required?: boolean;
+  includeUnpublished?: boolean;
 }) {
-  const { data: coursesWithLessons } = useCoursesWithLessons();
+  const { data: coursesWithLessons } = useCoursesWithLessons(
+    includeUnpublished ?? false,
+  );
   return (
     <label htmlFor="courseList" className="menuRow" id="courseRow">
       <p className={required ? 'required' : ''}>Course:</p>

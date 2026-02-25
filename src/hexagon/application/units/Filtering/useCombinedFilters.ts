@@ -35,12 +35,14 @@ export function useCombinedFilters({
     selectedSkillTags,
     excludeSpanglish,
     audioOnly,
+    includeUnpublished,
     batchUpdateFilterStateWithoutLesson,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
     bulkUpdateSkillTagKeys,
     updateExcludeSpanglish,
     updateAudioOnly,
+    updateIncludeUnpublished,
     isLoading: isLoadingExampleFilter,
     error: errorExampleFilter,
   } = useExampleFilterCoordinator();
@@ -75,6 +77,7 @@ export function useCombinedFilters({
       audioOnly,
       skillTags: selectedSkillTags,
       lessonRanges,
+      includeUnpublished,
     };
   }, [
     excludeSpanglish,
@@ -83,12 +86,14 @@ export function useCombinedFilters({
     course,
     fromLesson,
     toLesson,
+    includeUnpublished,
   ]);
 
   // Track previous filter values to detect actual changes
   const prevFilterRef = useRef({
     excludeSpanglish,
     audioOnly,
+    includeUnpublished,
     selectedSkillTags,
     courseId: course?.id,
     fromLessonNumber: fromLesson?.lessonNumber,
@@ -100,6 +105,7 @@ export function useCombinedFilters({
     const current = {
       excludeSpanglish,
       audioOnly,
+      includeUnpublished,
       selectedSkillTags,
       courseId: course?.id,
       fromLessonNumber: fromLesson?.lessonNumber,
@@ -112,6 +118,7 @@ export function useCombinedFilters({
     const hasChanged =
       prev.excludeSpanglish !== current.excludeSpanglish ||
       prev.audioOnly !== current.audioOnly ||
+      prev.includeUnpublished !== current.includeUnpublished ||
       prev.selectedSkillTags.length !== current.selectedSkillTags.length ||
       prev.selectedSkillTags.some(
         (tag, index) => tag.key !== current.selectedSkillTags[index]?.key,
@@ -128,6 +135,7 @@ export function useCombinedFilters({
   }, [
     excludeSpanglish,
     audioOnly,
+    includeUnpublished,
     selectedSkillTags,
     course,
     fromLesson,
@@ -175,6 +183,8 @@ export function useCombinedFilters({
     updateAudioOnly,
     excludeSpanglish,
     updateExcludeSpanglish,
+    includeUnpublished,
+    updateIncludeUnpublished,
     selectedSkillTags,
     addSkillTagToFilters,
     removeSkillTagFromFilters,

@@ -1,5 +1,6 @@
 import type { UseSelectedCourseAndLessonsReturnType } from '@application/coordinators/hooks/types';
 import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
+import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
 import SelectedCourseAndLessonsContext from '@application/coordinators/contexts/SelectedCourseAndLessonsContext';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
@@ -22,11 +23,14 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     updateToLessonNumber,
   } = context;
 
+  const { exampleFilters } = use(ExampleFilterContext);
+  const includeUnpublished = exampleFilters.includeUnpublished ?? false;
+
   const {
     data: coursesWithLessons,
     isLoading,
     error,
-  } = useCoursesWithLessons();
+  } = useCoursesWithLessons(includeUnpublished);
   const { appUser } = useActiveStudent();
 
   const course: CourseWithLessons | null = useMemo(() => {
@@ -125,6 +129,7 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     updateUserSelectedCourseId,
     updateFromLessonNumber,
     updateToLessonNumber,
+    includeUnpublished,
     isLoading,
     error,
   };

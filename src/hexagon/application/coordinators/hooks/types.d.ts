@@ -22,7 +22,7 @@ export interface UseSelectedCourseAndLessonsReturnType {
   updateUserSelectedCourseId: (courseId: number) => void;
   updateFromLessonNumber: (lessonNumber: number) => void;
   updateToLessonNumber: (lessonNumber: number) => void;
-
+  includeUnpublished: boolean;
   isLoading: boolean;
   error: Error | null;
 }

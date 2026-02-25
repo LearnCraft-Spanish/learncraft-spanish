@@ -1,3 +1,4 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import PresetSelector from '@interface/components/Filters/PresetSelector';
 import {
@@ -20,12 +21,15 @@ export function FilterPanel({
 }) {
   const [filterMode, setFilterMode] = useState<'preset' | 'search'>('search');
 
+  const { isAdmin } = useAuthAdapter();
   const {
     excludeSpanglish,
     audioOnly,
-    selectedSkillTags,
+    includeUnpublished,
     updateExcludeSpanglish,
     updateAudioOnly,
+    updateIncludeUnpublished,
+    selectedSkillTags,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
     skillTagSearch,
@@ -45,6 +49,17 @@ export function FilterPanel({
     <div className="filterPanel">
       <div className="filterPanelColumn basicOptions">
         {/* <div className="filterPanelRightSide"> */}
+        {isAdmin && (
+          <ToggleSwitch
+            id="includeUnpublished"
+            ariaLabel="includeUnpublished"
+            label="Include unpublished courses and lessons: "
+            checked={includeUnpublished ?? false}
+            onChange={() =>
+              updateIncludeUnpublished(!(includeUnpublished ?? false))
+            }
+          />
+        )}
         <div className="FromToLessonSelectorWrapper">
           <LessonRangeSelector />
         </div>

@@ -15,6 +15,7 @@ export function ExampleFilterContextProvider({
       excludeSpanglish: false,
       audioOnly: false,
       skillTagKeys: [],
+      includeUnpublished: false,
     });
 
   const updateExampleFilters = useCallback(

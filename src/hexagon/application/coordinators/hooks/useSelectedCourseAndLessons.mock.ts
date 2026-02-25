@@ -12,6 +12,7 @@ const defaultMockAdapter: UseSelectedCourseAndLessonsReturnType = {
   updateUserSelectedCourseId: vi.fn<() => void>(),
   updateFromLessonNumber: vi.fn<() => void>(),
   updateToLessonNumber: vi.fn<() => void>(),
+  includeUnpublished: false,
   isLoading: false,
   error: null,
 };

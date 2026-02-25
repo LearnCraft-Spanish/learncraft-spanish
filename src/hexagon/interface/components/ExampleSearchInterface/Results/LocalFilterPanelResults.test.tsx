@@ -74,6 +74,7 @@ describe('component: LocalFilterPanelResults', () => {
       excludeSpanglish,
       audioOnly,
       lessonRanges,
+      includeUnpublished: undefined,
     });
   });
 });

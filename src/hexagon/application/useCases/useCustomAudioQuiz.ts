@@ -1,6 +1,7 @@
 import type { AudioQuizProps } from '@application/units/AudioQuiz/useAudioQuiz';
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useQueryPagination } from '@application/units/Pagination/useQueryPagination';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
@@ -20,6 +21,7 @@ export interface UseCustomAudioQuizReturnType {
 }
 
 export function useCustomAudioQuiz(): UseCustomAudioQuizReturnType {
+  const { isCoach, isAdmin } = useAuthAdapter();
   const QUERY_PAGE_SIZE = 150;
   const PAGE_SIZE = 25;
   const [quizReady, setQuizReady] = useState(false);
@@ -32,7 +34,7 @@ export function useCustomAudioQuiz(): UseCustomAudioQuizReturnType {
     changeQueryPage,
     totalCount,
     error: errorExamples,
-  } = useExampleQuery(QUERY_PAGE_SIZE, true);
+  } = useExampleQuery(QUERY_PAGE_SIZE, true, isCoach || isAdmin);
 
   const pagination: QueryPaginationState = useQueryPagination({
     queryPage: page,

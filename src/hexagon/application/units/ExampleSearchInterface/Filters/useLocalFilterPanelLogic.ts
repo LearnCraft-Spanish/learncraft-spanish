@@ -1,10 +1,11 @@
 import type { ExtendedLesson } from '@interface/components/LessonSelector/SelectLesson';
+import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
 import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
 import {
   generateVirtualLessonId,
   getPrerequisitesForCourse,
 } from '@domain/coursePrerequisites';
-import { useMemo } from 'react';
+import { use, useMemo } from 'react';
 
 export interface UseLocalFilterPanelLogicParams {
   selectedCourseId: number;
@@ -17,7 +18,10 @@ export function useLocalFilterPanelLogic({
   fromLessonNumber,
   toLessonNumber,
 }: UseLocalFilterPanelLogicParams) {
-  const { data: coursesWithLessons } = useCoursesWithLessons();
+  const { exampleFilters } = use(ExampleFilterContext);
+  const includeUnpublished = exampleFilters.includeUnpublished ?? false;
+  const { data: coursesWithLessons } =
+    useCoursesWithLessons(includeUnpublished);
 
   const course = useMemo(() => {
     return coursesWithLessons?.find((c) => c.id === selectedCourseId);
@@ -125,5 +129,6 @@ export function useLocalFilterPanelLogic({
     toLessons,
     getDefaultLessonsForCourse,
     coursesWithLessons,
+    includeUnpublished,
   };
 }
