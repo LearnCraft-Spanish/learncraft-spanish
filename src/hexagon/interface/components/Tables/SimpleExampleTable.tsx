@@ -7,7 +7,7 @@ import MoreInfoViewExample from '@interface/components/ExampleListItem/units/Mor
 import { Pagination } from '@interface/components/general';
 import { useContextualMenu } from '@interface/hooks/useContextualMenu';
 import { useCallback, useState } from 'react';
-import 'src/components/ExamplesTable/ExamplesTable.scss';
+import './ExamplesTable.scss';
 import '@interface/components/Tables/ExampleAndFlashcardTable.scss';
 
 /**
