@@ -656,6 +656,10 @@ export function useAudioQuiz({
   const wrappedPlay = useCallback(async (): Promise<void> => {
     userRequestedPauseRef.current = false;
     if (isInBufferRef.current) {
+      if (bufferIntervalRef.current) {
+        clearInterval(bufferIntervalRef.current);
+        bufferIntervalRef.current = null;
+      }
       bufferStartTimeRef.current = Date.now();
       setVisualIsPlaying(true);
       bufferIntervalRef.current = startBufferInterval();
