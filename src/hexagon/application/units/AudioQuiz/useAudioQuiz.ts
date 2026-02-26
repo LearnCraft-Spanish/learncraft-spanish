@@ -44,8 +44,8 @@ export interface AudioQuizReturn {
   previousExampleReady: boolean;
   progressStatus: number;
   isPlaying: boolean;
-  pause: () => void;
-  play: () => void;
+  pause: () => Promise<void>;
+  play: () => Promise<void>;
   nextStep: () => void;
   goToQuestion: () => void;
   goToGuess: () => void;
