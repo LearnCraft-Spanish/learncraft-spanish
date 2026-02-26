@@ -728,72 +728,42 @@ export function useAudioQuiz({
       return;
     }
 
+    const applyAudioChange = (): void => {
+      const shouldAutoPlay = !userRequestedPauseRef.current;
+      if (shouldAutoPlay) {
+        setVisualIsPlaying(true);
+        changeCurrentAudio({
+          currentTime: 0,
+          src: currentStepValue.mp3AudioUrl,
+          onEnded: onEndedCallback,
+          playOnLoad: true,
+        });
+      } else {
+        setVisualIsPlaying(false);
+        changeCurrentAudio({
+          currentTime: 0,
+          src: currentStepValue.mp3AudioUrl,
+          onEnded: onEndedCallback,
+          playOnLoad: false,
+        });
+      }
+    };
+
     if (exampleChanged) {
       cleanupBuffer();
       previousExampleIndexRef.current = currentExampleIndex;
       previousStepRef.current = currentStep;
       previousRestartTriggerRef.current = restartTrigger;
-      const shouldAutoPlay = !userRequestedPauseRef.current;
-      if (shouldAutoPlay) {
-        setVisualIsPlaying(true);
-        changeCurrentAudio({
-          currentTime: 0,
-          src: currentStepValue.mp3AudioUrl,
-          onEnded: onEndedCallback,
-          playOnLoad: true,
-        });
-      } else {
-        setVisualIsPlaying(false);
-        changeCurrentAudio({
-          currentTime: 0,
-          src: currentStepValue.mp3AudioUrl,
-          onEnded: onEndedCallback,
-          playOnLoad: false,
-        });
-      }
+      applyAudioChange();
     } else if (stepChanged) {
       cleanupBuffer();
       previousStepRef.current = currentStep;
       previousRestartTriggerRef.current = restartTrigger;
-      const shouldAutoPlay = !userRequestedPauseRef.current;
-      if (shouldAutoPlay) {
-        setVisualIsPlaying(true);
-        changeCurrentAudio({
-          currentTime: 0,
-          src: currentStepValue.mp3AudioUrl,
-          onEnded: onEndedCallback,
-          playOnLoad: true,
-        });
-      } else {
-        setVisualIsPlaying(false);
-        changeCurrentAudio({
-          currentTime: 0,
-          src: currentStepValue.mp3AudioUrl,
-          onEnded: onEndedCallback,
-          playOnLoad: false,
-        });
-      }
+      applyAudioChange();
     } else if (restartTriggerChanged) {
       cleanupBuffer();
       previousRestartTriggerRef.current = restartTrigger;
-      const shouldAutoPlay = !userRequestedPauseRef.current;
-      if (shouldAutoPlay) {
-        setVisualIsPlaying(true);
-        changeCurrentAudio({
-          currentTime: 0,
-          src: currentStepValue.mp3AudioUrl,
-          onEnded: onEndedCallback,
-          playOnLoad: true,
-        });
-      } else {
-        setVisualIsPlaying(false);
-        changeCurrentAudio({
-          currentTime: 0,
-          src: currentStepValue.mp3AudioUrl,
-          onEnded: onEndedCallback,
-          playOnLoad: false,
-        });
-      }
+      applyAudioChange();
     }
   }, [
     ready,
