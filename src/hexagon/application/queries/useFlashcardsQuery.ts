@@ -92,16 +92,6 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
     queryKey: ['flashcards', userId],
     queryFn: () => getFlashcards(),
     enabled: hasAccess && appUser !== null && userId !== undefined,
-    select: (data) => {
-      const safeTime = (dateStr: string | null | undefined): number => {
-        if (!dateStr) return 0;
-        const t = new Date(dateStr).getTime();
-        return Number.isFinite(t) ? t : 0;
-      };
-      return [...data].sort(
-        (a, b) => safeTime(b.dateCreated) - safeTime(a.dateCreated),
-      );
-    },
     ...queryDefaults.entityData,
   });
 
