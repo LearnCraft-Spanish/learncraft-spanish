@@ -127,7 +127,7 @@ describe('app', () => {
     });
   });
 
-  it('displays example manager (old) if admin', async () => {
+  it('displays example manager if admin', async () => {
     overrideMockAuthAdapter({
       authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
       isAuthenticated: true,
@@ -143,27 +143,7 @@ describe('app', () => {
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(getByText('Example Manager (old)')).toBeInTheDocument();
-    });
-  });
-
-  it('displays example manager (new) if admin', async () => {
-    overrideMockAuthAdapter({
-      authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
-      isAuthenticated: true,
-      isLoading: false,
-      isAdmin: true,
-      isCoach: false,
-      isStudent: false,
-      isLimited: false,
-    });
-    const { getByText } = render(
-      <MockAllProviders>
-        <App />
-      </MockAllProviders>,
-    );
-    await waitFor(() => {
-      expect(getByText('Example Manager (new)')).toBeInTheDocument();
+      expect(getByText('Example Manager')).toBeInTheDocument();
     });
   });
 });

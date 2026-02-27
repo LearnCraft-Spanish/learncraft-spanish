@@ -2,7 +2,7 @@
 
 ## What is This?
 
-Ports define **interfaces for external dependencies** that infrastructure must implement. They enable dependency inversion and make the application layer independent of concrete infrastructure implementations.
+Ports define **interfaces for external dependencies** that infrastructure must implement. See DECISIONS.md for why ports exist as a separate concept.
 
 ## Responsibility
 
@@ -10,8 +10,6 @@ Type definitions for external dependencies:
 
 - Define interfaces that infrastructure must implement
 - Specify required behavior without implementation
-- Enable dependency inversion
-- Allow for easy mocking in tests
 - Document expected contracts
 
 ## ⚠️ Critical Rules
