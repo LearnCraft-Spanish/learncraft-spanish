@@ -104,7 +104,7 @@ export function useExampleSearch() {
         trimmedEnglishInput.length === 0
       ) {
         setNonValidSearchErrorMessage(
-          'ERROR: Please enter at least one charcter in either the Spanish or English field.',
+          'Please enter at least one charcter in either the Spanish or English field.',
         );
         return false;
       }
@@ -112,16 +112,14 @@ export function useExampleSearch() {
     }
     if (mode === 'ids') {
       if (parsedIds.length === 0) {
-        setNonValidSearchErrorMessage('ERROR: Please enter at least one ID.');
+        setNonValidSearchErrorMessage('Please enter at least one ID.');
         return false;
       }
       return true;
     }
     if (mode === 'quiz') {
       if (!quizGroupId || !quizId || quizId <= 0) {
-        setNonValidSearchErrorMessage(
-          'ERROR: Please select a course and quiz.',
-        );
+        setNonValidSearchErrorMessage('Please select a course and quiz.');
         return false;
       }
       return true;
@@ -136,9 +134,7 @@ export function useExampleSearch() {
         !filtersForUI.toLessonNumber ||
         filtersForUI.toLessonNumber <= 0
       ) {
-        setNonValidSearchErrorMessage(
-          'ERROR: Please select a course and To Lesson.',
-        );
+        setNonValidSearchErrorMessage('Please select a course and To Lesson.');
         return false;
       }
 

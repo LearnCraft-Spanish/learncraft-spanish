@@ -6,9 +6,9 @@ import {
 } from '@domain/coursePrerequisites';
 import SelectCourse from '@interface/components/LessonSelector/SelectCourse';
 import SelectLesson from '@interface/components/LessonSelector/SelectLesson';
+import { InlineLoading } from '@interface/components/Loading';
 import { useMemo } from 'react';
 import './LessonSelector.css';
-
 export default function LessonRangeSelector(): React.JSX.Element {
   const {
     course,
@@ -18,6 +18,7 @@ export default function LessonRangeSelector(): React.JSX.Element {
     updateToLessonNumber,
     updateFromLessonNumber,
     includeUnpublished,
+    isLoading,
   } = useSelectedCourseAndLessons();
 
   const fromLessons = useMemo((): ExtendedLesson[] => {
@@ -69,36 +70,42 @@ export default function LessonRangeSelector(): React.JSX.Element {
 
   return (
     <div className="FTLS">
-      <SelectCourse
-        value={course?.id.toString() ?? '0'}
-        onChange={(value: string) =>
-          updateUserSelectedCourseId(Number.parseInt(value))
-        }
-        includeUnpublished={includeUnpublished}
-      />
-      <div>
-        {course?.lessons && (
-          <SelectLesson
-            value={fromLesson?.lessonNumber.toString() ?? '0'}
+      {isLoading ? (
+        <InlineLoading message="Loading courses and lessons..." />
+      ) : (
+        <>
+          <SelectCourse
+            value={course?.id.toString() ?? '0'}
             onChange={(value: string) =>
-              updateFromLessonNumber(Number.parseInt(value))
+              updateUserSelectedCourseId(Number.parseInt(value))
             }
-            label="From"
-            id="fromLesson"
-            lessons={fromLessons ?? []}
+            includeUnpublished={includeUnpublished}
           />
-        )}
-        <SelectLesson
-          value={toLesson?.lessonNumber.toString() ?? '0'}
-          onChange={(value: string) =>
-            updateToLessonNumber(Number.parseInt(value))
-          }
-          label="To"
-          id="toLesson"
-          lessons={toLessons ?? []}
-          required
-        />
-      </div>
+          <div>
+            {course?.lessons && (
+              <SelectLesson
+                value={fromLesson?.lessonNumber.toString() ?? '0'}
+                onChange={(value: string) =>
+                  updateFromLessonNumber(Number.parseInt(value))
+                }
+                label="From"
+                id="fromLesson"
+                lessons={fromLessons ?? []}
+              />
+            )}
+            <SelectLesson
+              value={toLesson?.lessonNumber.toString() ?? '0'}
+              onChange={(value: string) =>
+                updateToLessonNumber(Number.parseInt(value))
+              }
+              label="To"
+              id="toLesson"
+              lessons={toLessons ?? []}
+              required
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
