@@ -15,11 +15,13 @@ vi.mock('@application/queries/useCoursesWithLessons', () => ({
 }));
 
 const createDefaultCombinedFilters = (): UseCombinedFiltersReturnType => ({
+  isAdmin: false,
   filterState: {
     lessonRanges: [],
     excludeSpanglish: false,
     audioOnly: false,
     skillTags: [],
+    includeUnpublished: false,
   },
   isLoading: false,
   error: null,
@@ -27,12 +29,15 @@ const createDefaultCombinedFilters = (): UseCombinedFiltersReturnType => ({
     excludeSpanglish: false,
     audioOnly: false,
     skillTagKeys: [],
+    includeUnpublished: false,
   },
   batchUpdateFilterStateWithoutLesson: vi.fn(),
   audioOnly: false,
   updateAudioOnly: vi.fn(),
   excludeSpanglish: false,
   updateExcludeSpanglish: vi.fn(),
+  includeUnpublished: false,
+  updateIncludeUnpublished: vi.fn(),
   selectedSkillTags: [],
   addSkillTagToFilters: vi.fn(),
   removeSkillTagFromFilters: vi.fn(),
@@ -80,7 +85,7 @@ describe('useExampleSearch', () => {
     expect(result.current.searchIsTriggered).toBe(false);
     expect(result.current.isValidSearch).toBe(false);
     expect(result.current.nonValidSearchErrorMessage).toBe(
-      'ERROR: Please enter at least one ID.',
+      'Please enter at least one ID.',
     );
   });
 

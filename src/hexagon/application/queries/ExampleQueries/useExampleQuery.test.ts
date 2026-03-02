@@ -14,11 +14,13 @@ vi.mock('@application/units/Filtering/useCombinedFilters', () => ({
 
 describe('useExampleQuery', () => {
   const defaultMockCombinedFilters: UseCombinedFiltersReturnType = {
+    isAdmin: false,
     filterState: {
       lessonRanges: [],
       excludeSpanglish: false,
       audioOnly: false,
       skillTags: undefined,
+      includeUnpublished: false,
     },
     isLoading: false,
     error: null,
@@ -27,12 +29,15 @@ describe('useExampleQuery', () => {
       excludeSpanglish: false,
       audioOnly: false,
       skillTagKeys: [],
+      includeUnpublished: false,
     },
     batchUpdateFilterStateWithoutLesson: vi.fn(),
     audioOnly: false,
     updateAudioOnly: vi.fn(),
     excludeSpanglish: false,
     updateExcludeSpanglish: vi.fn(),
+    includeUnpublished: false,
+    updateIncludeUnpublished: vi.fn(),
     selectedSkillTags: [],
     addSkillTagToFilters: vi.fn(),
     removeSkillTagFromFilters: vi.fn(),

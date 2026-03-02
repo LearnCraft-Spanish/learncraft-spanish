@@ -58,7 +58,9 @@ export function useExampleSearch() {
   });
 
   // Get course data for lesson calculations
-  const { data: coursesWithLessons } = useCoursesWithLessons();
+  const { data: coursesWithLessons } = useCoursesWithLessons(
+    filtersForUI.includeUnpublished,
+  );
 
   // Extract values needed for useEffect to avoid dependency issues
   const courseId = filtersForUI.courseId;
@@ -102,7 +104,7 @@ export function useExampleSearch() {
         trimmedEnglishInput.length === 0
       ) {
         setNonValidSearchErrorMessage(
-          'ERROR: Please enter at least one charcter in either the Spanish or English field.',
+          'Please enter at least one charcter in either the Spanish or English field.',
         );
         return false;
       }
@@ -110,16 +112,14 @@ export function useExampleSearch() {
     }
     if (mode === 'ids') {
       if (parsedIds.length === 0) {
-        setNonValidSearchErrorMessage('ERROR: Please enter at least one ID.');
+        setNonValidSearchErrorMessage('Please enter at least one ID.');
         return false;
       }
       return true;
     }
     if (mode === 'quiz') {
       if (!quizGroupId || !quizId || quizId <= 0) {
-        setNonValidSearchErrorMessage(
-          'ERROR: Please select a course and quiz.',
-        );
+        setNonValidSearchErrorMessage('Please select a course and quiz.');
         return false;
       }
       return true;
@@ -134,9 +134,7 @@ export function useExampleSearch() {
         !filtersForUI.toLessonNumber ||
         filtersForUI.toLessonNumber <= 0
       ) {
-        setNonValidSearchErrorMessage(
-          'ERROR: Please select a course and To Lesson.',
-        );
+        setNonValidSearchErrorMessage('Please select a course and To Lesson.');
         return false;
       }
 
@@ -207,6 +205,7 @@ export function useExampleSearch() {
         excludeSpanglish: filtersForUI.excludeSpanglish,
         audioOnly: filtersForUI.audioOnly,
         lessonRanges: filtersForUI.filterState.lessonRanges,
+        includeUnpublished: filtersForUI.includeUnpublished,
       },
       quizResultsProps: {
         quizId,
@@ -229,6 +228,7 @@ export function useExampleSearch() {
       filtersForUI.excludeSpanglish,
       filtersForUI.audioOnly,
       filtersForUI.filterState.lessonRanges,
+      filtersForUI.includeUnpublished,
       quizId,
       spanishInput,
       englishInput,

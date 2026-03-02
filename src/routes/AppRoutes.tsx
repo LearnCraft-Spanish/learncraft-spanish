@@ -20,7 +20,6 @@ import {
   StudentsTable,
   VqdLessonsTable,
 } from 'src/components/DatabaseTables';
-import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
 import { ExampleManagerRouter } from 'src/hexagon/interface/pages/ExampleManagerPage';
 import AdminDashboard from 'src/sections/AdminDashboard';
@@ -62,7 +61,6 @@ export default function AppRoutes() {
         path="/get-help"
         element={(isStudent || isCoach || isAdmin) && <GetHelpPage />}
       />
-      <Route path="/examplemanager" element={isAdmin && <ExampleManager />} />
       <Route
         path="/vocabularymanager"
         element={isAdmin && <VocabularyCreatorPage />}

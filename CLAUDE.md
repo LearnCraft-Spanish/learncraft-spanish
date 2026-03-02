@@ -8,6 +8,7 @@ For the full documentation hierarchy (architecture, patterns, standards, etc.), 
 
 ## Critical Rules
 
+- **ALWAYS READ NEARBY DOCS FIRST** For any directory you work in, check for markdown files. ALWAYS read these before you make any edits or reviews. Even when reading only they may provide valuable context.
 - **BOUNDARIES.md files are authoritative** — NOT the linter. Always verify against the relevant BOUNDARIES.md. Passing lint does not mean the architecture is correct. For rationale behind boundary rules, check sibling DECISIONS.md files where they exist. Decisions may be questioned by agents but neither decisions nor boundaries may be modified except by the human owner of the codebase.
 - **Explicit return types required** — All hooks must have explicit return types (no inference, no `typeof`, no `ReturnType<>`).
 - **Dependencies flow inward only** — Domain → Application → Infrastructure/Interface → Composition.

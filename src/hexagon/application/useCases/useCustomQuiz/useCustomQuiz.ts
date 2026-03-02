@@ -1,16 +1,18 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useCustomQuizFilterState } from '@application/units/CustomQuiz';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useMemo, useRef, useState } from 'react';
 
 export function useCustomQuiz() {
+  const { isCoach, isAdmin } = useAuthAdapter();
   const { filterState } = useCustomQuizFilterState();
   const {
     isLoading: isLoadingExamples,
     filteredExamples,
     totalCount,
     updatePageSize,
-  } = useExampleQuery(150, false);
+  } = useExampleQuery(150, false, isCoach || isAdmin);
   const [customQuizReady, setCustomQuizReady] = useState(false);
   const [presetQuizReady, setPresetQuizReady] = useState(false);
   const [startWithSpanish, setStartWithSpanish] = useState(false);

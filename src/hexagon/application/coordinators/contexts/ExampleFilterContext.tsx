@@ -4,6 +4,7 @@ interface ExampleFilterStateWithoutLesson {
   excludeSpanglish: boolean;
   audioOnly: boolean;
   skillTagKeys: string[];
+  includeUnpublished: boolean;
 }
 
 interface ExampleFilterContextType {
@@ -18,6 +19,7 @@ export const ExampleFilterContext = createContext<ExampleFilterContextType>({
     excludeSpanglish: false,
     audioOnly: false,
     skillTagKeys: [],
+    includeUnpublished: false,
   },
   updateExampleFilters: () => {},
 });

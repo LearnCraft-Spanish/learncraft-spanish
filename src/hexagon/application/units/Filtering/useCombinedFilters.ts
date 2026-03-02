@@ -2,6 +2,7 @@ import type { UseSelectedCourseAndLessonsReturnType } from '@application/coordin
 import type { UseExampleFilterCoordinatorReturnType } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import type { ExampleFilters as LocalExampleFilters } from '@application/ports/examplePort';
 import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleFilterCoordinator } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import {
@@ -12,7 +13,6 @@ import { usePresetFilters } from '@application/units/Filtering/FilterPresets/use
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { transformToLessonRanges } from '@domain/coursePrerequisites';
 import { useEffect, useMemo, useRef } from 'react';
-
 export type UseCombinedFiltersReturnType =
   UseExampleFilterCoordinatorReturnType &
     UseSelectedCourseAndLessonsReturnType & {
@@ -20,7 +20,7 @@ export type UseCombinedFiltersReturnType =
       skillTagSearch: UseSkillTagSearchReturnType;
       filterPreset: PreSetQuizPreset;
       setFilterPreset: (preset: PreSetQuizPreset) => void;
-    };
+    } & { isAdmin?: boolean };
 
 export interface UseCombinedFiltersProps {
   onFilterChange?: () => void;
@@ -35,15 +35,19 @@ export function useCombinedFilters({
     selectedSkillTags,
     excludeSpanglish,
     audioOnly,
+    includeUnpublished,
     batchUpdateFilterStateWithoutLesson,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
     bulkUpdateSkillTagKeys,
     updateExcludeSpanglish,
     updateAudioOnly,
+    updateIncludeUnpublished,
     isLoading: isLoadingExampleFilter,
     error: errorExampleFilter,
   } = useExampleFilterCoordinator();
+
+  const { isAdmin } = useAuthAdapter();
 
   // Destructure the course and lesson properties from the coordinator
   const {
@@ -56,7 +60,6 @@ export function useCombinedFilters({
     updateUserSelectedCourseId,
     updateFromLessonNumber,
     updateToLessonNumber,
-    isLoading: isLoadingCourseAndLessons,
     error: errorCourseAndLessons,
   } = useSelectedCourseAndLessons();
 
@@ -75,6 +78,7 @@ export function useCombinedFilters({
       audioOnly,
       skillTags: selectedSkillTags,
       lessonRanges,
+      includeUnpublished,
     };
   }, [
     excludeSpanglish,
@@ -83,12 +87,14 @@ export function useCombinedFilters({
     course,
     fromLesson,
     toLesson,
+    includeUnpublished,
   ]);
 
   // Track previous filter values to detect actual changes
   const prevFilterRef = useRef({
     excludeSpanglish,
     audioOnly,
+    includeUnpublished,
     selectedSkillTags,
     courseId: course?.id,
     fromLessonNumber: fromLesson?.lessonNumber,
@@ -100,6 +106,7 @@ export function useCombinedFilters({
     const current = {
       excludeSpanglish,
       audioOnly,
+      includeUnpublished,
       selectedSkillTags,
       courseId: course?.id,
       fromLessonNumber: fromLesson?.lessonNumber,
@@ -112,6 +119,7 @@ export function useCombinedFilters({
     const hasChanged =
       prev.excludeSpanglish !== current.excludeSpanglish ||
       prev.audioOnly !== current.audioOnly ||
+      prev.includeUnpublished !== current.includeUnpublished ||
       prev.selectedSkillTags.length !== current.selectedSkillTags.length ||
       prev.selectedSkillTags.some(
         (tag, index) => tag.key !== current.selectedSkillTags[index]?.key,
@@ -128,6 +136,7 @@ export function useCombinedFilters({
   }, [
     excludeSpanglish,
     audioOnly,
+    includeUnpublished,
     selectedSkillTags,
     course,
     fromLesson,
@@ -156,8 +165,8 @@ export function useCombinedFilters({
 
   // Load state for the full hook
   const isLoading = useMemo(() => {
-    return isLoadingExampleFilter || isLoadingCourseAndLessons;
-  }, [isLoadingExampleFilter, isLoadingCourseAndLessons]);
+    return isLoadingExampleFilter;
+  }, [isLoadingExampleFilter]);
 
   // Error state for the full hook
   const error = useMemo(() => {
@@ -175,6 +184,8 @@ export function useCombinedFilters({
     updateAudioOnly,
     excludeSpanglish,
     updateExcludeSpanglish,
+    includeUnpublished,
+    updateIncludeUnpublished,
     selectedSkillTags,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
@@ -195,5 +206,8 @@ export function useCombinedFilters({
     // Load state for the full hook
     isLoading,
     error,
+
+    // Is admin, for enabling unpublished courses and lessons toggle
+    isAdmin,
   };
 }

@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 // Assets and styles
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
-import 'src/components/ExamplesTable/ExamplesTable.scss';
+import './ExamplesTable.scss';
 import './ExampleAndFlashcardTable.scss';
 
 export default function FlashcardTable(props: UseFlashcardTableProps) {

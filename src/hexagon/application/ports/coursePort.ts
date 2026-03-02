@@ -12,6 +12,11 @@ export interface CoursePort {
    */
   getPublishedCoursesWithLessons: () => Promise<CourseWithLessons[]>;
 
+  /**
+   * Get all courses with lessons (published and unpublished). For admin use.
+   */
+  getAllCoursesWithLessons: () => Promise<CourseWithLessons[]>;
+
   getLessonVocabKnown: ({
     lessonRanges,
   }: {

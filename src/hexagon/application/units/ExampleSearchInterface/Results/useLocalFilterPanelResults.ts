@@ -14,6 +14,7 @@ export interface UseLocalFilterPanelResultsParams {
   excludeSpanglish: boolean;
   audioOnly: boolean;
   lessonRanges: LessonRange[];
+  includeUnpublished?: boolean;
 }
 
 export function useLocalFilterPanelResults({
@@ -21,6 +22,7 @@ export function useLocalFilterPanelResults({
   excludeSpanglish,
   audioOnly,
   lessonRanges,
+  includeUnpublished,
 }: UseLocalFilterPanelResultsParams) {
   const [queryPage, setQueryPage] = useState(1);
 
@@ -57,6 +59,7 @@ export function useLocalFilterPanelResults({
       limit: QUERY_PAGE_SIZE,
       seed: seed!,
       disableCache: true,
+      includeUnpublished,
     });
     return { examples: result.examples, totalCount: result.totalCount };
   }, [
@@ -67,6 +70,7 @@ export function useLocalFilterPanelResults({
     audioOnly,
     queryPage,
     seed,
+    includeUnpublished,
   ]);
 
   const {
@@ -83,6 +87,7 @@ export function useLocalFilterPanelResults({
       lessonRanges,
       queryPage,
       seed,
+      includeUnpublished,
     ],
     queryFn: () => fetchFilteredExamples(),
     enabled: !!seed,

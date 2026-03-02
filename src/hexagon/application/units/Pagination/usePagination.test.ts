@@ -18,4 +18,18 @@ describe('usePagination', () => {
     expect(result.current.nextPage).toBeDefined();
     expect(result.current.previousPage).toBeDefined();
   });
+
+  it('when totalItems is 0, pageNumber is 1 and indices are non-negative', () => {
+    const { result } = renderHook(() =>
+      usePagination({
+        itemsPerPage: 5,
+        totalItems: 0,
+      }),
+    );
+
+    expect(result.current.pageNumber).toBe(1);
+    expect(result.current.maxPageNumber).toBe(0);
+    expect(result.current.startIndex).toBe(0);
+    expect(result.current.endIndex).toBe(0);
+  });
 });

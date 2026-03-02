@@ -10,8 +10,13 @@ import { useMemo } from 'react';
 import './LessonSelector.css';
 
 export default function LessonSelector(): React.JSX.Element {
-  const { course, toLesson, updateUserSelectedCourseId, updateToLessonNumber } =
-    useSelectedCourseAndLessons();
+  const {
+    course,
+    toLesson,
+    updateUserSelectedCourseId,
+    updateToLessonNumber,
+    includeUnpublished,
+  } = useSelectedCourseAndLessons();
 
   const availableLessons = useMemo((): ExtendedLesson[] => {
     if (!course) {
@@ -47,6 +52,7 @@ export default function LessonSelector(): React.JSX.Element {
         onChange={(value: string) =>
           updateUserSelectedCourseId(Number.parseInt(value))
         }
+        includeUnpublished={includeUnpublished}
       />
       {course?.lessons && (
         <SelectLesson

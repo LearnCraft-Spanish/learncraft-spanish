@@ -9,6 +9,7 @@ export interface UseExampleFilterCoordinatorReturnType {
   selectedSkillTags: SkillTag[];
   excludeSpanglish: boolean;
   audioOnly: boolean;
+  includeUnpublished: boolean;
   batchUpdateFilterStateWithoutLesson: (
     filters: ExampleFilterStateWithoutLesson,
   ) => void;
@@ -17,6 +18,7 @@ export interface UseExampleFilterCoordinatorReturnType {
   bulkUpdateSkillTagKeys: (skillTagKeys: string[]) => void;
   updateExcludeSpanglish: (excludeSpanglish: boolean) => void;
   updateAudioOnly: (audioOnly: boolean) => void;
+  updateIncludeUnpublished: (includeUnpublished: boolean) => void;
   isLoading: boolean;
   error: Error | null;
 }
@@ -46,6 +48,7 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
         excludeSpanglish: exampleFilters.excludeSpanglish,
         audioOnly: exampleFilters.audioOnly,
         skillTagKeys: selectedSkillTags.map((tag) => tag.key),
+        includeUnpublished: exampleFilters.includeUnpublished,
       };
       return filters;
     }, [exampleFilters, selectedSkillTags]);
@@ -103,17 +106,26 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
     [exampleFilters, updateExampleFilters],
   );
 
+  const updateIncludeUnpublished = useCallback(
+    (includeUnpublished: boolean) => {
+      updateExampleFilters({ ...exampleFilters, includeUnpublished });
+    },
+    [exampleFilters, updateExampleFilters],
+  );
+
   return {
     filterStateWithoutLesson,
     selectedSkillTags,
     excludeSpanglish: exampleFilters.excludeSpanglish,
     audioOnly: exampleFilters.audioOnly,
+    includeUnpublished: exampleFilters.includeUnpublished,
     batchUpdateFilterStateWithoutLesson,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
     bulkUpdateSkillTagKeys,
     updateExcludeSpanglish,
     updateAudioOnly,
+    updateIncludeUnpublished,
     isLoading,
     error,
   };

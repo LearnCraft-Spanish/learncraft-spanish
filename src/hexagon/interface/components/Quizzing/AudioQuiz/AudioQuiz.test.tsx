@@ -90,8 +90,8 @@ function MockAudioQuizWrapper({
     setIsPlaying(false);
   };
 
-  const play = () => setIsPlaying(true);
-  const pause = () => setIsPlaying(false);
+  const play = () => Promise.resolve(setIsPlaying(true));
+  const pause = () => Promise.resolve(setIsPlaying(false));
 
   const restartQuiz = () => {
     setCurrentExampleIndex(0);

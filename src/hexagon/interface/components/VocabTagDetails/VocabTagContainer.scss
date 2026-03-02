@@ -1,3 +1,23 @@
+/* Vocabulary Tagging Styles */
+
+.vocabTag {
+  font-size: 12px;
+  padding: 7px 5px 0;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--light);
+  border: 4px solid var(--brand);
+  text-align: center;
+  overflow: hidden;
+  margin: 5px;
+  border-radius: 0;
+  cursor: pointer;
+  min-height: 80px;
+}
+
 .vocabTagContainer {
   position: relative; // Positioning context for the popup
   display: inline-block;
