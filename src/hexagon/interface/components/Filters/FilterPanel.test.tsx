@@ -84,7 +84,6 @@ const defaultCombinedFilters: UseCombinedFiltersReturnType = {
 describe('filterPanel', () => {
   beforeEach(() => {
     mockUseCombinedFilters.mockReturnValue(defaultCombinedFilters);
-    mockUseAuthAdapter.mockReturnValue({ isAdmin: false });
   });
 
   it('does not show Include unpublished toggle when user is not admin', () => {
@@ -95,7 +94,10 @@ describe('filterPanel', () => {
   });
 
   it('shows Include unpublished toggle when user is admin', () => {
-    mockUseAuthAdapter.mockReturnValue({ isAdmin: true });
+    mockUseCombinedFilters.mockReturnValue({
+      ...defaultCombinedFilters,
+      isAdmin: true,
+    });
     renderFilterPanel();
     expect(
       screen.getByText(/Include unpublished courses and lessons/i),
@@ -103,12 +105,12 @@ describe('filterPanel', () => {
   });
 
   it('calls updateIncludeUnpublished when admin toggles Include unpublished', () => {
-    mockUseAuthAdapter.mockReturnValue({ isAdmin: true });
     const updateIncludeUnpublished = vi.fn();
     mockUseCombinedFilters.mockReturnValue({
       ...defaultCombinedFilters,
       includeUnpublished: false,
       updateIncludeUnpublished,
+      isAdmin: true,
     });
 
     renderFilterPanel();
