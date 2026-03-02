@@ -1,4 +1,3 @@
-import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import PresetSelector from '@interface/components/Filters/PresetSelector';
 import {
@@ -21,7 +20,6 @@ export function FilterPanel({
 }) {
   const [filterMode, setFilterMode] = useState<'preset' | 'search'>('search');
 
-  const { isAdmin } = useAuthAdapter();
   const {
     excludeSpanglish,
     audioOnly,
@@ -35,6 +33,7 @@ export function FilterPanel({
     skillTagSearch,
     filterPreset,
     setFilterPreset,
+    isAdmin,
   } = useCombinedFilters({ onFilterChange });
 
   const {

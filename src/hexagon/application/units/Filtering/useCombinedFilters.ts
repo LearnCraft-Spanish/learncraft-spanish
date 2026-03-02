@@ -2,6 +2,7 @@ import type { UseSelectedCourseAndLessonsReturnType } from '@application/coordin
 import type { UseExampleFilterCoordinatorReturnType } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import type { ExampleFilters as LocalExampleFilters } from '@application/ports/examplePort';
 import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleFilterCoordinator } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import {
@@ -12,7 +13,6 @@ import { usePresetFilters } from '@application/units/Filtering/FilterPresets/use
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { transformToLessonRanges } from '@domain/coursePrerequisites';
 import { useEffect, useMemo, useRef } from 'react';
-
 export type UseCombinedFiltersReturnType =
   UseExampleFilterCoordinatorReturnType &
     UseSelectedCourseAndLessonsReturnType & {
@@ -20,7 +20,7 @@ export type UseCombinedFiltersReturnType =
       skillTagSearch: UseSkillTagSearchReturnType;
       filterPreset: PreSetQuizPreset;
       setFilterPreset: (preset: PreSetQuizPreset) => void;
-    };
+    } & { isAdmin?: boolean };
 
 export interface UseCombinedFiltersProps {
   onFilterChange?: () => void;
@@ -47,6 +47,8 @@ export function useCombinedFilters({
     error: errorExampleFilter,
   } = useExampleFilterCoordinator();
 
+  const { isAdmin } = useAuthAdapter();
+
   // Destructure the course and lesson properties from the coordinator
   const {
     course,
@@ -58,7 +60,6 @@ export function useCombinedFilters({
     updateUserSelectedCourseId,
     updateFromLessonNumber,
     updateToLessonNumber,
-    isLoading: isLoadingCourseAndLessons,
     error: errorCourseAndLessons,
   } = useSelectedCourseAndLessons();
 
@@ -164,8 +165,8 @@ export function useCombinedFilters({
 
   // Load state for the full hook
   const isLoading = useMemo(() => {
-    return isLoadingExampleFilter || isLoadingCourseAndLessons;
-  }, [isLoadingExampleFilter, isLoadingCourseAndLessons]);
+    return isLoadingExampleFilter;
+  }, [isLoadingExampleFilter]);
 
   // Error state for the full hook
   const error = useMemo(() => {
@@ -205,5 +206,8 @@ export function useCombinedFilters({
     // Load state for the full hook
     isLoading,
     error,
+
+    // Is admin, for enabling unpublished courses and lessons toggle
+    isAdmin,
   };
 }

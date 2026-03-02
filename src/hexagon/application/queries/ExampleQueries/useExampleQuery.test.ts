@@ -14,6 +14,7 @@ vi.mock('@application/units/Filtering/useCombinedFilters', () => ({
 
 describe('useExampleQuery', () => {
   const defaultMockCombinedFilters: UseCombinedFiltersReturnType = {
+    isAdmin: false,
     filterState: {
       lessonRanges: [],
       excludeSpanglish: false,

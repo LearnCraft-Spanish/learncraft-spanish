@@ -32,6 +32,7 @@ vi.mock('@interface/components/Filters/PresetSelector', () => ({
 }));
 
 const defaultCombinedFilters: UseCombinedFiltersReturnType = {
+  isAdmin: false,
   filterState: {
     lessonRanges: [],
     excludeSpanglish: false,
