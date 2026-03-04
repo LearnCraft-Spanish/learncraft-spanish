@@ -1,8 +1,8 @@
+import { InlineLoading } from '@interface/components/Loading';
 import { useState } from 'react';
 import useStudentsBeyond150ByCoach from 'src/hooks/AdminData/useStudentsBeyond150ByCoach';
 import DisplayOnlyTable from './RecentRecords/DisplayOnlyTable';
 import SectionHeader from './SectionHeader';
-
 const headers = [
   'Student',
   'Student Email',
@@ -29,7 +29,7 @@ function MyStudentsBeyond150({ coachId }: { coachId: number }) {
   const isError = studentsBeyond150ByCoachQuery.isError;
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <InlineLoading />;
   }
 
   if (isError) {
