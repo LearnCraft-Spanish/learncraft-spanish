@@ -22,10 +22,11 @@ export function writeTableToClipboard(exampleList: ExampleWithVocabulary[]) {
   const headers = 'ID\tSpanish\tEnglish\tAudio_Link\n';
   const table = exampleList
     .map((example) => {
-      return `${example.id}\t\
-            ${example.spanish}\t\
-          ${example.english}\t\
-          ${example.spanishAudio}\n`;
+      const baseString = `${example.id}\t\t${example.spanish}\t\t${example.english}`;
+      if (example.spanishAudio) {
+        return `${baseString}\t\t${example.spanishAudio}\n`;
+      }
+      return `${baseString}\n`;
     })
     .join('');
   const copiedText = headers + table;
