@@ -613,5 +613,71 @@ describe('useAudioQuiz', () => {
       // The Guess step triggers a new changeCurrentAudio via the main effect
       expect(newCalls).toBeLessThanOrEqual(1);
     });
+
+    it('should pause buffer countdown when pause is called during buffer', async () => {
+      overrideMockAudioAdapter({ isPlaying: true });
+      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
+      await getToHintStep(result);
+      startBufferAndGetCallback();
+
+      expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
+
+      // Let real time pass so stepStartTimeRef has measurably non-zero elapsed,
+      // meaning progressStatus will be a non-trivial fraction before we pause.
+      // The 50ms bufferProgressTick interval fires during this wait and drives
+      // re-renders, so the memo computes a live value.
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      });
+
+      await act(async () => {
+        await result.current.pause();
+      });
+      const frozenProgress = result.current.progressStatus;
+
+      // More real time passes and bufferProgressTick keeps ticking.
+      // Without pause, progress would continue to grow (Date.now() drift).
+      // With pause, progressStatus must return the same frozen value each tick.
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      });
+
+      expect(result.current.progressStatus).toBe(frozenProgress);
+      expect(mockAudioAdapter.pause).toHaveBeenCalled();
+    });
+
+    it('should advance step after pause and play during buffer when buffer ends', async () => {
+      // vi.useFakeTimers() cannot be used before renderHook/waitFor because
+      // waitFor relies on setTimeout internally and would never resolve.
+      // Instead we verify the core observable behavior: pause + play during buffer
+      // does not corrupt timerFiredRef or isInBufferRef, so the silence audio's
+      // onEnded callback can still fire and advance the step.
+      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
+      await getToHintStep(result);
+      const bufferOnEnded = startBufferAndGetCallback();
+
+      expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
+
+      // Pause during the buffer phase
+      await act(async () => {
+        await result.current.pause();
+      });
+      expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
+
+      // Resume
+      await act(async () => {
+        await result.current.play();
+      });
+      expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
+
+      // Silence audio ends → step must still advance (buffer state was not
+      // corrupted by the pause/play cycle)
+      act(() => {
+        bufferOnEnded();
+      });
+
+      expect(result.current.currentStep).toBe(AudioQuizStep.Answer);
+      expect(mockAudioAdapter.play).toHaveBeenCalled();
+    });
   });
 });

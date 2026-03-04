@@ -208,6 +208,8 @@ export function useAudioQuiz({
   const stepStartTimeRef = useRef(0);
   // When user pauses on a buffered step, store elapsed so the progress bar freezes (no jump on resume)
   const pausedElapsedRef = useRef<number | null>(null);
+  // One-shot guard: only one of timer or bufferEndedCallback may call nextStep per buffer phase
+  const timerFiredRef = useRef(false);
   // Ticks every 50ms during buffered steps so progressStatus re-renders from elapsed time
   const [bufferProgressTick, setBufferProgressTick] = useState(0);
 
@@ -215,6 +217,7 @@ export function useAudioQuiz({
     isInBufferRef.current = false;
     audioPortionDurationRef.current = 0;
     pausedElapsedRef.current = null;
+    timerFiredRef.current = false;
   }, []);
 
   // The current example number (1-indexed for UI purposes)
@@ -555,8 +558,7 @@ export function useAudioQuiz({
       const elapsedSec =
         pausedElapsedRef.current !== null
           ? pausedElapsedRef.current
-          : (Date.now() - stepStartTimeRef.current) / 1000 +
-            bufferProgressTick * 0;
+          : (Date.now() - stepStartTimeRef.current) / 1000;
       progress = elapsedSec / effectiveDuration;
     } else if (isInBufferRef.current) {
       progress =
@@ -565,6 +567,9 @@ export function useAudioQuiz({
       progress = currentTime / effectiveDuration;
     }
     const finalProgress = Math.min(Math.max(progress, 0), 1);
+
+    // bufferProgressTick is a dep of this memo (not used here) to force re-evaluation
+    void bufferProgressTick;
 
     return finalProgress;
   }, [
@@ -585,9 +590,12 @@ export function useAudioQuiz({
 
   // Called when the silence buffer audio ends
   const bufferEndedCallback = useCallback((): void => {
-    isInBufferRef.current = false;
-    audioPortionDurationRef.current = 0;
-    nextStepRef.current();
+    if (!timerFiredRef.current) {
+      timerFiredRef.current = true;
+      isInBufferRef.current = false;
+      audioPortionDurationRef.current = 0;
+      nextStepRef.current();
+    }
   }, []);
 
   // Called when any step's main audio ends
@@ -598,6 +606,7 @@ export function useAudioQuiz({
 
     if (stepHasBuffer) {
       const duration = currentStepValue?.duration ?? 0;
+      timerFiredRef.current = false;
       isInBufferRef.current = true;
       audioPortionDurationRef.current = duration;
       changeCurrentAudio({
@@ -660,7 +669,10 @@ export function useAudioQuiz({
       const elapsed = (Date.now() - stepStartTimeRef.current) / 1000;
       setBufferProgressTick((t) => t + 1);
       if (elapsed >= effectiveDuration) {
-        nextStepRef.current();
+        if (!timerFiredRef.current) {
+          timerFiredRef.current = true;
+          nextStepRef.current();
+        }
       }
     }, 50);
     return () => clearInterval(id);
