@@ -1,11 +1,13 @@
 import type { AudioQuizProps } from '@application/units/AudioQuiz/useAudioQuiz';
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
+import { useAudioAdapter } from '@application/adapters/audioAdapter';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useMemo, useRef, useState } from 'react';
+import silence1s from 'src/assets/audio/1s.mp3';
 
 export enum CombinedCustomQuizType {
   Text = 'text',
@@ -42,6 +44,7 @@ export interface UseCombinedCustomQuizReturn {
 
 export function useCombinedCustomQuiz(): UseCombinedCustomQuizReturn {
   const QUERY_PAGE_SIZE = 150;
+  const { primeAudioElement } = useAudioAdapter();
   const { isCoach, isAdmin } = useAuthAdapter();
   // Local state
   const [quizType, setQuizType] = useState<CombinedCustomQuizType>(
@@ -128,7 +131,7 @@ export function useCombinedCustomQuiz(): UseCombinedCustomQuizReturn {
         updatePageSize(textQuizSetup.quizLength);
       }
     } else {
-      // Take snapshot of audio examples
+      primeAudioElement(silence1s);
       const shuffledAudioExamples = fisherYatesShuffle(safeAudioExamples);
       staticAudioExamples.current = shuffledAudioExamples.slice(
         0,

@@ -3,6 +3,7 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import { vi } from 'vitest';
 
 const defaultMockAudioAdapter: AudioPort = {
+  primeAudioElement: vi.fn<(silenceUrl: string) => void>(),
   play: vi.fn<() => Promise<void>>(),
   pause: vi.fn<() => Promise<void>>(),
   isPlaying: false,

@@ -1,8 +1,10 @@
 import type { AudioQuizProps } from '@application/units/AudioQuiz/useAudioQuiz';
+import { useAudioAdapter } from '@application/adapters/audioAdapter';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useMemo, useRef, useState } from 'react';
+import silence1s from 'src/assets/audio/1s.mp3';
 
 export interface UseLimitedCustomQuizReturn {
   // Quiz readiness
@@ -26,6 +28,7 @@ export interface UseLimitedCustomQuizReturn {
 
 export function useLimitedCustomQuiz(): UseLimitedCustomQuizReturn {
   const QUERY_PAGE_SIZE = 150;
+  const { primeAudioElement } = useAudioAdapter();
 
   // Local state
   const [quizReady, setQuizReady] = useState(false);
@@ -68,7 +71,7 @@ export function useLimitedCustomQuiz(): UseLimitedCustomQuizReturn {
 
   // Function to ready the quiz
   const readyQuiz = () => {
-    // Take snapshot of audio examples
+    primeAudioElement(silence1s);
     const shuffledAudioExamples = fisherYatesShuffle(filteredExamples ?? []);
     staticAudioExamples.current = shuffledAudioExamples.slice(
       0,

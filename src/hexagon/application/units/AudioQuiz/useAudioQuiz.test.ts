@@ -386,32 +386,26 @@ describe('useAudioQuiz', () => {
     });
   });
 
-  describe.skip('buffer (autoplay) - countdown after hint/answer audio ends', () => {
-    const BUFFER_TEST_TIMEOUT_MS = 15_000;
-
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
+  describe('buffer (autoplay) - silence audio after hint/answer', () => {
     const autoplayProps = {
       ...defaultProps,
       autoplay: true,
     };
 
     /**
-     * Get the onEnded callback passed to changeCurrentAudio (simulates "audio ended").
-     * Must be called after the hook has set up audio for the current step (e.g. on Hint or Answer).
+     * Get the onEnded callback from the Nth changeCurrentAudio call (0-indexed from the end).
+     * offset=0 means the very last call.
      */
-    function getOnEndedFromLastChangeAudio(): () => void {
+    function getOnEndedFromChangeAudio(offsetFromEnd = 0): () => void {
       const calls = mockAudioAdapter.changeCurrentAudio.mock.calls;
-      expect(calls.length).toBeGreaterThan(0);
-      const lastCall = calls[calls.length - 1][0];
-      expect(lastCall?.onEnded).toBeDefined();
-      return lastCall.onEnded as () => void;
+      expect(calls.length).toBeGreaterThan(offsetFromEnd);
+      const call = calls[calls.length - 1 - offsetFromEnd][0];
+      expect(call?.onEnded).toBeDefined();
+      return call.onEnded as () => void;
     }
 
     /**
-     * Get hook to Hint step with autoplay (real timers). Does not start buffer.
+     * Navigate to Hint step with autoplay.
      */
     async function getToHintStep(result: {
       current: AudioQuizReturn;
@@ -428,318 +422,216 @@ describe('useAudioQuiz', () => {
     }
 
     /**
-     * Start the buffer (simulate audio ended). Call after vi.useFakeTimers() so the buffer interval is controlled.
-     * After overriding the mock adapter's currentTime, we need a re-render so the hook's lastCurrentTimeRef and
-     * lastStepDurationRef are updated (they are written during render). Otherwise onEndedCallback would read stale
-     * refs and progress/buffer math would be wrong. The setGetHelpIsOpen toggles are only used to force that
-     * re-render — getHelp state does not affect buffer behavior.
+     * Simulate the step audio ending. This triggers the buffer (silence audio)
+     * on hint/answer steps in autoplay. Returns the buffer's onEnded callback
+     * so tests can fire it to complete the buffer.
      */
-    function startBuffer(result: { current: AudioQuizReturn }): void {
-      overrideMockAudioAdapter({ currentTime: MOCK_STEP_DURATION });
+    function startBufferAndGetCallback(): () => void {
+      const callCountBefore =
+        mockAudioAdapter.changeCurrentAudio.mock.calls.length;
+      const stepOnEnded = getOnEndedFromChangeAudio();
+      act(() => {
+        stepOnEnded();
+      });
+      // onEndedCallback should have called changeCurrentAudio with the silence src
+      expect(
+        mockAudioAdapter.changeCurrentAudio.mock.calls.length,
+      ).toBeGreaterThan(callCountBefore);
+      return getOnEndedFromChangeAudio();
+    }
+
+    it('should play silence audio after Hint audio ends in autoplay', async () => {
+      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
+      await getToHintStep(result);
+
+      const callCountBefore =
+        mockAudioAdapter.changeCurrentAudio.mock.calls.length;
+      const stepOnEnded = getOnEndedFromChangeAudio();
+      act(() => {
+        stepOnEnded();
+      });
+
+      // A new changeCurrentAudio call was made for the silence buffer
+      const newCalls =
+        mockAudioAdapter.changeCurrentAudio.mock.calls.length - callCountBefore;
+      expect(newCalls).toBe(1);
+      const silenceCall =
+        mockAudioAdapter.changeCurrentAudio.mock.calls[
+          mockAudioAdapter.changeCurrentAudio.mock.calls.length - 1
+        ][0];
+      expect(silenceCall.playOnLoad).toBe(true);
+      // Step has not changed yet (still in buffer)
+      expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
+    });
+
+    it('should advance to Answer after Hint buffer silence ends', async () => {
+      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
+      await getToHintStep(result);
+
+      const bufferOnEnded = startBufferAndGetCallback();
+      expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
+
+      act(() => {
+        bufferOnEnded();
+      });
+
+      expect(result.current.currentStep).toBe(AudioQuizStep.Answer);
+    });
+
+    it('should advance to next example after Answer buffer silence ends', async () => {
+      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+      await waitFor(() => {
+        expect(result.current.nextExampleReady).toBe(true);
+      });
+      act(() => {
+        result.current.goToAnswer();
+      });
+      await waitFor(() => {
+        expect(result.current.currentStep).toBe(AudioQuizStep.Answer);
+      });
+
+      const bufferOnEnded = startBufferAndGetCallback();
+      act(() => {
+        bufferOnEnded();
+      });
+
+      expect(result.current.currentExampleNumber).toBe(2);
+      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+    });
+
+    it('should account for buffer in progressStatus during audio phase', async () => {
+      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
+      await getToHintStep(result);
+
+      // During audio phase on a buffered step, progress denominator includes the buffer
+      overrideMockAudioAdapter({ currentTime: MOCK_STEP_DURATION / 2 });
       act(() => {
         result.current.setGetHelpIsOpen(true);
       });
       act(() => {
         result.current.setGetHelpIsOpen(false);
       });
-      const onEnded = getOnEndedFromLastChangeAudio();
+
+      const effectiveDuration = MOCK_STEP_DURATION + AUDIO_QUIZ_BUFFER_SECONDS;
+      const expected = MOCK_STEP_DURATION / 2 / effectiveDuration;
+      expect(result.current.progressStatus).toBeCloseTo(expected, 2);
+    });
+
+    it('should account for buffer in progressStatus during silence phase', async () => {
+      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
+      await getToHintStep(result);
+
+      // Start buffer
+      startBufferAndGetCallback();
+
+      // Simulate silence playback at 1 second into the 2s buffer
+      overrideMockAudioAdapter({ currentTime: 1.0 });
       act(() => {
-        onEnded();
+        result.current.setGetHelpIsOpen(true);
       });
-    }
+      act(() => {
+        result.current.setGetHelpIsOpen(false);
+      });
 
-    it(
-      'should start buffer countdown after audio ends on Hint step when autoplay is true',
-      async () => {
-        const { result } = renderHook(() => useAudioQuiz(autoplayProps));
-        await getToHintStep(result);
-        vi.useFakeTimers();
-        startBuffer(result);
+      const effectiveDuration = MOCK_STEP_DURATION + AUDIO_QUIZ_BUFFER_SECONDS;
+      const expected = (MOCK_STEP_DURATION + 1.0) / effectiveDuration;
+      expect(result.current.progressStatus).toBeCloseTo(expected, 2);
+    });
 
-        // Buffer is running: progress should advance toward 1 over the next AUDIO_QUIZ_BUFFER_SECONDS
-        const progressAtStart = result.current.progressStatus;
-        act(() => {
-          vi.advanceTimersByTime(500);
-        });
-        const progressMid = result.current.progressStatus;
-        expect(progressMid).toBeGreaterThan(progressAtStart);
+    it('should cleanup buffer state when nextExample is called during buffer', async () => {
+      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
+      await waitFor(() => {
+        expect(result.current.nextExampleReady).toBe(true);
+      });
+      await getToHintStep(result);
 
-        // After buffer duration, nextStep runs and we leave Hint (e.g. go to Answer)
-        act(() => {
-          vi.advanceTimersByTime((AUDIO_QUIZ_BUFFER_SECONDS - 0.5) * 1000);
-        });
-        expect(result.current.currentStep).toBe(AudioQuizStep.Answer);
+      startBufferAndGetCallback();
 
-        vi.useRealTimers();
-      },
-      BUFFER_TEST_TIMEOUT_MS,
-    );
+      act(() => {
+        result.current.nextExample();
+      });
 
-    it(
-      'should start buffer countdown after audio ends on Answer step when autoplay is true',
-      async () => {
-        const { result } = renderHook(() => useAudioQuiz(autoplayProps));
-        await waitFor(() => {
-          expect(result.current.currentExampleReady).toBe(true);
-        });
-        await waitFor(() => {
-          expect(result.current.nextExampleReady).toBe(true);
-        });
-        act(() => {
-          result.current.goToAnswer();
-        });
-        await waitFor(() => {
-          expect(result.current.currentStep).toBe(AudioQuizStep.Answer);
-        });
-        vi.useFakeTimers();
-        startBuffer(result);
+      expect(result.current.currentExampleNumber).toBe(2);
+      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+    });
 
-        act(() => {
-          vi.advanceTimersByTime(500);
-        });
-        expect(result.current.progressStatus).toBeGreaterThan(0);
-
-        await act(async () => {
-          await vi.advanceTimersByTimeAsync(
-            (AUDIO_QUIZ_BUFFER_SECONDS + 0.5) * 1000,
-          );
-        });
-        // Buffer completed: nextStep() ran and called nextExample(); we had nextExampleReady so we advanced to example 2
-        expect(result.current.currentExampleNumber).toBe(2);
-        expect(result.current.currentStep).toBe(AudioQuizStep.Question);
-
-        vi.useRealTimers();
-      },
-      BUFFER_TEST_TIMEOUT_MS,
-    );
-
-    it(
-      'should pause buffer countdown when pause is called during buffer',
-      async () => {
-        const { result } = renderHook(() => useAudioQuiz(autoplayProps));
-        await getToHintStep(result);
-        vi.useFakeTimers();
-        startBuffer(result);
-
-        const progressBeforePause = result.current.progressStatus;
-        act(() => {
-          result.current.pause();
-        });
-        expect(result.current.isPlaying).toBe(false);
-
-        // Advance time; countdown should not advance (buffer paused)
-        act(() => {
-          vi.advanceTimersByTime(1500);
-        });
+    it('should cleanup buffer state when previousExample is called during buffer', async () => {
+      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
+      await waitFor(() => {
+        expect(result.current.nextExampleReady).toBe(true);
+      });
+      act(() => {
+        result.current.nextExample();
+      });
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
+      act(() => {
+        result.current.goToHint();
+      });
+      await waitFor(() => {
         expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
-        expect(result.current.progressStatus).toBeCloseTo(
-          progressBeforePause,
-          2,
-        );
+      });
 
-        vi.useRealTimers();
-      },
-      BUFFER_TEST_TIMEOUT_MS,
-    );
+      startBufferAndGetCallback();
 
-    it(
-      'should resume buffer countdown and advance to next step when play is called during buffer',
-      async () => {
-        const { result } = renderHook(() => useAudioQuiz(autoplayProps));
-        await getToHintStep(result);
-        vi.useFakeTimers();
-        startBuffer(result);
-        act(() => {
-          result.current.pause();
-        });
-        expect(result.current.isPlaying).toBe(false);
+      act(() => {
+        result.current.previousExample();
+      });
 
-        act(() => {
-          result.current.play();
-        });
-        expect(result.current.isPlaying).toBe(true);
+      expect(result.current.currentExampleNumber).toBe(1);
+      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+    });
 
-        for (let i = 0; i < 45; i++) {
-          act(() => {
-            vi.advanceTimersByTime(50);
-          });
-        }
-        expect(result.current.currentStep).toBe(AudioQuizStep.Answer);
+    it('should cleanup buffer state when restartQuiz is called during buffer', async () => {
+      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
+      await getToHintStep(result);
 
-        vi.useRealTimers();
-      },
-      BUFFER_TEST_TIMEOUT_MS,
-    );
+      startBufferAndGetCallback();
 
-    it(
-      'should reflect bufferTimeElapsed in progressStatus during buffer period',
-      async () => {
-        const { result } = renderHook(() => useAudioQuiz(autoplayProps));
-        await getToHintStep(result);
-        vi.useFakeTimers();
-        startBuffer(result);
+      act(() => {
+        result.current.restartQuiz();
+      });
 
-        const effectiveDuration =
-          MOCK_STEP_DURATION + AUDIO_QUIZ_BUFFER_SECONDS;
-        // After ~0.5s buffer time: progress = (duration + 0.5) / effectiveDuration
-        act(() => {
-          vi.advanceTimersByTime(500);
-        });
-        const expectedProgress = (MOCK_STEP_DURATION + 0.5) / effectiveDuration;
-        expect(result.current.progressStatus).toBeCloseTo(expectedProgress, 2);
+      expect(result.current.currentExampleNumber).toBe(1);
+      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+      expect(mockAudioAdapter.cleanupAudio).toHaveBeenCalled();
+    });
 
-        vi.useRealTimers();
-      },
-      BUFFER_TEST_TIMEOUT_MS,
-    );
+    it('should cleanup buffer on unmount', async () => {
+      const { result, unmount } = renderHook(() => useAudioQuiz(autoplayProps));
+      await getToHintStep(result);
 
-    it(
-      'should cleanup buffer when nextExample is called',
-      async () => {
-        const { result } = renderHook(() => useAudioQuiz(autoplayProps));
-        await waitFor(() => {
-          expect(result.current.nextExampleReady).toBe(true);
-        });
-        await getToHintStep(result);
-        vi.useFakeTimers();
-        startBuffer(result);
+      startBufferAndGetCallback();
 
-        act(() => {
-          result.current.nextExample();
-        });
+      unmount();
+      expect(mockAudioAdapter.cleanupAudio).toHaveBeenCalled();
+    });
 
-        expect(result.current.currentExampleNumber).toBe(2);
-        expect(result.current.currentStep).toBe(AudioQuizStep.Question);
-        // Buffer cleared: advancing time should not trigger the old buffer's nextStep again
-        act(() => {
-          vi.advanceTimersByTime(AUDIO_QUIZ_BUFFER_SECONDS * 1000);
-        });
-        expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+    it('should not start buffer for Question step in autoplay', async () => {
+      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
+      await waitFor(() => {
+        expect(result.current.currentExampleReady).toBe(true);
+      });
 
-        vi.useRealTimers();
-      },
-      BUFFER_TEST_TIMEOUT_MS,
-    );
+      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+      const callCountBefore =
+        mockAudioAdapter.changeCurrentAudio.mock.calls.length;
+      const stepOnEnded = getOnEndedFromChangeAudio();
+      act(() => {
+        stepOnEnded();
+      });
 
-    it(
-      'should cleanup buffer when previousExample is called',
-      async () => {
-        const { result } = renderHook(() => useAudioQuiz(autoplayProps));
-        await waitFor(() => {
-          expect(result.current.nextExampleReady).toBe(true);
-        });
-        act(() => {
-          result.current.nextExample();
-        });
-        await waitFor(() => {
-          expect(result.current.currentExampleReady).toBe(true);
-        });
-        act(() => {
-          result.current.goToHint();
-        });
-        await waitFor(() => {
-          expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
-        });
-        vi.useFakeTimers();
-        startBuffer(result);
-
-        act(() => {
-          result.current.previousExample();
-        });
-
-        expect(result.current.currentExampleNumber).toBe(1);
-        expect(result.current.currentStep).toBe(AudioQuizStep.Question);
-        act(() => {
-          vi.advanceTimersByTime(AUDIO_QUIZ_BUFFER_SECONDS * 1000);
-        });
-        expect(result.current.currentStep).toBe(AudioQuizStep.Question);
-
-        vi.useRealTimers();
-      },
-      BUFFER_TEST_TIMEOUT_MS,
-    );
-
-    it(
-      'should cleanup buffer when restartQuiz is called',
-      async () => {
-        const { result } = renderHook(() => useAudioQuiz(autoplayProps));
-        await getToHintStep(result);
-        vi.useFakeTimers();
-        startBuffer(result);
-
-        act(() => {
-          result.current.restartQuiz();
-        });
-
-        expect(result.current.currentExampleNumber).toBe(1);
-        expect(result.current.currentStep).toBe(AudioQuizStep.Question);
-        act(() => {
-          vi.advanceTimersByTime(AUDIO_QUIZ_BUFFER_SECONDS * 1000);
-        });
-        expect(result.current.currentStep).toBe(AudioQuizStep.Question);
-
-        vi.useRealTimers();
-      },
-      BUFFER_TEST_TIMEOUT_MS,
-    );
-
-    it(
-      'should cleanup buffer when quiz is complete',
-      async () => {
-        const { result } = renderHook(() => useAudioQuiz(autoplayProps));
-        await waitFor(() => {
-          expect(result.current.currentExampleReady).toBe(true);
-        });
-        for (let i = 0; i < mockExamples.length - 1; i++) {
-          await waitFor(() => {
-            expect(result.current.nextExampleReady).toBe(true);
-          });
-          act(() => {
-            result.current.nextExample();
-          });
-        }
-        act(() => {
-          result.current.goToAnswer();
-        });
-        await waitFor(() => {
-          expect(result.current.currentStep).toBe(AudioQuizStep.Answer);
-        });
-        vi.useFakeTimers();
-        startBuffer(result);
-
-        const cleanupBefore = mockAudioAdapter.cleanupAudio.mock.calls.length;
-        act(() => {
-          result.current.nextStep();
-        });
-        expect(result.current.isQuizComplete).toBe(true);
-        expect(mockAudioAdapter.cleanupAudio.mock.calls.length).toBeGreaterThan(
-          cleanupBefore,
-        );
-
-        vi.useRealTimers();
-      },
-      BUFFER_TEST_TIMEOUT_MS,
-    );
-
-    it(
-      'should cleanup buffer on unmount',
-      async () => {
-        const { result, unmount } = renderHook(() =>
-          useAudioQuiz(autoplayProps),
-        );
-        await getToHintStep(result);
-        vi.useFakeTimers();
-        startBuffer(result);
-
-        unmount();
-        act(() => {
-          vi.advanceTimersByTime(AUDIO_QUIZ_BUFFER_SECONDS * 1000);
-        });
-        // No crash / no state update on unmounted component; buffer interval was cleared
-        expect(mockAudioAdapter.cleanupAudio).toHaveBeenCalled();
-        vi.useRealTimers();
-      },
-      BUFFER_TEST_TIMEOUT_MS,
-    );
+      // Should go directly to Guess without an extra changeCurrentAudio for silence
+      expect(result.current.currentStep).toBe(AudioQuizStep.Guess);
+      // changeCurrentAudio is called once for the new Guess step, not for a silence buffer
+      const newCalls =
+        mockAudioAdapter.changeCurrentAudio.mock.calls.length - callCountBefore;
+      // The Guess step triggers a new changeCurrentAudio via the main effect
+      expect(newCalls).toBeLessThanOrEqual(1);
+    });
   });
 });
