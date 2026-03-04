@@ -85,9 +85,9 @@ export function useAudioInfrastructure(): AudioPort {
       el.src = newAudio.src;
       el.onended = newAudio.onEnded;
 
-      // Use canplay so playback starts as soon as enough is buffered (reduces gap when switching to buffer)
+      // Use loadeddata (first frame available) to start playback as early as possible when switching sources
       el.addEventListener(
-        'canplay',
+        'loadeddata',
         () => {
           el.currentTime = newAudio.currentTime;
           if (newAudio.playOnLoad) {

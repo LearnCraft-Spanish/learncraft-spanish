@@ -204,10 +204,17 @@ export function useAudioQuiz({
   const isInBufferRef = useRef(false);
   // Duration of the audio portion that preceded the current buffer
   const audioPortionDurationRef = useRef(0);
+  // When the current step's audio started (for timer-driven progress so UI is seamless across step→buffer transition)
+  const stepStartTimeRef = useRef(0);
+  // When user pauses on a buffered step, store elapsed so the progress bar freezes (no jump on resume)
+  const pausedElapsedRef = useRef<number | null>(null);
+  // Ticks every 50ms during buffered steps so progressStatus re-renders from elapsed time
+  const [bufferProgressTick, setBufferProgressTick] = useState(0);
 
   const cleanupBuffer = useCallback((): void => {
     isInBufferRef.current = false;
     audioPortionDurationRef.current = 0;
+    pausedElapsedRef.current = null;
   }, []);
 
   // The current example number (1-indexed for UI purposes)
@@ -541,8 +548,17 @@ export function useAudioQuiz({
       ? duration + AUDIO_QUIZ_BUFFER_SECONDS
       : duration;
 
+    // For buffered steps, drive progress from elapsed time so the UI is seamless.
+    // When paused, use frozen elapsed so the bar doesn't jump on resume.
     let progress: number;
-    if (isInBufferRef.current) {
+    if (stepHasBuffer && stepStartTimeRef.current > 0) {
+      const elapsedSec =
+        pausedElapsedRef.current !== null
+          ? pausedElapsedRef.current
+          : (Date.now() - stepStartTimeRef.current) / 1000 +
+            bufferProgressTick * 0;
+      progress = elapsedSec / effectiveDuration;
+    } else if (isInBufferRef.current) {
       progress =
         (audioPortionDurationRef.current + currentTime) / effectiveDuration;
     } else {
@@ -559,6 +575,7 @@ export function useAudioQuiz({
     currentStep,
     currentExampleIndex,
     stepHasBuffer,
+    bufferProgressTick,
   ]);
 
   // Ref to hold the latest nextStep so onEndedCallback and bufferEndedCallback
@@ -601,12 +618,22 @@ export function useAudioQuiz({
   ]);
 
   const wrappedPause = useCallback(async (): Promise<void> => {
+    if (stepHasBuffer && stepStartTimeRef.current > 0) {
+      pausedElapsedRef.current = (Date.now() - stepStartTimeRef.current) / 1000;
+    }
     await pause();
-  }, [pause]);
+  }, [pause, stepHasBuffer]);
 
   const wrappedPlay = useCallback(async (): Promise<void> => {
+    if (pausedElapsedRef.current !== null) {
+      stepStartTimeRef.current = Date.now() - pausedElapsedRef.current * 1000;
+      pausedElapsedRef.current = null;
+    } else if (isInBufferRef.current) {
+      const elapsedSoFar = audioPortionDurationRef.current + currentTime;
+      stepStartTimeRef.current = Date.now() - elapsedSoFar * 1000;
+    }
     await play();
-  }, [play]);
+  }, [play, currentTime]);
 
   // Preload the buffer silence file so the transition from step audio → buffer has minimal gap
   useEffect(() => {
@@ -615,6 +642,37 @@ export function useAudioQuiz({
     preloadEl.preload = 'auto';
     preloadEl.load();
   }, [ready, autoplay]);
+
+  // Visual buffer: advance when elapsed time reaches step+2s (so UI is seamless; we may cut off silence early)
+  useEffect(() => {
+    if (
+      !ready ||
+      !autoplay ||
+      !stepHasBuffer ||
+      !currentStepValue?.duration ||
+      !_isPlaying
+    ) {
+      return;
+    }
+    const effectiveDuration =
+      currentStepValue.duration + AUDIO_QUIZ_BUFFER_SECONDS;
+    const id = setInterval(() => {
+      const elapsed = (Date.now() - stepStartTimeRef.current) / 1000;
+      setBufferProgressTick((t) => t + 1);
+      if (elapsed >= effectiveDuration) {
+        nextStepRef.current();
+      }
+    }, 50);
+    return () => clearInterval(id);
+  }, [
+    ready,
+    autoplay,
+    stepHasBuffer,
+    currentStepValue?.duration,
+    _isPlaying,
+    currentStep,
+    currentExampleIndex,
+  ]);
 
   // Effect to parse the audio examples when the current example is ready
   useEffect(() => {
@@ -678,6 +736,8 @@ export function useAudioQuiz({
     }
 
     const applyAudioChange = (): void => {
+      pausedElapsedRef.current = null;
+      stepStartTimeRef.current = Date.now();
       changeCurrentAudio({
         currentTime: 0,
         src: currentStepValue.mp3AudioUrl,
