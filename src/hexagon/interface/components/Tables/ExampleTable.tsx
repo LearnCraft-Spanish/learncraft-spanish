@@ -4,14 +4,16 @@ import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 // import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '@interface/components/ExampleListItem/FlashcardFinderExampleListItem';
-import { Pagination } from '@interface/components/general';
 
+import { Pagination } from '@interface/components/general';
 import { InlineLoading } from '@interface/components/Loading';
+import { CopyAllExamplesToClipboard } from '@interface/components/Tables/units/CopyAllExamplesToClipboard';
+
 import { copyTableToClipboard } from '@interface/components/Tables/units/functions';
 import { useRef, useState } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
 import './ExamplesTable.scss';
@@ -38,6 +40,7 @@ export default function ExamplesTable({
 }: ExamplesTableProps) {
   const { page, maxPageNumber, nextPage, previousPage } = paginationState;
   const navigate = useNavigate();
+  const { isAdmin } = useAuthAdapter();
   // const {
   //   bulkSelectMode,
   //   bulkOperationInProgress,
@@ -111,6 +114,7 @@ export default function ExamplesTable({
                 onMouseEnter={show}
                 onMouseLeave={hide}
               >
+                {isAdmin && <CopyAllExamplesToClipboard />}
                 <button
                   type="button"
                   onClick={() => {
