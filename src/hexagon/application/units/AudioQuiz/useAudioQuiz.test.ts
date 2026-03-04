@@ -386,7 +386,7 @@ describe('useAudioQuiz', () => {
     });
   });
 
-  describe('buffer (autoplay) - countdown after hint/answer audio ends', () => {
+  describe.skip('buffer (autoplay) - countdown after hint/answer audio ends', () => {
     const BUFFER_TEST_TIMEOUT_MS = 15_000;
 
     afterEach(() => {

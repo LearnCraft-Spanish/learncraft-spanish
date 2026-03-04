@@ -19,6 +19,12 @@ import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+/**
+ * NOTE: The 2-second buffer implementation (extra time after hint/answer audio
+ * ends in autoplay) is commented out for production and will be revisited in
+ * development.
+ */
+
 export interface AudioQuizProps {
   examplesToQuiz: ExampleWithVocabulary[];
   audioQuizType: AudioQuizType;
@@ -67,8 +73,9 @@ export interface AudioQuizReturn {
   addPendingRemoveProps: AddPendingRemoveProps | undefined;
 }
 
+// [2s buffer - commented out for production]
 // Autoplay buffer: extra time after hint/answer audio ends (seconds)
-const AUDIO_QUIZ_BUFFER_SECONDS = 2;
+// const AUDIO_QUIZ_BUFFER_SECONDS = 2;
 
 /**
  * Audio Quiz Orchestration Hook
@@ -193,35 +200,37 @@ export function useAudioQuiz({
   // State to trigger audio restart without changing step or example
   const [restartTrigger, setRestartTrigger] = useState<number>(0);
 
-  const stepHasBuffer =
-    autoplay &&
-    (currentStep === AudioQuizStep.Hint ||
-      currentStep === AudioQuizStep.Answer);
+  // [2s buffer - commented out for production]
+  // const stepHasBuffer =
+  //   autoplay &&
+  //   (currentStep === AudioQuizStep.Hint ||
+  //     currentStep === AudioQuizStep.Answer);
 
   // Buffer state: visual progress continues after audio ends on hint/answer
-  const isInBufferRef = useRef(false);
-  const [bufferTimeElapsed, setBufferTimeElapsed] = useState(0);
-  const bufferIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const bufferPausedElapsedRef = useRef(0);
-  const bufferStartTimeRef = useRef(0);
+  // const isInBufferRef = useRef(false);
+  // const [bufferTimeElapsed, setBufferTimeElapsed] = useState(0);
+  // const bufferIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // const bufferPausedElapsedRef = useRef(0);
+  // const bufferStartTimeRef = useRef(0);
   // Refs for seamless audio-to-buffer transition (read in onEndedCallback)
-  const lastCurrentTimeRef = useRef(0);
-  const lastStepDurationRef = useRef(0);
+  // const lastCurrentTimeRef = useRef(0);
+  // const lastStepDurationRef = useRef(0);
   // Set when user pauses during audio phase so onEndedCallback does not start buffer or nextStep
-  const userRequestedPauseRef = useRef(false);
+  // const userRequestedPauseRef = useRef(false);
 
   // Visual play state (decoupled from adapter so buffer period appears as "playing")
   const [visualIsPlaying, setVisualIsPlaying] = useState(false);
 
   const cleanupBuffer = useCallback((): void => {
-    if (bufferIntervalRef.current) {
-      clearInterval(bufferIntervalRef.current);
-      bufferIntervalRef.current = null;
-    }
-    isInBufferRef.current = false;
-    setBufferTimeElapsed(0);
-    bufferPausedElapsedRef.current = 0;
-    bufferStartTimeRef.current = 0;
+    // [2s buffer - commented out for production]
+    // if (bufferIntervalRef.current) {
+    //   clearInterval(bufferIntervalRef.current);
+    //   bufferIntervalRef.current = null;
+    // }
+    // isInBufferRef.current = false;
+    // setBufferTimeElapsed(0);
+    // bufferPausedElapsedRef.current = 0;
+    // bufferStartTimeRef.current = 0;
   }, []);
 
   // The current example number (1-indexed for UI purposes)
@@ -398,7 +407,7 @@ export function useAudioQuiz({
   // Simple utility functions to increment and decrement the example index
   const nextExample = useCallback(() => {
     cleanupBuffer();
-    userRequestedPauseRef.current = false;
+    // [2s buffer] userRequestedPauseRef.current = false;
     if (nextExampleReady) {
       setSelectedExampleIndex(currentExampleIndex + 1);
       setCurrentStep(AudioQuizStep.Question);
@@ -422,7 +431,7 @@ export function useAudioQuiz({
 
   const previousExample = useCallback(() => {
     cleanupBuffer();
-    userRequestedPauseRef.current = false;
+    // [2s buffer] userRequestedPauseRef.current = false;
     if (previousExampleReady) {
       // Go to the previous example if it is ready
       setSelectedExampleIndex(currentExampleIndex - 1);
@@ -441,7 +450,7 @@ export function useAudioQuiz({
   // Resets the quiz to the initial state, called on menu and end of autoplay
   const restartQuiz = useCallback(() => {
     cleanupBuffer();
-    userRequestedPauseRef.current = false;
+    // [2s buffer] userRequestedPauseRef.current = false;
     setVisualIsPlaying(false);
     setSelectedExampleIndex(0);
     setCurrentStep(AudioQuizStep.Question);
@@ -459,31 +468,31 @@ export function useAudioQuiz({
   }, [cleanupAudio, cleanupBuffer, getHelpIsOpen]);
 
   const goToQuestion = useCallback(() => {
-    userRequestedPauseRef.current = false;
+    // [2s buffer] userRequestedPauseRef.current = false;
     setCurrentStep(AudioQuizStep.Question);
     // Let the main useEffect handle audio changes for consistency
   }, []);
 
   const goToGuess = useCallback(() => {
-    userRequestedPauseRef.current = false;
+    // [2s buffer] userRequestedPauseRef.current = false;
     setCurrentStep(AudioQuizStep.Guess);
     // Let the main useEffect handle audio changes for consistency
   }, []);
 
   const goToHint = useCallback(() => {
-    userRequestedPauseRef.current = false;
+    // [2s buffer] userRequestedPauseRef.current = false;
     setCurrentStep(AudioQuizStep.Hint);
     // Let the main useEffect handle audio changes for consistency
   }, []);
 
   const goToAnswer = useCallback(() => {
-    userRequestedPauseRef.current = false;
+    // [2s buffer] userRequestedPauseRef.current = false;
     setCurrentStep(AudioQuizStep.Answer);
     // Let the main useEffect handle audio changes for consistency
   }, []);
 
   const restartCurrentStep = useCallback(() => {
-    userRequestedPauseRef.current = false;
+    // [2s buffer] userRequestedPauseRef.current = false;
     // Trigger a restart by incrementing the restart trigger
     // This will cause the audio effect to restart without changing step or example
     setRestartTrigger((prev) => prev + 1);
@@ -568,15 +577,17 @@ export function useAudioQuiz({
     }
 
     const duration = currentStepValue.duration;
-    const effectiveDuration = stepHasBuffer
-      ? duration + AUDIO_QUIZ_BUFFER_SECONDS
-      : duration;
-    let progress: number;
-    if (isInBufferRef.current) {
-      progress = (duration + bufferTimeElapsed) / effectiveDuration;
-    } else {
-      progress = currentTime / effectiveDuration;
-    }
+    // [2s buffer - commented out for production]
+    // const effectiveDuration = stepHasBuffer
+    //   ? duration + AUDIO_QUIZ_BUFFER_SECONDS
+    //   : duration;
+    // let progress: number;
+    // if (isInBufferRef.current) {
+    //   progress = (duration + bufferTimeElapsed) / effectiveDuration;
+    // } else {
+    //   progress = currentTime / effectiveDuration;
+    // }
+    const progress = currentTime / duration;
     const finalProgress = Math.min(Math.max(progress, 0), 1);
 
     return finalProgress;
@@ -587,28 +598,28 @@ export function useAudioQuiz({
     previousStepRef,
     currentStep,
     currentExampleIndex,
-    stepHasBuffer,
-    bufferTimeElapsed,
+    // stepHasBuffer, bufferTimeElapsed [2s buffer]
   ]);
 
+  // [2s buffer - commented out for production]
   // Keep refs updated so onEndedCallback can read latest without being in its deps (avoids main effect re-running every 50ms)
-  lastCurrentTimeRef.current = currentTime;
-  lastStepDurationRef.current = currentStepValue?.duration ?? 0;
+  // lastCurrentTimeRef.current = currentTime;
+  // lastStepDurationRef.current = currentStepValue?.duration ?? 0;
 
-  const startBufferInterval = useCallback((): ReturnType<
-    typeof setInterval
-  > => {
-    return setInterval(() => {
-      const elapsed =
-        bufferPausedElapsedRef.current +
-        (Date.now() - bufferStartTimeRef.current) / 1000;
-      setBufferTimeElapsed(elapsed);
-      if (elapsed >= AUDIO_QUIZ_BUFFER_SECONDS) {
-        cleanupBuffer();
-        nextStep();
-      }
-    }, 50);
-  }, [cleanupBuffer, nextStep]);
+  // const startBufferInterval = useCallback((): ReturnType<
+  //   typeof setInterval
+  // > => {
+  //   return setInterval(() => {
+  //     const elapsed =
+  //       bufferPausedElapsedRef.current +
+  //       (Date.now() - bufferStartTimeRef.current) / 1000;
+  //     setBufferTimeElapsed(elapsed);
+  //     if (elapsed >= AUDIO_QUIZ_BUFFER_SECONDS) {
+  //       cleanupBuffer();
+  //       nextStep();
+  //     }
+  //   }, 50);
+  // }, [cleanupBuffer, nextStep]);
 
   // What to do when the audio ends - simplified since concatenated audio handles padding
   const onEndedCallback = useCallback((): void => {
@@ -616,58 +627,62 @@ export function useAudioQuiz({
       return;
     }
 
-    if (stepHasBuffer) {
-      const duration = lastStepDurationRef.current;
-      const initialBufferOffset = lastCurrentTimeRef.current - duration;
-      isInBufferRef.current = true;
-      bufferStartTimeRef.current = Date.now();
-      bufferPausedElapsedRef.current = initialBufferOffset;
-      setBufferTimeElapsed(initialBufferOffset);
+    // [2s buffer - commented out for production]
+    // if (stepHasBuffer) {
+    //   const duration = lastStepDurationRef.current;
+    //   const initialBufferOffset = lastCurrentTimeRef.current - duration;
+    //   isInBufferRef.current = true;
+    //   bufferStartTimeRef.current = Date.now();
+    //   bufferPausedElapsedRef.current = initialBufferOffset;
+    //   setBufferTimeElapsed(initialBufferOffset);
 
-      if (userRequestedPauseRef.current) {
-        userRequestedPauseRef.current = false;
-        setVisualIsPlaying(false);
-        return;
-      }
+    //   if (userRequestedPauseRef.current) {
+    //     userRequestedPauseRef.current = false;
+    //     setVisualIsPlaying(false);
+    //     return;
+    //   }
 
-      bufferIntervalRef.current = startBufferInterval();
-    } else {
-      nextStep();
-    }
-  }, [autoplay, nextStep, stepHasBuffer, startBufferInterval]);
+    //   bufferIntervalRef.current = startBufferInterval();
+    // } else {
+    //   nextStep();
+    // }
+    nextStep();
+  }, [autoplay, nextStep]);
 
   const wrappedPause = useCallback(async (): Promise<void> => {
-    if (isInBufferRef.current) {
-      if (bufferIntervalRef.current) {
-        clearInterval(bufferIntervalRef.current);
-        bufferIntervalRef.current = null;
-      }
-      bufferPausedElapsedRef.current =
-        bufferPausedElapsedRef.current +
-        (Date.now() - bufferStartTimeRef.current) / 1000;
-      setVisualIsPlaying(false);
-      return;
-    }
-    userRequestedPauseRef.current = true;
+    // [2s buffer - commented out for production]
+    // if (isInBufferRef.current) {
+    //   if (bufferIntervalRef.current) {
+    //     clearInterval(bufferIntervalRef.current);
+    //     bufferIntervalRef.current = null;
+    //   }
+    //   bufferPausedElapsedRef.current =
+    //     bufferPausedElapsedRef.current +
+    //     (Date.now() - bufferStartTimeRef.current) / 1000;
+    //   setVisualIsPlaying(false);
+    //   return;
+    // }
+    // userRequestedPauseRef.current = true;
     await pause();
     setVisualIsPlaying(false);
   }, [pause]);
 
   const wrappedPlay = useCallback(async (): Promise<void> => {
-    userRequestedPauseRef.current = false;
-    if (isInBufferRef.current) {
-      if (bufferIntervalRef.current) {
-        clearInterval(bufferIntervalRef.current);
-        bufferIntervalRef.current = null;
-      }
-      bufferStartTimeRef.current = Date.now();
-      setVisualIsPlaying(true);
-      bufferIntervalRef.current = startBufferInterval();
-      return;
-    }
+    // [2s buffer] userRequestedPauseRef.current = false;
+    // [2s buffer - commented out for production]
+    // if (isInBufferRef.current) {
+    //   if (bufferIntervalRef.current) {
+    //     clearInterval(bufferIntervalRef.current);
+    //     bufferIntervalRef.current = null;
+    //   }
+    //   bufferStartTimeRef.current = Date.now();
+    //   setVisualIsPlaying(true);
+    //   bufferIntervalRef.current = startBufferInterval();
+    //   return;
+    // }
     await play();
     setVisualIsPlaying(true);
-  }, [play, startBufferInterval]);
+  }, [play]);
 
   // Effect to parse the audio examples when the current example is ready
   useEffect(() => {
@@ -733,7 +748,8 @@ export function useAudioQuiz({
     }
 
     const applyAudioChange = (): void => {
-      const shouldAutoPlay = !userRequestedPauseRef.current;
+      // [2s buffer] When buffer was active, we used: const shouldAutoPlay = !userRequestedPauseRef.current;
+      const shouldAutoPlay = true;
       if (shouldAutoPlay) {
         setVisualIsPlaying(true);
         changeCurrentAudio({
