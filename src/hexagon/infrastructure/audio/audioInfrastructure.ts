@@ -30,9 +30,11 @@ export function useAudioInfrastructure(): AudioPort {
   );
 
   const play = useCallback(async () => {
+    // If the audio element is not mounted or is already playing, do nothing
     if (!playingAudioRef.current || isPlaying) {
       return;
     } else if (playingAudioRef.current.readyState < 1) {
+      // If the audio is not ready to be played, play it when the metadata is loaded
       setIsPlaying(true);
       playingAudioRef.current.addEventListener(
         'loadedmetadata',
@@ -83,8 +85,9 @@ export function useAudioInfrastructure(): AudioPort {
       el.src = newAudio.src;
       el.onended = newAudio.onEnded;
 
+      // Use canplay so playback starts as soon as enough is buffered (reduces gap when switching to buffer)
       el.addEventListener(
-        'loadedmetadata',
+        'canplay',
         () => {
           el.currentTime = newAudio.currentTime;
           if (newAudio.playOnLoad) {

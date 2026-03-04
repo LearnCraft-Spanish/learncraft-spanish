@@ -608,6 +608,14 @@ export function useAudioQuiz({
     await play();
   }, [play]);
 
+  // Preload the buffer silence file so the transition from step audio → buffer has minimal gap
+  useEffect(() => {
+    if (!ready || !autoplay) return;
+    const preloadEl = new Audio(silence2s);
+    preloadEl.preload = 'auto';
+    preloadEl.load();
+  }, [ready, autoplay]);
+
   // Effect to parse the audio examples when the current example is ready
   useEffect(() => {
     if (!currentExampleReady) {
