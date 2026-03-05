@@ -383,7 +383,7 @@ describe('useAudioQuiz', () => {
     });
   });
 
-  describe('buffer (autoplay) - silence audio after hint/answer', () => {
+  describe('buffer (autoplay) - silence audio after any step', () => {
     const autoplayProps = {
       ...defaultProps,
       autoplay: true,
@@ -589,29 +589,6 @@ describe('useAudioQuiz', () => {
 
       unmount();
       expect(mockAudioAdapter.cleanupAudio).toHaveBeenCalled();
-    });
-
-    it('should not start buffer for Question step in autoplay', async () => {
-      const { result } = renderHook(() => useAudioQuiz(autoplayProps));
-      await waitFor(() => {
-        expect(result.current.currentExampleReady).toBe(true);
-      });
-
-      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
-      const callCountBefore =
-        mockAudioAdapter.changeCurrentAudio.mock.calls.length;
-      const stepOnEnded = getOnEndedFromChangeAudio();
-      act(() => {
-        stepOnEnded();
-      });
-
-      // Should go directly to Guess without an extra changeCurrentAudio for silence
-      expect(result.current.currentStep).toBe(AudioQuizStep.Guess);
-      // changeCurrentAudio is called once for the new Guess step, not for a silence buffer
-      const newCalls =
-        mockAudioAdapter.changeCurrentAudio.mock.calls.length - callCountBefore;
-      // The Guess step triggers a new changeCurrentAudio via the main effect
-      expect(newCalls).toBeLessThanOrEqual(1);
     });
 
     it('should pause buffer countdown when pause is called during buffer', async () => {
