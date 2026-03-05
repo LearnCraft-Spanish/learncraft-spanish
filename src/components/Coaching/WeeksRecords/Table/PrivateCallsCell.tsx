@@ -33,6 +33,7 @@ const ratingOptions = [
   'Bad',
   'Late Cancel',
   'No-Show',
+  'Strategy Call',
 ];
 const callTypeOptions = [
   'Monthly Call',

@@ -2,6 +2,7 @@ import { Loading } from '@interface/components/Loading';
 import { DateRangeProvider } from '../Coaching/WeeksRecords/DateRangeProvider';
 import IncompleteRecords from './components/IncompleteRecords';
 import MyStudents from './components/MyStudents/MyStudents';
+import MyStudentsBeyond150 from './components/MyStudentsBeyond150';
 import RecentRecords from './components/RecentRecords';
 import useCoachingDashboard from './useCoachingDashboard';
 import './CoachingDashboard.scss';
@@ -38,6 +39,7 @@ function CoachingDashboard() {
             <div className="coachingDashbaord__recentActivity">
               <RecentRecords />
             </div>
+            {coach && <MyStudentsBeyond150 coachId={coach.recordId} />}
           </div>
         </>
       )}

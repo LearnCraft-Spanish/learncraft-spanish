@@ -166,7 +166,11 @@ export interface AudioQuizMapperReturn {
  * - Allows graceful handling of audio failures
  * - Maintains quiz integrity on audio errors
  */
-export function useAudioQuizMapper(): AudioQuizMapperReturn {
+export function useAudioQuizMapper({
+  audioQuizType,
+}: {
+  audioQuizType: AudioQuizType;
+}): AudioQuizMapperReturn {
   const { getAudioDurationSeconds } = useAudioAdapter();
 
   /**
@@ -209,7 +213,10 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
         }
 
         // Business rule: Calculate silence duration and get the appropriate audio file
-        const guessSilenceLengthSeconds = englishAudioDurationSeconds * 1.5;
+        const guessSilenceLengthSeconds =
+          audioQuizType === AudioQuizType.Speaking
+            ? englishAudioDurationSeconds
+            : spanishAudioDurationSeconds;
         const guessSilenceLengthRounded = Math.ceil(guessSilenceLengthSeconds);
 
         // Clamp to available silence durations (1-30 seconds)
@@ -303,7 +310,7 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
         throw new Error('Failed to parse example for quiz', { cause: error });
       }
     },
-    [getAudioDurationSeconds],
+    [getAudioDurationSeconds, audioQuizType],
   );
 
   return {
