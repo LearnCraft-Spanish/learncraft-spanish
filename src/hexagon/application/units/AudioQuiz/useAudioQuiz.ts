@@ -650,6 +650,9 @@ export function useAudioQuiz({
     const preloadEl = new Audio(silence2s);
     preloadEl.preload = 'auto';
     preloadEl.load();
+    return () => {
+      preloadEl.src = '';
+    };
   }, [ready, autoplay]);
 
   // Visual buffer: advance when elapsed time reaches step+2s (so UI is seamless; we may cut off silence early)

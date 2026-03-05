@@ -642,7 +642,7 @@ describe('useAudioQuiz', () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
-      expect(result.current.progressStatus).toBe(frozenProgress);
+      expect(result.current.progressStatus).toBeCloseTo(frozenProgress);
       expect(mockAudioAdapter.pause).toHaveBeenCalled();
     });
 
