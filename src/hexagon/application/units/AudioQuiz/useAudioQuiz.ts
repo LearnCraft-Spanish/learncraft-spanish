@@ -141,7 +141,7 @@ export function useAudioQuiz({
     deleteFlashcards,
   } = useStudentFlashcards();
 
-  const { parseExampleForQuiz } = useAudioQuizMapper();
+  const { parseExampleForQuiz } = useAudioQuizMapper({ audioQuizType });
 
   const [getHelpIsOpen, setGetHelpIsOpen] = useState(false);
   const [isQuizComplete, setIsQuizComplete] = useState(false);
@@ -195,10 +195,7 @@ export function useAudioQuiz({
   // State to trigger audio restart without changing step or example
   const [restartTrigger, setRestartTrigger] = useState<number>(0);
 
-  const stepHasBuffer =
-    autoplay &&
-    (currentStep === AudioQuizStep.Hint ||
-      currentStep === AudioQuizStep.Answer);
+  const stepHasBuffer = autoplay;
 
   // Buffer tracking: true when silence audio is playing after hint/answer
   const isInBufferRef = useRef(false);
