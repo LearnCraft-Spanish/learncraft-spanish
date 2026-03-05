@@ -18,6 +18,17 @@ export function useAudioInfrastructure(): AudioPort {
   // State for the current time of the playing audio
   const [currentTime, setCurrentTime] = useState(0);
 
+  // Unlocks the audio element for programmatic playback.
+  // Must be called synchronously from a user gesture (e.g. "Start Quiz" click).
+  const primeAudioElement = useCallback(
+    (silenceUrl: string) => {
+      if (!playingAudioRef.current) return;
+      playingAudioRef.current.src = silenceUrl;
+      playingAudioRef.current.play().catch(() => {});
+    },
+    [playingAudioRef],
+  );
+
   const play = useCallback(async () => {
     // If the audio element is not mounted or is already playing, do nothing
     if (!playingAudioRef.current || isPlaying) {
@@ -25,24 +36,15 @@ export function useAudioInfrastructure(): AudioPort {
     } else if (playingAudioRef.current.readyState < 1) {
       // If the audio is not ready to be played, play it when the metadata is loaded
       setIsPlaying(true);
-
-      const handlePlayOnLoad = () => {
-        if (playingAudioRef.current) {
-          playingAudioRef.current.play();
-        }
-        // Remove this listener after it fires once
-        playingAudioRef.current?.removeEventListener(
-          'loadedmetadata',
-          handlePlayOnLoad,
-        );
-      };
       playingAudioRef.current.addEventListener(
         'loadedmetadata',
-        handlePlayOnLoad,
+        () => {
+          playingAudioRef.current?.play();
+        },
+        { once: true },
       );
       return;
     }
-    // If the audio is ready to be played, play it
     setIsPlaying(true);
     await playingAudioRef.current.play();
   }, [playingAudioRef, isPlaying, setIsPlaying]);
@@ -72,60 +74,51 @@ export function useAudioInfrastructure(): AudioPort {
     async (newAudio: AudioElementState) => {
       if (!playingAudioRef.current) return;
 
-      // Remove any existing loadedmetadata listeners to prevent double play
-      const audioElement = playingAudioRef.current;
-      const existingListeners = audioElement.cloneNode(
-        true,
-      ) as HTMLAudioElement;
-      audioElement.replaceWith(existingListeners);
-      playingAudioRef.current = existingListeners;
+      const el = playingAudioRef.current;
 
-      // Set up new audio properties
-      playingAudioRef.current.src = newAudio.src;
-      playingAudioRef.current.currentTime = newAudio.currentTime;
-      playingAudioRef.current.onended = newAudio.onEnded;
+      // Stop current playback and clear pending listeners on the SAME element
+      // (preserves the user-gesture permission chain — never clone/replace)
+      el.pause();
+      el.onloadedmetadata = null;
+      el.onended = null;
 
-      // Add single loadedmetadata listener if playOnLoad is true
-      if (newAudio.playOnLoad) {
-        setIsPlaying(true);
+      el.src = newAudio.src;
+      el.onended = newAudio.onEnded;
 
-        const handleLoadedMetadata = () => {
-          if (playingAudioRef.current) {
-            playingAudioRef.current.play();
+      // Use loadeddata (first frame available) to start playback as early as possible when switching sources
+      el.addEventListener(
+        'loadeddata',
+        () => {
+          el.currentTime = newAudio.currentTime;
+          if (newAudio.playOnLoad) {
+            el.play();
           }
-          // Remove this listener after it fires once
-          playingAudioRef.current?.removeEventListener(
-            'loadedmetadata',
-            handleLoadedMetadata,
-          );
-        };
-        playingAudioRef.current.addEventListener(
-          'loadedmetadata',
-          handleLoadedMetadata,
-        );
-      }
+        },
+        { once: true },
+      );
+
+      setIsPlaying(newAudio.playOnLoad);
+      el.load();
 
       updateCurrentTime();
     },
     [playingAudioRef, updateCurrentTime],
   );
 
-  // Clean up audio state completely
   const cleanupAudio = useCallback(() => {
-    // Stop any playing audio
     if (playingAudioRef.current) {
       playingAudioRef.current.pause();
+      playingAudioRef.current.onloadedmetadata = null;
+      playingAudioRef.current.onended = null;
       playingAudioRef.current.currentTime = 0;
       playingAudioRef.current.src = '';
     }
 
-    // Clear any intervals
     if (tickRef.current) {
       clearInterval(tickRef.current);
       tickRef.current = null;
     }
 
-    // Reset state
     setIsPlaying(false);
     setCurrentTime(0);
   }, [playingAudioRef]);
@@ -202,6 +195,7 @@ export function useAudioInfrastructure(): AudioPort {
   );
 
   return {
+    primeAudioElement,
     play,
     pause,
     isPlaying,

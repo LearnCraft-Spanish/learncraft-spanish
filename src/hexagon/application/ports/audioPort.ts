@@ -6,6 +6,9 @@ export interface AudioElementState {
 }
 
 export interface AudioPort {
+  // Unlocks the audio element for programmatic playback (must be called synchronously from a user gesture)
+  primeAudioElement: (silenceUrl: string) => void;
+
   // Plays the current audio element
   play: () => Promise<void>;
 

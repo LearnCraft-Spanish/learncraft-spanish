@@ -5,6 +5,7 @@ import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTag
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
+import { useAudioAdapter } from '@application/adapters/audioAdapter';
 import { useCombinedFiltersWithVocabulary } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
 import { useFilterOwnedFlashcards } from '@application/units/Filtering/useFilterOwnedFlashcards';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
@@ -13,6 +14,7 @@ import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import silence1s from 'src/assets/audio/1s.mp3';
 
 export enum MyFlashcardsQuizType {
   Text = 'text',
@@ -52,6 +54,7 @@ export function useQuizMyFlashcards(
   props: UseQuizMyFlashcardsProps = {},
 ): UseQuizMyFlashcardsReturn {
   const { initialFilterOwnedFlashcards = false } = props;
+  const { primeAudioElement } = useAudioAdapter();
 
   // Static snapshots of examples taken when quiz starts to prevent live updates from affecting active quiz
   const staticTextExamples = useRef<ExampleWithVocabulary[]>([]);
@@ -154,6 +157,7 @@ export function useQuizMyFlashcards(
         textQuizSetup.quizLength,
       );
     } else if (quizType === MyFlashcardsQuizType.Audio) {
+      primeAudioElement(silence1s);
       const shuffledExamples = fisherYatesShuffle([...filteredAudioExamples]);
       staticAudioExamples.current = shuffledExamples.slice(
         0,
@@ -166,6 +170,7 @@ export function useQuizMyFlashcards(
     quizNotReady,
     setQuizReady,
     quizType,
+    primeAudioElement,
     textQuizSetup.examplesToQuiz,
     textQuizSetup.quizLength,
     filteredAudioExamples,

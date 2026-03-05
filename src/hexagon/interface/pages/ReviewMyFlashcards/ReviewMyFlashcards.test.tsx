@@ -1,3 +1,4 @@
+import { mockAudioAdapter } from '@application/adapters/audioAdapter.mock';
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
 import MyFlashcardsQuiz from '@interface/pages/ReviewMyFlashcards/ReviewMyFlashcards';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -6,7 +7,11 @@ import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@application/adapters/audioAdapter', () => ({
+  useAudioAdapter: () => mockAudioAdapter,
+}));
 
 describe('menu for student flashcards', () => {
   beforeEach(() => {
