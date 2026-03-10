@@ -21,7 +21,6 @@ export interface Lesson {
   recordId: number;
   lesson: string;
   lessonNumber: number;
-  subtitle: string;
 
   programName: string;
   relatedProgram: number;

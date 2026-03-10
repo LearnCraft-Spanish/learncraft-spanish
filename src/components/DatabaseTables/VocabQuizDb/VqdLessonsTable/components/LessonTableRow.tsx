@@ -13,7 +13,6 @@ export default function LessonTableRow({
     recordId,
     lesson: lessonName,
     lessonNumber,
-    subtitle,
     published,
     relatedProgram,
     programName,
@@ -32,7 +31,6 @@ export default function LessonTableRow({
       <td style={{ whiteSpace: 'nowrap' }}>{recordId}</td>
       <td style={{ whiteSpace: 'nowrap' }}>{lessonName}</td>
       <td style={{ whiteSpace: 'nowrap' }}>{lessonNumber}</td>
-      <td style={{ whiteSpace: 'nowrap' }}>{subtitle}</td>
       <td style={{ whiteSpace: 'nowrap' }}>{published ? 'Yes' : 'No'}</td>
       <td style={{ whiteSpace: 'nowrap' }}>{relatedProgram}</td>
       <td style={{ whiteSpace: 'nowrap' }}>{programName}</td>

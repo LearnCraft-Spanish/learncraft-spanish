@@ -31,7 +31,6 @@ export default function LessonsTable({
               <tr>
                 <th>Course</th>
                 <th>Lesson Number</th>
-                <th>Subtitle</th>
               </tr>
             </thead>
             <tbody>
@@ -39,7 +38,6 @@ export default function LessonsTable({
                 <tr key={lesson.id} className="lessons-table__row">
                   <td>{lesson.courseName}</td>
                   <td>{lesson.lessonNumber}</td>
-                  <td>{lesson.subtitle}</td>
                 </tr>
               ))}
             </tbody>

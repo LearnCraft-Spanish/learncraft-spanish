@@ -17,10 +17,6 @@ const headers: HeaderObject[] = [
     sortable: true,
   },
   {
-    header: 'Subtitle',
-    sortable: true,
-  },
-  {
     header: 'Published',
     sortable: true,
   },
