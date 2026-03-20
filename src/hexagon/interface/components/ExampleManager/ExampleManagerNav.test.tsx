@@ -26,6 +26,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -44,6 +45,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -58,6 +60,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -72,6 +75,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -86,6 +90,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -100,6 +105,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -114,6 +120,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -128,6 +135,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -151,6 +159,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -168,6 +177,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -195,6 +205,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -212,6 +223,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -231,6 +243,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
@@ -250,6 +263,7 @@ describe('component ExampleManagerNav', () => {
           <ExampleManagerNav
             hasUnsavedCreatedExamples={false}
             setHasUnsavedCreatedExamples={() => {}}
+            hasUnsavedEditedExamples={false}
           />
         </MockAllProviders>,
       );
