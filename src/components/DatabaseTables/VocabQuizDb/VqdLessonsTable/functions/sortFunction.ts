@@ -26,14 +26,6 @@ export default function sortFunction(data: Lesson[], sortConfig: SortConfig) {
     });
   }
 
-  if (sortConfig.key === 'Subtitle') {
-    return [...data].sort((a, b) => {
-      return sortConfig.direction === 'ascending'
-        ? a.subtitle.localeCompare(b.subtitle)
-        : b.subtitle.localeCompare(a.subtitle);
-    });
-  }
-
   if (sortConfig.key === 'Published') {
     return [...data].sort((a, b) => {
       return sortConfig.direction === 'ascending'
