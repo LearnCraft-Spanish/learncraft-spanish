@@ -1,8 +1,11 @@
+import type { SpanglishFilter } from '@application/types/exampleSearch';
 import type { SearchByIdsProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByIds';
+import type { SearchByMaxFrequencyProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByMaxFrequency';
 import type { SearchByQuizProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
 import type { SearchByTextProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByText';
 import type { LocalFilterPanelResultsProps } from '@interface/components/ExampleSearchInterface/Results/LocalFilterPanelResults';
 import type { SearchByIdsResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByIdsResults';
+import type { SearchByMaxFrequencyResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByMaxFrequencyResults';
 import type { SearchByQuizResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByQuizResults';
 import type { SearchByTextResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByTextResults';
 import type { ExampleSearchMode } from '@interface/components/ExampleSearchInterface/SearchModeNav';
@@ -19,6 +22,7 @@ export interface SearchComponentProps {
     vocabularyComplete: boolean | undefined;
     onVocabularyCompleteChange: (value: boolean | undefined) => void;
   };
+  searchByMaxFrequencyProps: SearchByMaxFrequencyProps;
 }
 
 export interface SearchResultProps {
@@ -27,9 +31,23 @@ export interface SearchResultProps {
   textResultsProps: SearchByTextResultsProps;
   idsResultsProps: SearchByIdsResultsProps;
   recentlyEditedResultsProps: { vocabularyComplete: boolean | undefined };
+  maxFrequencyResultsProps: SearchByMaxFrequencyResultsProps;
 }
 
-export function useExampleSearch() {
+export interface UseExampleSearchReturnType {
+  mode: ExampleSearchMode;
+  searchIsTriggered: boolean;
+  isValidSearch: boolean;
+  nonValidSearchErrorMessage: string;
+
+  handleChangeMode: (newMode: ExampleSearchMode) => void;
+  triggerSearch: () => void;
+
+  searchComponentProps: SearchComponentProps;
+  searchResultProps: SearchResultProps;
+}
+
+export function useExampleSearch(): UseExampleSearchReturnType {
   // Mode state
   const [mode, setMode] = useState<ExampleSearchMode>('ids');
   const [searchIsTriggered, setSearchIsTriggered] = useState(false);
@@ -51,6 +69,11 @@ export function useExampleSearch() {
   const [vocabularyComplete, setVocabularyComplete] = useState<
     boolean | undefined
   >(undefined);
+
+  // Shared for max-frequency: controls whether we show highest->lowest or lowest->highest
+  const [highestFirst, setHighestFirst] = useState(true);
+
+  const [spanglish, setSpanglish] = useState<SpanglishFilter>('all');
 
   // Combined filters for filter panel
   const filtersForUI = useCombinedFilters({
@@ -127,6 +150,9 @@ export function useExampleSearch() {
     if (mode === 'recentlyEdited') {
       return true;
     }
+    if (mode === 'max-frequency') {
+      return true;
+    }
     if (mode === 'filter') {
       if (
         !filtersForUI.courseId ||
@@ -185,6 +211,14 @@ export function useExampleSearch() {
         vocabularyComplete,
         onVocabularyCompleteChange: withSearchReset(setVocabularyComplete),
       },
+      searchByMaxFrequencyProps: {
+        highestFirst,
+        onHighestFirstChange: withSearchReset(setHighestFirst),
+        spanglish,
+        onSpanglishChange: withSearchReset(setSpanglish),
+        vocabularyComplete,
+        onVocabularyCompleteChange: withSearchReset(setVocabularyComplete),
+      },
     }),
     [
       handleFilterChange,
@@ -194,6 +228,8 @@ export function useExampleSearch() {
       englishInput,
       idsInput,
       vocabularyComplete,
+      highestFirst,
+      spanglish,
       withSearchReset,
     ],
   );
@@ -222,6 +258,11 @@ export function useExampleSearch() {
       idsResultsProps: {
         ids: parsedIds,
       },
+      maxFrequencyResultsProps: {
+        highestFirst,
+        spanglish,
+        vocabularyComplete,
+      },
     }),
     [
       filtersForUI.selectedSkillTags,
@@ -234,12 +275,16 @@ export function useExampleSearch() {
       englishInput,
       parsedIds,
       vocabularyComplete,
+      highestFirst,
+      spanglish,
     ],
   );
 
   const handleChangeMode = useCallback((newMode: ExampleSearchMode) => {
     setSearchIsTriggered(false);
     setVocabularyComplete(undefined);
+    setHighestFirst(true);
+    setSpanglish('all');
     setMode(newMode);
   }, []);
 

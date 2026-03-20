@@ -5,6 +5,7 @@ import type {
   UpdateExamplesCommand,
 } from '@learncraft-spanish/shared';
 import {
+  createMockExampleMaxFrequencyList,
   createMockExampleTechnicalList,
   createMockExampleWithVocabularyList,
 } from '@testing/factories/exampleFactory';
@@ -22,6 +23,8 @@ const defaultMockAdapter: ExamplePort = {
     examples: createMockExampleWithVocabularyList(5),
     totalCount: 5,
   }),
+  searchExamplesByMaxFrequency: async (_params) =>
+    createMockExampleMaxFrequencyList(5),
   getExamplesByRecentlyModified: async () => createMockExampleTechnicalList(2),
   createExamples: async (
     _exampleCreates: CreateExamplesCommand,

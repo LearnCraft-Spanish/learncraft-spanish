@@ -16,10 +16,11 @@ describe('component: SearchModeNav', () => {
       );
 
       expect(screen.getByText('Filter Panel')).toBeInTheDocument();
-      expect(screen.getByText('Search by Quiz')).toBeInTheDocument();
-      expect(screen.getByText('Search by Text')).toBeInTheDocument();
-      expect(screen.getByText('Search by IDs')).toBeInTheDocument();
-      expect(screen.getByText('Recently Edited Examples')).toBeInTheDocument();
+      expect(screen.getByText(/By Quiz/)).toBeInTheDocument();
+      expect(screen.getByText(/By Text/)).toBeInTheDocument();
+      expect(screen.getByText(/By IDs/)).toBeInTheDocument();
+      expect(screen.getByText(/Recently Edited/)).toBeInTheDocument();
+      expect(screen.getByText(/By Max Frequency/)).toBeInTheDocument();
     });
 
     describe('active mode', () => {
