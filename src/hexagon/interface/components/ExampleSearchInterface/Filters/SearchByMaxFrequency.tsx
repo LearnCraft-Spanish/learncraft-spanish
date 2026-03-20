@@ -11,6 +11,12 @@ export interface SearchByMaxFrequencyProps {
   onVocabularyCompleteChange: (value: boolean | undefined) => void;
 }
 
+function isSpanglishFilter(value: string): value is SpanglishFilter {
+  return (
+    value === 'all' || value === 'only-spanglish' || value === 'no-spanglish'
+  );
+}
+
 export function SearchByMaxFrequency({
   highestFirst,
   onHighestFirstChange,
@@ -37,7 +43,11 @@ export function SearchByMaxFrequency({
       <GenericDropdown
         label="Spanglish"
         selectedValue={spanglish}
-        onChange={(value) => onSpanglishChange(value as SpanglishFilter)}
+        onChange={(value) => {
+          if (isSpanglishFilter(value)) {
+            onSpanglishChange(value);
+          }
+        }}
         options={[
           { value: 'all', text: 'All' },
           { value: 'only-spanglish', text: 'Only Spanglish' },

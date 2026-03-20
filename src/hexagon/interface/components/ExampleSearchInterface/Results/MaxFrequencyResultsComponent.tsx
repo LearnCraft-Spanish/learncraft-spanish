@@ -1,6 +1,6 @@
 import type { ExampleMaxFrequency } from '@learncraft-spanish/shared';
 import type { ReactNode } from 'react';
-import { useMaxFrequencyBulkButton } from '@application/units/ExampleSearchInterface/Results/useMaxFrequencyBulkButton';
+import { useMaxFrequencyBulkButton } from '@application/useCases/ExampleSearch/useMaxFrequencyBulkButton';
 import ExampleListItemFactory from '@interface/components/ExampleListItem/ExampleListItemFactory';
 import BulkAddButton from '@interface/components/ExampleListItem/units/BulkAddButton';
 import Pagination from '@interface/components/general/Pagination/Pagination';

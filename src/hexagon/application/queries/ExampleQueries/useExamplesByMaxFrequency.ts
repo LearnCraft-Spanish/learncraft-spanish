@@ -45,7 +45,7 @@ export function useExamplesByMaxFrequency({
   });
 
   return {
-    examples: examples as ExampleMaxFrequency[] | undefined,
+    examples,
     isLoading,
     error: error ?? null,
   };
