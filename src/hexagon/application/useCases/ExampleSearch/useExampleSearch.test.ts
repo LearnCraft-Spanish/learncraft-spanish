@@ -165,6 +165,23 @@ describe('useExampleSearch', () => {
     expect(result.current.isValidSearch).toBe(true);
   });
 
+  it('always validates max-frequency mode', () => {
+    const { result } = renderHook(() => useExampleSearch());
+
+    act(() => {
+      result.current.handleChangeMode('max-frequency');
+    });
+
+    expect(result.current.isValidSearch).toBe(true);
+    expect(result.current.searchResultProps.maxFrequencyResultsProps).toEqual(
+      {
+        highestFirst: true,
+        spanglish: 'all',
+        vocabularyComplete: undefined,
+      },
+    );
+  });
+
   it('validates filter mode when course is selected and builds lessonRanges', () => {
     const mockUpdateToLessonNumber = vi.fn();
     const mockUpdateFromLessonNumber = vi.fn();

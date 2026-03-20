@@ -2,10 +2,14 @@ import type { LocalFilterPanelResultsProps } from '@interface/components/Example
 import type { SearchByIdsResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByIdsResults';
 import type { SearchByQuizResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByQuizResults';
 import type { SearchByRecentlyEditedResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByRecentlyEditedResults';
+import type {
+  SearchByMaxFrequencyResultsProps,
+} from '@interface/components/ExampleSearchInterface/Results/SearchByMaxFrequencyResults';
 import type { SearchByTextResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByTextResults';
 import type { ExampleSearchMode } from '@interface/components/ExampleSearchInterface/SearchModeNav';
 import { LocalFilterPanelResults } from '@interface/components/ExampleSearchInterface/Results/LocalFilterPanelResults';
 import { SearchByIdsResults } from '@interface/components/ExampleSearchInterface/Results/SearchByIdsResults';
+import { SearchByMaxFrequencyResults } from '@interface/components/ExampleSearchInterface/Results/SearchByMaxFrequencyResults';
 import { SearchByQuizResults } from '@interface/components/ExampleSearchInterface/Results/SearchByQuizResults';
 import { SearchByRecentlyEditedResults } from '@interface/components/ExampleSearchInterface/Results/SearchByRecentlyEditedResults';
 import { SearchByTextResults } from '@interface/components/ExampleSearchInterface/Results/SearchByTextResults';
@@ -16,6 +20,7 @@ export function Results({
   textResultsProps,
   idsResultsProps,
   recentlyEditedResultsProps,
+  maxFrequencyResultsProps,
 }: {
   mode: ExampleSearchMode;
   localFilterResultsProps: LocalFilterPanelResultsProps;
@@ -23,6 +28,7 @@ export function Results({
   textResultsProps: SearchByTextResultsProps;
   idsResultsProps: SearchByIdsResultsProps;
   recentlyEditedResultsProps: SearchByRecentlyEditedResultsProps;
+  maxFrequencyResultsProps: SearchByMaxFrequencyResultsProps;
 }) {
   if (mode === 'filter') {
     return <LocalFilterPanelResults {...localFilterResultsProps} />;
@@ -34,6 +40,8 @@ export function Results({
     return <SearchByTextResults {...textResultsProps} />;
   } else if (mode === 'ids') {
     return <SearchByIdsResults {...idsResultsProps} />;
+  } else if (mode === 'max-frequency') {
+    return <SearchByMaxFrequencyResults {...maxFrequencyResultsProps} />;
   }
   return <p>ERROR: Invalid mode</p>;
 }

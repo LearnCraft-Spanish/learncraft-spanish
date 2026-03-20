@@ -5,7 +5,8 @@ export type ExampleSearchMode =
   | 'quiz'
   | 'text'
   | 'ids'
-  | 'recentlyEdited';
+  | 'recentlyEdited'
+  | 'max-frequency';
 
 interface NavOption {
   mode: ExampleSearchMode;
@@ -14,11 +15,12 @@ interface NavOption {
 }
 
 const NAV_OPTIONS: NavOption[] = [
-  { mode: 'ids', label: 'Search by IDs' },
-  { mode: 'text', label: 'Search by Text' },
-  { mode: 'recentlyEdited', label: 'Recently Edited Examples' },
+  { mode: 'ids', label: 'By IDs' },
+  { mode: 'text', label: 'By Text' },
+  { mode: 'recentlyEdited', label: 'Recently Edited' },
   { mode: 'filter', label: 'Filter Panel' },
-  { mode: 'quiz', label: 'Search by Quiz' },
+  { mode: 'quiz', label: 'By Quiz' },
+  { mode: 'max-frequency', label: 'By Max Frequency' },
 ];
 
 export function SearchModeNav({

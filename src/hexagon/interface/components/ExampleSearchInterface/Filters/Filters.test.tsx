@@ -28,6 +28,13 @@ vi.mock(
   }),
 );
 
+vi.mock(
+  '@interface/components/ExampleSearchInterface/Filters/SearchByMaxFrequency',
+  () => ({
+    SearchByMaxFrequency: () => <div>Search By Max Frequency</div>,
+  }),
+);
+
 describe('component: Filters', () => {
   const mockProps = {
     onFilterChange: vi.fn(),
@@ -35,6 +42,7 @@ describe('component: Filters', () => {
     searchByQuizProps: {} as any,
     searchByTextProps: {} as any,
     searchByIdsProps: {} as any,
+    searchByMaxFrequencyProps: {} as any,
   };
 
   describe('mode routing', () => {
@@ -60,6 +68,14 @@ describe('component: Filters', () => {
       render(<Filters mode="ids" {...mockProps} />);
 
       expect(screen.getByText('Search By Ids')).toBeInTheDocument();
+    });
+
+    it('should render SearchByMaxFrequency when mode is "max-frequency"', () => {
+      render(<Filters mode="max-frequency" {...mockProps} />);
+
+      expect(
+        screen.getByText('Search By Max Frequency'),
+      ).toBeInTheDocument();
     });
 
     it('should render error message for invalid mode', () => {
