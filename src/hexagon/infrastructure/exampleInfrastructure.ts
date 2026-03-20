@@ -1,6 +1,7 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { LessonRange } from '@application/ports/coursePort';
 import type { ExamplePort } from '@application/ports/examplePort';
+import type { SpanglishFilter } from '@application/types/exampleSearch';
 import type {
   CreateExamplesCommand,
   ExampleMaxFrequency,
@@ -108,7 +109,7 @@ export function createExampleInfrastructure(
     searchExamplesByMaxFrequency: async (params: {
       highestFirst?: boolean;
       vocabularyComplete?: boolean;
-      spanglish?: 'all' | 'only-spanglish' | 'no-spanglish';
+      spanglish?: SpanglishFilter;
     }): Promise<ExampleMaxFrequency[]> => {
       const response = await httpClient.post<ExampleMaxFrequency[]>(
         searchExamplesByMaxFrequencyEndpoint.path,

@@ -1,7 +1,6 @@
+import type { SpanglishFilter } from '@application/types/exampleSearch';
 import { VocabularyCompleteFilter } from '@interface/components/ExampleSearchInterface/Filters/VocabularyCompleteFilter';
 import { GenericDropdown } from '@interface/components/FormComponents';
-
-export type SpanglishFilter = 'all' | 'only-spanglish' | 'no-spanglish';
 
 export interface SearchByMaxFrequencyProps {
   highestFirst: boolean;
@@ -56,4 +55,3 @@ export function SearchByMaxFrequency({
     </div>
   );
 }
-

@@ -1,3 +1,4 @@
+import type { SpanglishFilter } from '@application/types/exampleSearch';
 import type { PaginationState } from '@application/units/Pagination/usePagination';
 import type { ExampleMaxFrequency } from '@learncraft-spanish/shared';
 import { useExamplesByMaxFrequency } from '@application/queries/ExampleQueries/useExamplesByMaxFrequency';
@@ -8,7 +9,7 @@ const PAGE_SIZE = 25;
 
 export interface UseSearchByMaxFrequencyResultsParams {
   highestFirst: boolean;
-  spanglish: 'all' | 'only-spanglish' | 'no-spanglish';
+  spanglish: SpanglishFilter;
   vocabularyComplete?: boolean;
 }
 

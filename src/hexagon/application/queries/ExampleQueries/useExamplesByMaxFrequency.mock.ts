@@ -1,3 +1,4 @@
+import type { SpanglishFilter } from '@application/types/exampleSearch';
 import type { ExampleMaxFrequency } from '@learncraft-spanish/shared';
 import { createMockExampleMaxFrequencyList } from '@testing/factories/exampleFactory';
 import { createOverrideableMockHook } from '@testing/utils/createOverrideableMockHook';
@@ -23,9 +24,8 @@ export const {
     params: {
       highestFirst: boolean;
       vocabularyComplete?: boolean;
-      spanglish?: 'all' | 'only-spanglish' | 'no-spanglish';
+      spanglish?: SpanglishFilter;
     },
   ],
   UseExamplesByMaxFrequencyReturn
 >(defaultReturn);
-

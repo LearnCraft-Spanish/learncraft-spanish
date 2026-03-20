@@ -1,3 +1,4 @@
+import type { SpanglishFilter } from '@application/types/exampleSearch';
 import type { SearchByIdsProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByIds';
 import type { SearchByMaxFrequencyProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByMaxFrequency';
 import type { SearchByQuizProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
@@ -72,9 +73,7 @@ export function useExampleSearch(): UseExampleSearchReturnType {
   // Shared for max-frequency: controls whether we show highest->lowest or lowest->highest
   const [highestFirst, setHighestFirst] = useState(true);
 
-  const [spanglish, setSpanglish] = useState<
-    'all' | 'only-spanglish' | 'no-spanglish'
-  >('all');
+  const [spanglish, setSpanglish] = useState<SpanglishFilter>('all');
 
   // Combined filters for filter panel
   const filtersForUI = useCombinedFilters({

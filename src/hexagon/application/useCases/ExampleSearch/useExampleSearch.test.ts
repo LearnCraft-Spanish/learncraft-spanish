@@ -173,13 +173,11 @@ describe('useExampleSearch', () => {
     });
 
     expect(result.current.isValidSearch).toBe(true);
-    expect(result.current.searchResultProps.maxFrequencyResultsProps).toEqual(
-      {
-        highestFirst: true,
-        spanglish: 'all',
-        vocabularyComplete: undefined,
-      },
-    );
+    expect(result.current.searchResultProps.maxFrequencyResultsProps).toEqual({
+      highestFirst: true,
+      spanglish: 'all',
+      vocabularyComplete: undefined,
+    });
   });
 
   it('validates filter mode when course is selected and builds lessonRanges', () => {

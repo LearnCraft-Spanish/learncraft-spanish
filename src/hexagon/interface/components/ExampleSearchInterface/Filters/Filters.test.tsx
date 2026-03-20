@@ -73,9 +73,7 @@ describe('component: Filters', () => {
     it('should render SearchByMaxFrequency when mode is "max-frequency"', () => {
       render(<Filters mode="max-frequency" {...mockProps} />);
 
-      expect(
-        screen.getByText('Search By Max Frequency'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Search By Max Frequency')).toBeInTheDocument();
     });
 
     it('should render error message for invalid mode', () => {

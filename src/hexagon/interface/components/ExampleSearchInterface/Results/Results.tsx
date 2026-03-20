@@ -1,10 +1,8 @@
 import type { LocalFilterPanelResultsProps } from '@interface/components/ExampleSearchInterface/Results/LocalFilterPanelResults';
 import type { SearchByIdsResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByIdsResults';
+import type { SearchByMaxFrequencyResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByMaxFrequencyResults';
 import type { SearchByQuizResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByQuizResults';
 import type { SearchByRecentlyEditedResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByRecentlyEditedResults';
-import type {
-  SearchByMaxFrequencyResultsProps,
-} from '@interface/components/ExampleSearchInterface/Results/SearchByMaxFrequencyResults';
 import type { SearchByTextResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByTextResults';
 import type { ExampleSearchMode } from '@interface/components/ExampleSearchInterface/SearchModeNav';
 import { LocalFilterPanelResults } from '@interface/components/ExampleSearchInterface/Results/LocalFilterPanelResults';

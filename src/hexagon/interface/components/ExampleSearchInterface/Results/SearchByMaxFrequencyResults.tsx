@@ -1,9 +1,10 @@
+import type { SpanglishFilter } from '@application/types/exampleSearch';
 import { useSearchByMaxFrequencyResults } from '@application/units/ExampleSearchInterface/Results/useSearchByMaxFrequencyResults';
 import { MaxFrequencyResultsComponent } from '@interface/components/ExampleSearchInterface/Results/MaxFrequencyResultsComponent';
 
 export interface SearchByMaxFrequencyResultsProps {
   highestFirst: boolean;
-  spanglish: 'all' | 'only-spanglish' | 'no-spanglish';
+  spanglish: SpanglishFilter;
   vocabularyComplete?: boolean;
 }
 

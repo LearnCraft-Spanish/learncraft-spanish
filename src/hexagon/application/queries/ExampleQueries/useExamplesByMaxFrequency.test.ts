@@ -1,3 +1,4 @@
+import type { SpanglishFilter } from '@application/types/exampleSearch';
 import { overrideMockExampleAdapter } from '@application/adapters/exampleAdapter.mock';
 import { useExamplesByMaxFrequency } from '@application/queries/ExampleQueries/useExamplesByMaxFrequency';
 import { renderHook, waitFor } from '@testing-library/react';
@@ -19,7 +20,7 @@ describe('useExamplesByMaxFrequency', () => {
       | {
           highestFirst?: boolean;
           vocabularyComplete?: boolean;
-          spanglish?: 'all' | 'only-spanglish' | 'no-spanglish';
+          spanglish?: SpanglishFilter;
         }
       | undefined;
     overrideMockExampleAdapter({
@@ -57,7 +58,7 @@ describe('useExamplesByMaxFrequency', () => {
       | {
           highestFirst?: boolean;
           vocabularyComplete?: boolean;
-          spanglish?: 'all' | 'only-spanglish' | 'no-spanglish';
+          spanglish?: SpanglishFilter;
         }
       | undefined;
 

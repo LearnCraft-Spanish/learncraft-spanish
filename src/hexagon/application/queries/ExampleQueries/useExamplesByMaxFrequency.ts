@@ -1,3 +1,4 @@
+import type { SpanglishFilter } from '@application/types/exampleSearch';
 import type { ExampleMaxFrequency } from '@learncraft-spanish/shared';
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
 import { queryDefaults } from '@application/utils/queryUtils';
@@ -6,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 export interface UseExamplesByMaxFrequencyParams {
   highestFirst: boolean;
   vocabularyComplete?: boolean;
-  spanglish?: 'all' | 'only-spanglish' | 'no-spanglish';
+  spanglish?: SpanglishFilter;
 }
 
 export interface UseExamplesByMaxFrequencyReturnType {
