@@ -68,12 +68,12 @@ export function useExampleSearch(): UseExampleSearchReturnType {
   // Shared vocabulary complete filter (for text, quiz, and recentlyEdited modes)
   const [vocabularyComplete, setVocabularyComplete] = useState<
     boolean | undefined
-  >(undefined);
+  >(false);
 
   // Shared for max-frequency: controls whether we show highest->lowest or lowest->highest
-  const [highestFirst, setHighestFirst] = useState(true);
+  const [highestFirst, setHighestFirst] = useState(false);
 
-  const [spanglish, setSpanglish] = useState<SpanglishFilter>('all');
+  const [spanglish, setSpanglish] = useState<SpanglishFilter>('no-spanglish');
 
   // Combined filters for filter panel
   const filtersForUI = useCombinedFilters({
@@ -282,9 +282,6 @@ export function useExampleSearch(): UseExampleSearchReturnType {
 
   const handleChangeMode = useCallback((newMode: ExampleSearchMode) => {
     setSearchIsTriggered(false);
-    setVocabularyComplete(undefined);
-    setHighestFirst(true);
-    setSpanglish('all');
     setMode(newMode);
   }, []);
 

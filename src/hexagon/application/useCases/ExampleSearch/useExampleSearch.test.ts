@@ -151,7 +151,7 @@ describe('useExampleSearch', () => {
     expect(result.current.isValidSearch).toBe(true);
     expect(result.current.searchResultProps.quizResultsProps).toEqual({
       quizId: 2,
-      vocabularyComplete: undefined,
+      vocabularyComplete: false,
     });
   });
 
@@ -174,9 +174,9 @@ describe('useExampleSearch', () => {
 
     expect(result.current.isValidSearch).toBe(true);
     expect(result.current.searchResultProps.maxFrequencyResultsProps).toEqual({
-      highestFirst: true,
-      spanglish: 'all',
-      vocabularyComplete: undefined,
+      highestFirst: false,
+      spanglish: 'no-spanglish',
+      vocabularyComplete: false,
     });
   });
 

@@ -35,7 +35,6 @@ export function SearchByMaxFrequency({
           { value: 'true', text: 'Highest to Lowest' },
           { value: 'false', text: 'Lowest to Highest' },
         ]}
-        defaultOptionText="Select order"
         editMode
         required
       />
@@ -53,7 +52,6 @@ export function SearchByMaxFrequency({
           { value: 'only-spanglish', text: 'Only Spanglish' },
           { value: 'no-spanglish', text: 'No Spanglish' },
         ]}
-        defaultOptionText="Select spanglish"
         editMode
         required
       />
