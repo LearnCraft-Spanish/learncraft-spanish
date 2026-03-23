@@ -10,7 +10,7 @@ import {
 } from '@interface/components/EditableTable';
 import { AudioPlaybackCell } from '@interface/components/ExampleEditorInterface/AudioPlaybackCell';
 import { RelatedVocabularyCell } from '@interface/components/ExampleEditorInterface/RelatedVocabularyCell';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 /**
  * Display configuration for example editor columns
@@ -28,7 +28,11 @@ const exampleDisplayConfig: ColumnDisplayConfig[] = [
   { id: 'relatedVocabulary', label: 'Related Vocabulary', width: '2fr' },
 ];
 
-export function ExampleEditor() {
+export function ExampleEditor({
+  setHasUnsavedEditedExamples,
+}: {
+  setHasUnsavedEditedExamples: (hasUnsavedEditedExamples: boolean) => void;
+}) {
   const { tableProps, saveError, audioErrorHandlers } = useExampleEditor();
 
   const { vocabulary: vocabularyList } = useVocabulary();
@@ -132,6 +136,10 @@ export function ExampleEditor() {
 
     return <StandardCell {...props} />;
   };
+
+  useEffect(() => {
+    setHasUnsavedEditedExamples(tableProps.hasUnsavedChanges ?? false);
+  }, [tableProps.hasUnsavedChanges, setHasUnsavedEditedExamples]);
 
   return (
     <div>

@@ -21,7 +21,6 @@ export function LessonView({ lesson, onAction, createMode }: LessonViewProps) {
 
   const [lessonName, setLessonName] = useState<string>(lesson.lesson);
   const [lessonNumber, setLessonNumber] = useState<number>(lesson.lessonNumber);
-  const [subtitle, setSubtitle] = useState<string>(lesson.subtitle);
   const [published, setPublished] = useState<boolean>(lesson.published);
 
   const handleSubmit = async () => {
@@ -49,7 +48,6 @@ export function LessonView({ lesson, onAction, createMode }: LessonViewProps) {
         const newLesson: NewLesson = {
           lesson: lessonName.trim(),
           lessonNumber,
-          subtitle: subtitle.trim(),
           published,
         };
         onAction(newLesson);
@@ -57,7 +55,6 @@ export function LessonView({ lesson, onAction, createMode }: LessonViewProps) {
         const updatedLesson: LessonObjForUpdate = {
           lesson: lessonName.trim(),
           lessonNumber,
-          subtitle: subtitle.trim(),
           published,
           recordId: (lesson as Lesson).recordId,
         };
@@ -100,13 +97,6 @@ export function LessonView({ lesson, onAction, createMode }: LessonViewProps) {
           onChange={(value) => setLessonNumber(Number(value))}
           editMode={editMode}
           required
-        />
-
-        <TextInput
-          label="Subtitle"
-          value={subtitle}
-          onChange={setSubtitle}
-          editMode={editMode}
         />
 
         {!createMode && (
@@ -167,7 +157,6 @@ export function CreateLesson() {
   const emptyLesson: NewLesson = {
     lesson: '',
     lessonNumber: 1,
-    subtitle: '',
     published: false,
   };
 

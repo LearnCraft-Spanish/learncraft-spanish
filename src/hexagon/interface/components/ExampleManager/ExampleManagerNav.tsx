@@ -6,9 +6,11 @@ import './ExampleManager.scss';
 export default function ExampleManagerNav({
   hasUnsavedCreatedExamples,
   setHasUnsavedCreatedExamples,
+  hasUnsavedEditedExamples,
 }: {
   hasUnsavedCreatedExamples: boolean;
   setHasUnsavedCreatedExamples: (hasUnsavedCreatedExamples: boolean) => void;
+  hasUnsavedEditedExamples: boolean;
 }) {
   const { selectedExamples } = useSelectedExamples();
   const location = useLocation();
@@ -53,6 +55,21 @@ export default function ExampleManagerNav({
       });
       return;
     }
+
+    if (resolvedActiveSegment === 'edit' && hasUnsavedEditedExamples) {
+      openModal({
+        title: 'Warning: Unsaved Changes',
+        body: 'You have unsaved edits. If you continue, you will lose your unsaved changes.',
+        type: 'confirm',
+        confirmFunction: () => {
+          navigate(path);
+          closeModal();
+        },
+        cancelFunction: () => {},
+      });
+      return;
+    }
+
     navigate(path);
   };
   return (

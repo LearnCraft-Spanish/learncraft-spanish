@@ -1,9 +1,11 @@
 import type { SearchByIdsProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByIds';
+import type { SearchByMaxFrequencyProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByMaxFrequency';
 import type { SearchByQuizProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
 import type { SearchByRecentlyEditedProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByRecentlyEdited';
 import type { SearchByTextProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByText';
 import type { ExampleSearchMode } from '@interface/components/ExampleSearchInterface/SearchModeNav';
 import { SearchByIds } from '@interface/components/ExampleSearchInterface/Filters/SearchByIds';
+import { SearchByMaxFrequency } from '@interface/components/ExampleSearchInterface/Filters/SearchByMaxFrequency';
 import { SearchByQuiz } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
 import { SearchByRecentlyEdited } from '@interface/components/ExampleSearchInterface/Filters/SearchByRecentlyEdited';
 import { SearchByText } from '@interface/components/ExampleSearchInterface/Filters/SearchByText';
@@ -16,6 +18,7 @@ export function Filters({
   searchByTextProps,
   searchByIdsProps,
   searchByRecentlyEditedProps,
+  searchByMaxFrequencyProps,
 }: {
   mode: ExampleSearchMode;
   onFilterChange: () => void;
@@ -23,6 +26,7 @@ export function Filters({
   searchByTextProps: SearchByTextProps;
   searchByIdsProps: SearchByIdsProps;
   searchByRecentlyEditedProps: SearchByRecentlyEditedProps;
+  searchByMaxFrequencyProps: SearchByMaxFrequencyProps;
 }) {
   if (mode === 'filter') {
     return (
@@ -56,6 +60,12 @@ export function Filters({
     return (
       <div className="searchInterfaceFilterPanel">
         <SearchByIds {...searchByIdsProps} />
+      </div>
+    );
+  } else if (mode === 'max-frequency') {
+    return (
+      <div className="searchInterfaceFilterPanel">
+        <SearchByMaxFrequency {...searchByMaxFrequencyProps} />
       </div>
     );
   }

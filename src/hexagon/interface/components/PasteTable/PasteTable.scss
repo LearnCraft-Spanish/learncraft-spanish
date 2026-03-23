@@ -2,7 +2,6 @@
   width: 100%;
   border: 2px solid var(--dark);
   border-radius: 4px;
-  overflow: hidden; /* Ensure border radius applies to child borders */
 
   /* Semantic HTML table - class applied directly to <table> element */
   &__table {
