@@ -1,5 +1,8 @@
 import type { SpanglishFilter } from '@application/types/exampleSearch';
-import { overrideMockExampleAdapter } from '@application/adapters/exampleAdapter.mock';
+import {
+  overrideMockExampleAdapter,
+  resetMockExampleAdapter,
+} from '@application/adapters/exampleAdapter.mock';
 import { useExamplesByMaxFrequency } from '@application/queries/ExampleQueries/useExamplesByMaxFrequency';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createMockExampleMaxFrequencyList } from '@testing/factories/exampleFactory';
@@ -12,6 +15,9 @@ describe('useExamplesByMaxFrequency', () => {
       searchExamplesByMaxFrequency: async () =>
         createMockExampleMaxFrequencyList(2),
     });
+  });
+  afterEach(() => {
+    resetMockExampleAdapter();
   });
 
   it('should fetch examples by max frequency correctly', async () => {
