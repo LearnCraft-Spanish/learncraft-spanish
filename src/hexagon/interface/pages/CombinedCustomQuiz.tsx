@@ -11,10 +11,26 @@ import {
   MyTextQuizMenu,
 } from '@interface/components/Quizzing/general';
 import { RegularTextQuiz } from '@interface/components/Quizzing/TextQuiz';
+import { useState } from 'react';
 
 // This seems like a boundary violation: pulling styles from the wrong scope?
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
 import './CombinedCustomQuiz.scss';
+
+const MOBILE_STEP_LABELS: Record<0 | 1 | 2, string> = {
+  0: 'Course & Lesson',
+  1: 'Tags',
+  2: 'Quiz Options',
+};
+
+const MOBILE_ACTIVE_SECTION: Record<
+  0 | 1 | 2,
+  'courseLesson' | 'tags' | 'togglesOnly'
+> = {
+  0: 'courseLesson',
+  1: 'tags',
+  2: 'togglesOnly',
+};
 
 export default function CombinedCustomQuiz() {
   const {
@@ -33,6 +49,8 @@ export default function CombinedCustomQuiz() {
     audioQuizProps,
   } = useCombinedCustomQuiz();
 
+  const [mobileStep, setMobileStep] = useState<0 | 1 | 2>(0);
+
   if (errorExamples) {
     return (
       <div className="CombinedCustomQuizWrapper">
@@ -47,15 +65,34 @@ export default function CombinedCustomQuiz() {
     return <Loading message="Loading quiz setup..." />;
   }
 
+  const countLabel = isLoadingExamples
+    ? 'Loading...'
+    : `${totalCount ?? 0} flashcard${totalCount === 1 ? '' : 's'} available`;
+
   return (
-    <div className="myFlashcardsFormContentWrapper">
+    <div
+      className="myFlashcardsFormContentWrapper"
+      data-mobile-step={mobileStep}
+    >
       {!quizReady ? (
         <>
-          <h2>Custom Quiz</h2>
-          <FilterPanel
-            requireAudioOnly={quizType === CombinedCustomQuizType.Audio}
-            requireNoSpanglish={quizType === CombinedCustomQuizType.Audio}
-          />
+          <h2 className="combinedCustomQuizDesktopTitle">Custom Quiz</h2>
+
+          {/* Mobile-only stepper header */}
+          <div className="mobileStepHeader">
+            <span className="mobileStepLabel">
+              Step {mobileStep + 1} of 3 — {MOBILE_STEP_LABELS[mobileStep]}
+            </span>
+          </div>
+
+          {/* Filter panel — visible on all steps; CSS controls which column shows */}
+          <div className="mobileFilterSection">
+            <FilterPanel
+              requireAudioOnly={quizType === CombinedCustomQuizType.Audio}
+              requireNoSpanglish={quizType === CombinedCustomQuizType.Audio}
+              mobileActiveSection={MOBILE_ACTIVE_SECTION[mobileStep]}
+            />
+          </div>
 
           <form
             className="combinedCustomQuizForm"
@@ -122,7 +159,7 @@ export default function CombinedCustomQuiz() {
               </div>
             </div>
 
-            <div className="buttonBox">
+            <div className="buttonBox desktopStartButton">
               <button
                 type="submit"
                 disabled={quizNotReady}
@@ -132,10 +169,43 @@ export default function CombinedCustomQuiz() {
                 Start Quiz
               </button>
             </div>
-            <div className="buttonBox">
+            <div className="buttonBox desktopMenuButton">
               <MenuButton />
             </div>
           </form>
+
+          {/* Mobile-only stepper footer */}
+          <div className="mobileStepFooter">
+            <p className="mobileCountText">{countLabel}</p>
+
+            {mobileStep < 2 ? (
+              <button
+                type="button"
+                className="mobileStepNextButton"
+                onClick={() => setMobileStep((prev) => (prev + 1) as 0 | 1 | 2)}
+              >
+                Next →
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={quizNotReady}
+                onClick={readyQuiz}
+                className={`mobileStartQuizButton ${quizNotReady ? 'disabled' : ''}`}
+              >
+                Start Quiz
+              </button>
+            )}
+            {mobileStep > 0 && (
+              <button
+                type="button"
+                className="mobileStepBackButton"
+                onClick={() => setMobileStep((prev) => (prev - 1) as 0 | 1 | 2)}
+              >
+                ← Back
+              </button>
+            )}
+          </div>
         </>
       ) : quizType === CombinedCustomQuizType.Text ? (
         <RegularTextQuiz textQuizProps={textQuizProps} />
