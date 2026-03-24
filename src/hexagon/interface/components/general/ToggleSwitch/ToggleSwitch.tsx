@@ -2,6 +2,7 @@ import './ToggleSwitch.scss';
 
 export default function ToggleSwitch({
   id,
+  wrapperId,
   ariaLabel,
   label,
   checked,
@@ -10,13 +11,14 @@ export default function ToggleSwitch({
 }: {
   ariaLabel: string;
   id: string;
+  wrapperId?: string;
   label: string;
   checked: boolean;
   onChange: () => void;
   disabled?: boolean;
 }) {
   return (
-    <div className="toggleSwitch">
+    <div className="toggleSwitch" {...(wrapperId && { id: wrapperId })}>
       <p>{label}</p>
       <label htmlFor={id} className="switch" aria-label={ariaLabel}>
         <input

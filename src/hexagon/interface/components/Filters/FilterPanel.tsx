@@ -13,10 +13,12 @@ export function FilterPanel({
   onFilterChange,
   requireAudioOnly,
   requireNoSpanglish,
+  mobileActiveSection,
 }: {
   onFilterChange?: () => void;
   requireAudioOnly: boolean;
   requireNoSpanglish: boolean;
+  mobileActiveSection?: 'courseLesson' | 'tags' | 'togglesOnly';
 }) {
   const [filterMode, setFilterMode] = useState<'preset' | 'search'>('search');
 
@@ -45,12 +47,13 @@ export function FilterPanel({
   } = skillTagSearch;
 
   return (
-    <div className="filterPanel">
+    <div className="filterPanel" data-mobile-section={mobileActiveSection}>
       <div className="filterPanelColumn basicOptions">
         {/* <div className="filterPanelRightSide"> */}
         {isAdmin && (
           <ToggleSwitch
             id="includeUnpublished"
+            wrapperId="includeUnpublishedWrapper"
             ariaLabel="includeUnpublished"
             label="Include unpublished courses and lessons: "
             checked={includeUnpublished ?? false}
@@ -65,6 +68,7 @@ export function FilterPanel({
         {!requireNoSpanglish && (
           <ToggleSwitch
             id="removeSpanglish"
+            wrapperId="removeSpanglishWrapper"
             ariaLabel="noSpanglish"
             label="Exclude Spanglish: "
             checked={excludeSpanglish ?? false}
@@ -74,6 +78,7 @@ export function FilterPanel({
         {!requireAudioOnly && (
           <ToggleSwitch
             id="audioOnly"
+            wrapperId="audioOnlyWrapper"
             ariaLabel="audioOnly"
             label="Audio Flashcards Only: "
             checked={audioOnly ?? false}

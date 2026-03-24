@@ -8,6 +8,10 @@
   justify-content: center;
   align-content: center;
 
+  @media (max-width: 768px) {
+    padding: 0px;
+  }
+
   // any class that starts with filterPanel_
   .filterPanelColumn {
     display: flex;
@@ -22,6 +26,10 @@
       max-width: 320px;
       margin: 0px 16px;
       margin-bottom: 16px;
+      @media (max-width: 768px) {
+        max-width: 355px;
+        margin: 0px auto;
+      }
     }
 
     &.tagFiltering {
@@ -31,7 +39,41 @@
     }
   }
 
+  @media (max-width: 768px) {
+    &[data-mobile-section='courseLesson'] .tagFiltering {
+      display: none;
+    }
+
+    &[data-mobile-section='tags'] .basicOptions {
+      display: none;
+    }
+
+    &[data-mobile-section='togglesOnly'] .tagFiltering {
+      display: none;
+    }
+
+    &[data-mobile-section='togglesOnly'] .FromToLessonSelectorWrapper {
+      display: none;
+    }
+
+    &[data-mobile-section='togglesOnly'] #includeUnpublishedWrapper {
+      display: none;
+    }
+
+    &[data-mobile-section='togglesOnly'] #removeSpanglishWrapper {
+      display: none;
+    }
+
+    &[data-mobile-section='togglesOnly'] #audioOnlyWrapper {
+      display: none;
+    }
+  }
+
   .filterPanelColumn.tagFiltering {
+    @media (max-width: 768px) {
+      max-width: 355px;
+      margin: 0px auto;
+    }
     .filterPanel_modeSelector {
       width: 100%;
       display: flex;
