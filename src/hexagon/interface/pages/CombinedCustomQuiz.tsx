@@ -18,9 +18,9 @@ import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
 import './CombinedCustomQuiz.scss';
 
 const MOBILE_STEP_LABELS: Record<0 | 1 | 2, string> = {
-  0: 'Course & Lesson',
-  1: 'Tags',
-  2: 'Quiz Options',
+  0: 'Choose Course and Lessons',
+  1: 'Choose Tags (or Skip)',
+  2: 'Choose Quiz Type',
 };
 
 const MOBILE_ACTIVE_SECTION: Record<
