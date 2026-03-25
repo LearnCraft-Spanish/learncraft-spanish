@@ -6,6 +6,7 @@ export const defaultResult: UseFrequensayResult = {
   spellingsDataLoading: false,
   spellingsData: [],
   FrequensaySetupProps: {
+    isLoading: false,
     isFrequensayEnabled: false,
     setIsFrequensayEnabled: vi.fn<() => void>(),
   },
