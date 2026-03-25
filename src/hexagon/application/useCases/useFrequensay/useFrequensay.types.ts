@@ -6,6 +6,7 @@ export interface UseFrequensayResult {
   spellingsData: string[];
 
   FrequensaySetupProps: {
+    isLoading: boolean;
     isFrequensayEnabled: boolean;
     setIsFrequensayEnabled: (value: boolean) => void;
   };
