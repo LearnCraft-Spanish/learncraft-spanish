@@ -60,13 +60,13 @@
       display: none;
     }
 
-    &[data-mobile-section='togglesOnly'] #removeSpanglishWrapper {
-      display: none;
-    }
+    // &[data-mobile-section='togglesOnly'] #removeSpanglishWrapper {
+    //   display: none;
+    // }
 
-    &[data-mobile-section='togglesOnly'] #audioOnlyWrapper {
-      display: none;
-    }
+    // &[data-mobile-section='togglesOnly'] #audioOnlyWrapper {
+    //   display: none;
+    // }
   }
 
   .filterPanelColumn.tagFiltering {

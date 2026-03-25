@@ -66,7 +66,7 @@ export default function CombinedCustomQuiz() {
   }
 
   const countLabel = isLoadingExamples
-    ? 'Loading...'
+    ? 'counting flashcards...'
     : `${totalCount ?? 0} flashcard${totalCount === 1 ? '' : 's'} available`;
 
   return (

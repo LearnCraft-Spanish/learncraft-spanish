@@ -69,6 +69,11 @@
 
   // Step 2: desktop buttons replaced by footer; toggles reordered below quiz config
   .myFlashcardsFormContentWrapper[data-mobile-step='2'] {
+    #removeSpanglishWrapper,
+    #audioOnlyWrapper {
+      display: flex;
+    }
+
     .desktopStartButton,
     .desktopMenuButton {
       display: none;
