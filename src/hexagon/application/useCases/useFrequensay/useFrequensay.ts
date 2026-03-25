@@ -19,7 +19,7 @@ export default function useFrequensay(): UseFrequensayResult {
     enableManualVocabulary,
   } = useCustomVocabulary();
 
-  const { toLesson, course, isLoading } = useSelectedCourseAndLessons();
+  const { toLesson, course } = useSelectedCourseAndLessons();
 
   const [isFrequensayEnabled, setIsFrequensayEnabled] = useState(false);
 
@@ -88,7 +88,6 @@ export default function useFrequensay(): UseFrequensayResult {
     spellingsData: spellingsKnownData ?? [],
 
     FrequensaySetupProps: {
-      isLoading,
       isFrequensayEnabled,
       setIsFrequensayEnabled,
     },

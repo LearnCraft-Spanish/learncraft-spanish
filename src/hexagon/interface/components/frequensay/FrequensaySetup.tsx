@@ -3,15 +3,13 @@ import { FrequensayIncludeUnpublishedToggle } from '@interface/components/freque
 import { LessonSelector } from '@interface/components/LessonSelector';
 import { InlineLoading } from '@interface/components/Loading';
 export default function FrequensaySetup({
-  isLoading,
   isFrequensayEnabled,
   setIsFrequensayEnabled,
 }: {
-  isLoading: boolean;
   isFrequensayEnabled: boolean;
   setIsFrequensayEnabled: (value: boolean) => void;
 }) {
-  const { course, toLesson } = useSelectedCourseAndLessons();
+  const { course, toLesson, isLoading } = useSelectedCourseAndLessons();
 
   return (
     <div className="frequensay-page__setup">

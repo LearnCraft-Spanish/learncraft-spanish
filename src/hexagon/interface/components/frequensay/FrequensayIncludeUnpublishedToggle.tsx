@@ -14,8 +14,8 @@ export function FrequensayIncludeUnpublishedToggle() {
       id="includeUnpublished"
       ariaLabel="includeUnpublished"
       label="Include unpublished courses and lessons: "
-      checked={includeUnpublished ?? false}
-      onChange={() => updateIncludeUnpublished(!(includeUnpublished ?? false))}
+      checked={includeUnpublished}
+      onChange={() => updateIncludeUnpublished(!includeUnpublished)}
     />
   );
 }
