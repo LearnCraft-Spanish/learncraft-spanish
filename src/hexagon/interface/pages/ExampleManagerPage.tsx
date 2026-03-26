@@ -9,10 +9,19 @@ import { Route, Routes } from 'react-router-dom';
 export function ExampleManagerRouter() {
   const [hasUnsavedCreatedExamples, setHasUnsavedCreatedExamples] =
     useState(false);
+  const [hasUnsavedEditedExamples, setHasUnsavedEditedExamples] =
+    useState(false);
 
   const handleSetHasUnsavedCreatedExamples = useCallback(
     (hasUnsavedCreatedExamples: boolean) => {
       setHasUnsavedCreatedExamples(hasUnsavedCreatedExamples);
+    },
+    [],
+  );
+
+  const handleSetHasUnsavedEditedExamples = useCallback(
+    (hasUnsavedEditedExamples: boolean) => {
+      setHasUnsavedEditedExamples(hasUnsavedEditedExamples);
     },
     [],
   );
@@ -21,6 +30,7 @@ export function ExampleManagerRouter() {
       <ExampleManagerNav
         hasUnsavedCreatedExamples={hasUnsavedCreatedExamples}
         setHasUnsavedCreatedExamples={handleSetHasUnsavedCreatedExamples}
+        hasUnsavedEditedExamples={hasUnsavedEditedExamples}
       />
       <Routes>
         {/* <Route path="/" element={<ExampleManagerSetupMenu />} /> */}
@@ -33,7 +43,14 @@ export function ExampleManagerRouter() {
             />
           }
         />
-        <Route path="edit" element={<ExampleEditor />} />
+        <Route
+          path="edit"
+          element={
+            <ExampleEditor
+              setHasUnsavedEditedExamples={handleSetHasUnsavedEditedExamples}
+            />
+          }
+        />
         <Route path="assign" element={<ExampleAssigner />} />
       </Routes>
     </SelectedExamplesProvider>

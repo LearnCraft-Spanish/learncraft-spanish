@@ -151,7 +151,7 @@ describe('useExampleSearch', () => {
     expect(result.current.isValidSearch).toBe(true);
     expect(result.current.searchResultProps.quizResultsProps).toEqual({
       quizId: 2,
-      vocabularyComplete: undefined,
+      vocabularyComplete: false,
     });
   });
 
@@ -163,6 +163,21 @@ describe('useExampleSearch', () => {
     });
 
     expect(result.current.isValidSearch).toBe(true);
+  });
+
+  it('always validates max-frequency mode', () => {
+    const { result } = renderHook(() => useExampleSearch());
+
+    act(() => {
+      result.current.handleChangeMode('max-frequency');
+    });
+
+    expect(result.current.isValidSearch).toBe(true);
+    expect(result.current.searchResultProps.maxFrequencyResultsProps).toEqual({
+      highestFirst: false,
+      spanglish: 'no-spanglish',
+      vocabularyComplete: false,
+    });
   });
 
   it('validates filter mode when course is selected and builds lessonRanges', () => {

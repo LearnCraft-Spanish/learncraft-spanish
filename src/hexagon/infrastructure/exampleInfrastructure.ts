@@ -1,8 +1,10 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { LessonRange } from '@application/ports/coursePort';
 import type { ExamplePort } from '@application/ports/examplePort';
+import type { SpanglishFilter } from '@application/types/exampleSearch';
 import type {
   CreateExamplesCommand,
+  ExampleMaxFrequency,
   ExampleTechnical,
   ExampleTextSearch,
   ExampleWithVocabulary,
@@ -17,6 +19,7 @@ import {
   getExamplesByIdsWithVocabularyEndpoint,
   getExamplesByMostRecentlyModifiedEndpoint,
   queryExamplesEndpoint,
+  searchExamplesByMaxFrequencyEndpoint,
   searchExamplesByTextEndpoint,
   updateExamplesEndpoint,
 } from '@learncraft-spanish/shared';
@@ -99,6 +102,22 @@ export function createExampleInfrastructure(
           page,
           limit,
           vocabularyComplete,
+        },
+      );
+      return response;
+    },
+    searchExamplesByMaxFrequency: async (params: {
+      highestFirst?: boolean;
+      vocabularyComplete?: boolean;
+      spanglish?: SpanglishFilter;
+    }): Promise<ExampleMaxFrequency[]> => {
+      const response = await httpClient.post<ExampleMaxFrequency[]>(
+        searchExamplesByMaxFrequencyEndpoint.path,
+        searchExamplesByMaxFrequencyEndpoint.requiredScopes,
+        {
+          vocabularyComplete: params.vocabularyComplete,
+          highestFirst: params.highestFirst,
+          spanglish: params.spanglish ?? 'all',
         },
       );
       return response;

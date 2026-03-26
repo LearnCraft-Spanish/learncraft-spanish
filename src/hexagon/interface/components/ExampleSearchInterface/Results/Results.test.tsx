@@ -40,6 +40,15 @@ vi.mock(
   }),
 );
 
+vi.mock(
+  '@interface/components/ExampleSearchInterface/Results/SearchByMaxFrequencyResults',
+  () => ({
+    SearchByMaxFrequencyResults: () => (
+      <div>Search By Max Frequency Results</div>
+    ),
+  }),
+);
+
 describe('component: Results', () => {
   const mockProps = {
     recentlyEditedResultsProps: {} as any,
@@ -47,6 +56,7 @@ describe('component: Results', () => {
     quizResultsProps: {} as any,
     textResultsProps: {} as any,
     idsResultsProps: {} as any,
+    maxFrequencyResultsProps: {} as any,
   };
 
   describe('mode routing', () => {
@@ -84,6 +94,14 @@ describe('component: Results', () => {
       expect(screen.getByText('Search By Ids Results')).toBeInTheDocument();
     });
 
+    it('should render SearchByMaxFrequencyResults when mode is "max-frequency"', () => {
+      render(<Results mode="max-frequency" {...mockProps} />);
+
+      expect(
+        screen.getByText('Search By Max Frequency Results'),
+      ).toBeInTheDocument();
+    });
+
     it('should render error message for invalid mode', () => {
       render(<Results mode={'invalid' as any} {...mockProps} />);
 
@@ -109,6 +127,9 @@ describe('component: Results', () => {
       ).not.toBeInTheDocument();
       expect(
         screen.queryByText('Search By Ids Results'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Search By Max Frequency Results'),
       ).not.toBeInTheDocument();
 
       rerender(<Results mode="recentlyEdited" {...mockProps} />);

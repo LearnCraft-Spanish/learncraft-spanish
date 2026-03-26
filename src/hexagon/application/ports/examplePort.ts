@@ -1,6 +1,8 @@
 import type { LessonRange } from '@application/ports/coursePort';
+import type { SpanglishFilter } from '@application/types/exampleSearch';
 import type {
   CreateExamplesCommand,
+  ExampleMaxFrequency,
   ExampleTechnical,
   ExampleTextSearch,
   ExampleWithVocabulary,
@@ -48,6 +50,12 @@ export interface ExamplePort {
     limit: number,
     vocabularyComplete?: boolean,
   ) => Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }>;
+
+  searchExamplesByMaxFrequency: (params: {
+    highestFirst?: boolean;
+    vocabularyComplete?: boolean;
+    spanglish?: SpanglishFilter;
+  }) => Promise<ExampleMaxFrequency[]>;
   getExamplesByRecentlyModified: (
     page: number,
     limit: number,
