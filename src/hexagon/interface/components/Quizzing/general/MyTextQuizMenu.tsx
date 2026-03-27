@@ -99,7 +99,7 @@ export function MyTextQuizMenu({
           </div>
           <div className="quizSettingsBody">
             <div className="menuRow">
-              <p className="totalCount">{`${totalCount ?? 0} flashcards found`}</p>
+              <p className="totalCount desktopFlashcardsCountText">{`${totalCount ?? 0} flashcards found`}</p>
             </div>
           </div>
         </>

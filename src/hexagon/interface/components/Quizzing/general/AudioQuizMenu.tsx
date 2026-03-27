@@ -70,7 +70,7 @@ export function AudioQuizMenu({
           </label>
           <div className="quizSettingsBody">
             <div className="menuRow">
-              <p className="totalCount">{`${totalCount ?? 0} examples found`}</p>
+              <p className="totalCount desktopFlashcardsCountText">{`${totalCount ?? 0} examples found`}</p>
             </div>
           </div>
         </>
