@@ -8,8 +8,8 @@ export interface UseIncludeUnpublishedReturnType {
   isAdmin: boolean;
 }
 
-// this hoook basically does a subset of the functionality of the useExampleFilterCoordinator hook
-// kept seprate because we dont need useSkillTags. may remove this hook in the future, and use just the useExampleFilterCoordinator hook instead.
+// this hook basically does a subset of the functionality of the useExampleFilterCoordinator hook
+// kept separate because we don't need useSkillTags. may remove this hook in the future, and use just the useExampleFilterCoordinator hook instead.
 export function useIncludeUnpublished(): UseIncludeUnpublishedReturnType {
   const { isAdmin } = useAuthAdapter();
   const { exampleFilters, updateExampleFilters } = use(ExampleFilterContext);

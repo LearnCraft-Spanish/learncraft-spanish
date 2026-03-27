@@ -37,5 +37,3 @@ For AI agents: [`CLAUDE.md`](./CLAUDE.md).
 ## License
 
 ISC
-
-## triggering deploy
