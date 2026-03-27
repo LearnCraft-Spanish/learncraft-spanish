@@ -40,14 +40,15 @@
   // Stepper header: step label only
   .mobileStepHeader {
     display: flex;
+    flex-direction: row;
     justify-content: center;
-    padding: 12px 16px 4px;
+    padding: 12px 16px 8px;
     width: 100%;
     box-sizing: border-box;
 
     .mobileStepLabel {
       font-weight: 600;
-      font-size: 16px;
+      font-size: 18px;
       text-align: center;
     }
   }
@@ -76,6 +77,9 @@
 
     .desktopStartButton,
     .desktopMenuButton {
+      display: none;
+    }
+    .combinedCustomQuizForm .combinedCustomQuizFormContentWrapper h4 {
       display: none;
     }
 
