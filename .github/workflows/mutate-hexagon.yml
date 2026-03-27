@@ -2,7 +2,8 @@ name: Hexagon Mutation Testing Report
 
 on:
   schedule:
-    - cron: '0 2 * * *' # Run every day at 2:00 AM UTC
+    # Thu & Sun 00:00 CST (06:00 UTC). During CDT, runs 01:00 local — GitHub cron is UTC-only.
+    - cron: '0 6 * * 0,4'
   workflow_dispatch:
 
 jobs:
@@ -79,4 +80,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mutation-report
-          path: reports/mutation/mutation-hexagon.html # Adjust to your Stryker report directory
+          path: reports/mutation/frontend-mutation-hexagon.html # Adjust to your Stryker report directory

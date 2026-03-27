@@ -4,7 +4,11 @@ name: Continuous Integration
 on:
   # master branch will not accept if any failed
   # development branch will accept regardless of the status of the jobs
+  # pull_request: validate PR branch before merge (required for PR checks).
+  # push: validate when commits land on protected branches (merge + direct push).
+  # Omit pull_request "closed" so merge does not double-run with push to the same branch.
   pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - staging
       - development

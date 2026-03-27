@@ -2,16 +2,34 @@ name: Claude PR Review
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
 
 permissions:
   contents: read
   pull-requests: write
+  issues: read
   id-token: write
+  actions: read
 
 jobs:
   claude-review:
+    if: |
+      (github.event_name == 'pull_request' && github.event.action == 'opened') ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,9 +40,11 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
           prompt: |
             REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
+            PR NUMBER: ${{ env.PR_NUMBER }}
 
             You are reviewing this pull request. Operate in PR Review mode.
 
@@ -32,8 +52,8 @@ jobs:
 
             1. Read `CLAUDE.md` for critical rules and operating context.
             2. Read `documentation/PR_REVIEW_GUIDE.md` for the full review checklist.
-            3. Run `gh pr diff ${{ github.event.pull_request.number }}` to get the full diff.
-            4. Run `gh pr view ${{ github.event.pull_request.number }}` to get the PR description.
+            3. Run `gh pr diff ${{ env.PR_NUMBER }}` to get the full diff.
+            4. Run `gh pr view ${{ env.PR_NUMBER }}` to get the PR description.
             5. For any changed files under `src/hexagon/`, read the `BOUNDARIES.md` in that layer directory.
 
             ## Review
