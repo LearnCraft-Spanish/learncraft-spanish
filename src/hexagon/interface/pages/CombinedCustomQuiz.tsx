@@ -17,14 +17,16 @@ import { useState } from 'react';
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
 import './CombinedCustomQuiz.scss';
 
-const MOBILE_STEP_LABELS: Record<0 | 1 | 2, string> = {
+type MobileStep = 0 | 1 | 2;
+
+const MOBILE_STEP_LABELS: Record<MobileStep, string> = {
   0: 'Choose Course and Lessons',
   1: 'Choose Tags (or Skip)',
   2: 'Choose Quiz Type',
 };
 
 const MOBILE_ACTIVE_SECTION: Record<
-  0 | 1 | 2,
+  MobileStep,
   'courseLesson' | 'tags' | 'togglesOnly'
 > = {
   0: 'courseLesson',
@@ -49,7 +51,7 @@ export default function CombinedCustomQuiz() {
     audioQuizProps,
   } = useCombinedCustomQuiz();
 
-  const [mobileStep, setMobileStep] = useState<0 | 1 | 2>(0);
+  const [mobileStep, setMobileStep] = useState<MobileStep>(0);
 
   if (errorExamples) {
     return (
