@@ -26,6 +26,6 @@
     "@stryker-mutator/typescript-checker"
   ],
   "htmlReporter": {
-    "fileName": "reports/mutation/mutation.html"
+    "fileName": "reports/mutation/frontend-mutation.html"
   }
 }
