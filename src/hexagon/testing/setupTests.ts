@@ -50,6 +50,10 @@ import {
   resetMockActiveStudent,
 } from '@application/coordinators/hooks/useActiveStudent.mock';
 import {
+  mockUseIncludeUnpublished,
+  resetMockUseIncludeUnpublished,
+} from '@application/coordinators/hooks/useIncludeUnpublished.mock';
+import {
   mockSelectedCourseAndLessons,
   resetMockSelectedCourseAndLessons,
 } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
@@ -117,6 +121,10 @@ vi.mock('@application/coordinators/hooks/useSelectedCourseAndLessons', () => ({
   useSelectedCourseAndLessons: vi.fn(() => mockSelectedCourseAndLessons),
 }));
 
+vi.mock('@application/coordinators/hooks/useIncludeUnpublished', () => ({
+  useIncludeUnpublished: vi.fn(() => mockUseIncludeUnpublished),
+}));
+
 vi.mock('@application/units/useStudentFlashcards', () => ({
   useStudentFlashcards: vi.fn(() => mockUseStudentFlashcards),
 }));
@@ -146,6 +154,7 @@ const resetGlobalMocks = () => {
   // coordinator mocks
   resetMockActiveStudent();
   resetMockSelectedCourseAndLessons();
+  resetMockUseIncludeUnpublished();
 
   // unit mocks
   resetMockUseStudentFlashcards();

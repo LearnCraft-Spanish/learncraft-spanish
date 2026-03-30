@@ -20,5 +20,155 @@
     }
   }
 }
+.mobileFilterSection {
+  width: 100%;
+}
+
+// Mobile stepper elements — hidden on desktop by default
+.mobileStepHeader,
+.mobileStepFooter {
+  display: none;
+}
+
+// ─── Mobile stepper ───────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  // Hide the desktop-only title (stepper header provides the step label)
+  .combinedCustomQuizDesktopTitle {
+    display: none;
+  }
+
+  // Stepper header: step label only
+  .mobileStepHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 12px 16px 8px;
+    width: 100%;
+    box-sizing: border-box;
+
+    .mobileStepLabel {
+      font-weight: 600;
+      font-size: 18px;
+      text-align: center;
+    }
+  }
+
+  // Show/hide sections by step
+  // Steps 0 and 1: show filters, hide quiz config form
+  .myFlashcardsFormContentWrapper[data-mobile-step='0'],
+  .myFlashcardsFormContentWrapper[data-mobile-step='1'] {
+    .combinedCustomQuizForm {
+      display: none;
+    }
+    #removeSpanglishWrapper {
+      display: none;
+    }
+    #audioOnlyWrapper {
+      display: none;
+    }
+  }
+
+  // Step 2: desktop buttons replaced by footer; toggles reordered below quiz config
+  .myFlashcardsFormContentWrapper[data-mobile-step='2'] {
+    #removeSpanglishWrapper,
+    #audioOnlyWrapper {
+      display: flex;
+    }
+
+    .desktopStartButton,
+    .desktopMenuButton {
+      display: none;
+    }
+    .combinedCustomQuizForm .combinedCustomQuizFormContentWrapper h4 {
+      display: none;
+    }
+
+    .desktopFlashcardsCountText {
+      display: none;
+    }
+
+    .combinedCustomQuizForm {
+      order: 1;
+    }
+
+    .mobileFilterSection {
+      order: 2;
+    }
+
+    .mobileStepFooter {
+      order: 3;
+    }
+  }
+
+  // Stepper footer: count text → back button → next/start button (stacked)
+  .mobileStepFooter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px 20px;
+    width: 100%;
+    box-sizing: border-box;
+
+    .mobileCountText {
+      font-size: 14px;
+      font-style: italic;
+      text-align: center;
+      margin: auto;
+    }
+
+    .mobileStepBackButton {
+      width: 100%;
+      max-width: 320px;
+      padding: 12px 14px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      background: transparent;
+      border: 2px solid var(--brand);
+      color: var(--brand);
+
+      &:hover {
+        background-color: color-mix(in srgb, var(--brand) 8%, transparent);
+      }
+    }
+
+    .mobileStepNextButton,
+    .mobileStartQuizButton {
+      width: 100%;
+      max-width: 320px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .mobileStepNextButton {
+      background-color: var(--brand);
+      color: var(--light);
+
+      &:hover {
+        background-color: var(--accent);
+      }
+    }
+
+    .mobileStartQuizButton {
+      background-color: darkgreen;
+      color: var(--light);
+
+      &.disabled {
+        background-color: var(--dark);
+        cursor: not-allowed;
+      }
+
+      &:not(.disabled):hover {
+        background-color: green;
+      }
+    }
+  }
+}
 
 // All other styles are inherited from QuizSetupMenu.scss
