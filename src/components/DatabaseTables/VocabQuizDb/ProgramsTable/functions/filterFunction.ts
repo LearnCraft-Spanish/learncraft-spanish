@@ -1,8 +1,8 @@
+import type { CourseDetailed } from '@learncraft-spanish/shared';
 import type { FilterConfig } from 'src/components/Table/types';
-import type { Program } from 'src/types/interfaceDefinitions';
 
 export default function filterFunction(
-  data: Program[],
+  data: CourseDetailed[],
   filterConfig: FilterConfig,
 ) {
   if (!filterConfig.field || !filterConfig.value) {

@@ -1,19 +1,23 @@
-import type { Program } from 'src/types/interfaceDefinitions';
-import type { CohortField, CohortLetter, EditableProgram } from '../types';
+import type { CourseDetailed } from '@learncraft-spanish/shared';
+import type { CohortField, CohortLetter } from '../types';
 import { TextInput } from '@interface/components/FormComponents';
 import { useModal } from '@interface/hooks/useModal';
 import { useState } from 'react';
 import { Checkbox, FormControls } from 'src/components/FormComponents';
 import verifyRequiredInputs from 'src/components/FormComponents/functions/inputValidation';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
-import useProgramsTable from 'src/hooks/VocabQuizDbData/useProgramsTable';
 import { cohorts } from '../constants';
 
-export default function EditProgramView({ program }: { program: Program }) {
-  const [editObject, setEditObject] = useState<Program>(program);
+export default function EditProgramView({
+  program,
+  onUpdate,
+}: {
+  program: CourseDetailed;
+  onUpdate: (course: CourseDetailed) => void;
+}) {
+  const [editObject, setEditObject] = useState<CourseDetailed>(program);
   const [editMode, setEditMode] = useState(false);
   const { openModal } = useModal();
-  const { updateProgramMutation } = useProgramsTable();
 
   const captureSubmitForm = () => {
     const requiredInputs = [{ value: editObject.name, label: 'Name' }];
@@ -27,10 +31,7 @@ export default function EditProgramView({ program }: { program: Program }) {
       return;
     }
 
-    // Create a new object without the lessons property
-    const { lessons, ...programWithoutLessons } = editObject;
-
-    updateProgramMutation.mutate(programWithoutLessons as EditableProgram);
+    onUpdate(editObject);
     setEditMode(false);
   };
 

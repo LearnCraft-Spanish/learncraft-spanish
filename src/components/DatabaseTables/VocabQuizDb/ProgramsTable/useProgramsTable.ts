@@ -1,21 +1,26 @@
+import type { CourseDetailed } from '@learncraft-spanish/shared';
+import { useAllCoursesQuery } from '@application/queries/useAllCoursesQuery';
+import { useCoursesMutations } from '@application/queries/useCoursesMutations';
 import { useMemo, useState } from 'react';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import useProgramsTableQueries from 'src/hooks/VocabQuizDbData/useProgramsTable';
 
 export default function useProgramsTable() {
-  const { programsTableQuery, updateManyProgramsMutation } =
-    useProgramsTableQueries();
+  const programsTableQuery = useAllCoursesQuery();
+  const {
+    updateCourses,
+    isPending: isUpdating,
+    error: updateError,
+  } = useCoursesMutations();
   const { contextual } = useContextualMenu();
   const [tableEditMode, setTableEditMode] = useState(false);
 
-  const programToEdit = useMemo(() => {
+  const programToEdit = useMemo((): CourseDetailed | null => {
     if (!contextual.startsWith('edit-program-')) {
       return null;
     }
-
-    const recordId = Number(contextual.split('edit-program-')[1]);
-    return programsTableQuery.data?.find(
-      (program) => program.recordId === recordId,
+    const id = Number(contextual.split('edit-program-')[1]);
+    return (
+      programsTableQuery.data?.find((program) => program.id === id) ?? null
     );
   }, [programsTableQuery.data, contextual]);
 
@@ -24,7 +29,9 @@ export default function useProgramsTable() {
     programsTableQuery,
     tableEditMode,
     setTableEditMode,
-    updateManyProgramsMutation,
+    updateCourses,
+    isUpdating,
+    updateError,
     states: {
       isLoading: programsTableQuery.isLoading,
       isError: programsTableQuery.isError,

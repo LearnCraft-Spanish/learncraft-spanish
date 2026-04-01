@@ -1,5 +1,4 @@
-import type { Program } from 'src/types/interfaceDefinitions';
-import type { EditableProgram } from './types';
+import type { CourseDetailed } from '@learncraft-spanish/shared';
 import { Loading } from '@interface/components/Loading';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -20,15 +19,14 @@ export default function ProgramsTable() {
     programsTableQuery,
     tableEditMode,
     setTableEditMode,
-    updateManyProgramsMutation,
+    updateCourses,
     states: { isLoading, isError, isSuccess },
   } = useProgramsTable();
   const { openModal, closeModal } = useModal();
 
-  const [activeData, setActiveData] = useState<Program[]>([]);
+  const [activeData, setActiveData] = useState<CourseDetailed[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Initialize activeData when data is loaded
   useEffect(() => {
     if (programsTableQuery.data) {
       setActiveData(programsTableQuery.data);
@@ -36,47 +34,38 @@ export default function ProgramsTable() {
     }
   }, [programsTableQuery.data]);
 
-  // Function to update a program in the activeData
-  const updateProgramInActiveData = useCallback((updatedProgram: Program) => {
-    setActiveData((prevData) => {
-      const newData = prevData.map((program) =>
-        program.recordId === updatedProgram.recordId ? updatedProgram : program,
-      );
-      setHasUnsavedChanges(true);
-      return newData;
-    });
-  }, []);
+  const updateProgramInActiveData = useCallback(
+    (updatedProgram: CourseDetailed) => {
+      setActiveData((prevData) => {
+        const newData = prevData.map((program) =>
+          program.id === updatedProgram.id ? updatedProgram : program,
+        );
+        setHasUnsavedChanges(true);
+        return newData;
+      });
+    },
+    [],
+  );
 
-  // Function to check if a program has changed
   const programHasChanged = useCallback(
-    (program: Program) => {
-      const originalProgram = programsTableQuery.data?.find(
-        (p) => p.recordId === program.recordId,
+    (program: CourseDetailed) => {
+      const original = programsTableQuery.data?.find(
+        (p) => p.id === program.id,
       );
 
-      if (!originalProgram) return false;
+      if (!original) return false;
 
-      // Compare each cohort's current lesson
-      for (let i = 0; i < 10; i++) {
-        const cohort = String.fromCharCode(65 + i); // 'A' to 'J'
-        const field = `cohort${cohort}CurrentLesson` as keyof Program;
-
-        if (program[field] !== originalProgram[field]) {
-          return true;
-        }
+      const cohorts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+      for (const cohort of cohorts) {
+        const field = `cohort${cohort}CurrentLesson` as keyof CourseDetailed;
+        if (program[field] !== original[field]) return true;
       }
-      if (program.published !== originalProgram.published) {
-        return true;
-      }
-
-      return false;
+      return program.published !== original.published;
     },
     [programsTableQuery.data],
   );
 
-  // Apply changes function for bulk edit
-  const handleApplyChanges = useCallback(() => {
-    // Find changed programs
+  const handleApplyChanges = useCallback(async () => {
     const changedPrograms = activeData.filter(programHasChanged);
 
     if (changedPrograms.length === 0) {
@@ -84,26 +73,10 @@ export default function ProgramsTable() {
       return;
     }
 
-    // Convert to EditableProgram format (remove lessons property)
-    const programsToUpdate: EditableProgram[] = changedPrograms.map(
-      ({ lessons, ...rest }) => rest,
-    );
+    await updateCourses(changedPrograms);
+    setHasUnsavedChanges(false);
+  }, [activeData, programHasChanged, updateCourses]);
 
-    // Update programs
-    updateManyProgramsMutation.mutate(programsToUpdate, {
-      onSuccess: () => {
-        setHasUnsavedChanges(false);
-        programsTableQuery.refetch();
-      },
-    });
-  }, [
-    activeData,
-    programHasChanged,
-    updateManyProgramsMutation,
-    programsTableQuery,
-  ]);
-
-  // Handle disabling edit mode
   const handleDisableEditMode = useCallback(() => {
     if (hasUnsavedChanges) {
       openModal({
@@ -128,7 +101,6 @@ export default function ProgramsTable() {
     closeModal,
   ]);
 
-  // Modify headers for edit mode
   const displayHeaders = tableEditMode
     ? headers.filter((header) => header.header !== 'Edit Record')
     : headers;
@@ -180,7 +152,12 @@ export default function ProgramsTable() {
               )
             }
           />
-          {programToEdit && <EditProgramView program={programToEdit} />}
+          {programToEdit && (
+            <EditProgramView
+              program={programToEdit}
+              onUpdate={(course) => updateCourses([course])}
+            />
+          )}
         </>
       )}
     </div>
