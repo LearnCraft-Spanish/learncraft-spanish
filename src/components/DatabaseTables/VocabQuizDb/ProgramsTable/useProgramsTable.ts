@@ -19,7 +19,7 @@ export interface UseProgramsTableReturn {
     isSuccess: boolean;
   };
 }
-export default function useProgramsTable() {
+export default function useProgramsTable(): UseProgramsTableReturn {
   const programsTableQuery = useAllCoursesQuery();
   const {
     updateCourses,
