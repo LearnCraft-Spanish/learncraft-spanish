@@ -8,6 +8,7 @@ const defaultMockImplementation: UseAllCoursesQueryReturn = {
   isError: false,
   isSuccess: true,
   refetch: () => {},
+  status: 'success',
 };
 
 export const {

@@ -1,7 +1,6 @@
 import type { CourseDetailed } from '@learncraft-spanish/shared';
 import { useCourseAdapter } from '@application/adapters/courseAdapter';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
 
 export interface UseCoursesUpdateReturn {
   updateCourses: (courses: CourseDetailed[]) => Promise<CourseDetailed[]>;
@@ -16,12 +15,11 @@ export function useCoursesMutations(): UseCoursesUpdateReturn {
   const mutation = useMutation({
     mutationFn: (courses: CourseDetailed[]) => adapter.updateCourses(courses),
     onSuccess: () => {
-      toast.success('Programs updated successfully!');
       queryClient.invalidateQueries({ queryKey: ['courses'] });
     },
     onError: (error) => {
-      toast.error(
-        `Failed to update programs: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      console.error(
+        `Failed to update courses: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     },
   });

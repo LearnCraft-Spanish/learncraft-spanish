@@ -73,7 +73,11 @@ export default function ProgramsTable() {
       return;
     }
 
-    await updateCourses(changedPrograms);
+    try {
+      await updateCourses(changedPrograms);
+    } catch {
+      return;
+    }
     setHasUnsavedChanges(false);
   }, [activeData, programHasChanged, updateCourses]);
 

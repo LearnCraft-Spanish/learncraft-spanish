@@ -13,13 +13,11 @@ vi.mock('react-toastify', () => ({
 }));
 
 describe('useCoursesMutations', () => {
-  it('should call updateCourses on the adapter and show success toast', async () => {
+  it('should call updateCourses on the adapter', async () => {
     const mockData = createRealisticCourseDetailedList();
     overrideMockCourseAdapter({
       updateCourses: () => Promise.resolve(mockData),
     });
-
-    const { toast } = await import('react-toastify');
 
     const { result } = renderHook(() => useCoursesMutations(), {
       wrapper: TestQueryClientProvider,
@@ -29,19 +27,18 @@ describe('useCoursesMutations', () => {
 
     await result.current.updateCourses(mockData);
 
-    expect(toast.success).toHaveBeenCalledWith(
-      'Programs updated successfully!',
-    );
     expect(result.current.error).toBeNull();
   });
 
-  it('should show error toast when update fails', async () => {
+  it('should console error when update fails', async () => {
     const testError = new Error('Server error');
+    // spy console.error
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
     overrideMockCourseAdapter({
       updateCourses: () => Promise.reject(testError),
     });
-
-    const { toast } = await import('react-toastify');
 
     const { result } = renderHook(() => useCoursesMutations(), {
       wrapper: TestQueryClientProvider,
@@ -49,8 +46,9 @@ describe('useCoursesMutations', () => {
 
     await expect(result.current.updateCourses([])).rejects.toThrow();
 
-    expect(toast.error).toHaveBeenCalledWith(
-      'Failed to update programs: Server error',
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'Failed to update courses: Server error',
     );
+    consoleErrorSpy.mockRestore();
   });
 });

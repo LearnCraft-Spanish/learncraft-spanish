@@ -1,3 +1,4 @@
+import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
 import { overrideMockCourseAdapter } from '@application/adapters/courseAdapter.mock';
 import { useAllCoursesQuery } from '@application/queries/useAllCoursesQuery';
 import { renderHook, waitFor } from '@testing-library/react';
@@ -6,6 +7,12 @@ import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvi
 import { describe, expect, it } from 'vitest';
 
 describe('useAllCoursesQuery', () => {
+  beforeEach(() => {
+    overrideMockAuthAdapter({
+      isAuthenticated: true,
+      isAdmin: true,
+    });
+  });
   it('should fetch all courses successfully', async () => {
     const mockData = createRealisticCourseDetailedList();
     overrideMockCourseAdapter({
@@ -34,6 +41,32 @@ describe('useAllCoursesQuery', () => {
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.isError).toBe(true);
+    expect(result.current.data).toBeUndefined();
+  });
+  // should not fetch courses if the user is not authenticated
+  it('should not fetch courses if the user is not authenticated', async () => {
+    overrideMockAuthAdapter({
+      isAuthenticated: false,
+    });
+
+    const { result } = renderHook(() => useAllCoursesQuery(), {
+      wrapper: TestQueryClientProvider,
+    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.status).toBe('pending'); // pending because the query is not enabled
+    expect(result.current.data).toBeUndefined();
+  });
+  // should not fetch courses if the user is not an admin
+  it('should not fetch courses if the user is not an admin', async () => {
+    overrideMockAuthAdapter({
+      isAdmin: false,
+    });
+
+    const { result } = renderHook(() => useAllCoursesQuery(), {
+      wrapper: TestQueryClientProvider,
+    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.status).toBe('pending'); // pending because the query is not enabled
     expect(result.current.data).toBeUndefined();
   });
 });
