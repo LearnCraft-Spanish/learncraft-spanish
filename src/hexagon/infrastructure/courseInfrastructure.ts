@@ -1,14 +1,20 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { CoursePort } from '@application/ports/coursePort';
-import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
+import type {
+  CourseDetailed,
+  CourseWithLessons,
+  Lesson,
+} from '@learncraft-spanish/shared';
 
 import { createHttpClient } from '@infrastructure/http/client';
 import {
+  getAllCoursesEndpoint,
   getAllCoursesWithLessonsEndpoint,
   getLessonRangeVocabRequiredEndpoint,
   getLessonsByVocabularyEndpoint,
   getLessonVocabKnownEndpoint,
   getPublishedCoursesWithLessonsEndpoint,
+  updateCoursesEndpoint,
 } from '@learncraft-spanish/shared';
 
 export function createCourseInfrastructure(
@@ -63,6 +69,25 @@ export function createCourseInfrastructure(
           vocabId.toString(),
         ),
         getLessonsByVocabularyEndpoint.requiredScopes,
+      );
+      return response;
+    },
+
+    getAllCourses: async (): Promise<CourseDetailed[]> => {
+      const response = await httpClient.get<CourseDetailed[]>(
+        getAllCoursesEndpoint.path,
+        getAllCoursesEndpoint.requiredScopes,
+      );
+      return response;
+    },
+
+    updateCourses: async (
+      courses: CourseDetailed[],
+    ): Promise<CourseDetailed[]> => {
+      const response = await httpClient.put<CourseDetailed[]>(
+        updateCoursesEndpoint.path,
+        updateCoursesEndpoint.requiredScopes,
+        { courses },
       );
       return response;
     },

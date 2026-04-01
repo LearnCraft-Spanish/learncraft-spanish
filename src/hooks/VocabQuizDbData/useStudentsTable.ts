@@ -4,9 +4,9 @@ import type {
   EditableStudent,
   NewStudent,
 } from 'src/components/DatabaseTables/VocabQuizDb/StudentsTable/types';
+import { useAllCoursesQuery } from '@application/queries/useAllCoursesQuery';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { useProgramTable } from '../CourseData/useProgramTable';
 import { useBackendHelpers } from '../useBackend';
 
 import useVocabQuizDbBackend from './queries/BackendFunctions';
@@ -16,7 +16,7 @@ export default function useStudentsTable() {
     useVocabQuizDbBackend();
   const { newPostFactory, newPutFactory } = useBackendHelpers();
 
-  const { programTableQuery } = useProgramTable();
+  const programTableQuery = useAllCoursesQuery();
 
   const studentsTableQuery = useQuery({
     queryKey: ['students-table'],

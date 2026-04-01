@@ -1,4 +1,8 @@
-import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
+import type {
+  CourseDetailed,
+  CourseWithLessons,
+  Lesson,
+} from '@learncraft-spanish/shared';
 
 export interface LessonRange {
   courseId: number;
@@ -33,4 +37,14 @@ export interface CoursePort {
    * Get the lessons that taught a vocabulary
    */
   getLessonsByVocabulary: (vocabId: number) => Promise<Lesson[]>;
+
+  /**
+   * Get all courses (with cohort data) for admin editing. Uses vocabQuizDb programs.
+   */
+  getAllCourses: () => Promise<CourseDetailed[]>;
+
+  /**
+   * Update one or more courses. Pass a single-element array for individual edits.
+   */
+  updateCourses: (courses: CourseDetailed[]) => Promise<CourseDetailed[]>;
 }

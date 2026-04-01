@@ -1,5 +1,5 @@
 import type { Lesson, QbQuiz, QuizGroup } from 'src/types/DatabaseTables';
-import type { FlashcardStudent, Program } from 'src/types/interfaceDefinitions';
+import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
 import { useBackendHelpers } from 'src/hooks/useBackend';
 
 export default function useVocabQuizDbBackend() {
@@ -12,11 +12,6 @@ export default function useVocabQuizDbBackend() {
 
   const getStudentsTableCohortFieldOptions = () => {
     return getFactory<string[]>('vocab-quiz/students/cohort-field-options');
-  };
-
-  // get programs table
-  const getProgramsTable = () => {
-    return getFactory<Program[]>('vocab-quiz/programs');
   };
 
   // get quizzes table
@@ -37,7 +32,6 @@ export default function useVocabQuizDbBackend() {
   return {
     getStudentsTable,
     getStudentsTableCohortFieldOptions,
-    getProgramsTable,
     getQuizzesTable,
     getQuizGroupsTable,
     getVqdLessonsTable,

@@ -1,5 +1,9 @@
-import type { CourseWithLessons } from '@learncraft-spanish/shared';
+import type {
+  CourseDetailed,
+  CourseWithLessons,
+} from '@learncraft-spanish/shared';
 import {
+  CourseDetailedSchema,
   CourseWithLessonsSchema,
   LessonWithVocabSchema,
 } from '@learncraft-spanish/shared';
@@ -7,6 +11,45 @@ import {
   createZodFactory,
   createZodListFactory,
 } from '@testing/utils/factoryTools';
+
+export const createMockCourseDetailed = createZodFactory(CourseDetailedSchema);
+export const createMockCourseDetailedList =
+  createZodListFactory(CourseDetailedSchema);
+
+export function createRealisticCourseDetailedList(): CourseDetailed[] {
+  return [
+    {
+      id: 2,
+      name: 'LearnCraft Spanish',
+      published: true,
+      cohortACurrentLesson: 1,
+      cohortBCurrentLesson: 1,
+      cohortCCurrentLesson: 1,
+      cohortDCurrentLesson: 1,
+      cohortECurrentLesson: 1,
+      cohortFCurrentLesson: 1,
+      cohortGCurrentLesson: 1,
+      cohortHCurrentLesson: 1,
+      cohortICurrentLesson: 1,
+      cohortJCurrentLesson: 1,
+    },
+    {
+      id: 3,
+      name: '1-Month Challenge',
+      published: true,
+      cohortACurrentLesson: 5,
+      cohortBCurrentLesson: 5,
+      cohortCCurrentLesson: 5,
+      cohortDCurrentLesson: 5,
+      cohortECurrentLesson: 5,
+      cohortFCurrentLesson: 5,
+      cohortGCurrentLesson: 5,
+      cohortHCurrentLesson: 5,
+      cohortICurrentLesson: 5,
+      cohortJCurrentLesson: 5,
+    },
+  ];
+}
 
 export const createMockCourseWithLessons = createZodFactory(
   CourseWithLessonsSchema,

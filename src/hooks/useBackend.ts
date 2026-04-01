@@ -215,12 +215,7 @@ export function useBackend() {
 
   /*      GET Requests      */
   const { getAccessToken } = useAuthAdapter();
-  // used
-  const getProgramsFromBackend = useCallback((): Promise<
-    types.ProgramUnparsed[]
-  > => {
-    return getFactory<types.ProgramUnparsed[]>('public/programs');
-  }, [getFactory]);
+
   // used
   const getLessonsFromBackend = useCallback((): Promise<types.Lesson[]> => {
     return getFactory<types.Lesson[]>('public/lessons');
@@ -400,7 +395,6 @@ export function useBackend() {
     getMyExamplesFromBackend,
 
     getPMFDataForUser,
-    getProgramsFromBackend,
 
     // POST Requests
     createMyStudentExample,
