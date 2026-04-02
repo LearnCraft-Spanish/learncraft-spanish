@@ -60,7 +60,7 @@ export default function StudentRecordView({
 
   const programOptions = useMemo(() => {
     return programTableQuery.data?.map((program) => ({
-      value: program.recordId.toString(),
+      value: program.id.toString(),
       text: program.name,
     }));
   }, [programTableQuery.data]);

@@ -1,14 +1,14 @@
-import type { Program } from 'src/types/interfaceDefinitions';
+import type { CourseDetailed } from '@learncraft-spanish/shared';
 import React from 'react';
 import ProgramTableRow from '../components/ProgramTableRow';
 
 export default function renderProgramRow(
-  program: Program,
+  program: CourseDetailed,
   tableEditMode: boolean = false,
-  updateProgramInActiveData?: (updatedProgram: Program) => void,
+  updateProgramInActiveData?: (updatedProgram: CourseDetailed) => void,
 ) {
   return React.createElement(ProgramTableRow, {
-    key: program.recordId,
+    key: program.id,
     program,
     tableEditMode,
     updateProgramInActiveData,

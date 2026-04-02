@@ -1,5 +1,8 @@
 import type { CoursePort } from '@application/ports/coursePort';
-import { createRealisticCourseWithLessonsList } from '@testing/factories/courseFactory';
+import {
+  createRealisticCourseDetailedList,
+  createRealisticCourseWithLessonsList,
+} from '@testing/factories/courseFactory';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 const defaultMockAdapter: CoursePort = {
@@ -13,6 +16,8 @@ const defaultMockAdapter: CoursePort = {
   getLessonVocabKnown: () => Promise.reject(new Error('Not implemented')),
   getLessonRangeVocabRequired: () =>
     Promise.reject(new Error('Not implemented')),
+  getAllCourses: () => Promise.resolve(createRealisticCourseDetailedList()),
+  updateCourses: (courses) => Promise.resolve(courses),
 };
 
 export const {
