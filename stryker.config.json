@@ -5,6 +5,9 @@
   "mutate": [
     "src/**/*.{ts,tsx}",
     "!**/hexagon/**/*.{ts,tsx}",
+    "!**/assets/**",
+    "!**/types/**",
+    "!src/index.tsx",
     "!**/*.test.{ts,tsx}",
     "!**/*.mock.{ts,tsx}",
     "!**/*.stub.{ts,tsx}",

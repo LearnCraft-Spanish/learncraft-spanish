@@ -4,6 +4,13 @@
   "packageManager": "pnpm",
   "mutate": [
     "**/hexagon/**/*.{ts,tsx}",
+    "!**/hexagon/infrastructure/**",
+    "!**/hexagon/composition/**",
+    "!**/hexagon/testing/**",
+    "!**/application/ports/**",
+    "!**/application/types/**",
+    "!**/{index,types}.{ts,tsx}",
+    "!**/*.types.{ts,tsx}",
     "!**/*.test.{ts,tsx}",
     "!**/*.mock.{ts,tsx}",
     "!**/*.stub.{ts,tsx}",
