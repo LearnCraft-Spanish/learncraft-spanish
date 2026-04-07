@@ -56,10 +56,10 @@ describe('useAllCoursesQuery', () => {
     expect(result.current.status).toBe('pending'); // pending because the query is not enabled
     expect(result.current.data).toBeUndefined();
   });
-  // should not fetch courses if the user is not an admin
-  it('should not fetch courses if the user is not an admin', async () => {
+  // should not fetch courses if the user is not a coach
+  it('should not fetch courses if the user is not a coach', async () => {
     overrideMockAuthAdapter({
-      isAdmin: false,
+      isCoach: false,
     });
 
     const { result } = renderHook(() => useAllCoursesQuery(), {

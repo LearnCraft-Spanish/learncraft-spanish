@@ -17,11 +17,6 @@ export function useCoursesMutations(): UseCoursesUpdateReturn {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['courses'] });
     },
-    onError: (error) => {
-      console.error(
-        `Failed to update courses: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
-    },
   });
 
   return {
