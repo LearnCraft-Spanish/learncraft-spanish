@@ -1,7 +1,10 @@
+import type { CourseDetailed } from '@learncraft-spanish/shared';
 import type { SortConfig } from 'src/components/Table/types';
-import type { Program } from 'src/types/interfaceDefinitions';
 
-export default function sortFunction(data: Program[], sortConfig: SortConfig) {
+export default function sortFunction(
+  data: CourseDetailed[],
+  sortConfig: SortConfig,
+) {
   if (!data || sortConfig.direction === 'none') {
     return data;
   }
@@ -13,9 +16,6 @@ export default function sortFunction(data: Program[], sortConfig: SortConfig) {
     switch (sortConfig.key) {
       case 'Name':
         result = a.name.localeCompare(b.name);
-        break;
-      case 'Lessons':
-        result = a.lessons.length - b.lessons.length;
         break;
       case 'Cohort A Current':
         result = a.cohortACurrentLesson - b.cohortACurrentLesson;
@@ -48,7 +48,7 @@ export default function sortFunction(data: Program[], sortConfig: SortConfig) {
         result = a.cohortJCurrentLesson - b.cohortJCurrentLesson;
         break;
       case 'Published':
-        result = a.published ? 1 : 0 - (b.published ? 1 : 0);
+        result = (a.published ? 1 : 0) - (b.published ? 1 : 0);
         break;
     }
 

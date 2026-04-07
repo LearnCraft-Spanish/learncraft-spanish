@@ -1,14 +1,14 @@
+import type { CourseDetailed } from '@learncraft-spanish/shared';
 import type { ReactNode } from 'react';
-import type { Program } from 'src/types/interfaceDefinitions';
 import type { CohortField, CohortLetter } from '../types';
 import pencilIcon from 'src/assets/icons/pencil.svg';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { cohorts } from '../constants';
 
 interface ProgramTableRowProps {
-  program: Program;
+  program: CourseDetailed;
   tableEditMode?: boolean;
-  updateProgramInActiveData?: (updatedProgram: Program) => void;
+  updateProgramInActiveData?: (updatedProgram: CourseDetailed) => void;
 }
 
 export default function ProgramTableRow({
@@ -17,7 +17,7 @@ export default function ProgramTableRow({
   updateProgramInActiveData,
 }: ProgramTableRowProps): ReactNode {
   const { openContextual } = useContextualMenu();
-  const { name, recordId } = program;
+  const { name, id } = program;
 
   const handleCohortLessonChange = (cohort: CohortLetter, value: string) => {
     if (!updateProgramInActiveData) return;
@@ -43,7 +43,7 @@ export default function ProgramTableRow({
       {!tableEditMode && (
         <td
           className="edit-icon-cell"
-          onClick={() => openContextual(`edit-program-${recordId}`)}
+          onClick={() => openContextual(`edit-program-${id}`)}
         >
           <div className="edit-icon-container">
             <img src={pencilIcon} alt="Edit" className="edit-icon" />

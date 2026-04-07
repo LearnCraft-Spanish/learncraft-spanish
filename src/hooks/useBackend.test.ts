@@ -195,11 +195,6 @@ describe('useBackend Hook', () => {
   }
 
   testArrayFetchFunction({
-    functionName: 'getProgramsFromBackend',
-    requiredFields: ['recordId', 'name'],
-  });
-
-  testArrayFetchFunction({
     functionName: 'getLessonsFromBackend',
     requiredFields: ['recordId', 'lesson'],
   });

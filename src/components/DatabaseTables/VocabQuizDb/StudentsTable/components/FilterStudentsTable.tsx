@@ -158,8 +158,8 @@ export default function FilterStudentsTable({
             label="Filter by Program"
             selectedValue={filterValues.program}
             onChange={handleProgramFilterChange}
-            options={programTableQuery.data?.map((program) => ({
-              value: program.recordId.toString(),
+            options={(programTableQuery.data ?? []).map((program) => ({
+              value: program.id.toString(),
               text: program.name,
             }))}
             editMode
