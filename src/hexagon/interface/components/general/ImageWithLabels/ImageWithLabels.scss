@@ -1,0 +1,55 @@
+.imageWithLabels {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  &__label {
+    position: absolute;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-shadow:
+      1px 1px 0 rgba(0, 0, 0, 0.8),
+      -1px -1px 0 rgba(0, 0, 0, 0.8),
+      1px -1px 0 rgba(0, 0, 0, 0.8),
+      -1px 1px 0 rgba(0, 0, 0, 0.8);
+
+    &--top {
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    &--bottom {
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    &--topLeft {
+      top: 8px;
+      left: 8px;
+    }
+
+    &--bottomLeft {
+      bottom: 8px;
+      left: 8px;
+    }
+
+    &--topRight {
+      top: 8px;
+      right: 8px;
+    }
+
+    &--bottomRight {
+      bottom: 8px;
+      right: 8px;
+    }
+  }
+}

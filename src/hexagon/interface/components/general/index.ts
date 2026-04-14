@@ -1,5 +1,6 @@
 export * from '@interface/components/general/AudioControl';
 export * from '@interface/components/general/Buttons';
+export * from '@interface/components/general/ImageWithLabels';
 export * from '@interface/components/general/Pagination';
 export * from '@interface/components/general/SafeLink';
 export * from '@interface/components/general/SectionHeader';
