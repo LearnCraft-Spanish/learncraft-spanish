@@ -7,7 +7,6 @@ import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
-import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React, { act } from 'react';
@@ -16,19 +15,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 /*       Testing Setup        */
 const cleanupFunction = vi.fn();
 
-const studentUserData = getAuthUserFromEmail('student-lcsp@fake.not')!;
-const studentFlashcardDataObject = allStudentFlashcards.find(
-  (student) => student.emailAddress === studentUserData?.email,
-)?.studentFlashcardData;
-
 const unknownAudioExamples = createMockExampleWithVocabularyList(5);
 const knownAudioExamples = createMockExampleWithVocabularyList(5);
 
-if (
-  !studentFlashcardDataObject ||
-  !unknownAudioExamples ||
-  !knownAudioExamples
-) {
+if (!unknownAudioExamples || !knownAudioExamples) {
   throw new Error('Could not set up test data');
 }
 

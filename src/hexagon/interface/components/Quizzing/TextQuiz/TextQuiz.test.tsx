@@ -12,8 +12,8 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
+import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
-import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
@@ -22,30 +22,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const cleanupFunction = vi.fn();
 
-const user = getAuthUserFromEmail('student-admin@fake.not')!;
-if (!user) {
-  throw new Error(`Student not found in mock data set: student-admin`);
-}
-const userFlashcardData = allStudentFlashcards.find(
-  (student) => student.emailAddress === user.email,
-)?.studentFlashcardData;
-if (!userFlashcardData) {
-  throw new Error(`Student flashcard data not found: student-admin`);
-}
-
 const examplesForTextQuiz: ExampleWithVocabulary[] =
-  userFlashcardData.examples.map(
-    (f) =>
-      ({
-        id: f.recordId,
-        spanish: f.spanishExample,
-        english: f.englishTranslation,
-        spanishAudio: f.spanishAudioLa,
-        englishAudio: f.englishAudio,
-        vocabulary: [],
-        vocabularyComplete: !!f.vocabComplete,
-      }) as unknown as ExampleWithVocabulary,
-  );
+  createMockExampleWithVocabularyList(5).map((example, index) => ({
+    ...example,
+    id: index + 1,
+    spanish: `texto-prueba-${index + 1}`,
+    english: `test-text-${index + 1}`,
+  }));
 
 // Hook wrapper component that manages state and creates TextQuizReturn mock
 function MockQuizWrapper({
