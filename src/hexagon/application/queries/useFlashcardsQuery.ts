@@ -160,7 +160,9 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       const idsToRemove = tempFlashcards.map((flashcard) => flashcard.id);
       // Remove the flashcards with the mapped ids from the cache
       queryClient.setQueryData(['flashcards', userId], (oldData: Flashcard[]) =>
-        oldData.filter((flashcard) => !idsToRemove.includes(flashcard.id)),
+        (oldData ?? []).filter(
+          (flashcard) => !idsToRemove.includes(flashcard.id),
+        ),
       );
     },
     onSuccess: (result, _variables, context) => {
@@ -234,7 +236,9 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       const idsToRemove = tempFlashcards.map((flashcard) => flashcard.id);
       // Remove the flashcards with the mapped ids from the cache
       queryClient.setQueryData(['flashcards', userId], (oldData: Flashcard[]) =>
-        oldData.filter((flashcard) => !idsToRemove.includes(flashcard.id)),
+        (oldData ?? []).filter(
+          (flashcard) => !idsToRemove.includes(flashcard.id),
+        ),
       );
     },
     onSuccess: (result, _variables, context) => {
@@ -359,7 +363,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       queryClient.setQueryData(
         ['flashcards', userId],
         (oldData: Flashcard[]) => {
-          return oldData.filter(
+          return (oldData ?? []).filter(
             (flashcard) => !flashcardIds.includes(flashcard.id),
           );
         },
@@ -457,7 +461,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       queryClient.setQueryData(
         ['flashcards', userId],
         (oldData: Flashcard[]) => {
-          return oldData.filter(
+          return (oldData ?? []).filter(
             (flashcard) => !flashcardIds.includes(flashcard.id),
           );
         },
