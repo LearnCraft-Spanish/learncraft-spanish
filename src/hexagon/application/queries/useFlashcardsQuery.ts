@@ -159,10 +159,12 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       // Map the ids to remove
       const idsToRemove = tempFlashcards.map((flashcard) => flashcard.id);
       // Remove the flashcards with the mapped ids from the cache
-      queryClient.setQueryData(['flashcards', userId], (oldData: Flashcard[]) =>
-        (oldData ?? []).filter(
-          (flashcard) => !idsToRemove.includes(flashcard.id),
-        ),
+      queryClient.setQueryData(
+        ['flashcards', userId],
+        (oldData: Flashcard[] | undefined) =>
+          (oldData ?? []).filter(
+            (flashcard) => !idsToRemove.includes(flashcard.id),
+          ),
       );
     },
     onSuccess: (result, _variables, context) => {
@@ -215,7 +217,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       // Optimistically update the flashcards cache
       queryClient.setQueryData(
         ['flashcards', userId],
-        (oldData: Flashcard[]) => {
+        (oldData: Flashcard[] | undefined) => {
           if (!oldData) return tempFlashcards;
           return [...oldData, ...tempFlashcards];
         },
@@ -235,10 +237,12 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       // Map the ids to remove
       const idsToRemove = tempFlashcards.map((flashcard) => flashcard.id);
       // Remove the flashcards with the mapped ids from the cache
-      queryClient.setQueryData(['flashcards', userId], (oldData: Flashcard[]) =>
-        (oldData ?? []).filter(
-          (flashcard) => !idsToRemove.includes(flashcard.id),
-        ),
+      queryClient.setQueryData(
+        ['flashcards', userId],
+        (oldData: Flashcard[] | undefined) =>
+          (oldData ?? []).filter(
+            (flashcard) => !idsToRemove.includes(flashcard.id),
+          ),
       );
     },
     onSuccess: (result, _variables, context) => {
@@ -288,7 +292,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
     onSuccess: (result, _variables, _context) => {
       queryClient.setQueryData(
         ['flashcards', userId],
-        (oldData: Flashcard[]) => {
+        (oldData: Flashcard[] | undefined) => {
           if (!oldData) return result;
           // Update the flashcards with the returned updated flashcards
           const updatedMap = new Map(result.map((fc) => [fc.id, fc]));
