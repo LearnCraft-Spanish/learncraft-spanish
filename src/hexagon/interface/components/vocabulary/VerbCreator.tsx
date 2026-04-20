@@ -60,7 +60,6 @@ export const VerbCreator: React.FC<VerbCreatorProps> = ({ onBack }) => {
         verbId: 0,
         conjugationTagIds: [],
         frequency: 0,
-        notes: usage,
       },
     ]).then((success) => {
       if (success) {

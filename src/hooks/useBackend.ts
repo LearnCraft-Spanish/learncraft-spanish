@@ -210,30 +210,10 @@ export function useBackendHelpers() {
 }
 
 export function useBackend() {
-  const { getFactory, postFactory, deleteFactory, newPostFactory } =
-    useBackendHelpers();
+  const { getFactory, newPostFactory } = useBackendHelpers();
 
   /*      GET Requests      */
   const { getAccessToken } = useAuthAdapter();
-
-  // used
-  const getLessonsFromBackend = useCallback((): Promise<types.Lesson[]> => {
-    return getFactory<types.Lesson[]>('public/lessons');
-  }, [getFactory]);
-
-  // used - but possibly remove
-  const getMyExamplesFromBackend =
-    useCallback((): Promise<types.StudentFlashcardData> => {
-      return getFactory<types.StudentFlashcardData>('my-examples');
-    }, [getFactory]);
-
-  // used, but not for long
-  const getActiveExamplesFromBackend = useCallback(
-    (studentId: number): Promise<types.StudentFlashcardData> => {
-      return getFactory<types.StudentFlashcardData>(`${studentId}/examples`);
-    },
-    [getFactory],
-  );
 
   /*      Coaching API      */
 
@@ -293,43 +273,6 @@ export function useBackend() {
     [getFactory],
   );
 
-  /*      POST Requests      */
-  // used
-  const createMyStudentExample = useCallback(
-    (exampleId: number): Promise<number[]> => {
-      return postFactory<number[]>('create-my-student-example', {
-        exampleid: exampleId,
-      });
-    },
-    [postFactory],
-  );
-  // used
-  const createStudentExample = useCallback(
-    (studentId: number, exampleId: number): Promise<number[]> => {
-      return postFactory<number[]>('create-student-example', {
-        studentid: studentId,
-        exampleid: exampleId,
-      });
-    },
-    [postFactory],
-  );
-
-  /*      DELETE Requests      */
-  // used
-  const deleteMyStudentExample = useCallback(
-    (recordId: number): Promise<number> => {
-      return deleteFactory('delete-my-student-example', { deleteid: recordId });
-    },
-    [deleteFactory],
-  );
-  // used
-  const deleteStudentExample = useCallback(
-    (recordId: number): Promise<number> => {
-      return deleteFactory('delete-student-example', { deleteid: recordId });
-    },
-    [deleteFactory],
-  );
-
   // used, but not for long
   const getPMFDataForUser = useCallback(
     (userId: number): Promise<types.PMFData> => {
@@ -370,41 +313,20 @@ export function useBackend() {
     [newPostFactory],
   );
 
-  // used
-  const createMultipleStudentExamples = useCallback(
-    (studentId: number, exampleIdList: number[]): Promise<number[]> => {
-      return newPostFactory<number[]>({
-        path: 'create-multiple-student-examples',
-        body: { studentId, exampleIdList },
-      });
-    },
-    [newPostFactory],
-  );
-
   return {
     getAccessToken,
     // GET Requests
-    getActiveExamplesFromBackend,
     getActiveMemberships,
     getActiveStudents,
     getCoachList,
     getCourseList,
 
     getLessonList,
-    getLessonsFromBackend,
-    getMyExamplesFromBackend,
 
     getPMFDataForUser,
 
     // POST Requests
-    createMyStudentExample,
     createPMFDataForUser,
-    createStudentExample,
-    createMultipleStudentExamples,
     updatePMFDataForUser,
-
-    // DELETE Requests
-    deleteMyStudentExample,
-    deleteStudentExample,
   };
 }
