@@ -9,7 +9,6 @@ interface VerbCreatorProps {
 export const VerbCreator: React.FC<VerbCreatorProps> = ({ onBack }) => {
   const [infinitive, setInfinitive] = useState('');
   const [translation, setTranslation] = useState('');
-  const [usage, setUsage] = useState('');
   const [isRegular, setIsRegular] = useState(false);
 
   // Use the specialized verb creation hook
@@ -29,10 +28,6 @@ export const VerbCreator: React.FC<VerbCreatorProps> = ({ onBack }) => {
 
   const handleTranslationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTranslation(e.target.value);
-  };
-
-  const handleUsageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsage(e.target.value);
   };
 
   const handleRegularChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,7 +55,6 @@ export const VerbCreator: React.FC<VerbCreatorProps> = ({ onBack }) => {
         verbId: 0,
         conjugationTagIds: [],
         frequency: 0,
-        notes: usage,
       },
     ]).then((success) => {
       if (success) {
@@ -124,18 +118,6 @@ export const VerbCreator: React.FC<VerbCreatorProps> = ({ onBack }) => {
             className="verb-creator__input"
             value={translation}
             onChange={handleTranslationChange}
-          />
-        </div>
-
-        <div className="verb-creator__field">
-          <label htmlFor="usage">Usage Example (Optional)</label>
-          <input
-            type="text"
-            id="usage"
-            className="verb-creator__input"
-            value={usage}
-            onChange={handleUsageChange}
-            placeholder="Example of how to use this verb"
           />
         </div>
 

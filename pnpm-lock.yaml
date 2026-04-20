@@ -18,8 +18,8 @@ importers:
         specifier: ^0.12.2
         version: 0.12.2
       '@learncraft-spanish/shared':
-        specifier: ^0.11.8
-        version: 0.11.8
+        specifier: ^0.11.9
+        version: 0.11.9
       '@sentry/cli':
         specifier: ^2.42.2
         version: 2.50.2
@@ -1215,8 +1215,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@learncraft-spanish/shared@0.11.8':
-    resolution: {integrity: sha512-GopMHQFE7y7rZDo7a1K/W+wujGLbWAceEzlsWhd4dPZrUMrA5fiI7NcxdU04gAGL1pHGkxHlg8HkyVkAYi/Sug==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.11.8/2019eca6eaa89339813db5d42952db52569eb05d}
+  '@learncraft-spanish/shared@0.11.9':
+    resolution: {integrity: sha512-03TZM54VNVdZvhlUqgvzGtyo0e5v9fK37i3eK3trDM8D2A0d1YKfv8IQgGqGQRXyJfYlNoCZ2pciJI5j4e9jQQ==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.11.9/64da7c75591699e709ef78551415d5b026fffd09}
 
   '@mswjs/interceptors@0.39.5':
     resolution: {integrity: sha512-B9nHSJYtsv79uo7QdkZ/b/WoKm20IkVSmTc/WCKarmDtFwM0dRx2ouEniqwNkzCSLn3fydzKmnMzjtfdOWt3VQ==}
@@ -6787,7 +6787,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
 
-  '@learncraft-spanish/shared@0.11.8':
+  '@learncraft-spanish/shared@0.11.9':
     dependencies:
       zod: 3.25.76
 

@@ -84,7 +84,6 @@ export function PaginatedVocabularyTable({
               <th>Word</th>
               <th>Description</th>
               <th>Spellings</th>
-              <th>Notes</th>
               <th className="paginated-vocabulary__table-header-delete">
                 Delete
               </th>
@@ -96,7 +95,6 @@ export function PaginatedVocabularyTable({
                 <td>{item.word}</td>
                 <td>{item.descriptor}</td>
                 <td>{item.spellings?.join(', ') || ''}</td>
-                <td>{item.notes || ''}</td>
                 <td>
                   <DeleteVocabularyRecord recordId={item.id.toString()} />
                 </td>
