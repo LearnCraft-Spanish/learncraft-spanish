@@ -20,7 +20,11 @@ export function useFlushFlashcardUpdatesOnLoad() {
 
   // Auto-flush pending updates from localStorage on mount (after flashcards are loaded)
   useEffect(() => {
-    if (!hasAttemptedInitialFlushRef.current && flashcards) {
+    if (
+      !hasAttemptedInitialFlushRef.current &&
+      flashcards &&
+      flashcards.length > 0
+    ) {
       hasAttemptedInitialFlushRef.current = true;
       if (!isOwnUser || appUser?.studentRole !== 'student') return; // Only Students can have flashcards & flashcard updates
 
