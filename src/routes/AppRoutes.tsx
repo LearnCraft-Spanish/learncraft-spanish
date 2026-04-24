@@ -7,7 +7,6 @@ import GetHelpPage from '@interface/pages/GetHelpPage';
 import LimitedCustomQuiz from '@interface/pages/LimitedCustomQuiz';
 import { OfficialQuizzesRoutes } from '@interface/pages/OfficialQuizzes/OfficialQuizzesRoutes';
 import ReviewMyFlashcards from '@interface/pages/ReviewMyFlashcards';
-import { VocabularyCreatorPage } from '@interface/pages/VocabularyCreatorPage';
 import { Route } from 'react-router-dom';
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 import CoachingDashboard from 'src/components/CoachingDashboard';
@@ -60,10 +59,6 @@ export default function AppRoutes() {
       <Route
         path="/get-help"
         element={(isStudent || isCoach || isAdmin) && <GetHelpPage />}
-      />
-      <Route
-        path="/vocabularymanager"
-        element={isAdmin && <VocabularyCreatorPage />}
       />
       <Route
         path="/weeklyrecords"
