@@ -92,20 +92,19 @@ export function SRSButtons({
           <>
             <button
               type="button"
-              className="greenButton"
-              disabled={hasExampleBeenReviewed === 'easy'}
-              onClick={() => handleReviewExample('easy')}
-            >
-              Update to easy
-            </button>
-
-            <button
-              type="button"
               className="redButton"
               disabled={hasExampleBeenReviewed === 'hard'}
               onClick={() => handleReviewExample('hard')}
             >
               Update to hard
+            </button>
+            <button
+              type="button"
+              className="greenButton"
+              disabled={hasExampleBeenReviewed === 'easy'}
+              onClick={() => handleReviewExample('easy')}
+            >
+              Update to easy
             </button>
           </>
         )}
