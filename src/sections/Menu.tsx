@@ -152,6 +152,12 @@ export default function Menu() {
                   Database Tables
                 </Link>
               </div>
+              {/* Temporary archiving of Vocabulary Creator Page */}
+              {/* <div className="buttonBox">
+                <Link className="linkButton" to="/vocabularymanager">
+                  Create Vocabulary
+                </Link>
+              </div> */}
             </>
           )}
         </div>
