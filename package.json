@@ -10,7 +10,7 @@
   "keywords": [],
   "main": "index.tsx",
   "engines": {
-    "node": ">=24",
+    "node": "24.x",
     "pnpm": ">=7"
   },
   "scripts": {
