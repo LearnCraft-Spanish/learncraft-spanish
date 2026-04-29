@@ -14,7 +14,10 @@ import {
   resetMockUseStudentFlashcards,
 } from '@application/units/useStudentFlashcards.mock';
 import { renderHook } from '@testing-library/react';
-import { createMockFlashcard } from '@testing/factories/flashcardFactory';
+import {
+  createMockFlashcard,
+  createMockFlashcardList,
+} from '@testing/factories/flashcardFactory';
 import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
@@ -114,7 +117,7 @@ describe('useFlushFlashcardUpdatesOnLoad', () => {
     const mockSetPending = vi.fn();
 
     overrideMockUseStudentFlashcards({
-      flashcards: [],
+      flashcards: createMockFlashcardList()(1),
       getFlashcardByExampleId: () => undefined, // Flashcard not found (deleted)
     });
 
