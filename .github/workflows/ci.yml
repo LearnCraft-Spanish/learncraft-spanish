@@ -25,13 +25,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       # Set up Node.js environment
       - name: Set up Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 'lts/*'
+          node-version: 24.15.0
 
       # Write .npmrc
       - name: Write .npmrc
@@ -47,7 +47,7 @@ jobs:
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
@@ -68,13 +68,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       # Set up Node.js environment
       - name: Set up Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 'lts/*'
+          node-version: 24.15.0
 
       # Write .npmrc
       - name: Write .npmrc
@@ -90,7 +90,7 @@ jobs:
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
@@ -111,13 +111,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       # Set up Node.js environment
       - name: Set up Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 'lts/*'
+          node-version: 24.15.0
 
       # Write .npmrc
       - name: Write .npmrc
@@ -133,7 +133,7 @@ jobs:
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
@@ -155,13 +155,13 @@ jobs:
     needs: [format, typecheck, lint]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       # Set up Node.js environment
       - name: Set up Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 'lts/*'
+          node-version: 24.15.0
 
       # Write .npmrc
       - name: Write .npmrc
@@ -177,7 +177,7 @@ jobs:
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
@@ -203,13 +203,13 @@ jobs:
     needs: [format, typecheck, lint]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       # Set up Node.js environment
       - name: Set up Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 'lts/*'
+          node-version: 24.15.0
 
       # Write .npmrc
       - name: Write .npmrc
@@ -225,7 +225,7 @@ jobs:
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}

@@ -667,7 +667,7 @@ pnpm preview
 
 ```bash
 # Check versions
-node --version  # Should be >= 16
+node --version  # Should be >= 24
 pnpm --version  # Should be >= 7
 
 # If missing, install
