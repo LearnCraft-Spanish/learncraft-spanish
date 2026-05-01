@@ -22,7 +22,7 @@ cp .env.development .env   # edit with your Auth0/API credentials
 pnpm start                 # http://localhost:5173
 ```
 
-**Prerequisites**: Node.js >= 16, pnpm >= 7, Git.
+**Prerequisites**: Node.js >= 24, pnpm >= 7, Git.
 
 ---
 
