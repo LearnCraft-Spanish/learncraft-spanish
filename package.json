@@ -60,7 +60,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-howler": "^5.2.0",
-    "react-router-dom": "^7.14.2",
+    "react-router-dom": "^6.30.3",
     "react-toastify": "^11.0.5",
     "react-tooltip": "^5.29.1",
     "rimraf": "^6.0.1",
