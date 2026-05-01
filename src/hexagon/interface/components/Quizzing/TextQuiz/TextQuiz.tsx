@@ -1,6 +1,7 @@
 import type { UseStudentFlashcardUpdatesReturn } from '@application/units/studentFlashcardUpdates';
 import type { TextQuizReturn } from '@application/units/useTextQuiz';
 import type { SrsDifficulty } from '@domain/srs';
+import type { AudioControlHandle } from '@interface/components/general/AudioControl/AudioControl';
 import { MenuButton } from '@interface/components/general/Buttons';
 import Loading from '@interface/components/Loading/Loading';
 import {
@@ -11,7 +12,7 @@ import {
 import { SRSButtons } from '@interface/components/Quizzing/general/SRSButtons';
 import TextQuizEnd from '@interface/components/Quizzing/general/TextQuizEnd';
 import NoDueFlashcards from '@interface/components/Quizzing/TextQuiz/NoDueFlashcards';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 
 export interface TextQuizComponentProps {
@@ -53,6 +54,8 @@ export function TextQuiz({
     setGetHelpIsOpen,
   } = useTextQuizReturn;
 
+  const audioControlRef = useRef<AudioControlHandle | null>(null);
+
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
@@ -70,6 +73,13 @@ export function TextQuiz({
       ) {
         event.preventDefault();
         toggleAnswer();
+      } else if (event.key === ' ' && audioControlRef.current) {
+        event.preventDefault();
+        if (audioControlRef.current.isPlaying) {
+          audioControlRef.current.pauseAudio();
+        } else {
+          audioControlRef.current.playAudio();
+        }
       }
     },
     [previousExample, nextExample, toggleAnswer, isQuizComplete],
@@ -121,6 +131,7 @@ export function TextQuiz({
               addPendingRemoveProps={addPendingRemoveProps}
               getHelpIsOpen={getHelpIsOpen}
               setGetHelpIsOpen={setGetHelpIsOpen}
+              audioControlRef={audioControlRef}
             />
             <div className="quizButtons">
               {srsQuizProps && currentExample && (

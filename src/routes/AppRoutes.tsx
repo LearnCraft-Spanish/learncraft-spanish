@@ -60,6 +60,11 @@ export default function AppRoutes() {
         path="/get-help"
         element={(isStudent || isCoach || isAdmin) && <GetHelpPage />}
       />
+      {/* Temporary archiving of Vocabulary Creator Page */}
+      {/* <Route
+        path="/vocabularymanager"
+        element={isAdmin && <VocabularyCreatorPage />}
+      /> */}
       <Route
         path="/weeklyrecords"
         element={(isAdmin || isCoach) && <WeeksRecordsSection />}
