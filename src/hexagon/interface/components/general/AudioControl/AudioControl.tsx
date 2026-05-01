@@ -124,6 +124,7 @@ const AudioControl = function AudioControl({
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
+    setIsPlaying(false);
   }, [audioLink]);
 
   // Cleanup on unmount
