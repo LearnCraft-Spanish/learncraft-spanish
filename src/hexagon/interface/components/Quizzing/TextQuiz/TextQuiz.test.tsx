@@ -28,6 +28,18 @@ const examplesForTextQuiz: ExampleWithVocabulary[] =
     id: index + 1,
     spanish: `texto-prueba-${index + 1}`,
     english: `test-text-${index + 1}`,
+    spanishAudio: '',
+    englishAudio: '',
+  }));
+
+const examplesWithAudio: ExampleWithVocabulary[] =
+  createMockExampleWithVocabularyList(3).map((example, index) => ({
+    ...example,
+    id: index + 100,
+    spanish: `con-audio-${index + 1}`,
+    english: `with-audio-${index + 1}`,
+    spanishAudio: 'https://example.com/audio.mp3',
+    englishAudio: 'https://example.com/audio.mp3',
   }));
 
 // Hook wrapper component that manages state and creates TextQuizReturn mock
@@ -132,6 +144,65 @@ function renderQuizYesSrs({
   );
 }
 
+function MockQuizWrapperWithAudio({
+  startWithSpanish = true,
+}: {
+  startWithSpanish?: boolean;
+}) {
+  const [exampleIndex, setExampleIndex] = React.useState(0);
+  const [quizComplete, setQuizComplete] = React.useState(false);
+  const [answerShowing, setAnswerShowing] = React.useState(false);
+  const [getHelpIsOpen, setGetHelpIsOpen] = React.useState(false);
+
+  const currentExample = examplesWithAudio[exampleIndex] || null;
+
+  const useTextQuizReturn: TextQuizReturn = {
+    examplesAreLoading: false,
+    addPendingRemoveProps: undefined,
+    quizExample: currentExample
+      ? createMockFlashcardForDisplay(currentExample, startWithSpanish)
+      : null,
+    nextExample: () => {
+      if (exampleIndex < examplesWithAudio.length - 1) {
+        setExampleIndex(exampleIndex + 1);
+      } else {
+        setQuizComplete(true);
+      }
+      setAnswerShowing(false);
+      setGetHelpIsOpen(false);
+    },
+    previousExample: () => {
+      if (exampleIndex > 0) setExampleIndex(exampleIndex - 1);
+    },
+    exampleNumber: exampleIndex + 1,
+    quizLength: examplesWithAudio.length,
+    vocabInfoHook: vi.fn(),
+    currentExample,
+    cleanupFunction,
+    isQuizComplete: quizComplete,
+    restartQuiz: () => {
+      setExampleIndex(0);
+      setQuizComplete(false);
+    },
+    answerShowing,
+    toggleAnswer: () => setAnswerShowing(!answerShowing),
+    getHelpIsOpen,
+    setGetHelpIsOpen,
+  };
+
+  return <TextQuiz useTextQuizReturn={useTextQuizReturn} />;
+}
+
+function renderQuizWithAudio({
+  startWithSpanish = true,
+}: { startWithSpanish?: boolean } = {}) {
+  render(
+    <MockAllProviders>
+      <MockQuizWrapperWithAudio startWithSpanish={startWithSpanish} />
+    </MockAllProviders>,
+  );
+}
+
 describe('component TextQuiz', () => {
   afterEach(() => {
     vi.clearAllMocks();
@@ -199,6 +270,42 @@ describe('component TextQuiz', () => {
       const previousText = screen.getByLabelText('flashcard').textContent;
       expect(previousText).toBe(initialText);
       expect(previousText).not.toBe(nextText);
+    });
+  });
+
+  describe('spacebar keyboard control', () => {
+    it('plays audio when spacebar is pressed and the flashcard has audio', async () => {
+      const mockPlay = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(HTMLMediaElement.prototype, 'play', {
+        configurable: true,
+        value: mockPlay,
+      });
+
+      renderQuizWithAudio({ startWithSpanish: true });
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Play/Pause')).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        fireEvent.keyDown(document, { key: ' ' });
+      });
+
+      expect(mockPlay).toHaveBeenCalled();
+    });
+
+    it('does nothing when spacebar is pressed and the flashcard has no audio', async () => {
+      renderQuiz();
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('flashcard')).toBeInTheDocument();
+      });
+
+      act(() => {
+        fireEvent.keyDown(document, { key: ' ' });
+      });
+
+      expect(screen.getByLabelText('flashcard')).toBeInTheDocument();
     });
   });
 
