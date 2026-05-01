@@ -16,6 +16,7 @@ export function FlashcardDisplay({
   addPendingRemoveProps,
   getHelpIsOpen,
   setGetHelpIsOpen,
+  audioControlRef,
 }: FlashcardDisplayProps) {
   if (!quizExample) {
     return <p>Example not found</p>;
@@ -111,7 +112,7 @@ export function FlashcardDisplay({
           className="audioControlContainer"
           onClick={(e) => e.stopPropagation()}
         >
-          <AudioControl audioLink={audioUrl} />
+          <AudioControl ref={audioControlRef} audioLink={audioUrl} />
         </div>
       )}
     </div>
