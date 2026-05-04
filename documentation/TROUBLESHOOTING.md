@@ -39,7 +39,7 @@ pnpm --version
 
 ### Issue: Node version mismatch
 
-**Problem**: Project requires Node >= 16, but you have an older version.
+**Problem**: Project requires Node >= 24, but you have an older version.
 
 **Solution**:
 
@@ -54,8 +54,8 @@ pnpm --version
 
 2. Install and use correct Node version:
    ```bash
-   nvm install 18
-   nvm use 18
+   nvm install 24
+   nvm use 24
    ```
 
 ---

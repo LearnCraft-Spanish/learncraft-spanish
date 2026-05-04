@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import pause from 'src/assets/icons/pause_dark.svg';
 import play from 'src/assets/icons/play_dark.svg';
 import './AudioControl.scss';
@@ -11,11 +18,18 @@ export interface AudioControlProps {
   onSuccess?: () => void;
 }
 
-export default function AudioControl({
+export interface AudioControlHandle {
+  playAudio: () => void;
+  pauseAudio: () => void;
+  isPlaying: boolean;
+}
+
+const AudioControl = function AudioControl({
+  ref,
   audioLink,
   onError,
   onSuccess,
-}: AudioControlProps) {
+}: AudioControlProps & { ref?: React.RefObject<AudioControlHandle | null> }) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // State is computed fresh on each render - no reset needed
@@ -110,6 +124,7 @@ export default function AudioControl({
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
+    setIsPlaying(false);
   }, [audioLink]);
 
   // Cleanup on unmount
@@ -122,6 +137,10 @@ export default function AudioControl({
       }
     };
   }, [handleEnded, handleError, handleCanPlay]);
+
+  useImperativeHandle(ref, () => ({ playAudio, pauseAudio, isPlaying }), [
+    isPlaying,
+  ]);
 
   // Show error state if audio failed to load
   if (hasLoadError && audioLink) {
@@ -149,4 +168,6 @@ export default function AudioControl({
       </>
     )
   );
-}
+};
+
+export default AudioControl;

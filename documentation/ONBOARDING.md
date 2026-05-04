@@ -8,7 +8,7 @@ _Setup, then the guided path through everything you need to know._
 
 ### Prerequisites
 
-- **Node.js** >= 16 ([nvm](https://github.com/nvm-sh/nvm) recommended)
+- **Node.js** >= 24 ([nvm](https://github.com/nvm-sh/nvm) recommended)
 - **pnpm** >= 7 (`npm install -g pnpm`)
 - **Git**
 
