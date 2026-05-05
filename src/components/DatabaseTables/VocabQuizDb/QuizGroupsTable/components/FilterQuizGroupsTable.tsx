@@ -31,9 +31,9 @@ export default function FilterQuizGroupsTable({
     });
   };
 
-  const handleProgramNameFilterChange = (value: string) => {
+  const handleCourseNameFilterChange = (value: string) => {
     setFilterConfig({
-      field: 'Program Name',
+      field: 'Course Name',
       value,
       operator: 'contains',
     });
@@ -56,9 +56,9 @@ export default function FilterQuizGroupsTable({
       />
 
       <TextInput
-        label="Filter by Program Name"
-        value={filterConfig.field === 'Program Name' ? filterConfig.value : ''}
-        onChange={handleProgramNameFilterChange}
+        label="Filter by Course Name"
+        value={filterConfig.field === 'Course Name' ? filterConfig.value : ''}
+        onChange={handleCourseNameFilterChange}
         editMode
       />
 

@@ -15,10 +15,8 @@ export default function useQuizGroupsTable() {
     if (!contextual.startsWith('edit-quiz-group-')) {
       return null;
     }
-    const recordId = Number(contextual.split('edit-quiz-group-')[1]);
-    return quizGroupsTableQuery.data?.find(
-      (quizGroup) => quizGroup.recordId === recordId,
-    );
+    const id = Number(contextual.split('edit-quiz-group-')[1]);
+    return quizGroupsTableQuery.data?.find((quizGroup) => quizGroup.id === id);
   }, [quizGroupsTableQuery.data, contextual]);
 
   const states = {

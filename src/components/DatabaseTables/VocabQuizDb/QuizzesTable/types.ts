@@ -1,14 +1,13 @@
-import type { Quiz } from 'src/types/interfaceDefinitions';
+import type { AdminQuizRecord } from '@learncraft-spanish/shared';
 
-export type EditableQuiz = Quiz;
+export type EditableQuiz = AdminQuizRecord;
 
 export interface QuizObjForUpdate {
+  id: number;
   quizNickname: string;
   published: boolean;
-  recordId: number;
+  relatedQuizGroupId: number | null;
 }
-
-// new quiz has no recordId
 
 export interface NewQuiz {
   quizNickname: string;

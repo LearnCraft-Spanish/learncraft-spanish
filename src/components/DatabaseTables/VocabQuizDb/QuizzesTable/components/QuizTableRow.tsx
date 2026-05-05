@@ -1,17 +1,21 @@
+import type { AdminQuizRecord } from '@learncraft-spanish/shared';
 import type { ReactNode } from 'react';
-import type { QbQuiz } from 'src/types/DatabaseTables';
 import pencilIcon from 'src/assets/icons/pencil.svg';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
-export default function QuizTableRow({ quiz }: { quiz: QbQuiz }): ReactNode {
+export default function QuizTableRow({
+  quiz,
+}: {
+  quiz: AdminQuizRecord;
+}): ReactNode {
   const { openContextual } = useContextualMenu();
-  const { quizNickname, recordId, published } = quiz;
+  const { quizNickname, id, published } = quiz;
 
   return (
     <tr>
       <td
         className="edit-icon-cell"
-        onClick={() => openContextual(`edit-quiz-${recordId}`)}
+        onClick={() => openContextual(`edit-quiz-${id}`)}
       >
         <div className="edit-icon-container">
           <img src={pencilIcon} alt="Edit" className="edit-icon" />

@@ -1,5 +1,5 @@
 import type { UseActiveStudentReturnType } from '@application/coordinators/hooks/types';
-import type { AppUser } from '@learncraft-spanish/shared/dist/domain/appUser/core-types';
+import type { AppUser } from '@learncraft-spanish/shared';
 import { useAppUserAdapter } from '@application/adapters/appUserAdapter';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import ActiveStudentContext from '@application/coordinators/contexts/ActiveStudentContext';

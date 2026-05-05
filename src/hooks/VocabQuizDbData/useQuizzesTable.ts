@@ -1,5 +1,6 @@
 // used in Coaching interfaces
 
+import type { AdminQuizRecord } from '@learncraft-spanish/shared';
 import type {
   NewQuiz,
   QuizObjForUpdate,
@@ -21,9 +22,14 @@ export default function useQuizzesTable() {
 
   const createQuizMutation = useMutation({
     mutationFn: (quiz: NewQuiz) => {
-      const promise = newPostFactory<NewQuiz>({
-        path: 'vocab-quiz/quizzes',
-        body: quiz,
+      const body = {
+        quizNickname: quiz.quizNickname,
+        published: quiz.published,
+        relatedQuizGroupId: null,
+      };
+      const promise = newPostFactory<AdminQuizRecord>({
+        path: 'admin/quizzes',
+        body,
       });
 
       toast.promise(promise, {
@@ -41,9 +47,15 @@ export default function useQuizzesTable() {
 
   const updateQuizMutation = useMutation({
     mutationFn: (quiz: QuizObjForUpdate) => {
-      const promise = newPutFactory<QuizObjForUpdate>({
-        path: 'vocab-quiz/quizzes',
-        body: quiz,
+      const body = {
+        id: quiz.id,
+        quizNickname: quiz.quizNickname,
+        published: quiz.published,
+        relatedQuizGroupId: quiz.relatedQuizGroupId ?? null,
+      };
+      const promise = newPutFactory<AdminQuizRecord>({
+        path: 'admin/quizzes',
+        body,
       });
 
       toast.promise(promise, {
@@ -53,6 +65,9 @@ export default function useQuizzesTable() {
       });
 
       return promise;
+    },
+    onSuccess: () => {
+      quizzesTableQuery.refetch();
     },
   });
 

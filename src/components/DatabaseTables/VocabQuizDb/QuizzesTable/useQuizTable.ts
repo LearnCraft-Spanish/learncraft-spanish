@@ -11,8 +11,8 @@ export default function useQuizTable() {
     if (!contextual.startsWith('edit-quiz-')) {
       return null;
     }
-    const recordId = Number(contextual.split('edit-quiz-')[1]);
-    return quizzesTableQuery.data?.find((quiz) => quiz.recordId === recordId);
+    const id = Number(contextual.split('edit-quiz-')[1]);
+    return quizzesTableQuery.data?.find((quiz) => quiz.id === id);
   }, [quizzesTableQuery.data, contextual]);
 
   const states = {
