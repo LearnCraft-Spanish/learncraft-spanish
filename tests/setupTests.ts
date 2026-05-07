@@ -3,6 +3,10 @@ import {
   resetMockAuthAdapter,
 } from '@application/adapters/authAdapter.mock';
 import {
+  mockPMFSurveyFrequencyAdapter,
+  resetMockPMFSurveyFrequencyAdapter,
+} from '@application/adapters/pmfSurveyFrequencyAdapter.mock';
+import {
   mockSubcategoryAdapter,
   resetMockSubcategoryAdapter,
 } from '@application/adapters/subcategoryAdapter.mock';
@@ -58,6 +62,10 @@ vi.mock('@application/adapters/authAdapter', () => ({
   useAuthAdapter: vi.fn(() => mockAuthAdapter),
 }));
 
+vi.mock('@application/adapters/pmfSurveyFrequencyAdapter', () => ({
+  usePMFSurveyFrequencyAdapter: vi.fn(() => mockPMFSurveyFrequencyAdapter),
+}));
+
 const resetAdapterMocks = () => {
   // Reset the adapter mocks to their default implementations
   resetMockVocabularyAdapter();
@@ -65,6 +73,7 @@ const resetAdapterMocks = () => {
   resetMockActiveStudent();
   resetMockAuthAdapter();
   resetMockCourseAdapter();
+  resetMockPMFSurveyFrequencyAdapter();
 };
 
 beforeAll(() => {

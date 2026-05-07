@@ -1,5 +1,9 @@
+import { overrideMockPMFSurveyFrequencyAdapter } from '@application/adapters/pmfSurveyFrequencyAdapter.mock';
 import { renderHook, waitFor } from '@testing-library/react';
-import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
+import {
+  getAppUserFromEmail,
+  getAuthUserFromEmail,
+} from 'mocks/data/serverlike/userTable';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
@@ -7,16 +11,43 @@ import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAn
 import { beforeEach, describe, expect, it } from 'vitest';
 import { usePMFData } from './usePMFData';
 
+const NINETY_DAYS_MS = 7776000000;
+
+const sharedCreateUpdateMocks = {
+  createPMFSurveyFrequency: async (
+    studentId: number,
+    hasTakenSurvey: boolean,
+  ) => ({
+    id: 1,
+    relatedStudent: studentId,
+    lastContactDate: new Date().toISOString(),
+    hasTakenSurvey,
+  }),
+  updatePMFSurveyFrequency: async ({
+    recordId,
+    studentId,
+    hasTakenSurvey,
+  }: {
+    recordId: number;
+    studentId: number;
+    hasTakenSurvey: boolean;
+  }) => ({
+    id: recordId,
+    relatedStudent: studentId,
+    lastContactDate: new Date().toISOString(),
+    hasTakenSurvey,
+  }),
+};
+
 /*
-********* NOTE *********
-The mock api is set up to serve specific data based on what student is logged in.
-For testing, these are the avalible students and their api responses:
-student-lcsp: getPMFData: <todaysDate>, createPMFData: 1, updatePMFData: 1
-student-ser-estar: getPMFData: <90 days ago>, createPMFData: 1, updatePMFData: 1
-all other Students: getPMFData: '', createPMFData: 1, updatePMFData: 1
+The PMF adapter is mocked globally (see tests/setupTests.ts). Each scenario
+below overrides getPMFSurveyFrequency to match the former MSW behavior for
+that test user’s recordId.
 */
 describe('usePMFData', () => {
   describe('when student-lcsp is logged in', () => {
+    const lcsp = getAppUserFromEmail('student-lcsp@fake.not')!;
+
     beforeEach(() => {
       overrideAuthAndAppUser(
         {
@@ -31,6 +62,18 @@ describe('usePMFData', () => {
           isOwnUser: true,
         },
       );
+      overrideMockPMFSurveyFrequencyAdapter({
+        getPMFSurveyFrequency: async (studentId) =>
+          studentId === lcsp.recordId
+            ? {
+                id: 1,
+                relatedStudent: studentId,
+                lastContactDate: new Date().toISOString(),
+                hasTakenSurvey: false,
+              }
+            : null,
+        ...sharedCreateUpdateMocks,
+      });
     });
     it('data is successfully fetched', async () => {
       const { result } = renderHook(() => usePMFData(), {
@@ -56,6 +99,8 @@ describe('usePMFData', () => {
     });
   });
   describe('when student-ser-estar is logged in', () => {
+    const serEstar = getAppUserFromEmail('student-ser-estar@fake.not')!;
+
     beforeEach(() => {
       overrideAuthAndAppUser(
         {
@@ -70,6 +115,20 @@ describe('usePMFData', () => {
           isOwnUser: true,
         },
       );
+      overrideMockPMFSurveyFrequencyAdapter({
+        getPMFSurveyFrequency: async (studentId) =>
+          studentId === serEstar.recordId
+            ? {
+                id: 2,
+                relatedStudent: studentId,
+                lastContactDate: new Date(
+                  Date.now() - NINETY_DAYS_MS,
+                ).toISOString(),
+                hasTakenSurvey: false,
+              }
+            : null,
+        ...sharedCreateUpdateMocks,
+      });
     });
     it('data is successfully fetched', async () => {
       const { result } = renderHook(() => usePMFData(), {
@@ -96,6 +155,10 @@ describe('usePMFData', () => {
           isOwnUser: true,
         },
       );
+      overrideMockPMFSurveyFrequencyAdapter({
+        getPMFSurveyFrequency: async (_studentId) => null,
+        ...sharedCreateUpdateMocks,
+      });
     });
     it('data is successfully fetched', async () => {
       const { result } = renderHook(() => usePMFData(), {
@@ -104,7 +167,7 @@ describe('usePMFData', () => {
       await waitFor(() =>
         expect(result.current.pmfDataQuery.isSuccess).toBe(true),
       );
-      expect(result.current.pmfDataQuery.data).toBe('');
+      expect(result.current.pmfDataQuery.data).toBeNull();
     });
 
     it('createOrUpdatePMFData works', async () => {
