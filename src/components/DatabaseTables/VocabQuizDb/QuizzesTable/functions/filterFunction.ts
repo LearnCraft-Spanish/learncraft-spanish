@@ -1,8 +1,8 @@
+import type { AdminQuizRecord } from '@learncraft-spanish/shared';
 import type { FilterConfig } from 'src/components/Table/types';
-import type { QbQuiz } from 'src/types/DatabaseTables';
 
 export default function filterFunction(
-  data: QbQuiz[],
+  data: AdminQuizRecord[],
   filterConfig: FilterConfig,
 ) {
   if (!filterConfig.value) return data;

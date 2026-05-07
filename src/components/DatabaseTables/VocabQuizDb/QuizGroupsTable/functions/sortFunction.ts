@@ -1,15 +1,13 @@
+import type { AdminQuizGroup } from '@learncraft-spanish/shared';
 import type { SortConfig } from 'src/components/Table/types';
-import type { QuizGroup } from 'src/types/DatabaseTables';
 
 export default function sortFunction(
-  data: QuizGroup[],
+  data: AdminQuizGroup[],
   sortConfig: SortConfig,
 ) {
   if (sortConfig.key === 'Record ID') {
     return [...data].sort((a, b) => {
-      return sortConfig.direction === 'ascending'
-        ? a.recordId - b.recordId
-        : b.recordId - a.recordId;
+      return sortConfig.direction === 'ascending' ? a.id - b.id : b.id - a.id;
     });
   }
 
@@ -37,19 +35,19 @@ export default function sortFunction(
     });
   }
 
-  if (sortConfig.key === 'Related Program') {
+  if (sortConfig.key === 'Course ID') {
     return [...data].sort((a, b) => {
       return sortConfig.direction === 'ascending'
-        ? a.relatedProgram - b.relatedProgram
-        : b.relatedProgram - a.relatedProgram;
+        ? (a.courseId ?? 0) - (b.courseId ?? 0)
+        : (b.courseId ?? 0) - (a.courseId ?? 0);
     });
   }
 
-  if (sortConfig.key === 'Program Name') {
+  if (sortConfig.key === 'Course Name') {
     return [...data].sort((a, b) => {
       return sortConfig.direction === 'ascending'
-        ? a.programName.localeCompare(b.programName)
-        : b.programName.localeCompare(a.programName);
+        ? (a.courseName ?? '').localeCompare(b.courseName ?? '')
+        : (b.courseName ?? '').localeCompare(a.courseName ?? '');
     });
   }
 

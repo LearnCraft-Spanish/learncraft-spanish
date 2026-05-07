@@ -1,4 +1,4 @@
-import type { QbQuiz } from 'src/types/DatabaseTables';
+import type { AdminQuizRecord } from '@learncraft-spanish/shared';
 import type { QuizNameObj, QuizSubNameObj } from '../constants';
 import type { NewQuiz, QuizObjForUpdate } from '../types';
 import {
@@ -59,9 +59,10 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
       }
 
       onAction({
+        id: quiz.id,
         quizNickname,
-        recordId: quiz.recordId,
         published: quizPublished,
+        relatedQuizGroupId: quiz.relatedQuizGroupId ?? null,
       });
     } catch (error) {
       console.error('Error updating quiz:', error);
@@ -180,13 +181,14 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
   );
 }
 
-export function EditQuiz({ quiz }: { quiz: QbQuiz }) {
+export function EditQuiz({ quiz }: { quiz: AdminQuizRecord }) {
   const { updateQuizMutation } = useQuizTable();
 
   const editableQuizObj: QuizObjForUpdate = {
+    id: quiz.id,
     quizNickname: quiz.quizNickname,
-    recordId: quiz.recordId,
     published: quiz.published,
+    relatedQuizGroupId: quiz.relatedQuizGroupId ?? null,
   };
 
   const onAction = (quiz: QuizObjForUpdate) => {
@@ -210,7 +212,12 @@ export function CreateQuiz() {
   return (
     <QuizView
       quiz={
-        { quizNickname: '', recordId: 0, published: false } as QuizObjForUpdate
+        {
+          id: 0,
+          quizNickname: '',
+          published: false,
+          relatedQuizGroupId: null,
+        } as QuizObjForUpdate
       }
       onAction={onAction}
       createMode

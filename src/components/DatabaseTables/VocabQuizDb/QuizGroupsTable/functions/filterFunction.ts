@@ -1,8 +1,8 @@
+import type { AdminQuizGroup } from '@learncraft-spanish/shared';
 import type { FilterConfig } from 'src/components/Table/types';
-import type { QuizGroup } from 'src/types/DatabaseTables';
 
 export default function filterFunction(
-  data: QuizGroup[],
+  data: AdminQuizGroup[],
   filterConfig: FilterConfig,
 ) {
   if (!filterConfig.value) return data;
@@ -21,9 +21,9 @@ export default function filterFunction(
     );
   }
 
-  if (filterConfig.field === 'Program Name') {
+  if (filterConfig.field === 'Course Name') {
     return data.filter((quizGroup) =>
-      quizGroup.programName
+      (quizGroup.courseName ?? '')
         .toLowerCase()
         .includes(filterConfig.value.toLowerCase()),
     );

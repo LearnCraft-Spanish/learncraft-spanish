@@ -1,4 +1,4 @@
-import type { QuizGroup } from 'src/types/DatabaseTables';
+import type { AdminQuizGroup } from '@learncraft-spanish/shared';
 import type { NewQuizGroup, QuizGroupObjForUpdate } from '../types';
 import { TextInput } from '@interface/components/FormComponents';
 import React, { useState } from 'react';
@@ -9,7 +9,7 @@ import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import useQuizGroupsTable from '../useQuizGroupsTable';
 
 interface QuizGroupViewProps {
-  quizGroup: QuizGroup | NewQuizGroup;
+  quizGroup: AdminQuizGroup | NewQuizGroup;
   onAction: (quizGroup: QuizGroupObjForUpdate | NewQuizGroup) => void;
   createMode?: boolean;
 }
@@ -56,10 +56,13 @@ export function QuizGroupView({
         };
         onAction(newQuizGroup);
       } else {
+        const fullGroup = quizGroup as AdminQuizGroup;
         const updatedQuizGroup: QuizGroupObjForUpdate = {
+          id: fullGroup.id,
           name: name.trim(),
+          urlSlug: fullGroup.urlSlug,
+          courseId: fullGroup.courseId,
           published,
-          recordId: (quizGroup as QuizGroup).recordId,
         };
         onAction(updatedQuizGroup);
       }
@@ -73,7 +76,7 @@ export function QuizGroupView({
     closeContextual();
   };
 
-  const fullQuizGroup = quizGroup as QuizGroup;
+  const fullQuizGroup = quizGroup as AdminQuizGroup;
 
   return (
     <ContextualView editFunction={() => setEditMode(!editMode)}>
@@ -82,7 +85,7 @@ export function QuizGroupView({
         {!createMode && (
           <div className="lineWrapper">
             <p className="label">Record ID</p>
-            <p className="content">{fullQuizGroup.recordId}</p>
+            <p className="content">{fullQuizGroup.id}</p>
           </div>
         )}
 
@@ -105,13 +108,13 @@ export function QuizGroupView({
         {!createMode && (
           <>
             <div className="lineWrapper">
-              <p className="label">Related Program</p>
-              <p className="content">{fullQuizGroup.relatedProgram}</p>
+              <p className="label">Course ID</p>
+              <p className="content">{fullQuizGroup.courseId}</p>
             </div>
 
             <div className="lineWrapper">
-              <p className="label">Program Name</p>
-              <p className="content">{fullQuizGroup.programName}</p>
+              <p className="label">Course Name</p>
+              <p className="content">{fullQuizGroup.courseName}</p>
             </div>
           </>
         )}
@@ -140,7 +143,7 @@ export function QuizGroupView({
   );
 }
 
-export function EditQuizGroup({ quizGroup }: { quizGroup: QuizGroup }) {
+export function EditQuizGroup({ quizGroup }: { quizGroup: AdminQuizGroup }) {
   const { updateQuizGroupMutation } = useQuizGroupsTable();
 
   const onAction = (updatedQuizGroup: QuizGroupObjForUpdate | NewQuizGroup) => {
