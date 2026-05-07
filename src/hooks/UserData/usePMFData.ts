@@ -1,22 +1,23 @@
-// used outside hexagon, candidate for hexagon implementation
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { usePMFSurveyFrequencyAdapter } from '@application/adapters/pmfSurveyFrequencyAdapter';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
-import { useBackend } from 'src/hooks/useBackend';
-// import useAuth from 'src/hooks/useAuth';
 
 export function usePMFData() {
-  const { getPMFDataForUser, createPMFDataForUser, updatePMFDataForUser } =
-    useBackend();
+  const {
+    getPMFSurveyFrequency,
+    createPMFSurveyFrequency,
+    updatePMFSurveyFrequency,
+  } = usePMFSurveyFrequencyAdapter();
   const { isStudent } = useAuthAdapter();
   const { appUser, isOwnUser } = useActiveStudent();
 
   const getPMFData = useCallback(async () => {
     if (appUser && isOwnUser) {
-      return await getPMFDataForUser(appUser.recordId);
+      return await getPMFSurveyFrequency(appUser.recordId);
     }
-  }, [appUser, isOwnUser, getPMFDataForUser]);
+  }, [appUser, isOwnUser, getPMFSurveyFrequency]);
 
   const pmfDataQuery = useQuery({
     queryKey: ['pmfData', appUser?.recordId],
@@ -33,22 +34,15 @@ export function usePMFData() {
     async ({ hasTakenSurvey }: CreateOrUpdatePMFData) => {
       if (isOwnUser && pmfDataQuery.isSuccess && appUser) {
         if (!pmfDataQuery.data) {
-          const result = await createPMFDataForUser(
-            appUser.recordId,
-            hasTakenSurvey,
-          );
-          if (result === 1) {
-            pmfDataQuery.refetch();
-          }
+          await createPMFSurveyFrequency(appUser.recordId, hasTakenSurvey);
+          pmfDataQuery.refetch();
         } else {
-          const result = await updatePMFDataForUser({
+          await updatePMFSurveyFrequency({
             studentId: appUser.recordId,
-            recordId: pmfDataQuery.data.recordId,
+            recordId: pmfDataQuery.data.id,
             hasTakenSurvey,
           });
-          if (result === 1) {
-            pmfDataQuery.refetch();
-          }
+          pmfDataQuery.refetch();
         }
       }
     },
@@ -56,8 +50,8 @@ export function usePMFData() {
       isOwnUser,
       appUser,
       pmfDataQuery,
-      createPMFDataForUser,
-      updatePMFDataForUser,
+      createPMFSurveyFrequency,
+      updatePMFSurveyFrequency,
     ],
   );
 
@@ -66,11 +60,11 @@ export function usePMFData() {
       return false;
     }
     // Check if the last contact date is within 60 days
-    if (pmfDataQuery.data) {
-      const intervalInDays = 60; // number of days for comparison
+    if (pmfDataQuery.data?.lastContactDate) {
+      const intervalInDays = 60;
 
       const date = new Date().toISOString();
-      const storedDate = pmfDataQuery.data.lastContactDate; // Stored date will be in ISOString format
+      const storedDate = pmfDataQuery.data.lastContactDate;
       const storedDateInDays = Math.floor(Date.parse(storedDate) / 86400000);
       const currentDateInDays = Math.floor(Date.parse(date) / 86400000);
 
@@ -81,8 +75,8 @@ export function usePMFData() {
       }
     }
     // calcualte if we should show the PMF via random number
-    const randomNumber = Math.floor(Math.random() * 30);
-    // const randomNumber = 1; // for testing
+    // const randomNumber = Math.floor(Math.random() * 30);
+    const randomNumber = 1; // for testing
     if (randomNumber === 1) {
       return true;
     }

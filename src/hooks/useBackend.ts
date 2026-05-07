@@ -1,7 +1,6 @@
 // used in some contexts, possibly consider using inside hexagon implementation
 import type { QueryFunctionContext } from '@tanstack/react-query';
 import type * as StudentRecordsTypes from 'src/types/CoachingTypes';
-import type * as types from 'src/types/interfaceDefinitions';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useCallback } from 'react';
 
@@ -125,10 +124,6 @@ export function useBackendHelpers() {
     [getAccessToken, backendUrl],
   );
 
-  // We are going to want to update THIS FILE to send data via body of requests instead of headers
-  // (see current post factory)
-  // I have created an updated post factory just for these new routes so that this merge only concerns itself
-  // with the PMFData changes
   interface PostFactoryOptions {
     path: string;
     headers?: Record<string, any>;
@@ -210,7 +205,7 @@ export function useBackendHelpers() {
 }
 
 export function useBackend() {
-  const { getFactory, newPostFactory } = useBackendHelpers();
+  const { getFactory } = useBackendHelpers();
 
   /*      GET Requests      */
   const { getAccessToken } = useAuthAdapter();
@@ -273,46 +268,6 @@ export function useBackend() {
     [getFactory],
   );
 
-  // used, but not for long
-  const getPMFDataForUser = useCallback(
-    (userId: number): Promise<types.PMFData> => {
-      return getFactory(`pmf/${userId}`);
-    },
-    [getFactory],
-  );
-  // used, but not for long
-  const createPMFDataForUser = useCallback(
-    (studentId: number, hasTakenSurvey: boolean): Promise<number> => {
-      return newPostFactory({
-        path: 'pmf/create',
-        body: { studentId, hasTakenSurvey },
-      });
-    },
-    [newPostFactory],
-  );
-  // used, but not for long
-  const updatePMFDataForUser = useCallback(
-    ({
-      studentId,
-      recordId,
-      hasTakenSurvey,
-    }: {
-      studentId: number;
-      recordId: number;
-      hasTakenSurvey: boolean;
-    }): Promise<number> => {
-      return newPostFactory({
-        path: 'pmf/update',
-        body: {
-          studentId,
-          recordId,
-          hasTakenSurvey,
-        },
-      });
-    },
-    [newPostFactory],
-  );
-
   return {
     getAccessToken,
     // GET Requests
@@ -322,11 +277,5 @@ export function useBackend() {
     getCourseList,
 
     getLessonList,
-
-    getPMFDataForUser,
-
-    // POST Requests
-    createPMFDataForUser,
-    updatePMFDataForUser,
   };
 }
