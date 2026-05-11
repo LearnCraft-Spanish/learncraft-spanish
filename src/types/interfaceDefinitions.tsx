@@ -257,12 +257,6 @@ export type mockUserNames = Expanded<
   | undefined
 >;
 
-export type PMFData = Expanded<{
-  recordId: number;
-  relatedStudent: number;
-  lastContactDate: string;
-}>;
-
 export type Verb = Expanded<{
   recordId: number;
   infinitive: string;

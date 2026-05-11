@@ -1,21 +1,9 @@
-export interface QbQuiz {
-  recordId: number;
-  quizNickname: string;
-  published: boolean;
-
-  relatedQuizGroup: number;
-  quizGroupName: string;
-}
-
-export interface QuizGroup {
-  recordId: number;
-  name: string;
-  urlSlug: string;
-  published: boolean;
-
-  relatedProgram: number;
-  programName: string;
-}
+// QbQuiz and QuizGroup have been replaced by AdminQuizRecord and AdminQuizGroup
+// from @learncraft-spanish/shared. These aliases remain for any code not yet migrated.
+export type {
+  AdminQuizRecord as QbQuiz,
+  AdminQuizGroup as QuizGroup,
+} from '@learncraft-spanish/shared';
 
 export interface Lesson {
   recordId: number;

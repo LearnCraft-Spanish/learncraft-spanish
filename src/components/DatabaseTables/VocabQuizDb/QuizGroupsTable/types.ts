@@ -1,14 +1,15 @@
-import type { QuizGroup } from 'src/types/DatabaseTables';
+import type { AdminQuizGroup } from '@learncraft-spanish/shared';
 
-export type EditableQuizGroup = QuizGroup;
+export type EditableQuizGroup = AdminQuizGroup;
 
 export interface QuizGroupObjForUpdate {
+  id: number;
   name: string;
+  urlSlug: string;
+  courseId: number | null;
   published: boolean;
-  recordId: number;
 }
 
-// new quiz group - includes urlSlug since it can only be set on creation
 export interface NewQuizGroup {
   name: string;
   urlSlug: string;

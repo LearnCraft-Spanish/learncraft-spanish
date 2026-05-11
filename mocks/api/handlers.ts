@@ -13,30 +13,52 @@ export const handlers = [
     return HttpResponse.json(appUserTable);
   }),
 
-  // TEMPORARY routes to silence warnings in console.
-  // I will update these to be proper routes for testing
-  // As I add testing to PMF data
   http.get(`${backendUrl}pmf/:studentId`, async ({ params }) => {
     const param = params.studentId as string;
     const studentId = Number.parseInt(param);
     if (getAppUserFromName('student-lcsp')?.recordId === studentId) {
       return HttpResponse.json({
+        id: 1,
+        relatedStudent: studentId,
         lastContactDate: new Date().toISOString(),
+        hasTakenSurvey: false,
       });
     } else if (
       getAppUserFromName('student-ser-estar')?.recordId === studentId
     ) {
       return HttpResponse.json({
+        id: 2,
+        relatedStudent: studentId,
         lastContactDate: new Date(Date.now() - 7776000000).toISOString(),
+        hasTakenSurvey: false,
       });
     }
-    return HttpResponse.json('');
+    return HttpResponse.json(null);
   }),
-  http.post(`${backendUrl}pmf/create`, async () => {
-    return HttpResponse.json(1);
+  http.post(`${backendUrl}pmf/create`, async ({ request }) => {
+    const body = (await request.json()) as {
+      studentId: number;
+      hasTakenSurvey: boolean;
+    };
+    return HttpResponse.json({
+      id: 1,
+      relatedStudent: body.studentId,
+      lastContactDate: new Date().toISOString(),
+      hasTakenSurvey: body.hasTakenSurvey,
+    });
   }),
-  http.post(`${backendUrl}pmf/update`, async () => {
-    return HttpResponse.json(1);
+  http.post(`${backendUrl}pmf/update`, async ({ request }) => {
+    const body = (await request.json()) as {
+      recordId: number;
+      studentId: number;
+      hasTakenSurvey: boolean;
+    };
+    return HttpResponse.json({
+      id: body.recordId,
+      relatedStudent: body.studentId,
+      lastContactDate: new Date().toISOString(),
+      hasTakenSurvey: body.hasTakenSurvey,
+    });
   }),
 
   // Coaching

@@ -1,4 +1,8 @@
-import type { Lesson, QbQuiz, QuizGroup } from 'src/types/DatabaseTables';
+import type {
+  AdminQuizGroup,
+  AdminQuizRecord,
+} from '@learncraft-spanish/shared';
+import type { Lesson } from 'src/types/DatabaseTables';
 import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
 import { useBackendHelpers } from 'src/hooks/useBackend';
 
@@ -14,14 +18,14 @@ export default function useVocabQuizDbBackend() {
     return getFactory<string[]>('vocab-quiz/students/cohort-field-options');
   };
 
-  // get quizzes table
+  // get quizzes table (admin — migrated from vocab-quiz/quizzes)
   const getQuizzesTable = () => {
-    return getFactory<QbQuiz[]>('vocab-quiz/quizzes');
+    return getFactory<AdminQuizRecord[]>('admin/quizzes');
   };
 
-  // get quiz groups table
+  // get quiz groups table (admin — migrated from vocab-quiz/quiz-groups)
   const getQuizGroupsTable = () => {
-    return getFactory<QuizGroup[]>('vocab-quiz/quiz-groups');
+    return getFactory<AdminQuizGroup[]>('admin/quiz-groups');
   };
 
   // get vocab-quiz db lessons table

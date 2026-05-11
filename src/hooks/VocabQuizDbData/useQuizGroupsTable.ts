@@ -1,5 +1,6 @@
 // used in Coaching interfaces
 
+import type { AdminQuizGroup } from '@learncraft-spanish/shared';
 import type {
   NewQuizGroup,
   QuizGroupObjForUpdate,
@@ -21,9 +22,15 @@ export default function useQuizGroupsTable() {
 
   const createQuizGroupMutation = useMutation({
     mutationFn: (quizGroup: NewQuizGroup) => {
-      const promise = newPostFactory<NewQuizGroup>({
-        path: 'vocab-quiz/quiz-groups',
-        body: quizGroup,
+      const body = {
+        name: quizGroup.name,
+        urlSlug: quizGroup.urlSlug,
+        courseId: null,
+        published: quizGroup.published,
+      };
+      const promise = newPostFactory<AdminQuizGroup>({
+        path: 'admin/quiz-groups',
+        body,
       });
 
       toast.promise(promise, {
@@ -41,9 +48,16 @@ export default function useQuizGroupsTable() {
 
   const updateQuizGroupMutation = useMutation({
     mutationFn: (quizGroup: QuizGroupObjForUpdate) => {
-      const promise = newPutFactory<QuizGroupObjForUpdate>({
-        path: 'vocab-quiz/quiz-groups',
-        body: quizGroup,
+      const body = {
+        id: quizGroup.id,
+        name: quizGroup.name,
+        urlSlug: quizGroup.urlSlug ?? '',
+        courseId: quizGroup.courseId ?? null,
+        published: quizGroup.published,
+      };
+      const promise = newPutFactory<AdminQuizGroup>({
+        path: 'admin/quiz-groups',
+        body,
       });
 
       toast.promise(promise, {

@@ -1,7 +1,4 @@
-import type {
-  OfficialQuizRecord,
-  QuizGroup,
-} from '@learncraft-spanish/shared/dist/domain/quiz/core-types';
+import type { OfficialQuizRecord, QuizGroup } from '@learncraft-spanish/shared';
 import { overrideMockOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter.mock';
 import { useOfficialQuiz } from '@application/units/OfficialQuiz/useOfficialQuiz';
 
