@@ -33,7 +33,7 @@ export const handlers = [
         hasTakenSurvey: false,
       });
     }
-    return HttpResponse.json('');
+    return HttpResponse.json(null);
   }),
   http.post(`${backendUrl}pmf/create`, async ({ request }) => {
     const body = (await request.json()) as {

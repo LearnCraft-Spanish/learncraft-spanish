@@ -75,8 +75,8 @@ export function usePMFData() {
       }
     }
     // calcualte if we should show the PMF via random number
-    // const randomNumber = Math.floor(Math.random() * 30);
-    const randomNumber = 1; // for testing
+    const randomNumber = Math.floor(Math.random() * 30);
+    // const randomNumber = 1; // for testing
     if (randomNumber === 1) {
       return true;
     }
