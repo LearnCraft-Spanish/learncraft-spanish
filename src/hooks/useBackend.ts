@@ -241,7 +241,7 @@ export function useBackend() {
       queryKey,
     }: QueryFunctionContext<
       [string, { startDate: string | undefined; endDate: string | undefined }]
-    >): Promise<StudentRecordsTypes.Student[]> => {
+    >): Promise<StudentRecordsTypes.CoachingStudent[]> => {
       const [, { startDate, endDate }] = queryKey;
 
       if (!startDate || !endDate) {

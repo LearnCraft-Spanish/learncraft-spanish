@@ -1,4 +1,4 @@
-import type { Student } from 'src/types/CoachingTypes';
+import type { CoachingStudent } from 'src/types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { Loading } from '@interface/components/Loading';
 import React, { useMemo, useState } from 'react';
@@ -49,7 +49,7 @@ export function MyStudents() {
   const selectedStudent = useMemo(
     () =>
       allStudentsQuery.data?.find((s) => s.recordId === selectedStudentId) as
-        | Student
+        | CoachingStudent
         | undefined,
     [allStudentsQuery.data, selectedStudentId],
   );

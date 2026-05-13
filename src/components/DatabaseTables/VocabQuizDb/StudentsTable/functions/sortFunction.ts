@@ -29,8 +29,8 @@ export default function sortFunction(data: Student[], sortConfig: SortConfig) {
         bValue = b.cohort?.toLowerCase() || '';
         break;
       case 'Role':
-        aValue = a.role.toLowerCase();
-        bValue = b.role.toLowerCase();
+        aValue = (a.role ?? '').toLowerCase();
+        bValue = (b.role ?? '').toLowerCase();
         break;
       default:
         aValue = '';

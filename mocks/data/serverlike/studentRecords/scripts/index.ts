@@ -1,12 +1,12 @@
 import type {
   Assignment,
   Coach,
+  CoachingStudent,
   Course,
   GroupAttendees,
   GroupSession,
   Membership,
   PrivateCall,
-  Student,
   Week,
 } from 'src/types/CoachingTypes';
 
@@ -58,7 +58,7 @@ function generateWeekAndRelatedRecords({
 }: {
   coach: Coach;
   membership: Membership;
-  student: Student;
+  student: CoachingStudent;
   course: Course;
   weekStarts: string;
   holdWeek: boolean;
