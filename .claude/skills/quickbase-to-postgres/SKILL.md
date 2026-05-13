@@ -31,14 +31,14 @@ Search for all legacy data access outside `src/hexagon/` for the target table.
 
 ### What to search for
 
-| Location to check | What to look for |
-|---|---|
-| `src/hooks/VocabQuizDbData/` | Hooks that fetch/mutate the table |
-| `src/hooks/StudentRecordsData/` | Same for StudentRecords tables |
-| `src/hooks/CoachingData/` | Any queries for this table |
-| `src/hooks/AdminData/` | Same |
-| `src/components/` | Any direct API calls or component-level fetches |
-| `src/types/` | Legacy type definitions for this table's records |
+| Location to check               | What to look for                                 |
+| ------------------------------- | ------------------------------------------------ |
+| `src/hooks/VocabQuizDbData/`    | Hooks that fetch/mutate the table                |
+| `src/hooks/StudentRecordsData/` | Same for StudentRecords tables                   |
+| `src/hooks/CoachingData/`       | Any queries for this table                       |
+| `src/hooks/AdminData/`          | Same                                             |
+| `src/components/`               | Any direct API calls or component-level fetches  |
+| `src/types/`                    | Legacy type definitions for this table's records |
 
 ### What constitutes a legacy data concern
 
@@ -103,7 +103,11 @@ Define a TypeScript interface using only types from `@learncraft-spanish/shared`
 
 ```ts
 // Example: src/hexagon/application/ports/studentsPort.ts
-import type { Student, EditableStudent, NewStudent } from '@learncraft-spanish/shared';
+import type {
+  Student,
+  EditableStudent,
+  NewStudent,
+} from '@learncraft-spanish/shared';
 
 export interface StudentsPort {
   getStudents: () => Promise<Student[]>;
@@ -133,7 +137,11 @@ import {
 export function createStudentsInfrastructure(apiUrl: string, auth: AuthPort) {
   const http = createHttpClient(apiUrl, auth);
   return {
-    getStudents: () => http.get<Student[]>(getStudentsEndpoint.path, getStudentsEndpoint.requiredScopes),
+    getStudents: () =>
+      http.get<Student[]>(
+        getStudentsEndpoint.path,
+        getStudentsEndpoint.requiredScopes,
+      ),
     // ...etc
   };
 }
@@ -207,13 +215,13 @@ If a legacy consumer would require significant rework to be compatible, flag it 
 
 Follow `documentation/TESTING_STANDARDS.md`. Minimum required:
 
-| Layer | What to test |
-|---|---|
-| Port | No tests (pure types) |
-| Infrastructure | No unit tests — covered by adapter + mock |
-| Adapter | Create a colocated `*.mock.ts` with `createOverrideableMock` |
-| Queries | Integration test: renders with mock adapter, asserts loading/success/error states |
-| Use case (if any) | Integration test: composes queries/units correctly |
+| Layer             | What to test                                                                      |
+| ----------------- | --------------------------------------------------------------------------------- |
+| Port              | No tests (pure types)                                                             |
+| Infrastructure    | No unit tests — covered by adapter + mock                                         |
+| Adapter           | Create a colocated `*.mock.ts` with `createOverrideableMock`                      |
+| Queries           | Integration test: renders with mock adapter, asserts loading/success/error states |
+| Use case (if any) | Integration test: composes queries/units correctly                                |
 
 Every exported data hook **must** have a colocated `*.mock.ts` before the PR is ready.
 
