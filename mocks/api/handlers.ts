@@ -1,11 +1,12 @@
+import { config } from '@config';
 import { CourseWithLessonsSchema } from '@learncraft-spanish/shared';
-import { http, HttpResponse } from 'msw';
 
+import { http, HttpResponse } from 'msw';
 import { generatedMockData } from '../data/serverlike/studentRecords/studentRecordsMockData';
 import { appUserTable, getAppUserFromName } from '../data/serverlike/userTable';
 
 // import mockDataHardCoded from '../data/serverlike/studentRecords/studentRecordsMockData';
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = config.backendDomain;
 
 export const handlers = [
   // kinda used, but wrong path
