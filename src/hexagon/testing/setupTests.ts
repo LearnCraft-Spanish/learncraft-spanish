@@ -42,6 +42,10 @@ import {
   resetMockSkillTagsAdapter,
 } from '@application/adapters/skillTagsAdapter.mock';
 import {
+  mockStudentsAdapter,
+  resetMockStudentsAdapter,
+} from '@application/adapters/studentsAdapter.mock';
+import {
   mockSubcategoryAdapter,
   resetMockSubcategoryAdapter,
 } from '@application/adapters/subcategoryAdapter.mock';
@@ -121,6 +125,10 @@ vi.mock('@application/adapters/pmfSurveyFrequencyAdapter', () => ({
   usePMFSurveyFrequencyAdapter: vi.fn(() => mockPMFSurveyFrequencyAdapter),
 }));
 
+vi.mock('@application/adapters/studentsAdapter', () => ({
+  useStudentsAdapter: vi.fn(() => mockStudentsAdapter),
+}));
+
 vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
   useActiveStudent: vi.fn(() => mockActiveStudent),
 }));
@@ -157,6 +165,7 @@ const resetGlobalMocks = () => {
   resetMockOfficialQuizAdapter();
   resetMockSkillTagsAdapter();
   resetMockPMFSurveyFrequencyAdapter();
+  resetMockStudentsAdapter();
   resetMockUseStudentFlashcards();
   resetMockUseSpellingsKnownForLesson();
 

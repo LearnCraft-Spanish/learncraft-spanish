@@ -12,7 +12,6 @@ import './StudentsTable.scss';
 export default function StudentsTable() {
   const {
     studentToEdit,
-    programTableQuery,
     studentsTableQuery,
     states: { isLoading, isError, isSuccess },
     createStudent,
@@ -34,9 +33,7 @@ export default function StudentsTable() {
             sortFunction={sortFunction}
             filterFunction={filterFunction}
             filterComponent={FilterStudentsTable}
-            renderRow={(student) =>
-              renderStudentRow(student, programTableQuery.data ?? [])
-            }
+            renderRow={(student) => renderStudentRow(student)}
           />
           {studentToEdit && <EditStudent student={studentToEdit} />}
           {createStudent && <CreateStudent />}

@@ -1,6 +1,6 @@
 import type {
+  CoachingStudent,
   Membership,
-  Student,
   UpdateStudent,
   WeekWithRelations,
 } from 'src/types/CoachingTypes';
@@ -37,11 +37,11 @@ export default function useStudentDrillDownBackend() {
   };
 
   const getAllStudents = () => {
-    return getFactory<Student[]>('coaching/all-students');
+    return getFactory<CoachingStudent[]>('coaching/all-students');
   };
 
   const updateStudent = (student: UpdateStudent) => {
-    const promise = newPutFactory<Student>({
+    const promise = newPutFactory<CoachingStudent>({
       path: `coaching/update-student`,
       body: student,
     });

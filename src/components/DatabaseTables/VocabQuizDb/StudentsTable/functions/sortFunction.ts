@@ -13,24 +13,24 @@ export default function sortFunction(data: Student[], sortConfig: SortConfig) {
 
     switch (sortConfig.key) {
       case 'Name':
-        aValue = a.name.toLowerCase();
-        bValue = b.name.toLowerCase();
+        aValue = a.name?.toLowerCase() ?? '';
+        bValue = b.name?.toLowerCase() ?? '';
         break;
       case 'Email':
-        aValue = a.emailAddress.toLowerCase();
-        bValue = b.emailAddress.toLowerCase();
+        aValue = a.emailAddress?.toLowerCase() ?? '';
+        bValue = b.emailAddress?.toLowerCase() ?? '';
         break;
       case 'Program':
-        aValue = a.relatedProgram.toString();
-        bValue = b.relatedProgram.toString();
+        aValue = a.course.name.toLowerCase();
+        bValue = b.course.name.toLowerCase();
         break;
       case 'Cohort':
         aValue = a.cohort?.toLowerCase() || '';
         bValue = b.cohort?.toLowerCase() || '';
         break;
       case 'Role':
-        aValue = a.role.toLowerCase();
-        bValue = b.role.toLowerCase();
+        aValue = (a.role ?? '').toLowerCase();
+        bValue = (b.role ?? '').toLowerCase();
         break;
       default:
         aValue = '';

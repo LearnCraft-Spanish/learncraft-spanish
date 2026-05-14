@@ -56,8 +56,8 @@ Reference `documentation/ENGINEERING_DOCTRINE.md` and `src/hexagon/ARCHITECTURE.
 
 ```bash
 pnpm start              # Dev server
-pnpm test:hexagon:watch # Tests in watch mode
-pnpm validate           # Lint + format + typecheck
+pnpm test:hexagon:ai # Tests in watch mode
+pnpm validate:ai           # Lint + format + typecheck
 ```
 
 All scripts: [`documentation/SCRIPTS.md`](./documentation/SCRIPTS.md)

@@ -1,13 +1,5 @@
-import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
-
-export interface EditableStudent extends Omit<
-  FlashcardStudent,
-  'program' | 'relatedProgram'
-> {
-  program: 'LCSP' | 'SI1M' | '';
-  relatedProgram: number | '';
-}
-
-export type NewStudent = Omit<EditableStudent, 'recordId'>;
-
-export type Student = FlashcardStudent;
+export type {
+  EditableStudent,
+  NewStudent,
+  Student,
+} from '@learncraft-spanish/shared';

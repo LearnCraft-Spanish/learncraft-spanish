@@ -1,4 +1,4 @@
-import type { Coach, Student } from 'src/types/CoachingTypes';
+import type { Coach, CoachingStudent } from 'src/types/CoachingTypes';
 
 /* ------------------ Helper Functions ------------------ */
 /* ------------------ Mock Data ------------------ */
@@ -35,13 +35,13 @@ function generateActiveStudentsData({
   coachList,
   length = 3,
   mockUserData,
-}: GenerateActiveStudentsDataProps): Student[] {
+}: GenerateActiveStudentsDataProps): CoachingStudent[] {
   if (length > mockUserData.length) {
     throw new Error(
       'number of student records requested is larger than the number of mockUserData we have prepared!',
     );
   }
-  const studentsList: Student[] = [];
+  const studentsList: CoachingStudent[] = [];
   for (let i = 0; i < length; i++) {
     const fakePerson = mockUserData[i];
     const student = {
