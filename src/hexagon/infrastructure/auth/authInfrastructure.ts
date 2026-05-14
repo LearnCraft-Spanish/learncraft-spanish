@@ -52,7 +52,8 @@ export function useAuthInfrastructure(): AuthPort {
             audience,
             scope: scopes ? scopes.join(' ') : allScopes.join(' '),
           },
-          cacheMode: 'off',
+          // cacheMode: 'off' is causing issues with the token not being refreshed in local development
+          // cacheMode: 'off',
         });
 
         return accessToken as string | undefined;
