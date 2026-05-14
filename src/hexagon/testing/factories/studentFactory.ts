@@ -16,8 +16,7 @@ export function createRealisticStudentList(): Student[] {
       emailAddress: 'ana.garcia@example.com',
       role: 'student',
       cohort: 'A',
-      program: 'LCSP',
-      relatedProgram: 2,
+      course: { id: 2, name: 'LCSP', published: true },
     },
     {
       recordId: 2,
@@ -25,8 +24,7 @@ export function createRealisticStudentList(): Student[] {
       emailAddress: 'ben.torres@example.com',
       role: 'limited',
       cohort: 'B',
-      program: 'SI1M',
-      relatedProgram: 3,
+      course: { id: 3, name: 'SI1M', published: false },
     },
     {
       recordId: 3,
@@ -34,8 +32,7 @@ export function createRealisticStudentList(): Student[] {
       emailAddress: 'clara.lopez@example.com',
       role: null,
       cohort: 'C',
-      program: 'LCSP',
-      relatedProgram: 2,
+      course: { id: 2, name: 'LCSP', published: true },
     },
   ];
 }

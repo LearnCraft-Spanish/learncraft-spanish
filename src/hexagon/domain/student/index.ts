@@ -1,8 +1,4 @@
-import type {
-  CohortLetter,
-  ProgramCode,
-  StudentRole,
-} from '@learncraft-spanish/shared';
+import type { CohortLetter, StudentRole } from '@learncraft-spanish/shared';
 
 /**
  * In-progress form state for student create/edit forms.
@@ -17,7 +13,7 @@ export interface StudentDraft {
   emailAddress: string;
   role: StudentRole | null;
   cohort: CohortLetter | '';
-  program: ProgramCode | '';
+  /** Selected course id (matches `relatedProgram` on the API wire). */
   relatedProgram: number | '';
 }
 
@@ -27,7 +23,6 @@ export function emptyStudentDraft(): StudentDraft {
     emailAddress: '',
     role: null,
     cohort: '',
-    program: '',
     relatedProgram: '',
   };
 }

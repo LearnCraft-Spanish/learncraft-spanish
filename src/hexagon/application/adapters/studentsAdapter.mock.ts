@@ -5,8 +5,31 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 const defaultMockAdapter: StudentsPort = {
   getStudents: () => Promise.resolve(createRealisticStudentList()),
   createStudent: (data) =>
-    Promise.resolve({ ...data, recordId: Math.floor(Math.random() * 10000) }),
-  updateStudent: (data) => Promise.resolve(data),
+    Promise.resolve({
+      recordId: Math.floor(Math.random() * 10000),
+      name: data.name,
+      emailAddress: data.emailAddress,
+      role: data.role,
+      cohort: data.cohort,
+      course: {
+        id: data.relatedProgram,
+        name: 'Mock Course',
+        published: true,
+      },
+    }),
+  updateStudent: (data) =>
+    Promise.resolve({
+      recordId: data.recordId,
+      name: data.name,
+      emailAddress: data.emailAddress,
+      role: data.role,
+      cohort: data.cohort,
+      course: {
+        id: data.relatedProgram,
+        name: 'Mock Course',
+        published: true,
+      },
+    }),
 };
 
 export const {

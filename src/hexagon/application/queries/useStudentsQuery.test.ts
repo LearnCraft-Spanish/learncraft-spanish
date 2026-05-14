@@ -1,9 +1,21 @@
+import type { EditableStudent, Student } from '@learncraft-spanish/shared';
 import { overrideMockStudentsAdapter } from '@application/adapters/studentsAdapter.mock';
 import { useStudentsQuery } from '@application/queries/useStudentsQuery';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createRealisticStudentList } from '@testing/factories/studentFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { describe, expect, it } from 'vitest';
+
+function toEditable(s: Student): EditableStudent {
+  return {
+    recordId: s.recordId,
+    name: s.name,
+    emailAddress: s.emailAddress,
+    role: s.role,
+    cohort: s.cohort,
+    relatedProgram: s.course.id,
+  };
+}
 
 describe('useStudentsQuery', () => {
   describe('studentsQuery', () => {
@@ -52,10 +64,13 @@ describe('useStudentsQuery', () => {
         emailAddress: 'david.ruiz@example.com',
         role: null,
         cohort: 'D' as const,
-        program: 'LCSP' as const,
         relatedProgram: 2,
       };
-      const createdStudent = { ...newStudentInput, recordId: 99 };
+      const createdStudent: Student = {
+        ...newStudentInput,
+        recordId: 99,
+        course: { id: 2, name: 'LCSP', published: true },
+      };
 
       overrideMockStudentsAdapter({
         getStudents: () => Promise.resolve(mockList),
@@ -91,7 +106,6 @@ describe('useStudentsQuery', () => {
           emailAddress: '',
           role: null,
           cohort: 'A',
-          program: 'LCSP',
           relatedProgram: 2,
         }),
       ).rejects.toThrow('Failed to create student');
@@ -101,8 +115,11 @@ describe('useStudentsQuery', () => {
   describe('updateStudentMutation', () => {
     it('should call updateStudent on the adapter and invalidate the query cache', async () => {
       const mockList = createRealisticStudentList();
-      const existingStudent = mockList[0];
-      const updatedStudent = { ...existingStudent, name: 'Ana Updated' };
+      const existingStudent = toEditable(mockList[0]);
+      const updatedStudent: Student = {
+        ...mockList[0],
+        name: 'Ana Updated',
+      };
 
       overrideMockStudentsAdapter({
         getStudents: () => Promise.resolve(mockList),
@@ -124,7 +141,7 @@ describe('useStudentsQuery', () => {
 
     it('should expose error state when updateStudent fails', async () => {
       const mockList = createRealisticStudentList();
-      const existingStudent = mockList[0];
+      const existingStudent = toEditable(mockList[0]);
 
       overrideMockStudentsAdapter({
         updateStudent: () =>

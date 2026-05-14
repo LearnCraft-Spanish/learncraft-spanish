@@ -21,22 +21,16 @@ const cohortOptions = cohortLetterSchema.options;
 function studentToStudentDraft(student: Student): StudentDraft {
   return {
     recordId: student.recordId,
-    name: student.name,
-    emailAddress: student.emailAddress,
+    name: student.name ?? '',
+    emailAddress: student.emailAddress ?? '',
     role: student.role,
     cohort: student.cohort,
-    program: student.program,
-    relatedProgram: student.relatedProgram,
+    relatedProgram: student.course.id,
   };
 }
 
 function draftToEditableStudent(draft: StudentDraft): EditableStudent | null {
-  if (
-    !draft.recordId ||
-    !draft.cohort ||
-    !draft.program ||
-    draft.relatedProgram === ''
-  ) {
+  if (!draft.recordId || !draft.cohort || draft.relatedProgram === '') {
     return null;
   }
   return {
@@ -45,13 +39,12 @@ function draftToEditableStudent(draft: StudentDraft): EditableStudent | null {
     emailAddress: draft.emailAddress,
     role: draft.role,
     cohort: draft.cohort,
-    program: draft.program,
     relatedProgram: draft.relatedProgram,
   };
 }
 
 function draftToNewStudent(draft: StudentDraft): NewStudent | null {
-  if (!draft.cohort || !draft.program || draft.relatedProgram === '') {
+  if (!draft.cohort || draft.relatedProgram === '') {
     return null;
   }
   return {
@@ -59,7 +52,6 @@ function draftToNewStudent(draft: StudentDraft): NewStudent | null {
     emailAddress: draft.emailAddress,
     role: draft.role,
     cohort: draft.cohort,
-    program: draft.program,
     relatedProgram: draft.relatedProgram,
   };
 }
@@ -83,12 +75,8 @@ export default function StudentRecordView({
     const requiredInputs = [
       { value: editObject.name, label: 'Name' },
       { value: editObject.emailAddress, label: 'Email' },
-      { value: editObject.program, label: 'Program' },
+      { value: editObject.relatedProgram.toString(), label: 'Course' },
       { value: editObject.cohort, label: 'Cohort' },
-      {
-        value: editObject.relatedProgram.toString(),
-        label: 'Related Program',
-      },
     ];
     const error = verifyRequiredInputs(requiredInputs);
     if (error) {
@@ -111,7 +99,7 @@ export default function StudentRecordView({
     }
   };
 
-  const programOptions = useMemo(() => {
+  const courseOptions = useMemo(() => {
     return programTableQuery.data?.map((program) => ({
       value: program.id.toString(),
       text: program.name,
@@ -139,22 +127,9 @@ export default function StudentRecordView({
         editMode={editMode}
         required
       />
-      <Dropdown
-        label="Program"
-        options={['LCSP', 'SI1M']}
-        value={editObject.program}
-        onChange={(value) =>
-          setEditObject({
-            ...editObject,
-            program: value as 'LCSP' | 'SI1M' | '',
-          })
-        }
-        editMode={editMode}
-        required
-      />
       <GenericDropdown
-        label="Related Program"
-        options={programOptions || []}
+        label="Course"
+        options={courseOptions || []}
         selectedValue={editObject.relatedProgram.toString()}
         onChange={(value: string) =>
           setEditObject({
@@ -167,7 +142,7 @@ export default function StudentRecordView({
       />
       <Dropdown
         label="Cohort"
-        options={cohortOptions}
+        options={[...cohortOptions]}
         value={editObject.cohort}
         onChange={(value) =>
           setEditObject({
@@ -228,7 +203,6 @@ export function CreateStudent() {
         cohort: '',
         role: null,
         relatedProgram: '',
-        program: '',
       }}
       onUpdate={handleCreate}
       createMode
