@@ -1,19 +1,11 @@
-import type { CourseDetailed } from '@learncraft-spanish/shared';
 import type { Student } from '../types';
 import React from 'react';
 import StudentTableRow from '../components/StudentTableRow';
 
-export default function renderStudentRow(
-  student: Student,
-  program: CourseDetailed[],
-) {
-  // Foreign Key lookup, form data in backend
-  const programName = program.find(
-    (p) => p.id === student.relatedProgram,
-  )?.name;
+export default function renderStudentRow(student: Student) {
   return React.createElement(StudentTableRow, {
     key: student.recordId,
     student,
-    program: programName ?? '',
+    courseName: student.course.name,
   });
 }

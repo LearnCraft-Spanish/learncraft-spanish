@@ -4,8 +4,9 @@ import HexagonProviders from '@application/coordinators/providers/MainProvider';
 import { Auth0Provider } from '@auth0/auth0-react';
 import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
 import { ModalProvider } from '@composition/providers/ModalProvider';
-import React from 'react';
+import { config } from '@config';
 
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface ProvidersProps {
@@ -13,9 +14,9 @@ interface ProvidersProps {
 }
 
 function Providers({ children }: ProvidersProps) {
-  const domain = import.meta.env.VITE_AUTH0_DOMAIN;
-  const clientId = import.meta.env.VITE_AUTH0_CLIENTID;
-  const audience = import.meta.env.VITE_API_AUDIENCE;
+  const domain = config.auth0Domain;
+  const clientId = config.auth0ClientId;
+  const audience = config.apiAudience;
 
   const navigate = useNavigate();
 

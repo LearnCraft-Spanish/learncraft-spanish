@@ -1,4 +1,4 @@
-import type { Coach, Student } from 'src/types/CoachingTypes';
+import type { Coach, CoachingStudent } from 'src/types/CoachingTypes';
 import CoachStudentDrillDown from '@interface/components/CoachStudentDrillDown/CoachStudentDrillDown';
 import { Dropdown, TextInput } from '@interface/components/FormComponents';
 import React, { useEffect, useState } from 'react';
@@ -68,9 +68,9 @@ const timezones = [
   'MST - Arizona',
 ];
 
-// Create an interface that extends Student to include the primaryCoachEmail field for the form
-interface StudentFormData extends Omit<Student, 'primaryCoach'> {
-  primaryCoach: Student['primaryCoach'];
+// Create an interface that extends CoachingStudent to include the primaryCoachEmail field for the form
+interface StudentFormData extends Omit<CoachingStudent, 'primaryCoach'> {
+  primaryCoach: CoachingStudent['primaryCoach'];
   primaryCoachEmail?: string;
 }
 
@@ -79,7 +79,7 @@ export default function StudentInfoCard({
   currentCoach,
   isAdmin,
 }: {
-  student: Student;
+  student: CoachingStudent;
   currentCoach: Coach | undefined;
   isAdmin: boolean;
 }) {
@@ -177,7 +177,7 @@ export function StudentInfoContextual({
   currentCoach,
   isAdmin,
 }: {
-  student: Student;
+  student: CoachingStudent;
   currentCoach: Coach | undefined;
   isAdmin: boolean;
 }) {

@@ -22,10 +22,10 @@ export default function filterFunction(
     switch (filterConfig.field) {
       case 'name':
         return student.name
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(filterConfig.value.toLowerCase());
       case 'program':
-        return student.relatedProgram === Number.parseInt(filterConfig.value);
+        return student.course.id === Number.parseInt(filterConfig.value);
       case 'cohort':
         return student.cohort === filterConfig.value;
       // For multi-filter mode, use a special field to filter by all criteria
@@ -33,7 +33,7 @@ export default function filterFunction(
         // Check name filter
         if (filters.name && filters.name.trim() !== '') {
           if (
-            !student.name.toLowerCase().includes(filters.name.toLowerCase())
+            !student.name?.toLowerCase().includes(filters.name.toLowerCase())
           ) {
             return false;
           }
@@ -41,7 +41,7 @@ export default function filterFunction(
 
         // Check program filter
         if (filters.program && filters.program !== '') {
-          if (student.relatedProgram !== Number.parseInt(filters.program)) {
+          if (student.course.id !== Number.parseInt(filters.program)) {
             return false;
           }
         }

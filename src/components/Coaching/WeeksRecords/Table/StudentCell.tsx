@@ -1,4 +1,4 @@
-import type { Student, Week } from 'src/types/CoachingTypes';
+import type { CoachingStudent, Week } from 'src/types/CoachingTypes';
 import eye from 'src/assets/icons/eye.svg';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 // import pencil from 'src/resources/icons/pencil.svg';
@@ -9,7 +9,7 @@ export default function StudentCell({
   hiddenFields,
 }: {
   week: Week;
-  student: Student | null | undefined;
+  student: CoachingStudent | null | undefined;
   hiddenFields: string[];
 }) {
   const { openContextual } = useContextualMenu();

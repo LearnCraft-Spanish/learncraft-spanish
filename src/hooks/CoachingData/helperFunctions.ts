@@ -1,19 +1,19 @@
 import type {
   Assignment,
   Coach,
+  CoachingStudent,
   Course,
   GroupAttendees,
   GroupSession,
   Membership,
   PrivateCall,
-  Student,
   Week,
 } from '../../types/CoachingTypes';
 
 export function getCoachFromMembershipId(
   membershipId: number,
   memberships: Membership[],
-  students: Student[],
+  students: CoachingStudent[],
   coaches: Coach[],
 ): Coach | undefined {
   // Foreign Key lookup, form data in backend
@@ -57,8 +57,8 @@ export function getCourseFromMembershipId(
 export function getStudentFromMembershipId(
   membershipId: number | undefined,
   memberships: Membership[],
-  students: Student[],
-): Student | undefined {
+  students: CoachingStudent[],
+): CoachingStudent | undefined {
   if (!membershipId) return undefined;
 
   // Foreign Key lookup, form data in backend
@@ -157,10 +157,10 @@ export function getAttendeesFromGroupSessionId(
 
 export function getStudentFromWeekRecordId(
   weekRecordId: number,
-  students: Student[] | undefined,
+  students: CoachingStudent[] | undefined,
   weeks: Week[] | undefined,
   memberships: Membership[] | undefined,
-): Student | undefined {
+): CoachingStudent | undefined {
   if (!students || !weeks || !memberships) return undefined;
 
   // Foreign Key lookup, form data in backend

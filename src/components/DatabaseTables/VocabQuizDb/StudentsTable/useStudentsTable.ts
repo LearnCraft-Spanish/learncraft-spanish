@@ -1,9 +1,12 @@
+import { useAllCoursesQuery } from '@application/queries/useAllCoursesQuery';
+import { useStudentsQuery } from '@application/queries/useStudentsQuery';
 import { useMemo } from 'react';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import useStudentsTableQueries from 'src/hooks/VocabQuizDbData/useStudentsTable';
 
 export default function useStudentsTable() {
-  const { studentsTableQuery, programTableQuery } = useStudentsTableQueries();
+  const { studentsQuery, createStudentMutation, updateStudentMutation } =
+    useStudentsQuery();
+  const programTableQuery = useAllCoursesQuery();
   const { contextual } = useContextualMenu();
 
   const studentToEdit = useMemo(() => {
@@ -12,19 +15,19 @@ export default function useStudentsTable() {
     }
 
     const recordId = Number(contextual.split('edit-student-')[1]);
-    return studentsTableQuery.data?.find(
-      (student) => student.recordId === recordId,
-    );
-  }, [studentsTableQuery.data, contextual]);
+    return studentsQuery.data?.find((student) => student.recordId === recordId);
+  }, [studentsQuery.data, contextual]);
 
   return {
     studentToEdit,
     programTableQuery,
-    studentsTableQuery,
+    studentsTableQuery: studentsQuery,
+    createStudentMutation,
+    updateStudentMutation,
     states: {
-      isLoading: studentsTableQuery.isLoading,
-      isError: studentsTableQuery.isError,
-      isSuccess: studentsTableQuery.isSuccess,
+      isLoading: studentsQuery.isLoading,
+      isError: studentsQuery.isError,
+      isSuccess: studentsQuery.isSuccess,
     },
     createStudent: contextual === 'create-student',
   };

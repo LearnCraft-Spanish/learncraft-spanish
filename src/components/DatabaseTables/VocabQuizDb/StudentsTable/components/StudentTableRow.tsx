@@ -5,10 +5,10 @@ import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu
 
 export default function StudentTableRow({
   student,
-  program,
+  courseName,
 }: {
   student: Student;
-  program: string;
+  courseName: string;
 }): ReactNode {
   const { openContextual } = useContextualMenu();
   const { name, emailAddress, cohort, role, recordId } = student;
@@ -25,7 +25,7 @@ export default function StudentTableRow({
       </td>
       <td>{name}</td>
       <td>{emailAddress}</td>
-      <td>{program}</td>
+      <td>{courseName}</td>
       <td>{cohort}</td>
       <td>{role}</td>
     </tr>

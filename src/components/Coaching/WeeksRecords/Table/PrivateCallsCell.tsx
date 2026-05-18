@@ -1,4 +1,8 @@
-import type { PrivateCall, Student, Week } from 'src/types/CoachingTypes';
+import type {
+  CoachingStudent,
+  PrivateCall,
+  Week,
+} from 'src/types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { Dropdown } from '@interface/components/FormComponents';
 import { getWeekEnds } from 'mocks/data/serverlike/studentRecords/scripts/functions';
@@ -298,7 +302,7 @@ export default function PrivateCallsCell({
   week: Week;
   calls: PrivateCall[] | null;
   tableEditMode: boolean;
-  student?: Student | undefined | null;
+  student?: CoachingStudent | undefined | null;
 }) {
   const { contextual, openContextual } = useContextualMenu();
   return (

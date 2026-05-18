@@ -1,9 +1,9 @@
 import type { AuthPort } from '@application/ports/authPort';
 import { useAuth0 } from '@auth0/auth0-react';
+import { config } from '@config';
 import { useMemo } from 'react';
-
 export function useAuthInfrastructure(): AuthPort {
-  const audience = import.meta.env.VITE_API_AUDIENCE;
+  const audience = config.apiAudience;
   const {
     isAuthenticated,
     isLoading,
@@ -52,7 +52,8 @@ export function useAuthInfrastructure(): AuthPort {
             audience,
             scope: scopes ? scopes.join(' ') : allScopes.join(' '),
           },
-          cacheMode: 'off',
+          // cacheMode: 'off' is causing issues with the token not being refreshed in local development
+          // cacheMode: 'off',
         });
 
         return accessToken as string | undefined;

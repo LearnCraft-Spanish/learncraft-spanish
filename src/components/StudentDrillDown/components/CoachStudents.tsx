@@ -1,4 +1,4 @@
-import type { Coach, Student } from 'src/types/CoachingTypes';
+import type { Coach, CoachingStudent } from 'src/types/CoachingTypes';
 import React, { useMemo } from 'react';
 import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 export default function CoachStudents({
@@ -18,7 +18,8 @@ export default function CoachStudents({
     }
 
     return allStudentsQuery.data.filter(
-      (student: Student) => student.primaryCoach?.id === currentCoach.user.id,
+      (student: CoachingStudent) =>
+        student.primaryCoach?.id === currentCoach.user.id,
     );
   }, [allStudentsQuery.data, allStudentsQuery.isSuccess, currentCoach]);
 
@@ -33,7 +34,7 @@ export default function CoachStudents({
         <p>You don't have any active students assigned to you.</p>
       ) : (
         <div className="coach-students-list">
-          {coachStudents.map((student: Student) => (
+          {coachStudents.map((student: CoachingStudent) => (
             <div
               key={student.recordId}
               className="coach-student-card"

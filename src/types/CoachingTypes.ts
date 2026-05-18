@@ -45,7 +45,7 @@ export type Week = Expanded<{
   weekName: string;
 }>;
 
-export interface Student {
+export interface CoachingStudent {
   recordId: number;
   firstName: string;
   lastName: string;
@@ -156,12 +156,12 @@ export type Assignment = Expanded<{
 }>;
 
 /* --------- Student Drill Down Types --------- */
-export type UpdateStudent = Omit<Partial<Student>, 'primaryCoach'> & {
+export type UpdateStudent = Omit<Partial<CoachingStudent>, 'primaryCoach'> & {
   recordId: number;
   primaryCoach?: string; // Email string for updates
 };
 
-export type StudentResponse = Omit<Student, 'primaryCoach'> & {
+export type StudentResponse = Omit<CoachingStudent, 'primaryCoach'> & {
   primaryCoach: QbUser; // Full QbUser object in responses
 };
 
