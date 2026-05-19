@@ -1,5 +1,6 @@
-import * as Sentry from '@sentry/react';
 // SentryRoutes.js
+import { config } from '@config';
+import * as Sentry from '@sentry/react';
 import React from 'react';
 import {
   createRoutesFromChildren,
@@ -13,7 +14,7 @@ const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
 Sentry.init({
   dsn: 'https://e42f3e1acdc86e3e3119dbd586514255@o4507097747423232.ingest.us.sentry.io/4507097897500672',
-  environment: import.meta.env.MODE,
+  environment: config.environment,
   integrations: [
     Sentry.replayIntegration(),
     Sentry.reactRouterV6BrowserTracingIntegration({

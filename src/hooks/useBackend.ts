@@ -2,10 +2,11 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
 import type * as StudentRecordsTypes from 'src/types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { config } from '@config';
 import { useCallback } from 'react';
 
 export function useBackendHelpers() {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = config.backendDomain;
   const { getAccessToken } = useAuthAdapter();
 
   const getFactory = useCallback(
@@ -241,7 +242,7 @@ export function useBackend() {
       queryKey,
     }: QueryFunctionContext<
       [string, { startDate: string | undefined; endDate: string | undefined }]
-    >): Promise<StudentRecordsTypes.Student[]> => {
+    >): Promise<StudentRecordsTypes.CoachingStudent[]> => {
       const [, { startDate, endDate }] = queryKey;
 
       if (!startDate || !endDate) {
