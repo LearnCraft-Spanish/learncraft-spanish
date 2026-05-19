@@ -6,7 +6,7 @@ import { generatedMockData } from '../data/serverlike/studentRecords/studentReco
 import { appUserTable, getAppUserFromName } from '../data/serverlike/userTable';
 
 // import mockDataHardCoded from '../data/serverlike/studentRecords/studentRecordsMockData';
-const backendUrl = config.backendDomain;
+const backendUrl = `${config.backendDomain}api/`;
 
 export const handlers = [
   // kinda used, but wrong path
