@@ -57,9 +57,10 @@ describe('useAllCoursesQuery', () => {
     expect(result.current.data).toBeUndefined();
   });
   // should not fetch courses if the user is not a coach
-  it('should not fetch courses if the user is not a coach', async () => {
+  it('should not fetch courses if the user is not a coach or admin', async () => {
     overrideMockAuthAdapter({
       isCoach: false,
+      isAdmin: false,
     });
 
     const { result } = renderHook(() => useAllCoursesQuery(), {

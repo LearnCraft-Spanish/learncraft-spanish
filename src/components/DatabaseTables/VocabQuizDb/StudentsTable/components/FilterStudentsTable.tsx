@@ -12,7 +12,7 @@ import useStudentsTable from '../useStudentsTable';
 const cohortOptions = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
 // Define filter field type for type safety
-type FilterField = 'name' | 'program' | 'cohort';
+type FilterField = 'nameOrEmail' | 'program' | 'cohort';
 
 export default function FilterStudentsTable({
   filterConfig,
@@ -26,7 +26,7 @@ export default function FilterStudentsTable({
 
   // Create a state to track all filter values simultaneously
   const [filterValues, setFilterValues] = useState({
-    name: '',
+    nameOrEmail: '',
     program: '',
     cohort: '',
   });
@@ -40,7 +40,7 @@ export default function FilterStudentsTable({
       // For legacy single filter
       (filterConfig.field &&
         filterConfig.value &&
-        (filterConfig.field === 'name' ||
+        (filterConfig.field === 'nameOrEmail' ||
           filterConfig.field === 'program' ||
           filterConfig.field === 'cohort'));
 
@@ -52,7 +52,7 @@ export default function FilterStudentsTable({
         setFilterValues((prevValues) => {
           // Only update if values are different to prevent potential re-render cycles
           if (
-            prevValues.name === (parsedFilters.name || '') &&
+            prevValues.nameOrEmail === (parsedFilters.nameOrEmail || '') &&
             prevValues.program === (parsedFilters.program || '') &&
             prevValues.cohort === (parsedFilters.cohort || '')
           ) {
@@ -60,7 +60,7 @@ export default function FilterStudentsTable({
           }
 
           return {
-            name: parsedFilters.name || '',
+            nameOrEmail: parsedFilters.nameOrEmail || '',
             program: parsedFilters.program || '',
             cohort: parsedFilters.cohort || '',
           };
@@ -68,7 +68,7 @@ export default function FilterStudentsTable({
       } catch {
         // If parsing fails, just use empty values
         setFilterValues({
-          name: '',
+          nameOrEmail: '',
           program: '',
           cohort: '',
         });
@@ -80,7 +80,11 @@ export default function FilterStudentsTable({
 
         // Only set the value if the field is a valid filter field
         const field = filterConfig.field as FilterField;
-        if (field === 'name' || field === 'program' || field === 'cohort') {
+        if (
+          field === 'nameOrEmail' ||
+          field === 'program' ||
+          field === 'cohort'
+        ) {
           newFilterValues[field] = filterConfig.value;
         }
 
@@ -121,10 +125,10 @@ export default function FilterStudentsTable({
     });
   };
 
-  const handleNameFilterChange = (value: string) => {
+  const handleNameOrEmailFilterChange = (value: string) => {
     updateFilterConfig({
       ...filterValues,
-      name: value,
+      nameOrEmail: value,
     });
   };
 
@@ -149,9 +153,9 @@ export default function FilterStudentsTable({
       <div className="filter-container">
         <div className="filter-fields">
           <TextInput
-            label="Filter by Name"
-            value={filterValues.name}
-            onChange={handleNameFilterChange}
+            label="Filter by Name/Email"
+            value={filterValues.nameOrEmail}
+            onChange={handleNameOrEmailFilterChange}
             editMode
           />
           <GenericDropdown
