@@ -13,6 +13,7 @@ import {
 import {
   mockUseQuizExamples,
   overrideMockUseQuizExamples,
+  resetMockUseQuizExamples,
 } from '@application/queries/useQuizExamples.mock';
 import {
   mockUseStudentFlashcards,
@@ -134,6 +135,7 @@ describe('useExampleAssigner', () => {
     resetMockActiveStudent();
     resetMockUseAllQuizGroups();
     resetMockUseStudentFlashcards();
+    resetMockUseQuizExamples();
 
     // Reset all mocks to default values
     mockUseSelectedExamples.mockReturnValue({
@@ -350,7 +352,7 @@ describe('useExampleAssigner', () => {
       });
 
       expect(createFlashcardsMock).toHaveBeenCalledWith(
-        result.current.selectedExamples,
+        result.current.unassignedExamplesProps.examples,
       );
     });
 
@@ -410,8 +412,97 @@ describe('useExampleAssigner', () => {
         quizId: 1,
         quizNumber: 1,
         courseCode: 'SP101',
-        exampleIds: result.current.selectedExamples.map((ex) => ex.id),
+        exampleIds: result.current.unassignedExamplesProps.examples.map(
+          (ex) => ex.id,
+        ),
       });
+    });
+
+    it('should only send unassigned examples to quiz when some are already assigned', async () => {
+      // Assign explicit sequential IDs so the filter is deterministic regardless
+      // of the time-based factory seed (same-millisecond calls produce identical IDs).
+      const allSelectedExamples = createMockExampleWithVocabularyList(4).map(
+        (ex, i) => ({ ...ex, id: i + 1 }),
+      );
+      const alreadyAssignedExamples = allSelectedExamples.slice(0, 2);
+      const unassignedExamples = allSelectedExamples.slice(2);
+
+      const addExamplesToQuizMock = vi.fn(async () => Promise.resolve(1));
+      const quizzes = [
+        {
+          id: 1,
+          relatedQuizGroupId: 1,
+          quizNumber: 1,
+          quizTitle: 'Quiz 1',
+          published: true,
+        },
+      ];
+      const mockQuizGroups = [
+        createMockQuizGroup({
+          id: 1,
+          name: 'SP101',
+          urlSlug: 'SP101',
+          courseId: 1,
+          quizzes,
+        }),
+      ];
+
+      mockUseSelectedExamples.mockReturnValue({
+        selectedExamples: allSelectedExamples,
+        isFetchingExamples: 0,
+      });
+
+      overrideMockUseAllQuizGroups({
+        quizGroups: mockQuizGroups,
+        isLoading: false,
+        error: null,
+      });
+
+      overrideMockUseQuizExamples({
+        data: alreadyAssignedExamples,
+        isLoading: false,
+        isFetching: false,
+        error: null,
+      });
+
+      mockUseQuizExampleMutations.mockReturnValue({
+        addExamplesToQuiz: addExamplesToQuizMock,
+        isAddingExamples: false,
+        addingExamplesError: null,
+      });
+
+      const { result } = renderHook(() => useExampleAssigner(), {
+        wrapper: MockAllProviders,
+      });
+
+      act(() => {
+        result.current.assignmentTypeSelectorProps.onTypeChange('quiz');
+        result.current.quizSelectionProps.onQuizGroupIdChange(1);
+        result.current.quizSelectionProps.onQuizRecordIdChange(1);
+      });
+
+      await waitFor(() => {
+        expect(result.current.quizSelectionProps.selectedQuizRecordId).toBe(1);
+      });
+
+      await act(async () => {
+        await result.current.assignExamples();
+      });
+
+      expect(addExamplesToQuizMock).toHaveBeenCalledWith({
+        quizId: 1,
+        quizNumber: 1,
+        courseCode: 'SP101',
+        exampleIds: unassignedExamples.map((ex) => ex.id),
+      });
+
+      expect(addExamplesToQuizMock).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          exampleIds: expect.arrayContaining(
+            alreadyAssignedExamples.map((ex) => ex.id),
+          ),
+        }),
+      );
     });
   });
 

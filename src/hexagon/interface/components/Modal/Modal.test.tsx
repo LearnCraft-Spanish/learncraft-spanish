@@ -54,6 +54,36 @@ describe('component Modal', () => {
       });
       expect(mockProps.confirmFunction).toHaveBeenCalled();
     });
+
+    it('should disable confirm button after first click to prevent double submission', () => {
+      render(<Modal {...mockProps} type="confirm" />);
+      act(() => {
+        fireEvent.click(screen.getByText('Confirm'));
+      });
+      expect(screen.getByText('Confirm')).toBeDisabled();
+    });
+
+    it('should only call confirmFunction once even when confirm button is clicked multiple times', () => {
+      const confirmFn = vi.fn();
+      render(
+        <Modal {...mockProps} type="confirm" confirmFunction={confirmFn} />,
+      );
+      act(() => {
+        fireEvent.click(screen.getByText('Confirm'));
+        fireEvent.click(screen.getByText('Confirm'));
+        fireEvent.click(screen.getByText('Confirm'));
+      });
+      expect(confirmFn).toHaveBeenCalledTimes(1);
+    });
+
+    it('should disable accept button after first click on notice modal', () => {
+      render(<Modal {...mockProps} type="notice" />);
+      act(() => {
+        fireEvent.click(screen.getByText('Accept'));
+      });
+      expect(screen.getByText('Accept')).toBeDisabled();
+    });
+
     it('should call cancelFunction when Go Back button is clicked', () => {
       render(<Modal {...mockProps} type="confirm" />);
       act(() => {
