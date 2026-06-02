@@ -208,15 +208,15 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
 
   // Assignment function
   const assignExamples = useCallback(async () => {
-    if (selectedExamples.length === 0) {
-      throw new Error('No examples selected');
+    if (unassignedExamples.length === 0) {
+      throw new Error('No unassigned examples to add');
     }
 
     if (assignmentType === 'students') {
       if (!appUser?.recordId) {
         throw new Error('No active student selected');
       }
-      const createFlashcardsPromise = createFlashcards(selectedExamples);
+      const createFlashcardsPromise = createFlashcards(unassignedExamples);
       toast.promise(createFlashcardsPromise, {
         pending: 'Assigning flashcards...',
         success: 'Flashcards assigned',
@@ -227,7 +227,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       if (!selectedQuizRecord) {
         throw new Error('No quiz selected');
       }
-      const exampleIds = selectedExamples.map((ex) => ex.id);
+      const exampleIds = unassignedExamples.map((ex) => ex.id);
       const addExamplesToQuizPromise = addExamplesToQuiz({
         quizId: selectedQuizRecord.id,
         courseCode: selectedQuizGroup?.urlSlug || '',
@@ -242,7 +242,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       await addExamplesToQuizPromise;
     }
   }, [
-    selectedExamples,
+    unassignedExamples,
     assignmentType,
     appUser?.recordId,
     selectedQuizGroup,
