@@ -22,7 +22,12 @@ export default function Modal(props: ModalProps) {
     if (confirmFunction && !hasConfirmedRef.current) {
       hasConfirmedRef.current = true;
       setIsConfirming(true);
-      confirmFunction();
+      try {
+        confirmFunction();
+      } catch {
+        hasConfirmedRef.current = false;
+        setIsConfirming(false);
+      }
     }
   }
 
