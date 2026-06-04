@@ -62,10 +62,10 @@ export function createFlashcardInfrastructure(
   };
 
   const deleteMyStudentFlashcards = async ({
-    flashcardIds,
+    exampleIds,
     finallyFunction,
   }: {
-    flashcardIds: number[];
+    exampleIds: number[];
     finallyFunction?: () => void;
   }): Promise<number> => {
     const response = await httpClient
@@ -74,7 +74,7 @@ export function createFlashcardInfrastructure(
         deleteMyFlashcardsEndpoint.requiredScopes,
         {
           params: {
-            flashcardIds: flashcardIds.join(','),
+            exampleIds: exampleIds.join(','),
           },
         },
       )
@@ -127,18 +127,19 @@ export function createFlashcardInfrastructure(
   };
 
   const deleteStudentFlashcards = async ({
-    flashcardIds,
+    pairs,
   }: {
-    flashcardIds: number[];
+    pairs: { studentId: number; exampleId: number }[];
   }): Promise<number> => {
-    const flashcardIdsString = flashcardIds.join(',');
-
     const response = await httpClient.delete<number>(
       deleteFlashcardsEndpoint.path,
       deleteFlashcardsEndpoint.requiredScopes,
       {
-        params: {
-          flashcardIds: flashcardIdsString,
+        data: {
+          deletions: pairs.map((p) => ({
+            studentId: String(p.studentId),
+            exampleId: String(p.exampleId),
+          })),
         },
       },
     );
