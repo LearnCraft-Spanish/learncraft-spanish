@@ -334,28 +334,19 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
   );
 
   const deleteMyStudentFlashcardsMutation = useMutation({
-    mutationFn: (flashcardIds: number[]) => {
-      const promise = deleteMyStudentFlashcards({ flashcardIds });
+    mutationFn: (exampleIds: number[]) => {
+      const promise = deleteMyStudentFlashcards({ exampleIds });
       return promise;
     },
-    onMutate: (flashcardIds: number[]) => {
+    onMutate: (exampleIds: number[]) => {
       queryClient.cancelQueries({
         queryKey: ['flashcards', userId],
       });
       if (!flashcards) {
         throw new Error('Flashcards not found');
       }
-      const exampleIds = flashcardIds.map((flashcardId) => {
-        const flashcard = flashcards.find(
-          (flashcard) => flashcard.id === flashcardId,
-        );
-        if (!flashcard) {
-          throw new Error('Flashcard not found');
-        }
-        return flashcard.example.id;
-      });
       const deletedFlashcards = flashcards.filter((flashcard) =>
-        flashcardIds.includes(flashcard.id),
+        exampleIds.includes(flashcard.example.id),
       );
       queryClient.setQueryData(
         ['flashcards', 'pendingDeletes', userId],
@@ -368,7 +359,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
         ['flashcards', userId],
         (oldData: Flashcard[]) => {
           return (oldData ?? []).filter(
-            (flashcard) => !flashcardIds.includes(flashcard.id),
+            (flashcard) => !exampleIds.includes(flashcard.example.id),
           );
         },
       );
@@ -402,7 +393,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
     onSuccess: (result, variables, context) => {
       if (!context) return;
       const { exampleIds } = context;
-      // check result (number of deletes) is same as flashcardIds.length
+      // check result (number of deletes) is same as exampleIds.length
       if (result !== variables.length) {
         // Toast the failure
         toast.error(
@@ -425,33 +416,18 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
   });
 
   const deleteStudentFlashcardsMutation = useMutation({
-    mutationFn: (flashcardIds: number[]) => {
-      queryClient.setQueryData(
-        ['flashcards', 'pendingDeletes', userId],
-        (oldData: number[]) => {
-          if (!oldData) return flashcardIds;
-          return [...oldData, ...flashcardIds];
-        },
-      );
-      const promise = deleteStudentFlashcards({ flashcardIds });
+    mutationFn: (pairs: { studentId: number; exampleId: number }[]) => {
+      const promise = deleteStudentFlashcards({ pairs });
       return promise;
     },
-    onMutate: (flashcardIds: number[]) => {
+    onMutate: (pairs: { studentId: number; exampleId: number }[]) => {
       queryClient.cancelQueries({
         queryKey: ['flashcards', userId],
       });
       if (!flashcards) {
         throw new Error('Flashcards not found');
       }
-      const exampleIds = flashcardIds.map((flashcardId) => {
-        const flashcard = flashcards.find(
-          (flashcard) => flashcard.id === flashcardId,
-        );
-        if (!flashcard) {
-          throw new Error('Flashcard not found');
-        }
-        return flashcard.example.id;
-      });
+      const exampleIds = pairs.map((p) => p.exampleId);
       const deletedFlashcards = flashcards.filter((flashcard) =>
         exampleIds.includes(flashcard.example.id),
       );
@@ -466,7 +442,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
         ['flashcards', userId],
         (oldData: Flashcard[]) => {
           return (oldData ?? []).filter(
-            (flashcard) => !flashcardIds.includes(flashcard.id),
+            (flashcard) => !exampleIds.includes(flashcard.example.id),
           );
         },
       );
@@ -499,7 +475,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
     onSuccess: (result, variables, context) => {
       if (!context) return;
       const { exampleIds } = context;
-      // check result (number of deletes) is same as flashcardIds.length
+      // check result (number of deletes) is same as pairs.length
       if (result !== variables.length) {
         // Toast the failure
         toast.error(
@@ -523,23 +499,18 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
 
   const deleteFlashcards = useCallback(
     async (exampleIds: number[]) => {
-      // find flashcardIds from exampleIds
-      const flashcardIds = flashcards
-        ?.filter((flashcard) => exampleIds.includes(flashcard.example.id))
-        .map((flashcard) => flashcard.id);
-      if (!flashcardIds) {
-        throw new Error('Student example IDs not found');
-      }
       if (isOwnUser && appUser?.studentRole === 'student') {
-        return await deleteMyStudentFlashcardsMutation.mutateAsync(
-          flashcardIds,
-        );
+        return await deleteMyStudentFlashcardsMutation.mutateAsync(exampleIds);
       } else if (
         (isAdmin || isCoach) &&
         appUser?.studentRole === 'student' &&
         userId
       ) {
-        return await deleteStudentFlashcardsMutation.mutateAsync(flashcardIds);
+        const pairs = exampleIds.map((exampleId) => ({
+          studentId: userId,
+          exampleId,
+        }));
+        return await deleteStudentFlashcardsMutation.mutateAsync(pairs);
       } else {
         console.error('No access to delete flashcards');
         return Promise.reject(new Error('No access to delete flashcards'));
@@ -553,7 +524,6 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       userId,
       isAdmin,
       isCoach,
-      flashcards,
     ],
   );
 

@@ -32,10 +32,13 @@ const defaultMockAdapter: FlashcardPort = {
     Promise.resolve(
       examples.map((example) => createMockFlashcard({ id: example.id })),
     ),
-  deleteMyStudentFlashcards: ({ flashcardIds }: { flashcardIds: number[] }) =>
-    Promise.resolve(flashcardIds.length),
-  deleteStudentFlashcards: ({ flashcardIds }: { flashcardIds: number[] }) =>
-    Promise.resolve(flashcardIds.length),
+  deleteMyStudentFlashcards: ({ exampleIds }: { exampleIds: number[] }) =>
+    Promise.resolve(exampleIds.length),
+  deleteStudentFlashcards: ({
+    pairs,
+  }: {
+    pairs: { studentId: number; exampleId: number }[];
+  }) => Promise.resolve(pairs.length),
   updateMyStudentFlashcards: ({
     updates,
   }: {
