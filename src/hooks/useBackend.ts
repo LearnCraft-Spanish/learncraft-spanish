@@ -6,7 +6,7 @@ import { config } from '@config';
 import { useCallback } from 'react';
 
 export function useBackendHelpers() {
-  const backendUrl = config.backendDomain;
+  const backendUrl = `${config.backendDomain}api/`;
   const { getAccessToken } = useAuthAdapter();
 
   const getFactory = useCallback(

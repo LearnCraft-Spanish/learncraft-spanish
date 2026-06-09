@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import './modal.scss';
 
 export interface ModalProps {
@@ -12,9 +13,21 @@ export default function Modal(props: ModalProps) {
   const { title, body, type, confirmFunction, cancelFunction, closeModal } =
     props;
 
+  // Ref prevents double-fire within the same synchronous event cycle (before re-render).
+  // State drives the disabled attribute for the render after the first click.
+  const hasConfirmedRef = useRef(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+
   function handleConfirm() {
-    if (confirmFunction) {
-      confirmFunction();
+    if (confirmFunction && !hasConfirmedRef.current) {
+      hasConfirmedRef.current = true;
+      setIsConfirming(true);
+      try {
+        confirmFunction();
+      } catch {
+        hasConfirmedRef.current = false;
+        setIsConfirming(false);
+      }
     }
   }
 
@@ -43,14 +56,24 @@ export default function Modal(props: ModalProps) {
             >
               Go Back
             </button>
-            <button type="button" className="addButton" onClick={handleConfirm}>
+            <button
+              type="button"
+              className="addButton"
+              onClick={handleConfirm}
+              disabled={isConfirming}
+            >
               Confirm
             </button>
           </>
         );
       case 'notice':
         return (
-          <button type="button" className="addButton" onClick={handleConfirm}>
+          <button
+            type="button"
+            className="addButton"
+            onClick={handleConfirm}
+            disabled={isConfirming}
+          >
             Accept
           </button>
         );

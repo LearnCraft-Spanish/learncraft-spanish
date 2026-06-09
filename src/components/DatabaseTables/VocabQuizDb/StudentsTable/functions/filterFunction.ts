@@ -20,10 +20,15 @@ export default function filterFunction(
 
     // Apply filter based on the current filter configuration
     switch (filterConfig.field) {
-      case 'name':
-        return student.name
-          ?.toLowerCase()
-          .includes(filterConfig.value.toLowerCase());
+      case 'nameOrEmail':
+        return (
+          student.name
+            ?.toLowerCase()
+            .includes(filterConfig.value.toLowerCase()) ||
+          student.emailAddress
+            ?.toLowerCase()
+            .includes(filterConfig.value.toLowerCase())
+        );
       case 'program':
         return student.course.id === Number.parseInt(filterConfig.value);
       case 'cohort':
@@ -31,9 +36,14 @@ export default function filterFunction(
       // For multi-filter mode, use a special field to filter by all criteria
       case 'multi-filter':
         // Check name filter
-        if (filters.name && filters.name.trim() !== '') {
+        if (filters.nameOrEmail && filters.nameOrEmail.trim() !== '') {
           if (
-            !student.name?.toLowerCase().includes(filters.name.toLowerCase())
+            !student.name
+              ?.toLowerCase()
+              .includes(filters.nameOrEmail.toLowerCase()) &&
+            !student.emailAddress
+              ?.toLowerCase()
+              .includes(filters.nameOrEmail.toLowerCase())
           ) {
             return false;
           }

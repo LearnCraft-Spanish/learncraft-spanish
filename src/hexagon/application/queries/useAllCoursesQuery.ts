@@ -15,12 +15,12 @@ export interface UseAllCoursesQueryReturn {
 
 export function useAllCoursesQuery(): UseAllCoursesQueryReturn {
   const adapter = useCourseAdapter();
-  const { isAuthenticated, isCoach } = useAuthAdapter();
+  const { isAuthenticated, isCoach, isAdmin } = useAuthAdapter();
 
   return useQuery({
     queryKey: ['courses'],
     queryFn: () => adapter.getAllCourses(),
     staleTime: Infinity,
-    enabled: isAuthenticated && isCoach,
+    enabled: isAuthenticated && (isCoach || isAdmin),
   });
 }
