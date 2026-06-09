@@ -19,15 +19,12 @@ export interface FlashcardPort {
     studentId: number;
     examples: ExampleWithVocabulary[];
   }) => Promise<Flashcard[]>;
-  deleteMyStudentFlashcards: ({
-    flashcardIds,
-  }: {
-    flashcardIds: number[];
+  deleteMyStudentFlashcards: (params: {
+    exampleIds: number[];
+    finallyFunction?: () => void;
   }) => Promise<number>;
-  deleteStudentFlashcards: ({
-    flashcardIds,
-  }: {
-    flashcardIds: number[];
+  deleteStudentFlashcards: (params: {
+    pairs: { studentId: number; exampleId: number }[];
   }) => Promise<number>;
   updateMyStudentFlashcards: ({
     updates,
