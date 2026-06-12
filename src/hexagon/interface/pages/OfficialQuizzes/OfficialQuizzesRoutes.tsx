@@ -16,7 +16,7 @@ function LegacyQuizRedirect() {
   return <Navigate to={`/officialquizzes/lcsp/${number}`} replace />;
 }
 
-export function OfficialQuizzesRoutes() {
+export default function OfficialQuizzesRoutes() {
   const { isLoading, error, quizGroups, quizSetupMenuProps, isLoggedIn } =
     useOfficialQuizzes();
 

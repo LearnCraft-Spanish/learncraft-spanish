@@ -1,94 +1,104 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
-import CombinedCustomQuiz from '@interface/pages/CombinedCustomQuiz';
-import FlashcardFinderPage from '@interface/pages/FlashcardFinder';
-import FlashcardManager from '@interface/pages/FlashcardManager';
-import FrequensayPage from '@interface/pages/FrequensayPage';
-import GetHelpPage from '@interface/pages/GetHelpPage';
-import LimitedCustomQuiz from '@interface/pages/LimitedCustomQuiz';
-import { OfficialQuizzesRoutes } from '@interface/pages/OfficialQuizzes/OfficialQuizzesRoutes';
-import ReviewMyFlashcards from '@interface/pages/ReviewMyFlashcards';
+import { Loading } from '@interface/components/Loading';
+import { lazy, Suspense } from 'react';
 import { Route } from 'react-router-dom';
-import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
-import CoachingDashboard from 'src/components/CoachingDashboard';
-import {
-  CoursesTable,
-  LessonsTable,
-  ProgramsTable,
-  QuizGroupsTable,
-  QuizzesTable,
-  StudentsTable,
-  VqdLessonsTable,
-} from 'src/components/DatabaseTables';
-import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
-import { ExampleManagerRouter } from 'src/hexagon/interface/pages/ExampleManagerPage';
-import AdminDashboard from 'src/sections/AdminDashboard';
-import DatabaseTables from 'src/sections/DatabaseTables';
 import NotFoundPage from '../NotFoundPage';
 import Menu from '../sections/Menu';
 import SentryRoutes from './SentryRoutes';
+
+// Student / authenticated user pages
+const OfficialQuizzesRoutes = lazy(
+  () => import('@interface/pages/OfficialQuizzes/OfficialQuizzesRoutes'),
+);
+const ReviewMyFlashcards = lazy(
+  () => import('@interface/pages/ReviewMyFlashcards'),
+);
+const FlashcardManager = lazy(
+  () => import('@interface/pages/FlashcardManager'),
+);
+const CombinedCustomQuiz = lazy(
+  () => import('@interface/pages/CombinedCustomQuiz'),
+);
+const LimitedCustomQuiz = lazy(
+  () => import('@interface/pages/LimitedCustomQuiz'),
+);
+const FlashcardFinderPage = lazy(
+  () => import('@interface/pages/FlashcardFinder'),
+);
+const GetHelpPage = lazy(() => import('@interface/pages/GetHelpPage'));
+
+// Coach / Admin pages
+const FrequensayPage = lazy(() => import('@interface/pages/FrequensayPage'));
+const WeeksRecordsSection = lazy(
+  () => import('src/components/Coaching/WeeksRecords/WeeksRecords'),
+);
+const StudentDrillDown = lazy(
+  () => import('src/components/StudentDrillDown/StudentDrillDown'),
+);
+const CoachingDashboard = lazy(
+  () => import('src/components/CoachingDashboard'),
+);
+
+// Admin-only pages
+const AdminDashboard = lazy(() => import('src/sections/AdminDashboard'));
+const DatabaseTables = lazy(() => import('src/sections/DatabaseTables'));
+const ExampleManagerRouter = lazy(
+  () => import('src/hexagon/interface/pages/ExampleManagerPage'),
+);
 
 export default function AppRoutes() {
   const { isAdmin, isCoach, isStudent, isLimited, isAuthenticated } =
     useAuthAdapter();
 
   return (
-    <SentryRoutes>
-      <Route path="/" element={<Menu />} />
-      {/* <Route path="/callback" element={<CallbackPage />} /> */}
-      <Route
-        path="/myflashcards"
-        element={isAuthenticated && <ReviewMyFlashcards />}
-      />
-      <Route path="/manage-flashcards" element={<FlashcardManager />} />
-      <Route path="/officialquizzes/*" element={<OfficialQuizzesRoutes />} />
-      <Route
-        path="/customquiz"
-        element={
-          (isLimited || isStudent || isCoach || isAdmin) &&
-          (isLimited ? <LimitedCustomQuiz /> : <CombinedCustomQuiz />)
-        }
-      />
-      <Route
-        path="/flashcardfinder"
-        element={(isStudent || isAdmin || isCoach) && <FlashcardFinderPage />}
-      />
-      <Route
-        path="/frequensay"
-        element={(isAdmin || isCoach) && <FrequensayPage />}
-      />
-      <Route
-        path="/get-help"
-        element={(isStudent || isCoach || isAdmin) && <GetHelpPage />}
-      />
-      {/* Temporary archiving of Vocabulary Creator Page */}
-      {/* <Route
-        path="/vocabularymanager"
-        element={isAdmin && <VocabularyCreatorPage />}
-      /> */}
-      <Route
-        path="/weeklyrecords"
-        element={(isAdmin || isCoach) && <WeeksRecordsSection />}
-      />
-      <Route
-        path="/student-drill-down"
-        element={(isAdmin || isCoach) && <StudentDrillDown />}
-      />
-      <Route
-        path="/coaching-dashboard"
-        element={(isAdmin || isCoach) && <CoachingDashboard />}
-      />
-      <Route path="/database-tables/*" element={isAdmin && <DatabaseTables />}>
-        <Route path="students" element={<StudentsTable />} />
-        <Route path="programs" element={<ProgramsTable />} />
-        <Route path="quiz-groups" element={<QuizGroupsTable />} />
-        <Route path="vqd-lessons" element={<VqdLessonsTable />} />
-        <Route path="quizzes" element={<QuizzesTable />} />
-        <Route path="lessons" element={<LessonsTable />} />
-        <Route path="courses" element={<CoursesTable />} />
-      </Route>
-      <Route path="/example-manager/*" element={<ExampleManagerRouter />} />
-      <Route path="/*" element={<NotFoundPage />} />
-      <Route path="/admin-dashboard" element={<AdminDashboard />} />
-    </SentryRoutes>
+    <Suspense fallback={<Loading message="Loading..." />}>
+      <SentryRoutes>
+        <Route path="/" element={<Menu />} />
+        <Route
+          path="/myflashcards"
+          element={isAuthenticated && <ReviewMyFlashcards />}
+        />
+        <Route path="/manage-flashcards" element={<FlashcardManager />} />
+        <Route path="/officialquizzes/*" element={<OfficialQuizzesRoutes />} />
+        <Route
+          path="/customquiz"
+          element={
+            (isLimited || isStudent || isCoach || isAdmin) &&
+            (isLimited ? <LimitedCustomQuiz /> : <CombinedCustomQuiz />)
+          }
+        />
+        <Route
+          path="/flashcardfinder"
+          element={(isStudent || isAdmin || isCoach) && <FlashcardFinderPage />}
+        />
+        <Route
+          path="/frequensay"
+          element={(isAdmin || isCoach) && <FrequensayPage />}
+        />
+        <Route
+          path="/get-help"
+          element={(isStudent || isCoach || isAdmin) && <GetHelpPage />}
+        />
+        <Route
+          path="/weeklyrecords"
+          element={(isAdmin || isCoach) && <WeeksRecordsSection />}
+        />
+        <Route
+          path="/student-drill-down"
+          element={(isAdmin || isCoach) && <StudentDrillDown />}
+        />
+        <Route
+          path="/coaching-dashboard"
+          element={(isAdmin || isCoach) && <CoachingDashboard />}
+        />
+        <Route
+          path="/database-tables/*"
+          element={isAdmin && <DatabaseTables />}
+        />
+        <Route path="/example-manager/*" element={<ExampleManagerRouter />} />
+        <Route path="/*" element={<NotFoundPage />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      </SentryRoutes>
+    </Suspense>
   );
 }
