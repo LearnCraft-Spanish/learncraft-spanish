@@ -6,7 +6,7 @@ import ExampleManagerNav from '@interface/components/ExampleManager/ExampleManag
 import ExampleSearch from '@interface/components/ExampleSearchInterface/ExampleSearch';
 import { useCallback, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
-export function ExampleManagerRouter() {
+export default function ExampleManagerRouter() {
   const [hasUnsavedCreatedExamples, setHasUnsavedCreatedExamples] =
     useState(false);
   const [hasUnsavedEditedExamples, setHasUnsavedEditedExamples] =

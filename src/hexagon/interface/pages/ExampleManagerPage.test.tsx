@@ -1,5 +1,5 @@
 import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
-import { ExampleManagerRouter } from '@interface/pages/ExampleManagerPage';
+import ExampleManagerRouter from '@interface/pages/ExampleManagerPage';
 import { render, screen, waitFor } from '@testing-library/react';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';

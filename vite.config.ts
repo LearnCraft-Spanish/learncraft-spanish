@@ -45,6 +45,17 @@ export default defineConfig(({ mode }) => {
         external: [],
         output: {
           globals: {},
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom'],
+            'vendor-router': ['react-router-dom'],
+            'vendor-auth': ['@auth0/auth0-react'],
+            'vendor-query': [
+              '@tanstack/react-query',
+              '@tanstack/react-query-devtools',
+            ],
+            'vendor-sentry': ['@sentry/react'],
+            'vendor-ui': ['react-toastify', 'react-tooltip'],
+          },
         },
       },
     },
