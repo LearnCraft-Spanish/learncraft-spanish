@@ -23,7 +23,6 @@ pnpm-workspace.yaml
 
 # misc
 .env
-.env.*
 .env.staging
 .env.development
 .env.test
