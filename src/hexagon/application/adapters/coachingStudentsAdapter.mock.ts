@@ -3,6 +3,9 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 const defaultMockCoachingStudentsAdapter: CoachingStudentsPort = {
   getAllCoachingStudents: async () => [],
+  getAllSrCourses: async () => [],
+  getStudentBundleCredits: async () => [],
+  getStudentMemberships: async () => [],
 };
 
 export const {

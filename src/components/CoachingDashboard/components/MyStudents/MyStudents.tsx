@@ -99,6 +99,7 @@ export function MyStudents() {
               <div>
                 <StudentMemberships
                   studentId={selectedStudentId}
+                  studentName={selectedStudent.fullName}
                   selectedMembershipId={selectedMembershipId}
                   onMembershipSelect={handleMembershipSelect}
                 />

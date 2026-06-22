@@ -36,10 +36,6 @@ export default function useStudentDrillDownBackend() {
     );
   };
 
-  const getAllStudents = () => {
-    return getFactory<CoachingStudent[]>('coaching/all-students');
-  };
-
   const updateStudent = (student: UpdateStudent) => {
     const promise = newPutFactory<CoachingStudent>({
       path: `coaching/update-student`,
@@ -58,7 +54,6 @@ export default function useStudentDrillDownBackend() {
     updateMembership,
 
     getMembershipWeeks,
-    getAllStudents,
     updateStudent,
   };
 }
