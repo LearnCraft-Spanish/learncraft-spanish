@@ -47,9 +47,8 @@ export default function useStudentDrillDownBackend() {
   return {
     getStudentMemberships,
     updateMembership,
-
-    getMembershipWeeks,
     getAllStudents,
+    getMembershipWeeks,
     updateStudent,
   };
 }

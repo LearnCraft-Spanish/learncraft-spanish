@@ -1,8 +1,9 @@
+import type { BundleCredit } from '@learncraft-spanish/shared';
 import type {
-  BundleCredit,
   CreateBundleCreditInput,
   UpdateBundleCreditInput,
 } from 'src/hooks/CoachingData/useBundleCredits';
+import { useStudentBundleCreditsQuery } from '@application/queries/CoachingStudentQueries/useStudentBundleCreditsQuery';
 import React, { useState } from 'react';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
@@ -92,7 +93,7 @@ function BundleCreditView({
     closeModal();
     try {
       if (credit) {
-        await deleteBundleCredit.mutateAsync(credit.recordId);
+        await deleteBundleCredit.mutateAsync(credit.bundle_credit_id);
         closeContextual();
       }
     } catch (error) {
@@ -121,7 +122,7 @@ function BundleCreditView({
       if (credit) {
         await updateBundleCredit.mutateAsync(
           {
-            recordId: credit.recordId,
+            recordId: credit.bundle_credit_id,
             totalCredits: parsedTotalCredits,
             usedCredits: parsedUsedCredits,
             expiration: formData.expiration
@@ -249,12 +250,12 @@ function BundleCreditRow({
 
   return (
     <>
-      {contextual === `bundle-credit-${credit.recordId}` && (
+      {contextual === `bundle-credit-${credit.bundle_credit_id}` && (
         // Foreign Key lookup, form data in backend
 
-        <BundleCreditView studentId={credit.relatedStudent} credit={credit} />
+        <BundleCreditView studentId={credit.student_id} credit={credit} />
       )}
-      <div key={credit.recordId} className="credit-details">
+      <div key={credit.bundle_credit_id} className="credit-details">
         <div className="info-row">
           <div className="info-label">Credits Used:</div>
           <div className="info-value">{credit.usedCredits}</div>
@@ -278,17 +279,15 @@ function BundleCreditRow({
         <div className="info-row">
           <div className="info-label">Status:</div>
           <div className="info-value">
-            {credit.expired
-              ? 'Expired'
-              : credit.studentActive
-                ? 'Active'
-                : 'Inactive'}
+            {credit.expired ? 'Expired' : 'Active'}
           </div>
         </div>
         {isAdmin && (
           <div className="admin-controls">
             <button
-              onClick={() => openContextual(`bundle-credit-${credit.recordId}`)}
+              onClick={() =>
+                openContextual(`bundle-credit-${credit.bundle_credit_id}`)
+              }
               className="edit-button"
               type="button"
             >
@@ -308,7 +307,7 @@ export function BundleCreditsSection({
   studentId: number;
   isAdmin: boolean;
 }) {
-  const { bundleCreditsQuery } = useBundleCredits(studentId);
+  const { studentBundleCreditsQuery } = useStudentBundleCreditsQuery(studentId);
   const { contextual, openContextual } = useContextualMenu();
 
   return (
@@ -330,15 +329,16 @@ export function BundleCreditsSection({
         <BundleCreditView studentId={studentId} />
       )}
 
-      {bundleCreditsQuery.isLoading ? (
+      {studentBundleCreditsQuery.isLoading ? (
         <div>Loading bundle credits...</div>
-      ) : bundleCreditsQuery.error ? (
+      ) : studentBundleCreditsQuery.error ? (
         <div>Error loading bundle credits</div>
-      ) : bundleCreditsQuery.data && bundleCreditsQuery.data.length > 0 ? (
+      ) : studentBundleCreditsQuery.data &&
+        studentBundleCreditsQuery.data.length > 0 ? (
         <div className="bundle-credits-list">
-          {bundleCreditsQuery.data.map((credit: BundleCredit) => (
+          {studentBundleCreditsQuery.data.map((credit: BundleCredit) => (
             <BundleCreditRow
-              key={credit.recordId}
+              key={credit.bundle_credit_id}
               credit={credit}
               isAdmin={isAdmin}
             />

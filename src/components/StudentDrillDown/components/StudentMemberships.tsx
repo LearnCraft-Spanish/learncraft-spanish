@@ -1,5 +1,7 @@
-import type { Membership } from 'src/types/CoachingTypes';
+import type { StudentMembership } from '@learncraft-spanish/shared';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useAllSrCoursesQuery } from '@application/queries/CoachingStudentQueries/useAllSrCoursesQuery';
+import { useStudentMembershipsQuery } from '@application/queries/CoachingStudentQueries/useStudentMembershipsQuery';
 import { Dropdown, TextInput } from '@interface/components/FormComponents';
 import { InlineLoading } from '@interface/components/Loading';
 import React, { useMemo, useState } from 'react';
@@ -14,27 +16,28 @@ import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
-import { useCoachList, useCourseList } from 'src/hooks/CoachingData/queries';
+import { useCoachList } from 'src/hooks/CoachingData/queries';
 import {
-  useAllStudents,
   useMembershipWeeks,
   useStudentMemberships,
 } from 'src/hooks/CoachingData/queries/StudentDrillDown';
+
 import MembershipWeeks from './MembershipWeeks';
 interface StudentMembershipsProps {
   studentId: number;
+  studentName: string;
   selectedMembershipId: number | undefined;
   onMembershipSelect: (membershipId: number | undefined) => void;
 }
 
 export default function StudentMemberships({
   studentId,
+  studentName,
   selectedMembershipId,
   onMembershipSelect,
 }: StudentMembershipsProps) {
-  const { courseListQuery } = useCourseList();
-  const { allStudentsQuery } = useAllStudents();
-  const { studentMembershipsQuery } = useStudentMemberships(studentId);
+  const { allSrCoursesQuery } = useAllSrCoursesQuery();
+  const { studentMembershipsQuery } = useStudentMembershipsQuery(studentId);
   const { contextual, openContextual } = useContextualMenu();
   // Sort memberships only if we have data
   const sortedMemberships = React.useMemo(() => {
@@ -46,25 +49,13 @@ export default function StudentMemberships({
     });
   }, [studentMembershipsQuery.isSuccess, studentMembershipsQuery.data]);
 
-  const student = useMemo(() => {
-    const student = allStudentsQuery.data?.find(
-      (s) => s.recordId === studentId,
-    );
-    return student ? student.fullName : '';
-  }, [allStudentsQuery.data, studentId]);
-
-  const getCourseName = (courseId: number) => {
-    const course = courseListQuery.data?.find((c) => c.recordId === courseId);
-    return course?.name || 'Unknown Course';
-  };
-
   return (
     <div className="student-memberships">
       <h3>Memberships</h3>
-      {(!studentMembershipsQuery.isSuccess || !courseListQuery.isSuccess) && (
+      {(!studentMembershipsQuery.isSuccess || !allSrCoursesQuery.isSuccess) && (
         <InlineLoading />
       )}
-      {studentMembershipsQuery.isSuccess && courseListQuery.isSuccess && (
+      {studentMembershipsQuery.isSuccess && allSrCoursesQuery.isSuccess && (
         <>
           {sortedMemberships.length === 0 ? (
             <p>No memberships found</p>
@@ -84,8 +75,7 @@ export default function StudentMemberships({
                           )
                         }
                       />
-                      {/* // Foreign Key lookup, form data in backend */}
-                      <h4>{getCourseName(membership.relatedCourse)}</h4>
+                      <h4>{membership.relatedCourse.name}</h4>
                       <div className="membership-status">
                         {membership.active && !membership.onHold && (
                           <span className="status active">Active</span>
@@ -190,7 +180,7 @@ export default function StudentMemberships({
                       <div className="membership-weeks">
                         <MembershipWeeks
                           membershipId={membership.recordId}
-                          studentName={student}
+                          studentName={studentName}
                         />
                       </div>
                     )}
@@ -208,52 +198,47 @@ export default function StudentMemberships({
 function StudentMembershipContextual({
   membership,
 }: {
-  membership: Membership;
+  membership: StudentMembership;
 }) {
   const { closeContextual } = useContextualMenu();
-  const { courseListQuery } = useCourseList();
+  const { allSrCoursesQuery } = useAllSrCoursesQuery();
   const { openModal, closeModal } = useModal();
   const [startDate, setStartDate] = useState(membership.startDate as string);
   const [endDate, setEndDate] = useState(membership.endDate as string);
   const [onHold, setOnHold] = useState(membership.onHold);
   const [selectedCourse, setSelectedCourse] = useState(
-    membership.relatedCourse,
+    membership.relatedCourse.srCourseId,
   );
   const { isAdmin, authUser } = useAuthAdapter();
   const { coachListQuery } = useCoachList();
   const { updateMembershipMutation } = useStudentMemberships(
-    membership.relatedStudent,
+    membership.relatedStudent.student_id,
   );
   const membershipWeeksQuery = useMembershipWeeks(membership.recordId);
   // const [advanced, setAdvanced] = useState(membership.advancedStudent);
-  const getCourseName = (courseId: number) => {
-    const course = courseListQuery.data?.find((c) => c.recordId === courseId);
-    return course?.name || 'Unknown Course';
-  };
-
   const courseOptions = useMemo(() => {
-    if (!courseListQuery.data) return [];
-    return courseListQuery.data.map((course) => course.name);
-  }, [courseListQuery.data]);
+    if (!allSrCoursesQuery.data) return [];
+    return allSrCoursesQuery.data.map((course) => course.name);
+  }, [allSrCoursesQuery.data]);
 
   const courseIdByName = useMemo(() => {
-    if (!courseListQuery.data) return new Map();
+    if (!allSrCoursesQuery.data) return new Map();
     return new Map(
-      courseListQuery.data.map((course) => [course.name, course.recordId]),
+      allSrCoursesQuery.data.map((course) => [course.name, course.srCourseId]),
     );
-  }, [courseListQuery.data]);
+  }, [allSrCoursesQuery.data]);
 
   const courseNameById = useMemo(() => {
-    if (!courseListQuery.data) return new Map();
+    if (!allSrCoursesQuery.data) return new Map();
     return new Map(
-      courseListQuery.data.map((course) => [course.recordId, course.name]),
+      allSrCoursesQuery.data.map((course) => [course.srCourseId, course.name]),
     );
-  }, [courseListQuery.data]);
+  }, [allSrCoursesQuery.data]);
 
   const cancelEdit = () => {
     setEndDate(membership.endDate as string);
     setStartDate(membership.startDate as string);
-    setSelectedCourse(membership.relatedCourse);
+    setSelectedCourse(membership.relatedCourse.srCourseId);
     // setActive(membership.active);
     closeContextual();
   };
@@ -316,7 +301,7 @@ function StudentMembershipContextual({
 
   if (
     membership.primaryCoach &&
-    membership.primaryCoach.toString() !== currentUserAsQbUser?.user.id &&
+    membership.primaryCoach.email !== currentUserAsQbUser?.user.email &&
     isAdmin
   ) {
     return (
@@ -348,7 +333,7 @@ function StudentMembershipContextual({
         <TextInput
           label="Membership Name"
           // Foreign Key lookup, form data in backend
-          value={getCourseName(membership.relatedCourse)}
+          value={membership.relatedCourse.name}
           editMode={false}
           onChange={() => {}}
         />

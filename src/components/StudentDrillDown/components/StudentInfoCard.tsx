@@ -12,7 +12,7 @@ import {
 import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
+import { useUpdateStudent } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { BundleCreditsSection } from './BundleCreditsSection';
 
 const timezones = [
@@ -183,7 +183,7 @@ export function StudentInfoContextual({
   currentCoach: Coach | undefined;
   isAdmin: boolean;
 }) {
-  const { updateStudentMutation } = useAllStudents();
+  const { updateStudentMutation } = useUpdateStudent();
   const { allCoachesQuery } = useAllCoachesQuery();
 
   const { closeContextual } = useContextualMenu();
