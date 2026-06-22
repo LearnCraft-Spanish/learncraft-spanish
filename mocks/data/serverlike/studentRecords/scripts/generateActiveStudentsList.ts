@@ -68,7 +68,7 @@ function generateActiveStudentsData({
       firstSubscribed: '',
       advancedStudent: false,
       active: true,
-      usPhone: 1234567890,
+      usPhone: '1234567890',
     };
     studentsList.push(student);
   }

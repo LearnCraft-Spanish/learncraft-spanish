@@ -14,7 +14,7 @@ export default function DataDisplay({ studentId }: { studentId: number }) {
     return (
       <div className="coachStudentDrillDown">
         {data.map((coach: CoachCallCount) => (
-          <div key={coach.coach.id} className="coach-item-container">
+          <div key={coach.coach.coach_id} className="coach-item-container">
             <p>
               <span className="coach-drilldown-label">Coach: </span>
               {coach.coach.fullName}

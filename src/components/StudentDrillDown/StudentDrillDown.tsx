@@ -1,11 +1,10 @@
 // coaching interface
 
-import type { CoachingStudent } from 'src/types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useAllCoachingStudentsQuery } from '@application/queries/CoachingStudentQueries/useAllCoachingStudentsQuery';
+import { useAllCoachesQuery } from '@application/queries/CoachQueries/useAllCoachesQuery';
 import { Loading } from '@interface/components/Loading';
 import React, { useMemo, useState } from 'react';
-import { useCoachList } from 'src/hooks/CoachingData/queries';
-import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import {
   CoachStudents,
   StudentDrillDownSearch,
@@ -15,8 +14,8 @@ import {
 import './StudentDrillDown.scss';
 
 export default function StudentDrillDown() {
-  const { allStudentsQuery } = useAllStudents();
-  const { coachListQuery } = useCoachList();
+  const { allCoachingStudentsQuery } = useAllCoachingStudentsQuery();
+  const { allCoachesQuery } = useAllCoachesQuery();
 
   const {
     isLoading: authLoading,
@@ -26,13 +25,17 @@ export default function StudentDrillDown() {
   } = useAuthAdapter();
 
   const isLoading =
-    allStudentsQuery.isLoading || coachListQuery.isLoading || authLoading;
+    allCoachingStudentsQuery.isLoading ||
+    allCoachesQuery.isLoading ||
+    authLoading;
 
   const isError =
-    allStudentsQuery.isError || coachListQuery.isError || authLoading;
+    allCoachingStudentsQuery.isError || allCoachesQuery.isError || authLoading;
 
   const isSuccess =
-    allStudentsQuery.isSuccess && coachListQuery.isSuccess && isAuthenticated;
+    allCoachingStudentsQuery.isSuccess &&
+    allCoachesQuery.isSuccess &&
+    isAuthenticated;
 
   const [selectedStudentId, setSelectedStudentId] = useState<
     number | undefined
@@ -52,10 +55,10 @@ export default function StudentDrillDown() {
 
   const selectedStudent = useMemo(
     () =>
-      allStudentsQuery.data?.find((s) => s.recordId === selectedStudentId) as
-        | CoachingStudent
-        | undefined,
-    [allStudentsQuery.data, selectedStudentId],
+      allCoachingStudentsQuery.data?.find(
+        (s) => s.student_id === selectedStudentId,
+      ),
+    [allCoachingStudentsQuery.data, selectedStudentId],
   );
 
   const currentCoach = useMemo(() => {
@@ -65,10 +68,10 @@ export default function StudentDrillDown() {
     ];
 
     if (authUser?.email) {
-      const currentUserCoach = coachListQuery.data?.find((coach) => {
+      const currentUserCoach = allCoachesQuery.data?.find((coach) => {
         const emailPrefix = authUser.email.split('@')[0].toLowerCase();
         for (const domain of possibleEmailDomains) {
-          if (coach.user.email.toLowerCase() === emailPrefix + domain) {
+          if (coach.email.toLowerCase() === emailPrefix + domain) {
             return true;
           }
         }
@@ -76,7 +79,7 @@ export default function StudentDrillDown() {
       });
       if (currentUserCoach) return currentUserCoach;
     }
-  }, [authUser, coachListQuery.data]);
+  }, [authUser, allCoachesQuery.data]);
 
   return (
     <div className="student-deep-dive">

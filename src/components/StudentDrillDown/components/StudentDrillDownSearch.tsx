@@ -1,6 +1,6 @@
+import { useAllCoachingStudentsQuery } from '@application/queries/CoachingStudentQueries/useAllCoachingStudentsQuery';
 import { debounce } from 'lodash';
 import { useMemo, useRef, useState } from 'react';
-import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 
 interface StudentDrillDownSearchProps {
   onStudentSelect: (studentId: number | undefined) => void;
@@ -23,10 +23,10 @@ export default function StudentDrillDownSearch({
     debouncedSearch(value);
   };
 
-  const { allStudentsQuery } = useAllStudents();
+  const { allCoachingStudentsQuery } = useAllCoachingStudentsQuery();
   const listOfStudents = useMemo(() => {
-    return allStudentsQuery.isSuccess
-      ? allStudentsQuery.data
+    return allCoachingStudentsQuery.isSuccess
+      ? allCoachingStudentsQuery.data
           .filter((student) => {
             if (activeStudentsOnly) {
               return student.active;
@@ -41,7 +41,7 @@ export default function StudentDrillDownSearch({
               .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
               .join(' ');
             return {
-              recordId: student.recordId,
+              studentId: student.student_id,
               displayString: `${studentName} -- ${studentEmail}`,
             };
           })
@@ -52,12 +52,16 @@ export default function StudentDrillDownSearch({
             else return -1;
           })
       : [];
-  }, [allStudentsQuery.isSuccess, allStudentsQuery.data, activeStudentsOnly]);
+  }, [
+    allCoachingStudentsQuery.isSuccess,
+    allCoachingStudentsQuery.data,
+    activeStudentsOnly,
+  ]);
 
   const selectedStudent = useMemo(() => {
     if (!selectedStudentId) return null;
     return listOfStudents.find(
-      (student) => student.recordId === Number(selectedStudentId),
+      (student) => student.studentId === Number(selectedStudentId),
     );
   }, [listOfStudents, selectedStudentId]);
 
@@ -114,13 +118,13 @@ export default function StudentDrillDownSearch({
                 <div className="search-results">
                   {searchStudentOptions.map((student) => (
                     <div
-                      key={student.recordId}
+                      key={student.studentId}
                       className={`search-result-item ${
-                        student.recordId === Number(selectedStudentId)
+                        student.studentId === Number(selectedStudentId)
                           ? 'selected'
                           : ''
                       }`}
-                      onClick={() => handleStudentSelect(student.recordId)}
+                      onClick={() => handleStudentSelect(student.studentId)}
                     >
                       {student.displayString}
                     </div>
