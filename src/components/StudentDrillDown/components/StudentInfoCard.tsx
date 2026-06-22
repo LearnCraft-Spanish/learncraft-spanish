@@ -1,4 +1,5 @@
-import type { Coach, CoachingStudent } from 'src/types/CoachingTypes';
+import type { Coach, CoachingStudent } from '@learncraft-spanish/shared';
+import { useAllCoachesQuery } from '@application/queries/CoachQueries/useAllCoachesQuery';
 import CoachStudentDrillDown from '@interface/components/CoachStudentDrillDown/CoachStudentDrillDown';
 import { Dropdown, TextInput } from '@interface/components/FormComponents';
 import React, { useEffect, useState } from 'react';
@@ -11,9 +12,9 @@ import {
 import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import { useCoachList } from 'src/hooks/CoachingData/queries';
 import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { BundleCreditsSection } from './BundleCreditsSection';
+
 const timezones = [
   'AZ',
   'CT',
@@ -107,10 +108,6 @@ export default function StudentInfoCard({
           <div className="info-value">{student.fullName}</div>
         </div>
         <div className="info-row">
-          <div className="info-label">Pronouns:</div>
-          <div className="info-value">{student.pronoun}</div>
-        </div>
-        <div className="info-row">
           <div className="info-label">Learning Disabilities:</div>
           <div className="info-value">{student.learningDisabilities}</div>
         </div>
@@ -133,7 +130,9 @@ export default function StudentInfoCard({
         <div className="info-row">
           <div className="info-label">Primary Coach:</div>
           <div className="info-value">
-            {student.primaryCoach ? student.primaryCoach.name : 'Not assigned'}
+            {student.primaryCoach
+              ? student.primaryCoach.fullName
+              : 'Not assigned'}
           </div>
         </div>
         <div className="info-row">
@@ -143,7 +142,7 @@ export default function StudentInfoCard({
           </div>
         </div>
         {/* only show to users who are admins */}
-        {isAdmin && <CoachStudentDrillDown studentId={student.recordId} />}
+        {isAdmin && <CoachStudentDrillDown studentId={student.student_id} />}
         {isAdmin && (
           <>
             <h3>Billing Information</h3>
@@ -166,7 +165,10 @@ export default function StudentInfoCard({
           </>
         )}
 
-        <BundleCreditsSection studentId={student.recordId} isAdmin={isAdmin} />
+        <BundleCreditsSection
+          studentId={student.student_id}
+          isAdmin={isAdmin}
+        />
       </div>
     </>
   );
@@ -182,7 +184,7 @@ export function StudentInfoContextual({
   isAdmin: boolean;
 }) {
   const { updateStudentMutation } = useAllStudents();
-  const { coachListQuery } = useCoachList();
+  const { allCoachesQuery } = useAllCoachesQuery();
 
   const { closeContextual } = useContextualMenu();
 
@@ -194,17 +196,15 @@ export function StudentInfoContextual({
   }
 
   function captureSubmitForm() {
-    // if data is undefined, return
     if (!data) return;
-    // for each field, if it was previously defined, include it. if it was not defined, remove it
     let relatedCoach: number | string | undefined =
-      student?.primaryCoach?.id || undefined;
+      student?.primaryCoach?.coach_id || undefined;
     if (data.primaryCoachEmail) {
-      const coach = coachListQuery.data?.find(
-        (coach) => coach.user.email === data.primaryCoachEmail,
+      const coach = allCoachesQuery.data?.find(
+        (coach) => coach.email === data.primaryCoachEmail,
       );
       if (coach) {
-        relatedCoach = coach.recordId;
+        relatedCoach = coach.coach_id;
       }
     }
 
@@ -212,7 +212,6 @@ export function StudentInfoContextual({
       {
         firstName: data.firstName || undefined,
         lastName: data.lastName || undefined,
-        pronoun: data.pronoun || undefined,
         learningDisabilities: data.learningDisabilities || '',
         email: data.email || undefined,
         timeZone: data.timeZone || undefined,
@@ -221,7 +220,7 @@ export function StudentInfoContextual({
         advancedStudent: data.advancedStudent || false,
         billingEmail: data.billingEmail || undefined,
         billingNotes: data.billingNotes || undefined,
-        recordId: student.recordId,
+        recordId: student.student_id,
         usPhone: data.usPhone || undefined,
         relatedCoach,
       },
@@ -242,15 +241,7 @@ export function StudentInfoContextual({
     }
   }, [student]);
 
-  // if (!student) {
-  //   return (
-  //     <div>
-  //       Error retrieving student information, please report this to support.
-  //     </div>
-  //   );
-  // }
-
-  if (student.primaryCoach?.email !== currentCoach?.user.email && !isAdmin) {
+  if (student.primaryCoach?.email !== currentCoach?.email && !isAdmin) {
     return (
       <div className="contextualWrapper">
         <div className="contextual">
@@ -282,15 +273,6 @@ export function StudentInfoContextual({
           onChange={(value) => {
             setData({ ...data, lastName: value });
           }}
-          editMode
-        />
-        <Dropdown
-          label="Pronouns"
-          value={data.pronoun}
-          onChange={(value) => {
-            setData({ ...data, pronoun: value });
-          }}
-          options={['He', 'She', 'They', 'Other']}
           editMode
         />
         <TextInput
@@ -343,7 +325,6 @@ export function StudentInfoContextual({
           }}
           editMode
         />
-        {/* checkbox for advancedStudent */}
         <Checkbox
           labelText="Advanced Student"
           labelFor="advancedStudent"

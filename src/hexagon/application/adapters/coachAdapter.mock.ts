@@ -5,6 +5,7 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 // Create a default mock implementation
 export const defaultMockCoachAdapter: CoachPort = {
   getAllCoachesByStudent: async () => createMockCoachCallCountList(3),
+  getAllCoaches: async () => [],
 };
 
 // Create an overrideable mock with the default implementation

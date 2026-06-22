@@ -52,7 +52,7 @@ export interface CoachingStudent {
   fullName: string;
   email: string;
   timeZone: string | undefined;
-  usPhone: number;
+  usPhone: string;
   fluencyGoal: string;
   startingLevel: string;
   primaryCoach: QbUser;

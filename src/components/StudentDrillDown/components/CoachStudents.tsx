@@ -1,6 +1,7 @@
-import type { Coach, CoachingStudent } from 'src/types/CoachingTypes';
+import type { Coach, CoachingStudent } from '@learncraft-spanish/shared';
+import { useAllCoachingStudentsQuery } from '@application/queries/CoachingStudentQueries/useAllCoachingStudentsQuery';
 import React, { useMemo } from 'react';
-import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
+
 export default function CoachStudents({
   onStudentSelect,
   currentCoach,
@@ -8,20 +9,23 @@ export default function CoachStudents({
   onStudentSelect: (studentId: number | undefined) => void;
   currentCoach: Coach | undefined;
 }) {
-  // const { activeStudentsQuery } = useActiveStudents();
-  const { allStudentsQuery } = useAllStudents();
+  const { allCoachingStudentsQuery } = useAllCoachingStudentsQuery();
 
   // Filter students where the current coach is the primary coach
   const coachStudents = useMemo(() => {
-    if (!allStudentsQuery.isSuccess || !currentCoach) {
+    if (!allCoachingStudentsQuery.isSuccess || !currentCoach) {
       return [];
     }
 
-    return allStudentsQuery.data.filter(
+    return allCoachingStudentsQuery.data.filter(
       (student: CoachingStudent) =>
-        student.primaryCoach?.id === currentCoach.user.id,
+        student.primaryCoach?.coach_id === currentCoach.coach_id,
     );
-  }, [allStudentsQuery.data, allStudentsQuery.isSuccess, currentCoach]);
+  }, [
+    allCoachingStudentsQuery.data,
+    allCoachingStudentsQuery.isSuccess,
+    currentCoach,
+  ]);
 
   if (!currentCoach) {
     return null;
@@ -36,9 +40,9 @@ export default function CoachStudents({
         <div className="coach-students-list">
           {coachStudents.map((student: CoachingStudent) => (
             <div
-              key={student.recordId}
+              key={student.student_id}
               className="coach-student-card"
-              onClick={() => onStudentSelect(student.recordId)}
+              onClick={() => onStudentSelect(student.student_id)}
             >
               <h4>{student.fullName}</h4>
               <p>{student.email}</p>
