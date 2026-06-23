@@ -119,7 +119,11 @@ export default function Menu() {
                 </Link>
               </div> */}
               <div className="buttonBox">
-                <button className="linkButton" disabled>
+                <button
+                  className="linkButton disabledButton"
+                  disabled
+                  type="button"
+                >
                   Weekly Records Interface
                 </button>
               </div>
@@ -130,7 +134,11 @@ export default function Menu() {
                 </Link>
               </div> */}
               <div className="buttonBox">
-                <button className="linkButton" disabled>
+                <button
+                  className="linkButton disabledButton"
+                  disabled
+                  type="button"
+                >
                   Student Drill Down
                 </button>
               </div>
@@ -141,7 +149,11 @@ export default function Menu() {
                 </Link>
               </div> */}
               <div className="buttonBox">
-                <button className="linkButton" disabled>
+                <button
+                  className="linkButton disabledButton"
+                  disabled
+                  type="button"
+                >
                   Coaching Dashboard
                 </button>
               </div>
@@ -162,7 +174,11 @@ export default function Menu() {
                 </Link>
               </div> */}
               <div className="buttonBox">
-                <button className="linkButton" disabled>
+                <button
+                  className="linkButton disabledButton"
+                  disabled
+                  type="button"
+                >
                   Admin Dashboard
                 </button>
               </div>

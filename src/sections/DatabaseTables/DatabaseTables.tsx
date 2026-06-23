@@ -45,12 +45,12 @@ function DatabaseTablesMenu() {
       </div>
       <h3>Student Records Database</h3>
       <div className="buttonBox">
-        <button className="linkButton" disabled type="button">
+        <button className="linkButton disabledButton" disabled type="button">
           Lessons Table
         </button>
       </div>
       <div className="buttonBox">
-        <button className="linkButton" disabled type="button">
+        <button className="linkButton disabledButton" disabled type="button">
           Courses Table
         </button>
       </div>
