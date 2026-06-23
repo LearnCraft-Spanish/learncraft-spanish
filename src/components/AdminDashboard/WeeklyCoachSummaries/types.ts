@@ -1,9 +1,11 @@
 import type {
-  Assignment,
-  GroupSessionWithAttendees,
-  PrivateCall,
-  QbUser,
-} from 'src/types/CoachingTypes';
+  BaseAssignment,
+  BaseGroupSession,
+  FurnishedWeek,
+} from '@learncraft-spanish/shared';
+import type { QbUser } from 'src/types/CoachingTypes';
+
+type PrivateCallItem = FurnishedWeek['privateCalls'][number];
 
 export interface CoachSummaryData {
   primaryCoach: string;
@@ -17,9 +19,9 @@ export interface CoachSummaryDrilldownData {
   level: string;
   primaryCoach: QbUser;
   weekStarts: string;
-  assignments: Assignment[];
-  privateCalls: PrivateCall[];
-  groupCalls: GroupSessionWithAttendees[];
+  assignments: BaseAssignment[];
+  privateCalls: PrivateCallItem[];
+  groupCalls: BaseGroupSession[];
   currentLessonName: string;
   notes: string;
   holdWeek: boolean;

@@ -4,6 +4,7 @@ import { useAllSrCoursesQuery } from '@application/queries/CoachingStudentQuerie
 import { useStudentMembershipsQuery } from '@application/queries/CoachingStudentQueries/useStudentMembershipsQuery';
 import { Dropdown, TextInput } from '@interface/components/FormComponents';
 import { InlineLoading } from '@interface/components/Loading';
+import { useQueryClient } from '@tanstack/react-query';
 import React, { useMemo, useState } from 'react';
 import downArrow from 'src/assets/icons/down-arrow.svg';
 import pencilIcon from 'src/assets/icons/pencil.svg';
@@ -12,15 +13,13 @@ import {
   DateInput,
   FormControls,
 } from 'src/components/FormComponents';
+import { MEMBERSHIP_WEEKS_QUERY_KEY } from 'src/hexagon/application/queries/WeekQueries/useMembershipWeeksQuery';
 import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
-import {
-  useMembershipWeeks,
-  useStudentMemberships,
-} from 'src/hooks/CoachingData/queries/StudentDrillDown';
+import { useStudentMemberships } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 
 import MembershipWeeks from './MembershipWeeks';
 interface StudentMembershipsProps {
@@ -211,10 +210,10 @@ function StudentMembershipContextual({
   );
   const { isAdmin, authUser } = useAuthAdapter();
   const { coachListQuery } = useCoachList();
+  const queryClient = useQueryClient();
   const { updateMembershipMutation } = useStudentMemberships(
     membership.relatedStudent.student_id,
   );
-  const membershipWeeksQuery = useMembershipWeeks(membership.recordId);
   // const [advanced, setAdvanced] = useState(membership.advancedStudent);
   const courseOptions = useMemo(() => {
     if (!allSrCoursesQuery.data) return [];
@@ -254,7 +253,9 @@ function StudentMembershipContextual({
       },
       {
         onSuccess: () => {
-          membershipWeeksQuery.refetch();
+          void queryClient.invalidateQueries({
+            queryKey: MEMBERSHIP_WEEKS_QUERY_KEY(membership.recordId),
+          });
           closeContextual();
         },
       },

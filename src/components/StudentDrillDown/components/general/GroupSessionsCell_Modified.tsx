@@ -1,4 +1,4 @@
-import type { GroupSessionWithAttendees } from 'src/types/CoachingTypes';
+import type { BaseGroupSession } from '@learncraft-spanish/shared';
 import { Dropdown } from '@interface/components/FormComponents';
 import {
   DateInput,
@@ -9,39 +9,24 @@ import ContextualView from 'src/hexagon/interface/components/Contextual/Contextu
 
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
-// const sessionTypeOptions = [
-//   '1MC',
-//   '2MC',
-//   'Modules 1 & 2',
-//   'Level 1',
-//   'Level 2',
-//   'Level 3',
-//   'Level 4',
-//   'Level 5',
-//   'Level 6',
-//   'Module 3',
-//   'Module 4',
-//   'LCS Cohort',
-//   'Advanced',
-//   'Conversation',
-// ];
-
 function GroupSessionCell({
   groupSession,
 }: {
-  groupSession: GroupSessionWithAttendees;
+  groupSession: BaseGroupSession;
 }) {
   const { contextual, openContextual } = useContextualMenu();
   return (
     <div className="cellWithContextual">
       <button
         type="button"
-        onClick={() => openContextual(`groupSession${groupSession.recordId}`)}
+        onClick={() =>
+          openContextual(`groupSession${groupSession.groupSessionId}`)
+        }
       >
-        {groupSession.sessionType}
+        {groupSession.groupSessionType?.groupSessionType}
       </button>
 
-      {contextual === `groupSession${groupSession.recordId}` && (
+      {contextual === `groupSession${groupSession.groupSessionId}` && (
         <GroupSessionView groupSession={groupSession} />
       )}
     </div>
@@ -51,39 +36,34 @@ function GroupSessionCell({
 export function GroupSessionView({
   groupSession,
 }: {
-  groupSession: GroupSessionWithAttendees;
+  groupSession: BaseGroupSession;
 }) {
   return (
     <ContextualView>
-      <h3>{`Session: ${groupSession.sessionType} on ${groupSession.date}`}</h3>
+      <h3>{`Session: ${groupSession.groupSessionType?.groupSessionType} on ${groupSession.callDate}`}</h3>
       <div>
-        {/* <CoachDropdown
-            coachEmail={groupSession.coach.email}
-            onChange={() => {}}
-            editMode={false}
-          /> */}
         <div className="lineWrapper">
           <h4 className="label">Coach</h4>
-          <p className="content">{groupSession.coach.name}</p>
+          <p className="content">{groupSession.coach.fullName}</p>
         </div>
         <DateInput
           value={
-            typeof groupSession.date === 'string'
-              ? groupSession.date
-              : groupSession.date.toISOString()
+            typeof groupSession.callDate === 'string'
+              ? groupSession.callDate
+              : groupSession.callDate.toISOString()
           }
           onChange={() => {}}
         />
         <Dropdown
           label="Session Type"
-          value={groupSession.sessionType}
+          value={groupSession.groupSessionType?.groupSessionType}
           onChange={() => {}}
           options={[]}
           editMode={false}
         />
       </div>
       <Dropdown
-        value={groupSession.topic}
+        value={groupSession.groupSessionTopic?.groupSessionTopic}
         onChange={() => {}}
         editMode={false}
         label="Topic"
@@ -91,19 +71,19 @@ export function GroupSessionView({
       />
       <TextAreaInput
         label="Comments"
-        value={groupSession.comments}
+        value={groupSession.comments ?? ''}
         onChange={() => {}}
         editMode={false}
       />
       <LinkInput
         label="Call Document"
-        value={groupSession.callDocument}
+        value={groupSession.callDocument ?? ''}
         onChange={() => {}}
         editMode={false}
       />
       <LinkInput
         label="Zoom Link"
-        value={groupSession.zoomLink}
+        value={groupSession.zoomLink ?? ''}
         onChange={() => {}}
         editMode={false}
       />
@@ -113,17 +93,12 @@ export function GroupSessionView({
         <div className="content">
           {groupSession.attendees &&
             groupSession.attendees.map((attendee) => (
-              // if attendee is to be removed, don't display it
-              <div key={attendee.student} className="attendee-wrapper">
-                <p> {attendee.weekStudent}</p>
+              <div key={attendee.groupAttendeeId} className="attendee-wrapper">
+                <p>{String(attendee.weekId)}</p>
               </div>
             ))}
         </div>
       </div>
-
-      {/* userDataQuery.data?.roles.adminRole === 'admin' && (
-            <DeleteRecord deleteFunction={deleteRecordFunction} />
-          )} */}
     </ContextualView>
   );
 }
@@ -131,14 +106,14 @@ export function GroupSessionView({
 export default function GroupSessionsCell({
   groupSessions,
 }: {
-  groupSessions: GroupSessionWithAttendees[];
+  groupSessions: BaseGroupSession[];
 }) {
   return (
     <>
       {groupSessions?.map((groupSession) => (
         <GroupSessionCell
           groupSession={groupSession}
-          key={groupSession.recordId}
+          key={groupSession.groupSessionId}
         />
       ))}
     </>
