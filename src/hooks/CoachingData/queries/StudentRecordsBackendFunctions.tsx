@@ -1,73 +1,63 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
 import type * as StudentRecordsTypes from 'src/types/CoachingTypes';
-import { useBackendHelpers } from '../../useBackend';
+// import { useBackendHelpers } from '../../useBackend';
 
 export default function useStudentRecordsBackend() {
-  const { getFactory } = useBackendHelpers();
+  // const { getFactory } = useBackendHelpers();
 
-  function getWeeks({
-    queryKey,
-  }: QueryFunctionContext<
-    [string, { startDate: string | undefined; endDate: string | undefined }]
-  >): Promise<StudentRecordsTypes.Week[]> {
-    const [, { startDate, endDate }] = queryKey;
-
-    if (!startDate || !endDate) {
-      return Promise.resolve([]);
-    }
-    return getFactory(`coaching/weeks/${startDate}.${endDate}`);
+  function getWeeks(
+    _ctx: QueryFunctionContext<
+      [string, { startDate: string | undefined; endDate: string | undefined }]
+    >,
+  ): Promise<StudentRecordsTypes.Week[]> {
+    throw new Error('This feature is not available at this time.');
+    // const [, { startDate, endDate }] = _ctx.queryKey;
+    // if (!startDate || !endDate) { return Promise.resolve([]); }
+    // return getFactory(`coaching/weeks/${startDate}.${endDate}`);
   }
 
-  function getAssignments({
-    queryKey,
-  }: QueryFunctionContext<
-    [string, { startDate: string | undefined; endDate: string | undefined }]
-  >): Promise<StudentRecordsTypes.Assignment[]> {
-    const [, { startDate, endDate }] = queryKey;
-
-    if (!startDate || !endDate) {
-      return Promise.resolve([]);
-    }
-    return getFactory(`coaching/assignments/${startDate}.${endDate}`);
+  function getAssignments(
+    _ctx: QueryFunctionContext<
+      [string, { startDate: string | undefined; endDate: string | undefined }]
+    >,
+  ): Promise<StudentRecordsTypes.Assignment[]> {
+    throw new Error('This feature is not available at this time.');
+    // const [, { startDate, endDate }] = _ctx.queryKey;
+    // if (!startDate || !endDate) { return Promise.resolve([]); }
+    // return getFactory(`coaching/assignments/${startDate}.${endDate}`);
   }
 
-  function getPrivateCalls({
-    queryKey,
-  }: QueryFunctionContext<
-    [string, { startDate: string | undefined; endDate: string | undefined }]
-  >): Promise<StudentRecordsTypes.PrivateCall[]> {
-    const [, { startDate, endDate }] = queryKey;
-
-    if (!startDate || !endDate) {
-      return Promise.resolve([]);
-    }
-    return getFactory(`coaching/private-calls/${startDate}.${endDate}`);
+  function getPrivateCalls(
+    _ctx: QueryFunctionContext<
+      [string, { startDate: string | undefined; endDate: string | undefined }]
+    >,
+  ): Promise<StudentRecordsTypes.PrivateCall[]> {
+    throw new Error('This feature is not available at this time.');
+    // const [, { startDate, endDate }] = _ctx.queryKey;
+    // if (!startDate || !endDate) { return Promise.resolve([]); }
+    // return getFactory(`coaching/private-calls/${startDate}.${endDate}`);
   }
 
-  function getGroupSessions({
-    queryKey,
-  }: QueryFunctionContext<
-    [string, { startDate: string | undefined; endDate: string | undefined }]
-  >): Promise<StudentRecordsTypes.GroupSession[]> {
-    const [, { startDate, endDate }] = queryKey;
-
-    if (!startDate || !endDate) {
-      return Promise.resolve([]);
-    }
-    return getFactory(`coaching/group-sessions/${startDate}.${endDate}`);
+  function getGroupSessions(
+    _ctx: QueryFunctionContext<
+      [string, { startDate: string | undefined; endDate: string | undefined }]
+    >,
+  ): Promise<StudentRecordsTypes.GroupSession[]> {
+    throw new Error('This feature is not available at this time.');
+    // const [, { startDate, endDate }] = _ctx.queryKey;
+    // if (!startDate || !endDate) { return Promise.resolve([]); }
+    // return getFactory(`coaching/group-sessions/${startDate}.${endDate}`);
   }
 
-  function getGroupAttendees({
-    queryKey,
-  }: QueryFunctionContext<
-    [string, { startDate: string | undefined; endDate: string | undefined }]
-  >): Promise<StudentRecordsTypes.GroupAttendees[]> {
-    const [, { startDate, endDate }] = queryKey;
-
-    if (!startDate || !endDate) {
-      return Promise.resolve([]);
-    }
-    return getFactory(`coaching/group-attendees/${startDate}.${endDate}`);
+  function getGroupAttendees(
+    _ctx: QueryFunctionContext<
+      [string, { startDate: string | undefined; endDate: string | undefined }]
+    >,
+  ): Promise<StudentRecordsTypes.GroupAttendees[]> {
+    throw new Error('This feature is not available at this time.');
+    // const [, { startDate, endDate }] = _ctx.queryKey;
+    // if (!startDate || !endDate) { return Promise.resolve([]); }
+    // return getFactory(`coaching/group-attendees/${startDate}.${endDate}`);
   }
 
   return {

@@ -5,7 +5,7 @@ import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { describe, expect, it } from 'vitest';
 import WeeksRecordsSection from './WeeksRecords';
 
-describe('section WeeksRecordsSection', () => {
+describe.skip('section WeeksRecordsSection', () => {
   // Write better tests, delete skipped ones
   it('renders without crashing', async () => {
     render(
@@ -20,7 +20,7 @@ describe('section WeeksRecordsSection', () => {
       { timeout: 10000 },
     );
   });
-  describe.skip('filtering logic', () => {
+  describe('filtering logic', () => {
     /*
     tests: 
     - default values are correct

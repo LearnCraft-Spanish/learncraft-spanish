@@ -1,13 +1,14 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import {
-  CoursesTable,
-  LessonsTable,
+  // CoursesTable,
+  // LessonsTable,
   ProgramsTable,
   QuizGroupsTable,
   QuizzesTable,
   StudentsTable,
   VqdLessonsTable,
 } from 'src/components/DatabaseTables';
+import NotAvailablePage from 'src/NotAvailablePage';
 import useDatabaseTables from './useDatabaseTables';
 import './DatabaseTables.scss';
 
@@ -44,14 +45,14 @@ function DatabaseTablesMenu() {
       </div>
       <h3>Student Records Database</h3>
       <div className="buttonBox">
-        <Link className="linkButton" to="/database-tables/lessons">
+        <button className="linkButton" disabled type="button">
           Lessons Table
-        </Link>
+        </button>
       </div>
       <div className="buttonBox">
-        <Link className="linkButton" to="/database-tables/courses">
+        <button className="linkButton" disabled type="button">
           Courses Table
-        </Link>
+        </button>
       </div>
     </>
   );
@@ -70,8 +71,8 @@ export default function DatabaseTables() {
           <Route path="quiz-groups" element={<QuizGroupsTable />} />
           <Route path="vqd-lessons" element={<VqdLessonsTable />} />
           <Route path="quizzes" element={<QuizzesTable />} />
-          <Route path="lessons" element={<LessonsTable />} />
-          <Route path="courses" element={<CoursesTable />} />
+          <Route path="lessons" element={<NotAvailablePage />} />
+          <Route path="courses" element={<NotAvailablePage />} />
         </Routes>
       </div>
     )

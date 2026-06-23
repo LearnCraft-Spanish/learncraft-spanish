@@ -112,20 +112,38 @@ export default function Menu() {
                   FrequenSay
                 </Link>
               </div>
-              <div className="buttonBox">
+              {/* Not available at this time */}
+              {/* <div className="buttonBox">
                 <Link className="linkButton" to="/weeklyrecords">
                   Weekly Records Interface
                 </Link>
-              </div>
+              </div> */}
               <div className="buttonBox">
+                <button className="linkButton" disabled>
+                  Weekly Records Interface
+                </button>
+              </div>
+              {/* Not available at this time */}
+              {/* <div className="buttonBox">
                 <Link className="linkButton" to="/student-drill-down">
                   Student Drill Down
                 </Link>
-              </div>
+              </div> */}
               <div className="buttonBox">
+                <button className="linkButton" disabled>
+                  Student Drill Down
+                </button>
+              </div>
+              {/* Not available at this time */}
+              {/* <div className="buttonBox">
                 <Link className="linkButton" to="/coaching-dashboard">
                   Coaching Dashboard
                 </Link>
+              </div> */}
+              <div className="buttonBox">
+                <button className="linkButton" disabled>
+                  Coaching Dashboard
+                </button>
               </div>
               <div className="buttonBox">
                 <Link className="linkButton" to="/get-help">
@@ -137,10 +155,16 @@ export default function Menu() {
           {isAdmin && (
             <>
               <h3>Admin Tools</h3>
-              <div className="buttonBox">
+              {/* Not available at this time */}
+              {/* <div className="buttonBox">
                 <Link className="linkButton" to="/admin-dashboard">
                   Admin Dashboard
                 </Link>
+              </div> */}
+              <div className="buttonBox">
+                <button className="linkButton" disabled>
+                  Admin Dashboard
+                </button>
               </div>
               <div className="buttonBox">
                 <Link className="linkButton" to="/example-manager/search">
