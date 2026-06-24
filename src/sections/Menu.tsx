@@ -127,20 +127,10 @@ export default function Menu() {
                   Weekly Records Interface
                 </button>
               </div>
-              {/* Not available at this time */}
-              {/* <div className="buttonBox">
+              <div className="buttonBox">
                 <Link className="linkButton" to="/student-drill-down">
                   Student Drill Down
                 </Link>
-              </div> */}
-              <div className="buttonBox">
-                <button
-                  className="linkButton disabledButton"
-                  disabled
-                  type="button"
-                >
-                  Student Drill Down
-                </button>
               </div>
               {/* Not available at this time */}
               {/* <div className="buttonBox">

@@ -34,9 +34,9 @@ const FrequensayPage = lazy(() => import('@interface/pages/FrequensayPage'));
 // const WeeksRecordsSection = lazy(
 //   () => import('src/components/Coaching/WeeksRecords/WeeksRecords'),
 // );
-// const StudentDrillDown = lazy(
-//   () => import('src/components/StudentDrillDown/StudentDrillDown'),
-// );
+const StudentDrillDown = lazy(
+  () => import('src/components/StudentDrillDown/StudentDrillDown'),
+);
 // const CoachingDashboard = lazy(
 //   () => import('src/components/CoachingDashboard'),
 // );
@@ -91,14 +91,9 @@ export default function AppRoutes() {
           path="/weeklyrecords"
           element={(isAdmin || isCoach) && <NotAvailablePage />}
         />
-        {/* Not available at this time */}
-        {/* <Route
-          path="/student-drill-down"
-          element={(isAdmin || isCoach) && <StudentDrillDown />}
-        /> */}
         <Route
           path="/student-drill-down"
-          element={(isAdmin || isCoach) && <NotAvailablePage />}
+          element={(isAdmin || isCoach) && <StudentDrillDown />}
         />
         {/* Not available at this time */}
         {/* <Route
