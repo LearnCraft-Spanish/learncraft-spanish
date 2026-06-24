@@ -5,13 +5,17 @@ import type {
   CoachingStudent,
   SrCourse,
   StudentMembership,
+  TimeZone,
+  UpdateCoachingStudentCommand,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
   getAllCoachingStudentsEndpoint,
   getAllSrCoursesEndpoint,
+  getAllTimeZonesEndpoint,
   getSrStudentBundleCreditsEndpoint,
   getStudentMembershipsEndpoint,
+  updateCoachingStudentEndpoint,
 } from '@learncraft-spanish/shared';
 
 export function createCoachingStudentsInfrastructure(
@@ -45,6 +49,17 @@ export function createCoachingStudentsInfrastructure(
           String(srStudentId),
         ),
         getStudentMembershipsEndpoint.requiredScopes,
+      ),
+    getAllTimeZones: () =>
+      httpClient.get<TimeZone[]>(
+        getAllTimeZonesEndpoint.path,
+        getAllTimeZonesEndpoint.requiredScopes,
+      ),
+    updateCoachingStudent: (cmd: UpdateCoachingStudentCommand) =>
+      httpClient.put<CoachingStudent>(
+        updateCoachingStudentEndpoint.path,
+        updateCoachingStudentEndpoint.requiredScopes,
+        { student: cmd },
       ),
   };
 }

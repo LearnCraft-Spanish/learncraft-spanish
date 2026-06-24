@@ -1,7 +1,74 @@
+import { useAllCoachesQuery } from '@application/queries/CoachQueries/useAllCoachesQuery';
 import { useMemo } from 'react';
-import { useCoachList } from 'src/hooks/CoachingData/queries';
 
 export function CoachDropdown({
+  coachId,
+  onChange,
+  editMode,
+  label = 'Coach',
+  defaultOptionText = undefined,
+  required = false,
+}: {
+  coachId: number;
+  onChange: (value: number) => void;
+  editMode: boolean;
+  label?: string;
+  defaultOptionText?: string;
+  required?: boolean;
+}) {
+  const { allCoachesQuery } = useAllCoachesQuery();
+
+  const dataReady = allCoachesQuery.isSuccess;
+
+  const coachName = useMemo(() => {
+    const corrector = allCoachesQuery.data?.find(
+      (coach) => coach.coach_id === coachId,
+    );
+    return corrector ? corrector.fullName : 'No Coach Found';
+  }, [coachId, allCoachesQuery.data]);
+
+  const sortedCoaches = useMemo(() => {
+    if (!allCoachesQuery.data) {
+      return [];
+    }
+    return allCoachesQuery.data?.sort((a, b) =>
+      a.fullName.localeCompare(b.fullName),
+    );
+  }, [allCoachesQuery.data]);
+
+  return (
+    dataReady && (
+      <div className="lineWrapper">
+        <label
+          className={`label ${required && editMode ? 'required' : ''}`}
+          htmlFor="coachDropdown"
+        >
+          {`${label}:`}
+        </label>
+        {editMode ? (
+          <select
+            id="coachDropdown"
+            className="content"
+            value={coachId}
+            onChange={(e) => onChange(Number(e.target.value))}
+          >
+            <option value={''}>{defaultOptionText || 'Select'}</option>
+
+            {sortedCoaches.map((coach) => (
+              <option key={coach.coach_id} value={coach.coach_id}>
+                {coach.fullName}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <p className="content">{coachName}</p>
+        )}
+      </div>
+    )
+  );
+}
+
+export function CoachDropdown_LEGACY({
   coachEmail,
   onChange,
   editMode,
@@ -16,25 +83,25 @@ export function CoachDropdown({
   defaultOptionText?: string;
   required?: boolean;
 }) {
-  const { coachListQuery } = useCoachList();
+  const { allCoachesQuery } = useAllCoachesQuery();
 
-  const dataReady = coachListQuery.isSuccess;
+  const dataReady = allCoachesQuery.isSuccess;
 
   const coachName = useMemo(() => {
-    const corrector = coachListQuery.data?.find(
-      (user) => user.user.email === coachEmail,
+    const corrector = allCoachesQuery.data?.find(
+      (coach) => coach.email === coachEmail,
     );
-    return corrector ? corrector.user.name : 'No Coach Found';
-  }, [coachEmail, coachListQuery.data]);
+    return corrector ? corrector.fullName : 'No Coach Found';
+  }, [coachEmail, allCoachesQuery.data]);
 
   const sortedCoaches = useMemo(() => {
-    if (!coachListQuery.data) {
+    if (!allCoachesQuery.data) {
       return [];
     }
-    return coachListQuery.data?.sort((a, b) =>
-      a.user.name.localeCompare(b.user.name),
+    return allCoachesQuery.data?.sort((a, b) =>
+      a.fullName.localeCompare(b.fullName),
     );
-  }, [coachListQuery.data]);
+  }, [allCoachesQuery.data]);
 
   return (
     dataReady && (
@@ -55,8 +122,8 @@ export function CoachDropdown({
             <option value={''}>{defaultOptionText || 'Select'}</option>
 
             {sortedCoaches.map((coach) => (
-              <option key={coach.coach} value={coach.user.email}>
-                {coach.user.name}
+              <option key={coach.email} value={coach.email}>
+                {coach.fullName}
               </option>
             ))}
           </select>

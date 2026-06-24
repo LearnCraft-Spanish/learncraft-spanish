@@ -6,6 +6,28 @@ const defaultMockCoachingStudentsAdapter: CoachingStudentsPort = {
   getAllSrCourses: async () => [],
   getStudentBundleCredits: async () => [],
   getStudentMemberships: async () => [],
+  getAllTimeZones: async () => [],
+  updateCoachingStudent: async () => ({
+    student_id: 1,
+    firstName: 'John',
+    lastName: 'Doe',
+    fullName: 'John Doe',
+    email: 'john.doe@example.com',
+    billingEmail: 'john.doe@example.com',
+    billingNotes: 'Lorem ipsum dolor sit amet',
+    learningDisabilities: 'Lorem ipsum dolor sit amet',
+    primaryCoach: {
+      coach_id: 1,
+      fullName: 'John Doe',
+      email: 'john.doe@example.com',
+    },
+    usPhone: '1234567890',
+    active: true,
+    firstSubscribed: new Date(),
+    advancedStudent: false,
+    fluencyGoal: 'Lorem ipsum dolor sit amet',
+    startingLevel: 'Lorem ipsum dolor sit amet',
+  }),
 };
 
 export const {

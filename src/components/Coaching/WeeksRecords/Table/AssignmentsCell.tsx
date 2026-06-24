@@ -4,7 +4,7 @@ import { Dropdown } from '@interface/components/FormComponents';
 import { useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
 import {
-  CoachDropdown,
+  CoachDropdown_LEGACY,
   DeleteRecord,
   FormControls,
   LinkInput,
@@ -251,7 +251,7 @@ export function AssignmentView({
         required
       />
 
-      <CoachDropdown
+      <CoachDropdown_LEGACY
         label="Corrected by"
         editMode={editMode}
         coachEmail={homeworkCorrector}
@@ -593,7 +593,7 @@ export function NewAssignmentView({
         required
       />
 
-      <CoachDropdown
+      <CoachDropdown_LEGACY
         label="Corrected by"
         editMode={editMode}
         coachEmail={homeworkCorrector}

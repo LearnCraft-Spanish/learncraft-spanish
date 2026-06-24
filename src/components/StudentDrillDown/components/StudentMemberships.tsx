@@ -2,6 +2,7 @@ import type { StudentMembership } from '@learncraft-spanish/shared';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useAllSrCoursesQuery } from '@application/queries/CoachingStudentQueries/useAllSrCoursesQuery';
 import { useStudentMembershipsQuery } from '@application/queries/CoachingStudentQueries/useStudentMembershipsQuery';
+import { useAllCoachesQuery } from '@application/queries/CoachQueries/useAllCoachesQuery';
 import { Dropdown, TextInput } from '@interface/components/FormComponents';
 import { InlineLoading } from '@interface/components/Loading';
 import { useQueryClient } from '@tanstack/react-query';
@@ -18,7 +19,6 @@ import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
-import { useCoachList } from 'src/hooks/CoachingData/queries';
 import { useStudentMemberships } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 
 import MembershipWeeks from './MembershipWeeks';
@@ -209,7 +209,7 @@ function StudentMembershipContextual({
     membership.relatedCourse.srCourseId,
   );
   const { isAdmin, authUser } = useAuthAdapter();
-  const { coachListQuery } = useCoachList();
+  const { allCoachesQuery } = useAllCoachesQuery();
   const queryClient = useQueryClient();
   const { updateMembershipMutation } = useStudentMemberships(
     membership.relatedStudent.student_id,
@@ -269,10 +269,10 @@ function StudentMembershipContextual({
     ];
 
     if (authUser?.email) {
-      const currentUserCoach = coachListQuery.data?.find((coach) => {
+      const currentUserCoach = allCoachesQuery.data?.find((coach) => {
         const emailPrefix = authUser.email.split('@')[0].toLowerCase();
         for (const domain of possibleEmailDomains) {
-          if (coach.user.email.toLowerCase() === emailPrefix + domain) {
+          if (coach.email.toLowerCase() === emailPrefix + domain) {
             return true;
           }
         }
@@ -280,7 +280,7 @@ function StudentMembershipContextual({
       });
       if (currentUserCoach) return currentUserCoach;
     }
-  }, [authUser, coachListQuery.data]);
+  }, [authUser, allCoachesQuery.data]);
 
   const handleCourseChange = (courseName: string) => {
     const newCourseId = courseIdByName.get(courseName);
@@ -302,7 +302,7 @@ function StudentMembershipContextual({
 
   if (
     membership.primaryCoach &&
-    membership.primaryCoach.email !== currentUserAsQbUser?.user.email &&
+    membership.primaryCoach.email !== currentUserAsQbUser?.email &&
     isAdmin
   ) {
     return (

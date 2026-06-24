@@ -1,10 +1,18 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DateRangeProvider } from '../DateRangeProvider';
 import AssignmentsCell from './AssignmentsCell';
 
+vi.mock('@application/queries/CoachQueries/useAllCoachesQuery', () => ({
+  useAllCoachesQuery: () => ({
+    allCoachesQuery: {
+      isSuccess: true,
+      data: [],
+    },
+  }),
+}));
 const assignment = generatedMockData.assignments.find(
   (assignment) => assignment.assignmentLink.length > 0,
 );

@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CustomGroupAttendeeSelector from 'src/components/Coaching/general/CustomGroupAttendeeSelector';
 import getWeekEnds from 'src/components/Coaching/general/functions/getWeekEnds';
 import {
-  CoachDropdown,
+  CoachDropdown_LEGACY,
   DateInput,
   DeleteRecord,
   FormControls,
@@ -602,7 +602,7 @@ export function GroupSessionView({
         <h3>{`Session: ${sessionType} on ${date}`}</h3>
       )}
       <div>
-        <CoachDropdown
+        <CoachDropdown_LEGACY
           coachEmail={coach}
           onChange={updateCoach}
           editMode={editMode}

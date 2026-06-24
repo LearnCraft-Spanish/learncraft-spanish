@@ -1,8 +1,10 @@
 import type { Coach, CoachingStudent } from '@learncraft-spanish/shared';
+import { useAllTimeZonesQuery } from '@application/queries/CoachingStudentQueries/useAllTimeZonesQuery';
+import { useUpdateCoachingStudentMutation } from '@application/queries/CoachingStudentQueries/useUpdateCoachingStudentMutation';
 import { useAllCoachesQuery } from '@application/queries/CoachQueries/useAllCoachesQuery';
 import CoachStudentDrillDown from '@interface/components/CoachStudentDrillDown/CoachStudentDrillDown';
 import { Dropdown, TextInput } from '@interface/components/FormComponents';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import pencil from 'src/assets/icons/pencil.svg';
 import {
   Checkbox,
@@ -12,67 +14,12 @@ import {
 import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import { useUpdateStudent } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { BundleCreditsSection } from './BundleCreditsSection';
-
-const timezones = [
-  'AZ',
-  'CT',
-  'Eastern - US',
-  'Central - US',
-  'Pacific - US',
-  'BST',
-  'UK',
-  'Mountain - US',
-  'GMT + 1',
-  'CET',
-  'Western Australia',
-  'Shanghai',
-  'PR',
-  'Sydney',
-  'AEST',
-  'New Zealand',
-  'Central Australia',
-  'Trinidad',
-  'India',
-  'Atlantic Standard',
-  'Mexico City',
-  'Colombia Standard Time',
-  'GMT +8',
-  'Central - MX',
-  'GMT+0',
-  'GMT-5',
-  'Costa Rica',
-  'PST',
-  'other',
-  'Peru',
-  'Kuala Lumpur/Malaysia',
-  'Kuwait',
-  'Taiwan',
-  'South Africa',
-  'Saudi',
-  'Jamaica - EST',
-  'Alaska',
-  'Ecuador',
-  'Uruguay',
-  'Pacific - MX',
-  'AEDT',
-  'Mountain - CA',
-  'Paraguay',
-  'AWST',
-  'GTM + 4',
-  'Eastern - Canada',
-  'Argentina',
-  'Hawaii',
-  'Georgia',
-  'Chile',
-  'MST - Arizona',
-];
 
 // Create an interface that extends CoachingStudent to include the primaryCoachEmail field for the form
 interface StudentFormData extends Omit<CoachingStudent, 'primaryCoach'> {
   primaryCoach: CoachingStudent['primaryCoach'];
-  primaryCoachEmail?: string;
+  primaryCoachId?: number;
 }
 
 export default function StudentInfoCard({
@@ -183,12 +130,18 @@ export function StudentInfoContextual({
   currentCoach: Coach | undefined;
   isAdmin: boolean;
 }) {
-  const { updateStudentMutation } = useUpdateStudent();
+  const { updateCoachingStudentMutation } = useUpdateCoachingStudentMutation();
   const { allCoachesQuery } = useAllCoachesQuery();
+  const { allTimeZonesQuery } = useAllTimeZonesQuery();
 
   const { closeContextual } = useContextualMenu();
 
   const [data, setData] = useState<StudentFormData | undefined>(undefined);
+
+  const timeZoneOptions = useMemo(
+    () => allTimeZonesQuery.data?.map((tz) => tz.timeZone) ?? [],
+    [allTimeZonesQuery.data],
+  );
 
   function cancelEdit() {
     setData(student);
@@ -197,32 +150,37 @@ export function StudentInfoContextual({
 
   function captureSubmitForm() {
     if (!data) return;
-    let relatedCoach: number | string | undefined =
+
+    let primaryCoach: number | undefined =
       student?.primaryCoach?.coach_id || undefined;
-    if (data.primaryCoachEmail) {
+    if (data.primaryCoachId) {
       const coach = allCoachesQuery.data?.find(
-        (coach) => coach.email === data.primaryCoachEmail,
+        (coach) => coach.coach_id === data.primaryCoachId,
       );
       if (coach) {
-        relatedCoach = coach.coach_id;
+        primaryCoach = coach.coach_id;
       }
     }
 
-    updateStudentMutation.mutate(
+    const timeZoneId = allTimeZonesQuery.data?.find(
+      (tz) => tz.timeZone === data.timeZone,
+    )?.time_zone_id;
+
+    updateCoachingStudentMutation.mutate(
       {
+        student_id: student.student_id,
         firstName: data.firstName || undefined,
         lastName: data.lastName || undefined,
         learningDisabilities: data.learningDisabilities || '',
         email: data.email || undefined,
-        timeZone: data.timeZone || undefined,
+        timeZone: timeZoneId,
         startingLevel: data.startingLevel || undefined,
         fluencyGoal: data.fluencyGoal || undefined,
         advancedStudent: data.advancedStudent || false,
         billingEmail: data.billingEmail || undefined,
         billingNotes: data.billingNotes || undefined,
-        recordId: student.student_id,
         usPhone: data.usPhone || undefined,
-        relatedCoach,
+        primaryCoach,
       },
       {
         onSuccess: () => {
@@ -236,7 +194,7 @@ export function StudentInfoContextual({
     if (student) {
       setData({
         ...student,
-        primaryCoachEmail: student.primaryCoach?.email,
+        primaryCoachId: student.primaryCoach?.coach_id,
       });
     }
   }, [student]);
@@ -297,7 +255,7 @@ export function StudentInfoContextual({
           onChange={(value) => {
             setData({ ...data, timeZone: value });
           }}
-          options={timezones}
+          options={timeZoneOptions}
           editMode
         />
         <TextInput
@@ -317,10 +275,10 @@ export function StudentInfoContextual({
           editMode
         />
         <CoachDropdown
-          coachEmail={data.primaryCoachEmail || ''}
-          onChange={(value: string) => {
+          coachId={data.primaryCoachId || 0}
+          onChange={(value: number) => {
             setData((prev) =>
-              prev ? { ...prev, primaryCoachEmail: value } : undefined,
+              prev ? { ...prev, primaryCoachId: value } : undefined,
             );
           }}
           editMode
