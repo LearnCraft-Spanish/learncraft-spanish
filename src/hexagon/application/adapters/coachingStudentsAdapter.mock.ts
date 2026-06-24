@@ -28,6 +28,25 @@ const defaultMockCoachingStudentsAdapter: CoachingStudentsPort = {
     fluencyGoal: 'Lorem ipsum dolor sit amet',
     startingLevel: 'Lorem ipsum dolor sit amet',
   }),
+  createBundleCredit: async () => ({
+    bundle_credit_id: 1,
+    student_id: 1,
+    expiration: Date.now(),
+    totalCredits: 0,
+    usedCredits: 0,
+    creditsRemaining: 0,
+    expired: false,
+  }),
+  updateBundleCredit: async () => ({
+    bundle_credit_id: 1,
+    student_id: 1,
+    expiration: Date.now(),
+    totalCredits: 0,
+    usedCredits: 0,
+    creditsRemaining: 0,
+    expired: false,
+  }),
+  deleteBundleCredit: async () => 1,
 };
 
 export const {

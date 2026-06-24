@@ -1,9 +1,12 @@
 import type {
   BundleCredit,
   CoachingStudent,
+  CreateBundleCreditCommand,
+  DeleteBundleCreditCommand,
   SrCourse,
   StudentMembership,
   TimeZone,
+  UpdateBundleCreditCommand,
   UpdateCoachingStudentCommand,
 } from '@learncraft-spanish/shared';
 
@@ -16,4 +19,7 @@ export interface CoachingStudentsPort {
   updateCoachingStudent: (
     cmd: UpdateCoachingStudentCommand,
   ) => Promise<CoachingStudent>;
+  createBundleCredit: (cmd: CreateBundleCreditCommand) => Promise<BundleCredit>;
+  updateBundleCredit: (cmd: UpdateBundleCreditCommand) => Promise<BundleCredit>;
+  deleteBundleCredit: (cmd: DeleteBundleCreditCommand) => Promise<number>;
 }

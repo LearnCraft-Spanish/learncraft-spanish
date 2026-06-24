@@ -3,18 +3,24 @@ import type { CoachingStudentsPort } from '@application/ports/coachingStudentsPo
 import type {
   BundleCredit,
   CoachingStudent,
+  CreateBundleCreditCommand,
+  DeleteBundleCreditCommand,
   SrCourse,
   StudentMembership,
   TimeZone,
+  UpdateBundleCreditCommand,
   UpdateCoachingStudentCommand,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
+  createBundleCreditEndpoint,
+  deleteBundleCreditEndpoint,
   getAllCoachingStudentsEndpoint,
   getAllSrCoursesEndpoint,
   getAllTimeZonesEndpoint,
   getSrStudentBundleCreditsEndpoint,
   getStudentMembershipsEndpoint,
+  updateBundleCreditEndpoint,
   updateCoachingStudentEndpoint,
 } from '@learncraft-spanish/shared';
 
@@ -60,6 +66,24 @@ export function createCoachingStudentsInfrastructure(
         updateCoachingStudentEndpoint.path,
         updateCoachingStudentEndpoint.requiredScopes,
         { student: cmd },
+      ),
+    createBundleCredit: (cmd: CreateBundleCreditCommand) =>
+      httpClient.post<BundleCredit>(
+        createBundleCreditEndpoint.path,
+        createBundleCreditEndpoint.requiredScopes,
+        { bundleCredit: cmd },
+      ),
+    updateBundleCredit: (cmd: UpdateBundleCreditCommand) =>
+      httpClient.put<BundleCredit>(
+        updateBundleCreditEndpoint.path,
+        updateBundleCreditEndpoint.requiredScopes,
+        { bundleCredit: cmd },
+      ),
+    deleteBundleCredit: (cmd: DeleteBundleCreditCommand) =>
+      httpClient.delete<number>(
+        deleteBundleCreditEndpoint.path,
+        deleteBundleCreditEndpoint.requiredScopes,
+        { data: cmd },
       ),
   };
 }

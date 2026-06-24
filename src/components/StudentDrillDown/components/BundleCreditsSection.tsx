@@ -1,14 +1,12 @@
 import type { BundleCredit } from '@learncraft-spanish/shared';
-import type {
-  CreateBundleCreditInput,
-  UpdateBundleCreditInput,
-} from 'src/hooks/CoachingData/useBundleCredits';
+import { useCreateBundleCreditMutation } from '@application/queries/CoachingStudentQueries/useCreateBundleCreditMutation';
+import { useDeleteBundleCreditMutation } from '@application/queries/CoachingStudentQueries/useDeleteBundleCreditMutation';
 import { useStudentBundleCreditsQuery } from '@application/queries/CoachingStudentQueries/useStudentBundleCreditsQuery';
+import { useUpdateBundleCreditMutation } from '@application/queries/CoachingStudentQueries/useUpdateBundleCreditMutation';
 import React, { useState } from 'react';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
-import { useBundleCredits } from 'src/hooks/CoachingData/useBundleCredits';
 
 function BundleCreditView({
   studentId,
@@ -18,8 +16,12 @@ function BundleCreditView({
   credit?: BundleCredit;
 }) {
   const { closeContextual } = useContextualMenu();
-  const { createBundleCredit, updateBundleCredit, deleteBundleCredit } =
-    useBundleCredits(studentId);
+  const { createBundleCreditMutation } =
+    useCreateBundleCreditMutation(studentId);
+  const { updateBundleCreditMutation } =
+    useUpdateBundleCreditMutation(studentId);
+  const { deleteBundleCreditMutation } =
+    useDeleteBundleCreditMutation(studentId);
   const { openModal, closeModal } = useModal();
   const [formData, setFormData] = useState<{
     totalCredits: string;
@@ -93,7 +95,9 @@ function BundleCreditView({
     closeModal();
     try {
       if (credit) {
-        await deleteBundleCredit.mutateAsync(credit.bundle_credit_id);
+        await deleteBundleCreditMutation.mutateAsync({
+          bundle_credit_id: credit.bundle_credit_id,
+        });
         closeContextual();
       }
     } catch (error) {
@@ -120,15 +124,16 @@ function BundleCreditView({
         formData.usedCredits === '' ? 0 : Number(formData.usedCredits);
 
       if (credit) {
-        await updateBundleCredit.mutateAsync(
+        await updateBundleCreditMutation.mutateAsync(
           {
-            recordId: credit.bundle_credit_id,
+            bundle_credit_id: credit.bundle_credit_id,
+            student_id: studentId,
             totalCredits: parsedTotalCredits,
             usedCredits: parsedUsedCredits,
             expiration: formData.expiration
-              ? `${formData.expiration}T08:00:00`
+              ? new Date(`${formData.expiration}T08:00:00`).getTime()
               : undefined,
-          } as UpdateBundleCreditInput,
+          },
           {
             onSuccess: () => {
               closeContextual();
@@ -136,15 +141,14 @@ function BundleCreditView({
           },
         );
       } else {
-        await createBundleCredit.mutateAsync(
+        await createBundleCreditMutation.mutateAsync(
           {
-            relatedStudent: studentId,
+            student_id: studentId,
             totalCredits: parsedTotalCredits,
             usedCredits: parsedUsedCredits,
-            expiration: formData.expiration
-              ? `${formData.expiration}T08:00:00`
-              : undefined,
-          } as CreateBundleCreditInput,
+            // validateForm() guarantees expiration is set before reaching this point
+            expiration: new Date(`${formData.expiration!}T08:00:00`).getTime(),
+          },
           {
             onSuccess: () => {
               closeContextual();
