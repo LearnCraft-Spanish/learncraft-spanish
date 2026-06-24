@@ -87,19 +87,28 @@ export default function AppRoutes() {
           path="/weeklyrecords"
           element={(isAdmin || isCoach) && <WeeksRecordsSection />}
         /> */}
-        <Route path="/weeklyrecords" element={<NotAvailablePage />} />
+        <Route
+          path="/weeklyrecords"
+          element={(isAdmin || isCoach) && <NotAvailablePage />}
+        />
         {/* Not available at this time */}
         {/* <Route
           path="/student-drill-down"
           element={(isAdmin || isCoach) && <StudentDrillDown />}
         /> */}
-        <Route path="/student-drill-down" element={<NotAvailablePage />} />
+        <Route
+          path="/student-drill-down"
+          element={(isAdmin || isCoach) && <NotAvailablePage />}
+        />
         {/* Not available at this time */}
         {/* <Route
           path="/coaching-dashboard"
           element={(isAdmin || isCoach) && <CoachingDashboard />}
         /> */}
-        <Route path="/coaching-dashboard" element={<NotAvailablePage />} />
+        <Route
+          path="/coaching-dashboard"
+          element={(isAdmin || isCoach) && <NotAvailablePage />}
+        />
         <Route
           path="/database-tables/*"
           element={isAdmin && <DatabaseTables />}
@@ -107,8 +116,11 @@ export default function AppRoutes() {
         <Route path="/example-manager/*" element={<ExampleManagerRouter />} />
         <Route path="/*" element={<NotFoundPage />} />
         {/* Not available at this time */}
-        {/* <Route path="/admin-dashboard" element={<AdminDashboard />} /> */}
-        <Route path="/admin-dashboard" element={<NotAvailablePage />} />
+        {/* <Route path="/admin-dashboard" element={isAdmin && <AdminDashboard />} /> */}
+        <Route
+          path="/admin-dashboard"
+          element={isAdmin && <NotAvailablePage />}
+        />
       </SentryRoutes>
     </Suspense>
   );
