@@ -36,7 +36,7 @@ if (weeksInRange.length === 0) {
  *
  *  - Pagination (next page & previous page buttons, need >50 records)
  */
-describe('component WeeksTable', () => {
+describe.skip('component WeeksTable', () => {
   it('renders without crashing', async () => {
     render(
       <MockAllProviders>

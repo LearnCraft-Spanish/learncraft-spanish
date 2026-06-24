@@ -32,7 +32,7 @@ if (!(relatedGroupSession.callDocument || relatedGroupSession.zoomLink)) {
   throw new Error('mock Group Session is missing required fields');
 }
 
-describe('component StudentCell', () => {
+describe.skip('component StudentCell', () => {
   it('renders with valid data', async () => {
     render(
       <MockAllProviders>

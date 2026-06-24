@@ -1,12 +1,13 @@
 import type { CoachSummaryData } from 'src/components/AdminDashboard/WeeklyCoachSummaries/types';
 import { useQuery } from '@tanstack/react-query';
-import { useBackendHelpers } from '../useBackend';
+// import { useBackendHelpers } from '../useBackend';
 
 export default function useWeeklyCoachSummary() {
-  const { getFactory } = useBackendHelpers();
+  // const { getFactory } = useBackendHelpers();
 
-  const getWeeklyCoachSummary = () => {
-    return getFactory<CoachSummaryData[]>('admin/report/weekly-coach-summary');
+  const getWeeklyCoachSummary = (): Promise<CoachSummaryData[]> => {
+    throw new Error('This feature is not available at this time.');
+    // return getFactory<CoachSummaryData[]>('admin/report/weekly-coach-summary');
   };
 
   const weeklyCoachSummaryQuery = useQuery({
