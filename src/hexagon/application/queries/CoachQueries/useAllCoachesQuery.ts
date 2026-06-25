@@ -16,7 +16,10 @@ export function useAllCoachesQuery(): UseAllCoachesQueryReturn {
 
   const allCoachesQuery = useQuery({
     queryKey: ALL_COACHES_QUERY_KEY,
-    queryFn: () => adapter.getAllCoaches(),
+    queryFn: async () => {
+      const data = await adapter.getAllCoaches();
+      return data.sort((a, b) => a.fullName.localeCompare(b.fullName));
+    },
     staleTime: Infinity,
     enabled: isCoach || isAdmin,
   });

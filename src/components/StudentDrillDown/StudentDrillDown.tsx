@@ -111,7 +111,7 @@ export default function StudentDrillDown() {
               <div>
                 <StudentMemberships
                   studentId={selectedStudentId}
-                  studentName={selectedStudent.fullName}
+                  studentName={selectedStudent?.fullName ?? ''}
                   selectedMembershipId={selectedMembershipId}
                   onMembershipSelect={handleMembershipSelect}
                 />

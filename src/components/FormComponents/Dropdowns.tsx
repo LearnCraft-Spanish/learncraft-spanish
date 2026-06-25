@@ -27,15 +27,6 @@ export function CoachDropdown({
     return corrector ? corrector.fullName : 'No Coach Found';
   }, [coachId, allCoachesQuery.data]);
 
-  const sortedCoaches = useMemo(() => {
-    if (!allCoachesQuery.data) {
-      return [];
-    }
-    return allCoachesQuery.data?.sort((a, b) =>
-      a.fullName.localeCompare(b.fullName),
-    );
-  }, [allCoachesQuery.data]);
-
   return (
     dataReady && (
       <div className="lineWrapper">
@@ -54,7 +45,7 @@ export function CoachDropdown({
           >
             <option value={''}>{defaultOptionText || 'Select'}</option>
 
-            {sortedCoaches.map((coach) => (
+            {allCoachesQuery.data?.map((coach) => (
               <option key={coach.coach_id} value={coach.coach_id}>
                 {coach.fullName}
               </option>
@@ -94,15 +85,6 @@ export function CoachDropdown_LEGACY({
     return corrector ? corrector.fullName : 'No Coach Found';
   }, [coachEmail, allCoachesQuery.data]);
 
-  const sortedCoaches = useMemo(() => {
-    if (!allCoachesQuery.data) {
-      return [];
-    }
-    return allCoachesQuery.data?.sort((a, b) =>
-      a.fullName.localeCompare(b.fullName),
-    );
-  }, [allCoachesQuery.data]);
-
   return (
     dataReady && (
       <div className="lineWrapper">
@@ -121,7 +103,7 @@ export function CoachDropdown_LEGACY({
           >
             <option value={''}>{defaultOptionText || 'Select'}</option>
 
-            {sortedCoaches.map((coach) => (
+            {allCoachesQuery.data?.map((coach) => (
               <option key={coach.email} value={coach.email}>
                 {coach.fullName}
               </option>
