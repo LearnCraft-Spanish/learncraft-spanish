@@ -38,6 +38,7 @@ export default defineConfig(({ mode }) => {
       format: 'es',
     },
     build: {
+      cssCodeSplit: false,
       manifest: true,
       outDir: 'build',
       sourcemap: true,

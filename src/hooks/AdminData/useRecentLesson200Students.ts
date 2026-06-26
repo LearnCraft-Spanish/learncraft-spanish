@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { useBackendHelpers } from '../useBackend';
+// import { useBackendHelpers } from '../useBackend';
 
 export default function useRecentLesson200Students() {
-  const { getFactory } = useBackendHelpers();
+  // const { getFactory } = useBackendHelpers();
 
-  const getRecentLesson200Students = () => {
-    return getFactory<any>('admin/report/recent-lesson-200-students');
+  const getRecentLesson200Students = (): Promise<any> => {
+    throw new Error('This feature is not available at this time.');
+    // return getFactory<any>('admin/report/recent-lesson-200-students');
   };
 
   const recentLesson200StudentsQuery = useQuery({

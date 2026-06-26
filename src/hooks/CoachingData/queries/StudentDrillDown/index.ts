@@ -1,5 +1,5 @@
-import useAllStudents from './useAllStudents';
 import useMembershipWeeks from './useMembershipWeeks';
 import useStudentMemberships from './useStudentMemberships';
+import useUpdateStudent from './useUpdateStudent';
 
-export { useAllStudents, useMembershipWeeks, useStudentMemberships };
+export { useMembershipWeeks, useStudentMemberships, useUpdateStudent };

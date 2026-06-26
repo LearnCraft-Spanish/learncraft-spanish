@@ -1,7 +1,10 @@
-import type { Coach, CoachingStudent } from 'src/types/CoachingTypes';
+import type { Coach, CoachingStudent } from '@learncraft-spanish/shared';
+import { useAllTimeZonesQuery } from '@application/queries/CoachingStudentQueries/useAllTimeZonesQuery';
+import { useUpdateCoachingStudentMutation } from '@application/queries/CoachingStudentQueries/useUpdateCoachingStudentMutation';
+import { useAllCoachesQuery } from '@application/queries/CoachQueries/useAllCoachesQuery';
 import CoachStudentDrillDown from '@interface/components/CoachStudentDrillDown/CoachStudentDrillDown';
 import { Dropdown, TextInput } from '@interface/components/FormComponents';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import pencil from 'src/assets/icons/pencil.svg';
 import {
   Checkbox,
@@ -11,67 +14,12 @@ import {
 import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import { useCoachList } from 'src/hooks/CoachingData/queries';
-import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { BundleCreditsSection } from './BundleCreditsSection';
-const timezones = [
-  'AZ',
-  'CT',
-  'Eastern - US',
-  'Central - US',
-  'Pacific - US',
-  'BST',
-  'UK',
-  'Mountain - US',
-  'GMT + 1',
-  'CET',
-  'Western Australia',
-  'Shanghai',
-  'PR',
-  'Sydney',
-  'AEST',
-  'New Zealand',
-  'Central Australia',
-  'Trinidad',
-  'India',
-  'Atlantic Standard',
-  'Mexico City',
-  'Colombia Standard Time',
-  'GMT +8',
-  'Central - MX',
-  'GMT+0',
-  'GMT-5',
-  'Costa Rica',
-  'PST',
-  'other',
-  'Peru',
-  'Kuala Lumpur/Malaysia',
-  'Kuwait',
-  'Taiwan',
-  'South Africa',
-  'Saudi',
-  'Jamaica - EST',
-  'Alaska',
-  'Ecuador',
-  'Uruguay',
-  'Pacific - MX',
-  'AEDT',
-  'Mountain - CA',
-  'Paraguay',
-  'AWST',
-  'GTM + 4',
-  'Eastern - Canada',
-  'Argentina',
-  'Hawaii',
-  'Georgia',
-  'Chile',
-  'MST - Arizona',
-];
 
 // Create an interface that extends CoachingStudent to include the primaryCoachEmail field for the form
 interface StudentFormData extends Omit<CoachingStudent, 'primaryCoach'> {
   primaryCoach: CoachingStudent['primaryCoach'];
-  primaryCoachEmail?: string;
+  primaryCoachId?: number;
 }
 
 export default function StudentInfoCard({
@@ -107,10 +55,6 @@ export default function StudentInfoCard({
           <div className="info-value">{student.fullName}</div>
         </div>
         <div className="info-row">
-          <div className="info-label">Pronouns:</div>
-          <div className="info-value">{student.pronoun}</div>
-        </div>
-        <div className="info-row">
           <div className="info-label">Learning Disabilities:</div>
           <div className="info-value">{student.learningDisabilities}</div>
         </div>
@@ -133,7 +77,9 @@ export default function StudentInfoCard({
         <div className="info-row">
           <div className="info-label">Primary Coach:</div>
           <div className="info-value">
-            {student.primaryCoach ? student.primaryCoach.name : 'Not assigned'}
+            {student.primaryCoach
+              ? student.primaryCoach.fullName
+              : 'Not assigned'}
           </div>
         </div>
         <div className="info-row">
@@ -143,7 +89,7 @@ export default function StudentInfoCard({
           </div>
         </div>
         {/* only show to users who are admins */}
-        {isAdmin && <CoachStudentDrillDown studentId={student.recordId} />}
+        {isAdmin && <CoachStudentDrillDown studentId={student.student_id} />}
         {isAdmin && (
           <>
             <h3>Billing Information</h3>
@@ -166,7 +112,10 @@ export default function StudentInfoCard({
           </>
         )}
 
-        <BundleCreditsSection studentId={student.recordId} isAdmin={isAdmin} />
+        <BundleCreditsSection
+          studentId={student.student_id}
+          isAdmin={isAdmin}
+        />
       </div>
     </>
   );
@@ -181,12 +130,18 @@ export function StudentInfoContextual({
   currentCoach: Coach | undefined;
   isAdmin: boolean;
 }) {
-  const { updateStudentMutation } = useAllStudents();
-  const { coachListQuery } = useCoachList();
+  const { updateCoachingStudentMutation } = useUpdateCoachingStudentMutation();
+  const { allCoachesQuery } = useAllCoachesQuery();
+  const { allTimeZonesQuery } = useAllTimeZonesQuery();
 
   const { closeContextual } = useContextualMenu();
 
   const [data, setData] = useState<StudentFormData | undefined>(undefined);
+
+  const timeZoneOptions = useMemo(
+    () => allTimeZonesQuery.data?.map((tz) => tz.timeZone) ?? [],
+    [allTimeZonesQuery.data],
+  );
 
   function cancelEdit() {
     setData(student);
@@ -194,36 +149,38 @@ export function StudentInfoContextual({
   }
 
   function captureSubmitForm() {
-    // if data is undefined, return
     if (!data) return;
-    // for each field, if it was previously defined, include it. if it was not defined, remove it
-    let relatedCoach: number | string | undefined =
-      student?.primaryCoach?.id || undefined;
-    if (data.primaryCoachEmail) {
-      const coach = coachListQuery.data?.find(
-        (coach) => coach.user.email === data.primaryCoachEmail,
+
+    let primaryCoach: number | undefined =
+      student?.primaryCoach?.coach_id || undefined;
+    if (data.primaryCoachId) {
+      const coach = allCoachesQuery.data?.find(
+        (coach) => coach.coach_id === data.primaryCoachId,
       );
       if (coach) {
-        relatedCoach = coach.recordId;
+        primaryCoach = coach.coach_id;
       }
     }
 
-    updateStudentMutation.mutate(
+    const timeZoneId = allTimeZonesQuery.data?.find(
+      (tz) => tz.timeZone === data.timeZone,
+    )?.time_zone_id;
+
+    updateCoachingStudentMutation.mutate(
       {
+        student_id: student.student_id,
         firstName: data.firstName || undefined,
         lastName: data.lastName || undefined,
-        pronoun: data.pronoun || undefined,
         learningDisabilities: data.learningDisabilities || '',
         email: data.email || undefined,
-        timeZone: data.timeZone || undefined,
+        timeZone: timeZoneId,
         startingLevel: data.startingLevel || undefined,
         fluencyGoal: data.fluencyGoal || undefined,
         advancedStudent: data.advancedStudent || false,
         billingEmail: data.billingEmail || undefined,
         billingNotes: data.billingNotes || undefined,
-        recordId: student.recordId,
         usPhone: data.usPhone || undefined,
-        relatedCoach,
+        primaryCoach,
       },
       {
         onSuccess: () => {
@@ -237,20 +194,12 @@ export function StudentInfoContextual({
     if (student) {
       setData({
         ...student,
-        primaryCoachEmail: student.primaryCoach?.email,
+        primaryCoachId: student.primaryCoach?.coach_id,
       });
     }
   }, [student]);
 
-  // if (!student) {
-  //   return (
-  //     <div>
-  //       Error retrieving student information, please report this to support.
-  //     </div>
-  //   );
-  // }
-
-  if (student.primaryCoach?.email !== currentCoach?.user.email && !isAdmin) {
+  if (student.primaryCoach?.email !== currentCoach?.email && !isAdmin) {
     return (
       <div className="contextualWrapper">
         <div className="contextual">
@@ -284,15 +233,6 @@ export function StudentInfoContextual({
           }}
           editMode
         />
-        <Dropdown
-          label="Pronouns"
-          value={data.pronoun}
-          onChange={(value) => {
-            setData({ ...data, pronoun: value });
-          }}
-          options={['He', 'She', 'They', 'Other']}
-          editMode
-        />
         <TextInput
           label="Learning Disabilities"
           value={data.learningDisabilities}
@@ -315,7 +255,7 @@ export function StudentInfoContextual({
           onChange={(value) => {
             setData({ ...data, timeZone: value });
           }}
-          options={timezones}
+          options={timeZoneOptions}
           editMode
         />
         <TextInput
@@ -335,15 +275,14 @@ export function StudentInfoContextual({
           editMode
         />
         <CoachDropdown
-          coachEmail={data.primaryCoachEmail || ''}
-          onChange={(value: string) => {
+          coachId={data.primaryCoachId || 0}
+          onChange={(value: number) => {
             setData((prev) =>
-              prev ? { ...prev, primaryCoachEmail: value } : undefined,
+              prev ? { ...prev, primaryCoachId: value } : undefined,
             );
           }}
           editMode
         />
-        {/* checkbox for advancedStudent */}
         <Checkbox
           labelText="Advanced Student"
           labelFor="advancedStudent"

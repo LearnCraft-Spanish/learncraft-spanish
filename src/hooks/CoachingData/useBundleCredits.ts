@@ -1,5 +1,6 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { STUDENT_BUNDLE_CREDITS_QUERY_KEY } from '@application/queries/CoachingStudentQueries/useStudentBundleCreditsQuery';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useBackendHelpers } from 'src/hooks/useBackend';
 
@@ -30,7 +31,7 @@ export interface UpdateBundleCreditInput {
 }
 
 export function useBundleCredits(studentId: number) {
-  const { getFactory, newPostFactory, newPutFactory, newDeleteFactory } =
+  const { newPostFactory, newPutFactory, newDeleteFactory } =
     useBackendHelpers();
   const queryClient = useQueryClient();
   const { isAdmin, isLoading, isAuthenticated } = useAuthAdapter();
@@ -43,19 +44,7 @@ export function useBundleCredits(studentId: number) {
     }
   };
 
-  // Query for fetching bundle credits
-  const bundleCreditsQuery = useQuery({
-    queryKey: ['bundleCredits', studentId],
-    queryFn: async () => {
-      const data = await getFactory<BundleCredit[]>(
-        `coaching/bundle-credits/${studentId}`,
-      );
-      return data;
-    },
-    enabled: !!studentId,
-  });
-
-  // Mutation for creating a new bundle credit
+  // Mutations for bundle credits (legacy endpoints until write contracts exist)
   const createBundleCredit = useMutation({
     mutationFn: async (input: CreateBundleCreditInput) => {
       validateAdminAccess();
@@ -71,7 +60,9 @@ export function useBundleCredits(studentId: number) {
       return promise;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bundleCredits', studentId] });
+      queryClient.invalidateQueries({
+        queryKey: STUDENT_BUNDLE_CREDITS_QUERY_KEY(studentId),
+      });
     },
   });
 
@@ -92,7 +83,9 @@ export function useBundleCredits(studentId: number) {
       return promise;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bundleCredits', studentId] });
+      queryClient.invalidateQueries({
+        queryKey: STUDENT_BUNDLE_CREDITS_QUERY_KEY(studentId),
+      });
     },
   });
 
@@ -111,12 +104,13 @@ export function useBundleCredits(studentId: number) {
       return promise;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bundleCredits', studentId] });
+      queryClient.invalidateQueries({
+        queryKey: STUDENT_BUNDLE_CREDITS_QUERY_KEY(studentId),
+      });
     },
   });
 
   return {
-    bundleCreditsQuery,
     createBundleCredit,
     updateBundleCredit,
     deleteBundleCredit,

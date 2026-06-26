@@ -1,9 +1,11 @@
-import type { PrivateCall } from 'src/types/CoachingTypes';
+import type { FurnishedWeek } from '@learncraft-spanish/shared';
 import { Dropdown } from '@interface/components/FormComponents';
 import React from 'react';
 import { LinkInput, TextAreaInput } from 'src/components/FormComponents';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+
+type PrivateCallItem = FurnishedWeek['privateCalls'][number];
 
 const ratingOptions = [
   'Excellent',
@@ -20,24 +22,25 @@ const callTypeOptions = [
   'Strategy Call',
   'Uses Credit (Bundle)',
 ];
+
 function PrivateCallInstance({
   call,
   studentName,
 }: {
-  call: PrivateCall;
+  call: PrivateCallItem;
   studentName: string;
 }) {
   const { openContextual, contextual } = useContextualMenu();
 
   return (
-    <div className="cellWithContextual" key={call.recordId}>
+    <div className="cellWithContextual" key={call.callId}>
       <button
         type="button"
-        onClick={() => openContextual(`call${call.recordId}`)}
+        onClick={() => openContextual(`call${call.callId}`)}
       >
-        {call.rating}
+        {call.callRating.rating}
       </button>
-      {contextual === `call${call.recordId}` && (
+      {contextual === `call${call.callId}` && (
         <PrivateCallView call={call} studentName={studentName} />
       )}
     </div>
@@ -48,50 +51,31 @@ function PrivateCallView({
   call,
   studentName,
 }: {
-  call: PrivateCall;
+  call: PrivateCallItem;
   studentName: string;
 }) {
   return (
     <ContextualView>
       <h4>
-        {/* {
-              getStudentFromMembershipId(
-                getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
-              )?.fullName
-            }{' '} */}
         {studentName} on{' '}
-        {typeof call.date === 'string' ? call.date : call.date.toString()}
+        {typeof call.callDate === 'string'
+          ? call.callDate
+          : call.callDate.toString()}
       </h4>
 
       <div className="lineWrapper">
         <p className="label">Student: </p>
-        {/* <p>
-              {
-                getStudentFromMembershipId(
-                  getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
-                )?.fullName
-              }
-            </p> */}
         {studentName}
       </div>
 
       <div className="lineWrapper">
         <h4 className="label">Caller</h4>
-        <p className="content">{call.caller.name}</p>
+        <p className="content">{call.caller.fullName}</p>
       </div>
-
-      {/* <CoachDropdown
-          label="Caller"
-          coachEmail={call.caller}
-          onChange={() => {}}
-          editMode={false}
-        /> */}
-
-      {/* {editMode && <DateInput value={date} onChange={setDate} />} */}
 
       <Dropdown
         label="Rating"
-        value={call.rating}
+        value={call.callRating.rating}
         onChange={() => {}}
         options={ratingOptions}
         editMode={false}
@@ -99,36 +83,32 @@ function PrivateCallView({
 
       <TextAreaInput
         label="Notes"
-        value={call.notes}
+        value={call.notes ?? ''}
         onChange={() => {}}
         editMode={false}
       />
 
       <TextAreaInput
         label="Difficulties"
-        value={call.areasOfDifficulty}
+        value={call.areasOfDifficulty ?? ''}
         onChange={() => {}}
         editMode={false}
       />
 
       <LinkInput
         label="Recording Link"
-        value={call.recording}
+        value={call.recording ?? ''}
         onChange={() => {}}
         editMode={false}
       />
 
       <Dropdown
         label="Call Type"
-        value={call.callType}
+        value={call.callType.callType}
         onChange={() => {}}
         options={callTypeOptions}
         editMode={false}
       />
-
-      {/* {editMode && userDataQuery.data?.roles.adminRole === 'admin' && (
-          <DeleteRecord deleteFunction={deleteRecordFunction} />
-        )} */}
     </ContextualView>
   );
 }
@@ -137,16 +117,15 @@ export default function PrivateCallsCell({
   calls,
   studentName,
 }: {
-  calls: PrivateCall[] | null;
+  calls: PrivateCallItem[] | null;
   studentName: string;
 }) {
   return (
     <div className="callBox">
-      {/* Existing Calls */}
       {calls &&
         calls.map((call) => (
           <PrivateCallInstance
-            key={call.recordId}
+            key={call.callId}
             call={call}
             studentName={studentName}
           />

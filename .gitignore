@@ -22,18 +22,9 @@ buld/*
 pnpm-workspace.yaml
 
 # misc
-.env
-.env.*
-.env.staging
-.env.development
-.env.test
-.env.production
-.env.local
-.env.staging.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.sentry-build-plugin
+.env*
+!.env.example
+
 .DS_Store
 
 npm-debug.log*

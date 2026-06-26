@@ -1,8 +1,7 @@
 import { InlineLoading } from '@interface/components/Loading';
 import React, { useMemo } from 'react';
+import { useMembershipWeeksQuery } from 'src/hexagon/application/queries/WeekQueries/useMembershipWeeksQuery';
 import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
-
-import { useMembershipWeeks } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import AssignmentsCell from './general/AssignmentsCell_Modificed';
 import GroupSessionsCell from './general/GroupSessionsCell_Modified';
 import PrivateCallsCell from './general/PrivateCallsCell_Modificed';
@@ -17,29 +16,19 @@ export default function MembershipWeeks({
   membershipId,
   studentName,
 }: MembershipWeeksProps) {
-  const weeksQuery = useMembershipWeeks(membershipId);
+  const { membershipWeeksQuery } = useMembershipWeeksQuery(membershipId);
 
-  const isLoading = weeksQuery.isLoading;
+  const isLoading = membershipWeeksQuery.isLoading;
 
-  // const sortedWeeks = useMemo(() => {
-  //   if (!weeksQuery.data) return [];
-  //   return weeksQuery.data.sort((a, b) => {
-  //     const dateA = new Date(a.weekStarts.toString());
-  //     const dateB = new Date(b.weekStarts.toString());
-  //     return dateB.getTime() - dateA.getTime(); // Sort in descending order (newest first)
-  //   });
-  // }, [weeksQuery.data]);
-  // if (!weeksQuery.isSuccess) {
-  //   return <div>Loading weeks...</div>;
-  // }
   const sortedWeeks = useMemo(() => {
-    if (!weeksQuery.data) return [];
-    return weeksQuery.data.sort((a, b) => {
-      const dateA = new Date(a.weekStarts.toString());
-      const dateB = new Date(b.weekStarts.toString());
-      return dateB.getTime() - dateA.getTime(); // Sort in descending order (newest first)
+    if (!membershipWeeksQuery.data) return [];
+    return membershipWeeksQuery.data.slice().sort((a, b) => {
+      const dateA = new Date(a.weekStarts?.toString() ?? '');
+      const dateB = new Date(b.weekStarts?.toString() ?? '');
+      return dateB.getTime() - dateA.getTime();
     });
-  }, [weeksQuery.data]);
+  }, [membershipWeeksQuery.data]);
+
   return (
     <div className="membership-weeks">
       {isLoading ? (
@@ -60,12 +49,16 @@ export default function MembershipWeeks({
           </thead>
           <tbody className="weeks-list">
             {sortedWeeks.map((week) => (
-              <tr key={week.recordId}>
+              <tr key={week.weekId}>
                 <td>
-                  <h4>Week {week.week}</h4>
-                  <span>{toISODate(new Date(week.weekStarts))}</span>
+                  <h4>Week {week.weekNumber}</h4>
+                  <span>
+                    {week.weekStarts
+                      ? toISODate(new Date(week.weekStarts.toString()))
+                      : ''}
+                  </span>
                 </td>
-                <td>{week.currentLessonName}</td>
+                <td>{week.lesson?.lessonName}</td>
                 <td>{week.notes}</td>
                 <td>
                   {week.privateCalls.length > 0 && (
@@ -75,10 +68,9 @@ export default function MembershipWeeks({
                     />
                   )}
                 </td>
-
                 <td>
-                  {week.groupSessions.length > 0 && (
-                    <GroupSessionsCell groupSessions={week.groupSessions} />
+                  {week.groupCalls.length > 0 && (
+                    <GroupSessionsCell groupSessions={week.groupCalls} />
                   )}
                 </td>
                 <td>
@@ -88,90 +80,6 @@ export default function MembershipWeeks({
                 </td>
               </tr>
             ))}
-
-            {/* <h3>Weeks</h3>
-          <div className="weeks-list">
-            {sortedWeeks.map((week) => (
-              <div key={week.recordId} className="week-card">
-                <div className="week-header">
-                  <h4>
-                    Week {week.week} - {toISODate(new Date(week.weekStarts))}
-                  </h4>
-                </div>
-                <div className="week-stats">
-                  <div className="stat-row">
-                    <span className="stat-label">Group Calls:</span>
-                    <span className="stat-value">
-                      {week.numberOfGroupCalls}
-                    </span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-label">Private Calls:</span>
-                    <span className="stat-value">
-                      {week.privateCallsCompleted}
-                    </span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-label">Assignments:</span>
-                    <span className="stat-value">
-                      {week.assignments.length}
-                    </span>
-                  </div>
-                </div>
-                {week.notes && (
-                  <div className="week-notes">
-                    <span className="notes-label">Notes:</span>
-                    <p className="notes-content">{week.notes}</p>
-                  </div>
-                )}
-                {week.assignments.length > 0 && (
-                  <div className="week-assignments">
-                    <span className="assignments-label">Assignments:</span>
-                    <ul className="assignments-list">
-                      {week.assignments.map((assignment) => (
-                        <li
-                          key={assignment.recordId}
-                          className="assignment-item"
-                        >
-                          {assignment.assignmentType}:{assignment.rating}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {week.privateCalls.length > 0 && (
-                  <div className="week-private-calls">
-                    <span className="private-calls-label">Private Calls:</span>
-                    <ul className="private-calls-list">
-                      {week.privateCalls.map((call) => (
-                        <li key={call.recordId} className="private-call-item">
-                          Rating: {call.rating}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {week.groupSessions.length > 0 && (
-                  <div className="week-group-sessions">
-                    <span className="group-sessions-label">
-                      Group Sessions:
-                    </span>
-                    <ul className="group-sessions-list">
-                      {week.groupSessions.map((session) => (
-                        <li
-                          key={session.recordId}
-                          className="group-session-item"
-                        >
-                          {session.sessionType} - Coach: {session.coach.name}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </> */}
           </tbody>
         </table>
       )}

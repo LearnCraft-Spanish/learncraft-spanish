@@ -14,6 +14,10 @@ import {
   resetMockCoachAdapter,
 } from '@application/adapters/coachAdapter.mock';
 import {
+  mockCoachingStudentsAdapter,
+  resetMockCoachingStudentsAdapter,
+} from '@application/adapters/coachingStudentsAdapter.mock';
+import {
   mockCourseAdapter,
   resetMockCourseAdapter,
 } from '@application/adapters/courseAdapter.mock';
@@ -53,6 +57,10 @@ import {
   mockVocabularyAdapter,
   resetMockVocabularyAdapter,
 } from '@application/adapters/vocabularyAdapter.mock';
+import {
+  mockWeeksAdapter,
+  resetMockWeeksAdapter,
+} from '@application/adapters/weeksAdapter.mock';
 import {
   mockActiveStudent,
   resetMockActiveStudent,
@@ -129,6 +137,14 @@ vi.mock('@application/adapters/studentsAdapter', () => ({
   useStudentsAdapter: vi.fn(() => mockStudentsAdapter),
 }));
 
+vi.mock('@application/adapters/coachingStudentsAdapter', () => ({
+  useCoachingStudentsAdapter: vi.fn(() => mockCoachingStudentsAdapter),
+}));
+
+vi.mock('@application/adapters/weeksAdapter', () => ({
+  useWeeksAdapter: vi.fn(() => mockWeeksAdapter),
+}));
+
 vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
   useActiveStudent: vi.fn(() => mockActiveStudent),
 }));
@@ -166,6 +182,8 @@ const resetGlobalMocks = () => {
   resetMockSkillTagsAdapter();
   resetMockPMFSurveyFrequencyAdapter();
   resetMockStudentsAdapter();
+  resetMockCoachingStudentsAdapter();
+  resetMockWeeksAdapter();
   resetMockUseStudentFlashcards();
   resetMockUseSpellingsKnownForLesson();
 

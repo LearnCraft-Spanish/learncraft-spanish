@@ -8,6 +8,14 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 
+// error reload key prevents infinite reloads if reload doesnt fix the error
+const CHUNK_ERROR_RELOAD_KEY = 'chunk_load_error_reloaded';
+window.addEventListener('vite:preloadError', () => {
+  if (sessionStorage.getItem(CHUNK_ERROR_RELOAD_KEY)) return;
+  sessionStorage.setItem(CHUNK_ERROR_RELOAD_KEY, '1');
+  window.location.reload();
+});
+
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error('Root element not found');

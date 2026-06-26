@@ -1,17 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
-import { useBackendHelpers } from '../useBackend';
+// import { useBackendHelpers } from '../useBackend';
 
 export default function useStudentsBeyond150ByCoach(
   coachId: number | undefined,
 ) {
-  const { getFactory } = useBackendHelpers();
-  const routeTemplate = 'coaching/students-beyond-150-by-coach/:coachId';
+  // const { getFactory } = useBackendHelpers();
+  // const routeTemplate = 'coaching/students-beyond-150-by-coach/:coachId';
 
-  const getStudentsBeyond150ByCoach = () => {
-    if (!coachId) return [];
-    return getFactory<any>(
-      routeTemplate.replace(':coachId', coachId.toString()),
-    );
+  const getStudentsBeyond150ByCoach = (): Promise<any> => {
+    throw new Error('This feature is not available at this time.');
+    // if (!coachId) return [];
+    // return getFactory<any>(routeTemplate.replace(':coachId', coachId.toString()));
   };
 
   const studentsBeyond150ByCoachQuery = useQuery({
