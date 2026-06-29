@@ -1,7 +1,7 @@
 import { useAllCoachingStudentsQuery } from '@application/queries/CoachingStudentQueries/useAllCoachingStudentsQuery';
 import { debounce } from 'lodash';
 import { useMemo, useRef, useState } from 'react';
-
+import { ToggleSwitch } from 'src/hexagon/interface/components/general';
 interface StudentDrillDownSearchProps {
   onStudentSelect: (studentId: number | undefined) => void;
   selectedStudentId?: number;
@@ -135,17 +135,13 @@ export default function StudentDrillDownSearch({
           )}
         </div>
         <div className="active-students-filter">
-          <p>Active Students Only:</p>
-          <label htmlFor="activeStudentsOnly" className="switch">
-            <input
-              alt="Active Students"
-              type="checkbox"
-              id="activeStudentsOnly"
-              checked={activeStudentsOnly}
-              onChange={(e) => setActiveStudentsOnly(e.target.checked)}
-            />
-            <span className="slider round"></span>
-          </label>
+          <ToggleSwitch
+            ariaLabel="Active Students Only"
+            id="activeStudentsOnly"
+            label="Active Students Only"
+            checked={activeStudentsOnly}
+            onChange={() => setActiveStudentsOnly(!activeStudentsOnly)}
+          />
         </div>
       </div>
     </div>
