@@ -1,8 +1,11 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { CoachPort } from '@application/ports/coachPort';
-import type { CoachCallCount } from '@learncraft-spanish/shared';
+import type { Coach, CoachCallCount } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
-import { getAllCoachesForStudentEndpoint } from '@learncraft-spanish/shared';
+import {
+  getAllCoachesEndpoint,
+  getAllCoachesForStudentEndpoint,
+} from '@learncraft-spanish/shared';
 
 export function createCoachInfrastructure(
   apiUrl: string,
@@ -20,5 +23,10 @@ export function createCoachInfrastructure(
       );
       return response;
     },
+    getAllCoaches: () =>
+      httpClient.get<Coach[]>(
+        getAllCoachesEndpoint.path,
+        getAllCoachesEndpoint.requiredScopes,
+      ),
   };
 }

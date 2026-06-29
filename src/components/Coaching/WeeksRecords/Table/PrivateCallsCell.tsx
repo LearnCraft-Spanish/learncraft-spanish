@@ -11,7 +11,7 @@ import x_dark from 'src/assets/icons/x_dark.svg';
 import CustomStudentSelector from 'src/components/Coaching/general/CustomStudentSelector';
 import getDateRange from 'src/components/Coaching/general/functions/dateRange';
 import {
-  CoachDropdown,
+  CoachDropdown_LEGACY,
   DateInput,
   DeleteRecord,
   FormControls,
@@ -234,7 +234,7 @@ export function PrivateCallView({
         </div>
       )}
 
-      <CoachDropdown
+      <CoachDropdown_LEGACY
         label="Caller"
         coachEmail={caller}
         onChange={setCaller}
@@ -587,7 +587,7 @@ export function NewPrivateCallView({
         required
       />
 
-      <CoachDropdown
+      <CoachDropdown_LEGACY
         label="Caller"
         coachEmail={caller}
         onChange={setCaller}

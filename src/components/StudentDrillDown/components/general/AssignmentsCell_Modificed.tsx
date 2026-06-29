@@ -1,4 +1,4 @@
-import type { Assignment } from 'src/types/CoachingTypes';
+import type { BaseAssignment } from '@learncraft-spanish/shared';
 import { Dropdown } from '@interface/components/FormComponents';
 import {
   // DeleteRecord,
@@ -39,59 +39,44 @@ const ratings = [
   'Advanced',
 ];
 
-function AssignmentCell({ assignment }: { assignment: Assignment }) {
+function AssignmentCell({ assignment }: { assignment: BaseAssignment }) {
   const { openContextual, contextual } = useContextualMenu();
 
   return (
     <div className="cellWithContextual">
       <button
         type="button"
-        onClick={() => openContextual(`assignment${assignment.recordId}`)}
+        onClick={() => openContextual(`assignment${assignment.assignmentId}`)}
       >
-        {`${assignment.assignmentType}: ${assignment.rating}`}
+        {`${assignment.assignmentType.assignmentType}: ${assignment.assignmentRating.assignmentRating}`}
       </button>
-      {contextual === `assignment${assignment.recordId}` && (
+      {contextual === `assignment${assignment.assignmentId}` && (
         <AssignmentView assignment={assignment} />
       )}
     </div>
   );
 }
 
-function AssignmentView({ assignment }: { assignment: Assignment }) {
-  // const {
-  //   getStudentFromMembershipId,
-  //   getMembershipFromWeekRecordId,
-  //   coachListQuery,
-  //   updateAssignmentMutation,
-  //   deleteAssignmentMutation,
-  // } = useCoaching();
-
+function AssignmentView({ assignment }: { assignment: BaseAssignment }) {
   return (
-    <ContextualView key={`assignment${assignment.recordId}`}>
-      {<h4>{assignment.assignmentType}</h4>}
+    <ContextualView key={`assignment${assignment.assignmentId}`}>
+      {<h4>{assignment.assignmentType.assignmentType}</h4>}
 
       <Dropdown
         label="Assignment Type"
-        value={assignment.assignmentType}
+        value={assignment.assignmentType.assignmentType}
         options={assignmentTypes}
         onChange={() => {}}
         editMode={false}
       />
       <div className="lineWrapper">
         <h4 className="label">Corrected by</h4>
-        <p className="content">{assignment.homeworkCorrector?.name}</p>
+        <p className="content">{assignment.homeworkCorrector?.fullName}</p>
       </div>
-
-      {/* <CoachDropdown
-          label="Corrected by"
-          coachEmail={assignment.homeworkCorrector.email}
-          onChange={() => {}}
-          editMode={false}
-        /> */}
 
       <Dropdown
         label="Rating"
-        value={assignment.rating}
+        value={assignment.assignmentRating.assignmentRating}
         options={ratings}
         onChange={() => {}}
         editMode={false}
@@ -99,21 +84,21 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
 
       <TextAreaInput
         label="Notes"
-        value={assignment.notes}
+        value={assignment.notes ?? ''}
         onChange={() => {}}
         editMode={false}
       />
 
       <TextAreaInput
         label="Areas of Difficulty"
-        value={assignment.areasOfDifficulty}
+        value={assignment.areasOfDifficulty ?? ''}
         onChange={() => {}}
         editMode={false}
       />
 
       <LinkInput
         label="Assignment Link"
-        value={assignment.assignmentLink}
+        value={assignment.assignmentLink ?? ''}
         onChange={() => {}}
         editMode={false}
       />
@@ -126,7 +111,7 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
 export default function AssignmentsCell({
   assignments,
 }: {
-  assignments: Assignment[] | null | undefined;
+  assignments: BaseAssignment[] | null | undefined;
 }) {
   return (
     <div className="assignmentsCell">
@@ -134,7 +119,7 @@ export default function AssignmentsCell({
         assignments.map((assignment) => (
           <AssignmentCell
             assignment={assignment}
-            key={`assignment${assignment.recordId}`}
+            key={`assignment${assignment.assignmentId}`}
           />
         ))}
     </div>
