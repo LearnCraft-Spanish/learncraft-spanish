@@ -79,7 +79,7 @@ h6 {
 .menuRow > label.quizLength p {
   margin: 0;
 }
-*/ .bannerMessage {
+.bannerMessage {
   position: fixed;
   top: 50px;
   left: 50%;
