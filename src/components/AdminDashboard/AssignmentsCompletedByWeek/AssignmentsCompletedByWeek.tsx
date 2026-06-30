@@ -1,3 +1,6 @@
+import DeprecatedSectionHeader from '../DeprecatedSectionHeader';
+
+/* Deprecated — re-enable when admin reports are migrated to hexagon.
 import type { AssignmentsCompletedByWeekData } from './types';
 import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
@@ -34,4 +37,9 @@ export default function AssignmentsCompletedByWeek() {
       )}
     </div>
   );
+}
+*/
+
+export default function AssignmentsCompletedByWeek() {
+  return <DeprecatedSectionHeader title="Assignments Completed By Week" />;
 }

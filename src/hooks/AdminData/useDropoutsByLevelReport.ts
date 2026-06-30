@@ -1,5 +1,6 @@
 import type { MembershipReportData } from 'src/components/AdminDashboard/ActiveMemberships/types';
 import { useQuery } from '@tanstack/react-query';
+import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
 // import { useBackendHelpers } from '../useBackend';
 export default function useDropoutsByLevelReport() {
   // const { getFactory } = useBackendHelpers();
@@ -12,7 +13,8 @@ export default function useDropoutsByLevelReport() {
   const dropoutsByLevelReportQuery = useQuery({
     queryKey: ['dropouts-by-level-report'],
     queryFn: getDropoutsByLevelReport,
-    staleTime: Infinity,
+    // staleTime: Infinity,
+    ...deprecatedAdminReportQueryOptions,
   });
 
   return { dropoutsByLevelReportQuery };

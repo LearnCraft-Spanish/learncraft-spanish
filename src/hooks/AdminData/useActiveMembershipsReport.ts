@@ -1,5 +1,6 @@
 import type { MembershipReportData } from 'src/components/AdminDashboard/ActiveMemberships/types';
 import { useQuery } from '@tanstack/react-query';
+import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
 // import { useBackendHelpers } from '../useBackend';
 
 export default function useActiveMembershipsReport() {
@@ -13,7 +14,8 @@ export default function useActiveMembershipsReport() {
   const activeMembershipsReportQuery = useQuery({
     queryKey: ['active-memberships-report'],
     queryFn: getActiveMembershipsReport,
-    staleTime: Infinity,
+    // staleTime: Infinity,
+    ...deprecatedAdminReportQueryOptions,
   });
 
   return { activeMembershipsReportQuery };

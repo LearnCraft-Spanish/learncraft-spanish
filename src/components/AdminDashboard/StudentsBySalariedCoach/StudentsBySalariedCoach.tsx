@@ -1,3 +1,6 @@
+import DeprecatedSectionHeader from '../DeprecatedSectionHeader';
+
+/* Deprecated — re-enable when admin reports are migrated to hexagon.
 import { useCallback, useEffect, useState } from 'react';
 import CurrentStudentsDrilldownTable from './CurrentStudentsDrilldownTable';
 import CurrentStudentsBySalariedCoach from './CurrentStuentsBySalariedCoach';
@@ -39,6 +42,18 @@ export default function StudentsBySalariedCoach() {
       {selectedReport?.includes('2 Weeks Out') && (
         <TwoWeeksOutDrilldownTable selectedReport={selectedReport} />
       )}
+    </div>
+  );
+}
+*/
+
+export default function StudentsBySalariedCoach() {
+  return (
+    <div className="section-with-interactive-table">
+      <div className="admin-dashboard-grid">
+        <DeprecatedSectionHeader title="Current Students by Salaried Coach" />
+        <DeprecatedSectionHeader title="Students by Salaried Coach - 2 Weeks Out" />
+      </div>
     </div>
   );
 }

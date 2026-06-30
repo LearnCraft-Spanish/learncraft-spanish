@@ -1,5 +1,6 @@
 import type { GroupCallData } from 'src/components/AdminDashboard/CallsByCoach/GroupCallsByCoach/types';
 import { useQuery } from '@tanstack/react-query';
+import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
 // import { useBackendHelpers } from '../useBackend';
 export default function useGroupCallsByCoach() {
   // const { getFactory } = useBackendHelpers();
@@ -12,7 +13,8 @@ export default function useGroupCallsByCoach() {
   const groupCallsByCoachQuery = useQuery({
     queryKey: ['group-calls-by-coach'],
     queryFn: getGroupCallsByCoach,
-    staleTime: Infinity,
+    // staleTime: Infinity,
+    ...deprecatedAdminReportQueryOptions,
   });
 
   return { groupCallsByCoachQuery };

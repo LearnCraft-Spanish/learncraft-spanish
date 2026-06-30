@@ -1,6 +1,7 @@
 import type { GroupCallData } from 'src/components/AdminDashboard/CallsByCoach/GroupCallsByCoach/types';
 import type { PrivateCallData } from 'src/components/AdminDashboard/CallsByCoach/PrivateCallsByCoach/types';
 import { useQuery } from '@tanstack/react-query';
+import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
 // import { useBackendHelpers } from '../useBackend';
 
 export default function useReportCallsDrilldown(
@@ -22,7 +23,8 @@ export default function useReportCallsDrilldown(
   const reportCallsDrilldownQuery = useQuery({
     queryKey: ['calls-report-drilldown', coachId, report],
     queryFn: () => getReportCallsDrilldown(coachId, report),
-    staleTime: Infinity,
+    // staleTime: Infinity,
+    ...deprecatedAdminReportQueryOptions,
   });
 
   return {

@@ -1,3 +1,6 @@
+import DeprecatedSectionHeader from '../DeprecatedSectionHeader';
+
+/* Deprecated — re-enable when admin reports are migrated to hexagon.
 import type { MembershipReportData } from './types';
 import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
@@ -36,4 +39,9 @@ export default function ActiveMemberships() {
       )}
     </div>
   );
+}
+*/
+
+export default function ActiveMemberships() {
+  return <DeprecatedSectionHeader title="Active Memberships" />;
 }

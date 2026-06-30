@@ -1,5 +1,6 @@
 import type { AssignmentsCompletedByWeekData } from 'src/components/AdminDashboard/AssignmentsCompletedByWeek/types';
 import { useQuery } from '@tanstack/react-query';
+import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
 // import { useBackendHelpers } from '../useBackend';
 
 export default function useAssignmentsCompletedByWeek() {
@@ -15,7 +16,8 @@ export default function useAssignmentsCompletedByWeek() {
   const assignmentsCompletedByWeekQuery = useQuery({
     queryKey: ['assignments-completed-by-week'],
     queryFn: getAssignmentsCompletedByWeek,
-    staleTime: Infinity,
+    // staleTime: Infinity,
+    ...deprecatedAdminReportQueryOptions,
   });
 
   return { assignmentsCompletedByWeekQuery };

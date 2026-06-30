@@ -1,3 +1,4 @@
+/* Deprecated — re-enable when admin reports are migrated to hexagon.
 import useActiveMembershipsReport from 'src/hooks/AdminData/useActiveMembershipsReport';
 import useAssignmentsCompletedByWeek from 'src/hooks/AdminData/useAssignmentsCompletedByWeek';
 import useDropoutsByLevelReport from 'src/hooks/AdminData/useDropoutsByLevelReport';
@@ -50,5 +51,14 @@ export default function useAdminDashboard() {
     isLoading,
     isError,
     isSuccess,
+  };
+}
+*/
+
+export default function useAdminDashboard() {
+  return {
+    isLoading: false,
+    isError: false,
+    isSuccess: true,
   };
 }
