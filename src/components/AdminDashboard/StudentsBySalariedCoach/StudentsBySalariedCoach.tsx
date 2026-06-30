@@ -1,11 +1,16 @@
-import DeprecatedSectionHeader from '../DeprecatedSectionHeader';
-
-/* Deprecated — re-enable when admin reports are migrated to hexagon.
 import { useCallback, useEffect, useState } from 'react';
 import CurrentStudentsDrilldownTable from './CurrentStudentsDrilldownTable';
 import CurrentStudentsBySalariedCoach from './CurrentStuentsBySalariedCoach';
 import StudentsBySalariedCoach2WeeksOut from './StudentsBySalariedCoach2WeeksOut';
 import TwoWeeksOutDrilldownTable from './TwoWeeksOutDrilldownTable';
+
+/* Deprecated — legacy AdminData hooks (useCurrentStudentsBySalariedCoach, useStudentsBySalariedCoach2WeeksOut).
+import type { CoachStudentData } from './types';
+import useCurrentStudentsBySalariedCoach from 'src/hooks/AdminData/useCurrentStudentsBySalariedCoach';
+import useStudentsBySalariedCoach2WeeksOut from 'src/hooks/AdminData/useStudentsBySalariedCoach2WeeksOut';
+
+// Previous implementation used coachName-based selection and local CoachStudentData types.
+*/
 
 export default function StudentsBySalariedCoach() {
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
@@ -42,18 +47,6 @@ export default function StudentsBySalariedCoach() {
       {selectedReport?.includes('2 Weeks Out') && (
         <TwoWeeksOutDrilldownTable selectedReport={selectedReport} />
       )}
-    </div>
-  );
-}
-*/
-
-export default function StudentsBySalariedCoach() {
-  return (
-    <div className="section-with-interactive-table">
-      <div className="admin-dashboard-grid">
-        <DeprecatedSectionHeader title="Current Students by Salaried Coach" />
-        <DeprecatedSectionHeader title="Students by Salaried Coach - 2 Weeks Out" />
-      </div>
     </div>
   );
 }

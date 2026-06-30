@@ -5,6 +5,8 @@ import { createHttpClient } from '@infrastructure/http/client';
 import {
   getMembershipsByCoachCurrentReportEndpoint,
   getMembershipsByCoachTwoWeeksOutReportEndpoint,
+  getMembershipsBySalariedCoachCurrentReportEndpoint,
+  getMembershipsBySalariedCoachTwoWeeksOutReportEndpoint,
 } from '@learncraft-spanish/shared';
 
 export function createAdminReportsInfrastructure(
@@ -22,6 +24,16 @@ export function createAdminReportsInfrastructure(
       httpClient.get<MembershipsByCoach[]>(
         getMembershipsByCoachTwoWeeksOutReportEndpoint.path,
         getMembershipsByCoachTwoWeeksOutReportEndpoint.requiredScopes,
+      ),
+    getMembershipsBySalariedCoachCurrentReport: () =>
+      httpClient.get<MembershipsByCoach[]>(
+        getMembershipsBySalariedCoachCurrentReportEndpoint.path,
+        getMembershipsBySalariedCoachCurrentReportEndpoint.requiredScopes,
+      ),
+    getMembershipsBySalariedCoachTwoWeeksOutReport: () =>
+      httpClient.get<MembershipsByCoach[]>(
+        getMembershipsBySalariedCoachTwoWeeksOutReportEndpoint.path,
+        getMembershipsBySalariedCoachTwoWeeksOutReportEndpoint.requiredScopes,
       ),
   };
 }
