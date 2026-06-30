@@ -2,7 +2,7 @@ import ActiveMemberships from './ActiveMemberships';
 import AssignmentsCompletedByWeek from './AssignmentsCompletedByWeek';
 import CallsByCoach from './CallsByCoach';
 import DropoutsByLevel from './DropoutsByLevel';
-import MembershipsByCoachCurrentReport from './MembershipsByCoachCurrentReport/MembershipsByCoachCurrentReport';
+import MembershipsByCoachReports from './MembershipsByCoachReports/MembershipsByCoachReports';
 import RecentLesson200Students from './recentLesson200Students';
 import StudentsBySalariedCoach from './StudentsBySalariedCoach/StudentsBySalariedCoach';
 import WeeklySummaries from './WeeklyCoachSummaries/WeeklySummaries';
@@ -12,7 +12,7 @@ export {
   AssignmentsCompletedByWeek,
   CallsByCoach,
   DropoutsByLevel,
-  MembershipsByCoachCurrentReport,
+  MembershipsByCoachReports,
   RecentLesson200Students,
   StudentsBySalariedCoach,
   WeeklySummaries,

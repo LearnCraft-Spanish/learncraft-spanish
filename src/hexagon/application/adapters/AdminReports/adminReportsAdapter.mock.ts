@@ -3,6 +3,7 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 const defaultMockAdminReportsAdapter: AdminReportsPort = {
   getMembershipsByCoachCurrentReport: async () => [],
+  getMembershipsByCoachTwoWeeksOutReport: async () => [],
 };
 
 export const {
