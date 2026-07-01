@@ -1,3 +1,6 @@
+import DeprecatedSectionHeader from '../DeprecatedSectionHeader';
+
+/* Deprecated — re-enable when admin reports are migrated to hexagon.
 import { useEffect, useState } from 'react';
 import GroupCallsByCoach from './GroupCallsByCoach';
 import GroupCallsDrilldownTable from './GroupCallsDrilldownTable';
@@ -39,6 +42,18 @@ export default function CallsByCoach() {
       {selectedReport?.includes('Calls') && (
         <PrivateCallsDrilldownTable selectedReport={selectedReport} />
       )}
+    </div>
+  );
+}
+*/
+
+export default function CallsByCoach() {
+  return (
+    <div className="section-with-interactive-table">
+      <div className="admin-dashboard-grid">
+        <DeprecatedSectionHeader title="Group Calls by Coach" />
+        <DeprecatedSectionHeader title="Private Calls by Coach" />
+      </div>
     </div>
   );
 }

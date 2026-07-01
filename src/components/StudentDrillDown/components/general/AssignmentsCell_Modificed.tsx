@@ -9,6 +9,7 @@ import ContextualView from 'src/hexagon/interface/components/Contextual/Contextu
 
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
+import '../../../Coaching/coaching.scss';
 const assignmentTypes = [
   'Pronunciation',
   'Writing',

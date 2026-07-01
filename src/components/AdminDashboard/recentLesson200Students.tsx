@@ -1,3 +1,6 @@
+import DeprecatedSectionHeader from './DeprecatedSectionHeader';
+
+/* Deprecated — re-enable when admin reports are migrated to hexagon.
 import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
@@ -37,4 +40,9 @@ export default function RecentLesson200Students() {
       )}
     </div>
   );
+}
+*/
+
+export default function RecentLesson200Students() {
+  return <DeprecatedSectionHeader title="Recent Lesson 200 Students" />;
 }

@@ -6,6 +6,10 @@
  */
 
 import {
+  mockAdminReportsAdapter,
+  resetMockAdminReportsAdapter,
+} from '@application/adapters/AdminReports/adminReportsAdapter.mock';
+import {
   mockAuthAdapter,
   resetMockAuthAdapter,
 } from '@application/adapters/authAdapter.mock';
@@ -145,6 +149,10 @@ vi.mock('@application/adapters/weeksAdapter', () => ({
   useWeeksAdapter: vi.fn(() => mockWeeksAdapter),
 }));
 
+vi.mock('@application/adapters/AdminReports/adminReportsAdapter', () => ({
+  useAdminReportsAdapter: vi.fn(() => mockAdminReportsAdapter),
+}));
+
 vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
   useActiveStudent: vi.fn(() => mockActiveStudent),
 }));
@@ -184,6 +192,7 @@ const resetGlobalMocks = () => {
   resetMockStudentsAdapter();
   resetMockCoachingStudentsAdapter();
   resetMockWeeksAdapter();
+  resetMockAdminReportsAdapter();
   resetMockUseStudentFlashcards();
   resetMockUseSpellingsKnownForLesson();
 

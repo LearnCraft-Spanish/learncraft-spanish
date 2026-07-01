@@ -4,6 +4,7 @@ import React from 'react';
 import { LinkInput, TextAreaInput } from 'src/components/FormComponents';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import '../../../Coaching/coaching.scss';
 
 type PrivateCallItem = FurnishedWeek['privateCalls'][number];
 

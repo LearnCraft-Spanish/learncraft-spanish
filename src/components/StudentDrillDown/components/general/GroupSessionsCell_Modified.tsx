@@ -8,6 +8,7 @@ import {
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import '../../../Coaching/coaching.scss';
 
 function GroupSessionCell({
   groupSession,

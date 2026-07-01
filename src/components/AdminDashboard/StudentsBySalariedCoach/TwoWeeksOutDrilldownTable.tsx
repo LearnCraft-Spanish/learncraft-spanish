@@ -1,29 +1,21 @@
-import type { Membership } from './types';
+import type { ActiveMembershipSummary } from '@learncraft-spanish/shared';
 import { InlineLoading } from '@interface/components/Loading';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
-import useStudentsBySalariedCoach2WeeksOut from 'src/hooks/AdminData/useStudentsBySalariedCoach2WeeksOut';
+import useMembershipsBySalariedCoachTwoWeeksOutReport from 'src/hooks/AdminData/useMembershipsBySalariedCoachTwoWeeksOutReport';
 import 'src/components/Table/Table.scss';
 
-function renderRow(row: Membership) {
+function formatDate(date: string): string {
+  return date ? new Date(date).toLocaleDateString() : '';
+}
+
+function renderRow(row: ActiveMembershipSummary) {
   return (
-    <tr key={`${row.student}-${row.courseName}`}>
-      <td>{row.student}</td>
+    <tr key={`${row.studentName}-${row.courseName}`}>
+      <td>{row.studentName}</td>
       <td>{row.courseName}</td>
       <td>{row.courseWeeklyPrivateCalls}</td>
-      <td>
-        {typeof row.startDate === 'string'
-          ? row.startDate
-          : row.startDate
-            ? new Date(row.startDate).toLocaleDateString()
-            : ''}
-      </td>
-      <td>
-        {row.endDate
-          ? typeof row.endDate === 'string'
-            ? row.endDate
-            : new Date(row.endDate).toLocaleDateString()
-          : ''}
-      </td>
+      <td>{formatDate(row.startDate)}</td>
+      <td>{formatDate(row.endDate)}</td>
     </tr>
   );
 }
@@ -33,20 +25,19 @@ export default function TwoWeeksOutDrilldownTable({
 }: {
   selectedReport: string;
 }) {
-  const coachName = selectedReport.split('_')[0];
+  const coachId = Number(selectedReport.split('_')[0]);
 
-  if (!coachName) {
-    throw new Error('Coach name not found');
+  if (!coachId) {
+    throw new Error('Coach id not found');
   }
 
-  const { studentsBySalariedCoach2WeeksOutQuery } =
-    useStudentsBySalariedCoach2WeeksOut();
+  const { membershipsBySalariedCoachTwoWeeksOutReportQuery } =
+    useMembershipsBySalariedCoachTwoWeeksOutReport();
 
   const { data, isLoading, isError, isSuccess } =
-    studentsBySalariedCoach2WeeksOutQuery;
+    membershipsBySalariedCoachTwoWeeksOutReportQuery;
 
-  // Find the coach's data and get their memberships
-  const coachData = data?.find((coach) => coach.coachName === coachName);
+  const coachData = data?.find((coach) => coach.coach.coach_id === coachId);
   const memberships = coachData?.memberships ?? [];
 
   return (

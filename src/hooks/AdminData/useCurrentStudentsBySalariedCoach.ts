@@ -1,5 +1,6 @@
 import type { CoachStudentData } from 'src/components/AdminDashboard/StudentsBySalariedCoach/types';
 import { useQuery } from '@tanstack/react-query';
+import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
 // import { useBackendHelpers } from '../useBackend';
 
 export default function useCurrentStudentsBySalariedCoach() {
@@ -13,7 +14,8 @@ export default function useCurrentStudentsBySalariedCoach() {
   const currentStudentsBySalariedCoachQuery = useQuery({
     queryKey: ['current-students-by-salaried-coach'],
     queryFn: getCurrentStudentsBySalariedCoach,
-    staleTime: Infinity,
+    // staleTime: Infinity,
+    ...deprecatedAdminReportQueryOptions,
   });
 
   return { currentStudentsBySalariedCoachQuery };
