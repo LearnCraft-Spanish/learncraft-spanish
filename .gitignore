@@ -6,6 +6,7 @@ node_modules/
 /.pnp
 .pnp.js
 .shared-local-mode
+.local-shared-staging
 lockfiles/local/*
 
 # testing

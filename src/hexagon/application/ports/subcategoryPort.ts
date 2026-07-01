@@ -1,4 +1,4 @@
-import type { Subcategory } from '@learncraft-spanish/shared/src/domain/vocabulary/core-types';
+import type { Subcategory } from '@learncraft-spanish/shared';
 
 /**
  * Port for subcategory operations.

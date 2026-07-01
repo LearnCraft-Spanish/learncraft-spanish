@@ -10,7 +10,7 @@ _Complete guide to all npm/pnpm scripts in LearnCraft Spanish_
 | ------------------------- | -------------------------------------------- |
 | `pnpm start`              | Start development server                     |
 | `pnpm install:ci`         | Install from CI lockfile (published shared)    |
-| `pnpm install:local`      | Install CI deps, symlink local `../lcs-shared` |
+| `pnpm install:local`      | Install CI deps, build local `../lcs-shared`, stage `dist/` only (keeps `tsc` fast) |
 | `pnpm install:published`  | Restore published `@learncraft-spanish/shared` |
 | `pnpm test:hexagon:watch` | Test while developing                        |
 | `pnpm validate`           | Pre-commit check (lint + format + typecheck) |
@@ -391,7 +391,7 @@ pnpm install:ci
 
 ### `pnpm install:local`
 
-**What it does:** Installs CI dependencies, then symlinks local `../lcs-shared` into `node_modules/@learncraft-spanish/shared`.
+**What it does:** Installs CI dependencies, builds local `../lcs-shared`, stages a dist-only copy to `.local-shared-staging/`, then symlinks `node_modules/@learncraft-spanish/shared` to that staging dir.
 
 **When to use:**
 
@@ -405,18 +405,20 @@ pnpm install:ci
 **Details:**
 
 - Runs `install:ci` first (published deps from CI lockfile)
-- Builds local shared package (`pnpm install` in `lcs-shared`)
-- Symlinks local shared into `node_modules` (does not modify `package.json` or lockfiles)
-- Creates `.shared-local-mode` marker file
+- Builds local shared package (`pnpm install && pnpm build` in `lcs-shared`)
+- Stages `package.json` + `dist/` only to `.local-shared-staging/` (same layout as the published package)
+- Symlinks staged package into `node_modules` (keeps `tsc` fast — no shared `src/` or declaration-map source resolution)
+- Creates `.shared-local-mode` marker file with the source repo path
+- Does not modify `package.json` or lockfiles
 
 **Example:**
 
 ```bash
 pnpm install:local
-# Local shared mode enabled
+# Local shared mode enabled (dist-only staging)
 ```
 
-**Note:** Rebuild shared when types/contracts change: `cd ../lcs-shared && pnpm install` (runs `prepare` → `tsc`).
+**Note:** After changing shared source, rebuild and refresh staging: `cd ../lcs-shared && pnpm build`, then re-run `pnpm install:local`.
 
 ---
 
@@ -666,8 +668,7 @@ pnpm install:published
 
 # Developing shared + frontend together
 pnpm install:local
-# edit lcs-shared → rebuild shared (pnpm install in lcs-shared or tsc watch)
-# vite HMR should pick up changes via symlink
+# edit lcs-shared → cd ../lcs-shared && pnpm build → pnpm install:local to refresh staging
 
 # Before opening a PR (ensure published shared)
 pnpm install:published
