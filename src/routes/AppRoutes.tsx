@@ -30,10 +30,9 @@ const GetHelpPage = lazy(() => import('@interface/pages/GetHelpPage'));
 
 // Coach / Admin pages
 const FrequensayPage = lazy(() => import('@interface/pages/FrequensayPage'));
-// Not available at this time
-// const WeeksRecordsSection = lazy(
-//   () => import('src/components/Coaching/WeeksRecords/WeeksRecords'),
-// );
+const WeeksRecordsSection = lazy(
+  () => import('src/components/Coaching/WeeksRecords/WeeksRecords'),
+);
 const StudentDrillDown = lazy(
   () => import('src/components/StudentDrillDown/StudentDrillDown'),
 );
@@ -81,14 +80,9 @@ export default function AppRoutes() {
           path="/get-help"
           element={(isStudent || isCoach || isAdmin) && <GetHelpPage />}
         />
-        {/* Not available at this time */}
-        {/* <Route
-          path="/weeklyrecords"
-          element={(isAdmin || isCoach) && <WeeksRecordsSection />}
-        /> */}
         <Route
           path="/weeklyrecords"
-          element={(isAdmin || isCoach) && <NotAvailablePage />}
+          element={(isAdmin || isCoach) && <WeeksRecordsSection />}
         />
         <Route
           path="/student-drill-down"

@@ -4,7 +4,6 @@ import { Dropdown } from '@interface/components/FormComponents';
 import React, { useMemo, useState } from 'react';
 import { CoachDropdown_LEGACY } from 'src/components/FormComponents';
 import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
-import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
 import getDateRange from '../../general/functions/dateRange';
@@ -46,7 +45,6 @@ export default function WeeksFilter({
   updateFilterByOneMonthChallenge,
 }: CoachingFilterProps) {
   const { courseListQuery, activeMembershipsQuery } = useCoaching();
-  const { openContextual } = useContextualMenu();
   const { setStartDate, startDate } = useDateRange();
   const [numWeeks, setNumWeeks] = useState(4); // Start with 4 weeks
   const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
@@ -140,6 +138,8 @@ export default function WeeksFilter({
         </div>
         <div className="advancedFilters">
           <div className="buttonBox">
+            {/* Legacy CRUD disabled until assignment creation is migrated to hexagon. */}
+            {/*
             <button
               type="button"
               className="greenButton"
@@ -147,11 +147,21 @@ export default function WeeksFilter({
             >
               New Assignment
             </button>
+            */}
+            <button type="button" className="greenButton" disabled>
+              New Assignment
+            </button>
+            {/* Legacy CRUD disabled until group call creation is migrated to hexagon. */}
+            {/*
             <button
               type="button"
               className="greenButton"
               onClick={() => openContextual('newGroupSession')}
             >
+              New Group Call
+            </button>
+            */}
+            <button type="button" className="greenButton" disabled>
               New Group Call
             </button>
           </div>

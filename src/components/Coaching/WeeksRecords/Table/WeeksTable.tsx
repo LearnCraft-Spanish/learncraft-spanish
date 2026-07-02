@@ -339,12 +339,20 @@ export default function WeeksTable({
                 </button>
               </>
             ) : (
+              <>
+                {/* Legacy CRUD disabled until week updates are migrated to hexagon. */}
+                {/*
               <button
                 type="button"
                 onClick={() => setTableEditMode(!tableEditMode)}
               >
                 Enable Edit Mode
               </button>
+              */}
+                <button type="button" disabled>
+                  Enable Edit Mode
+                </button>
+              </>
             )}
           </div>
         )}

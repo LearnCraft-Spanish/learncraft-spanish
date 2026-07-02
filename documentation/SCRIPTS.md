@@ -6,15 +6,15 @@ _Complete guide to all npm/pnpm scripts in LearnCraft Spanish_
 
 ## Quick Reference
 
-| Script                    | Use Case                                     |
-| ------------------------- | -------------------------------------------- |
-| `pnpm start`              | Start development server                     |
-| `pnpm install:ci`         | Install from CI lockfile (published shared)    |
+| Script                    | Use Case                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| `pnpm start`              | Start development server                                                            |
+| `pnpm install:ci`         | Install from CI lockfile (published shared)                                         |
 | `pnpm install:local`      | Install CI deps, build local `../lcs-shared`, stage `dist/` only (keeps `tsc` fast) |
-| `pnpm install:published`  | Restore published `@learncraft-spanish/shared` |
-| `pnpm test:hexagon:watch` | Test while developing                        |
-| `pnpm validate`           | Pre-commit check (lint + format + typecheck) |
-| `pnpm build`              | Build for production                         |
+| `pnpm install:published`  | Restore published `@learncraft-spanish/shared`                                      |
+| `pnpm test:hexagon:watch` | Test while developing                                                               |
+| `pnpm validate`           | Pre-commit check (lint + format + typecheck)                                        |
+| `pnpm build`              | Build for production                                                                |
 
 ---
 

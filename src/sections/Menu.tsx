@@ -112,13 +112,13 @@ export default function Menu() {
                   FrequenSay
                 </Link>
               </div>
-              {/* Not available at this time */}
-              {/* <div className="buttonBox">
+              <div className="buttonBox">
                 <Link className="linkButton" to="/weeklyrecords">
                   Weekly Records Interface
                 </Link>
-              </div> */}
-              <div className="buttonBox">
+              </div>
+              {/* Legacy disabled-button state kept for reference during refactor. */}
+              {/* <div className="buttonBox">
                 <button
                   className="linkButton disabledButton"
                   disabled
@@ -126,7 +126,7 @@ export default function Menu() {
                 >
                   Weekly Records Interface
                 </button>
-              </div>
+              </div> */}
               <div className="buttonBox">
                 <Link className="linkButton" to="/student-drill-down">
                   Student Drill Down

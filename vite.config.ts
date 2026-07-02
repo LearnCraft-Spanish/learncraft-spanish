@@ -29,7 +29,12 @@ export default defineConfig(({ mode }) => {
       }),
     ],
     optimizeDeps: {
-      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
+      exclude: [
+        '@ffmpeg/ffmpeg',
+        '@ffmpeg/util',
+        // Local shared package exports can change during API contract work.
+        '@learncraft-spanish/shared',
+      ],
     },
     define: {
       global: 'globalThis',
