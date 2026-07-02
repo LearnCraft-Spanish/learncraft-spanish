@@ -1,14 +1,17 @@
-import type { FurnishedWeekWithCoach } from '@learncraft-spanish/shared';
 import type {
   Coach,
-  Course,
+  FurnishedWeekWithCoach,
+  SrCourse,
+} from '@learncraft-spanish/shared';
+import type {
+  // Coach,
+  // Course,
   GroupSession,
   Week,
 } from '../../../types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
 import { Loading } from '@interface/components/Loading';
-
 import React, {
   useCallback,
   useEffect,
@@ -16,6 +19,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useAllSrCoursesQuery } from 'src/hexagon/application/queries/CoachingStudentQueries/useAllSrCoursesQuery';
+import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
 import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
@@ -23,7 +28,6 @@ import getDateRange from '../general/functions/dateRange';
 import getLoggedInCoach from '../general/functions/getLoggedInCoach';
 import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';
-
 // import { NewAssignmentView } from './Table/AssignmentsCell';
 import { GroupSessionView } from './Table/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
@@ -218,26 +222,29 @@ function WeeksRecordsReadOnlyContent() {
 const _WeeksRecordsContent = function WeeksRecordsContent() {
   const { isAuthenticated, isLoading, authUser } = useAuthAdapter();
   const { startDate } = useDateRange();
-  const {
-    weeksQuery,
-    coachListQuery,
-    courseListQuery,
-    activeMembershipsQuery,
-    activeStudentsQuery,
-    groupSessionsQuery,
-    groupAttendeesQuery,
-    assignmentsQuery,
-    privateCallsQuery,
-    getCoachFromMembershipId,
-    getCourseFromMembershipId,
-    getStudentFromMembershipId,
-  } = useCoaching();
+  const { weeks } = useWeeksByStartDate(startDate);
+  const { coaches } = useAllCoachesQuery();
+  const { srCourses, isLoading: srCoursesLoading } = useAllSrCoursesQuery();
+  // const {
+  //   weeksQuery,
+  //   coachListQuery,
+  //   courseListQuery,
+  //   activeMembershipsQuery,
+  //   activeStudentsQuery,
+  //   groupSessionsQuery,
+  //   groupAttendeesQuery,
+  //   assignmentsQuery,
+  //   privateCallsQuery,
+  //   getCoachFromMembershipId,
+  //   getCourseFromMembershipId,
+  //   getStudentFromMembershipId,
+  // } = useCoaching();
 
   // Filtering state
   const [filterByOneMonthChallenge, setFilterByOneMonthChallenge] =
     useState<boolean>(true);
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
-  const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
+  const [filterByCourse, setFilterByCourse] = useState<SrCourse | undefined>();
   const [filterByCompletion, updateFilterByCompletion] =
     useState<string>('incompleteOnly');
   const [filterByHoldWeeks, setFilterByHoldWeeks] = useState<boolean>(true); // True, filter out hold weeks.
@@ -245,7 +252,7 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
   const [filterBySearchTerm, setFilterBySearchTerm] = useState<string>();
 
   // State for the weeks to display
-  const [weeks, setWeeks] = useState<Week[] | undefined>();
+  // const [weeks, setWeeks] = useState<FurnishedWeekWithCoach[] | undefined>();
   const rendered = useRef(false);
   const { contextual } = useContextualMenu();
   const [tableEditMode, setTableEditMode] = useState(false);
@@ -254,41 +261,41 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
   const [sortByStudent, setSortByStudent] = useState<boolean>(false);
   const [sortDirection, setSortDirection] = useState<SortDirection>('none');
 
-  const initialDataLoad =
-    rendered.current === false &&
-    (isLoading ||
-      weeksQuery.isLoading ||
-      coachListQuery.isLoading ||
-      courseListQuery.isLoading ||
-      activeMembershipsQuery.isLoading ||
-      activeStudentsQuery.isLoading ||
-      groupSessionsQuery.isLoading ||
-      groupAttendeesQuery.isLoading ||
-      assignmentsQuery.isLoading ||
-      privateCallsQuery.isLoading);
+  // const initialDataLoad =
+  //   rendered.current === false &&
+  //   (isLoading ||
+  //     weeksQuery.isLoading ||
+  //     coachListQuery.isLoading ||
+  //     courseListQuery.isLoading ||
+  //     activeMembershipsQuery.isLoading ||
+  //     activeStudentsQuery.isLoading ||
+  //     groupSessionsQuery.isLoading ||
+  //     groupAttendeesQuery.isLoading ||
+  //     assignmentsQuery.isLoading ||
+  //     privateCallsQuery.isLoading);
 
-  const dataReady =
-    isAuthenticated &&
-    weeksQuery.isSuccess &&
-    coachListQuery.isSuccess &&
-    courseListQuery.isSuccess &&
-    activeMembershipsQuery.isSuccess &&
-    activeStudentsQuery.isSuccess &&
-    groupSessionsQuery.isSuccess &&
-    groupAttendeesQuery.isSuccess &&
-    assignmentsQuery.isSuccess &&
-    privateCallsQuery.isSuccess;
+  // const dataReady =
+  //   isAuthenticated &&
+  //   weeksQuery.isSuccess &&
+  //   coachListQuery.isSuccess &&
+  //   courseListQuery.isSuccess &&
+  //   activeMembershipsQuery.isSuccess &&
+  //   activeStudentsQuery.isSuccess &&
+  //   groupSessionsQuery.isSuccess &&
+  //   groupAttendeesQuery.isSuccess &&
+  //   assignmentsQuery.isSuccess &&
+  //   privateCallsQuery.isSuccess;
 
-  const dataError =
-    weeksQuery.isError ||
-    coachListQuery.isError ||
-    courseListQuery.isError ||
-    activeMembershipsQuery.isError ||
-    activeStudentsQuery.isError ||
-    groupSessionsQuery.isError ||
-    groupAttendeesQuery.isError ||
-    assignmentsQuery.isError ||
-    privateCallsQuery.isError;
+  // const dataError =
+  //   weeksQuery.isError ||
+  //   coachListQuery.isError ||
+  //   courseListQuery.isError ||
+  //   activeMembershipsQuery.isError ||
+  //   activeStudentsQuery.isError ||
+  //   groupSessionsQuery.isError ||
+  //   groupAttendeesQuery.isError ||
+  //   assignmentsQuery.isError ||
+  //   privateCallsQuery.isError;
 
   const hiddenFields = useMemo(() => {
     const fields = [];
@@ -299,17 +306,14 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
 
   /* ------------------ Update Filter State ------------------ */
   function updateCoachFilter(coachEmail: string) {
-    if (!coachListQuery.data) throw new Error('Unable to load coach list');
-    const coachToSet = coachListQuery.data.find(
-      (coach) => coach.user.email === coachEmail,
-    );
+    if (!coaches) throw new Error('Unable to load coach list');
+    const coachToSet = coaches.find((coach) => coach.email === coachEmail);
     setFilterByCoach(coachToSet);
   }
   function updateCourseFilter(courseName: string | undefined) {
-    if (!courseListQuery.data) throw new Error('Unable to load course list');
-    const courseToSet = courseListQuery.data.find(
-      (course) => course.name === courseName,
-    );
+    if (srCoursesLoading || !srCourses)
+      throw new Error('Unable to load course list');
+    const courseToSet = srCourses.find((course) => course.name === courseName);
     setFilterByCourse(courseToSet);
   }
   function updateFilterHoldWeeks(value: boolean) {
@@ -324,87 +328,74 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
 
   /* ------------------ Filtering Functions ------------------ */
   const filterByCoachFunction = useCallback(
-    (weeks: Week[]) => {
+    (weeks: FurnishedWeekWithCoach[]) => {
       if (!filterByCoach) return weeks;
       return weeks.filter((week) => {
-        // Foreign Key lookup, form data in backend?
-        const weekCoach = getCoachFromMembershipId(week.relatedMembership);
-        return weekCoach === filterByCoach;
+        return week.coach.coach_id === filterByCoach.coach_id;
       });
     },
-    [filterByCoach, getCoachFromMembershipId],
+    [filterByCoach],
   );
   const filterByCourseFunction = useCallback(
-    (weeks: Week[]) => {
+    (weeks: FurnishedWeekWithCoach[]) => {
       if (!filterByCourse) return weeks;
       return weeks.filter((week) => {
-        // Foreign Key lookup, form data in backend?
-        const weekCourse = getCourseFromMembershipId(week.relatedMembership);
-        return weekCourse === filterByCourse;
+        return week.srCourseName === filterByCourse.name;
       });
     },
-    [filterByCourse, getCourseFromMembershipId],
+    [filterByCourse],
   );
   const filterByHoldWeeksFunction = useCallback(
-    (weeks: Week[]) => {
+    (weeks: FurnishedWeekWithCoach[]) => {
       if (!filterByHoldWeeks) return weeks;
       return weeks.filter((week) => !week.holdWeek);
     },
     [filterByHoldWeeks],
   );
   const filterByOneMonthChallengeFunction = useCallback(
-    (weeks: Week[]) => {
+    (weeks: FurnishedWeekWithCoach[]) => {
       if (!filterByOneMonthChallenge) return weeks;
-      return weeks.filter((week) => week.level !== '1-Month Challenge');
+      return weeks.filter((week) => week.srCourseName !== '1-Month Challenge');
     },
     [filterByOneMonthChallenge],
   );
   const filterWeeksByWeeksAgoFunction = useCallback(
-    (weeks: Week[]) => {
+    (weeks: FurnishedWeekWithCoach[]) => {
       return weeks.filter((week) => week.weekStarts === startDate);
     },
     [startDate],
   );
   const filterWeeksByCoachlessFunction = useCallback(
-    (weeks: Week[]) => {
+    (weeks: FurnishedWeekWithCoach[]) => {
       if (!filterByCoachless) return weeks;
       return weeks.filter((week) => {
-        // Foreign Key lookup, form data in backend?
-        const weekCoach = getCoachFromMembershipId(week.relatedMembership);
-        return weekCoach;
+        return week?.coach === undefined || week?.coach === null;
       });
     },
-    [filterByCoachless, getCoachFromMembershipId],
+    [filterByCoachless, filterByCoach],
   );
   const filterWeeksBySearchTerm = useCallback(
-    (weeks: Week[]) => {
+    (weeks: FurnishedWeekWithCoach[]) => {
       if (filterBySearchTerm && filterBySearchTerm.length > 0) {
         return weeks.filter((week) => {
-          // Foreign Key lookup, form data in backend?
-          const student = getStudentFromMembershipId(week.relatedMembership);
-          if (!student) return false;
-          const nameMatches = student.fullName
-            ? student.fullName.toLowerCase().includes(filterBySearchTerm)
-            : false;
-          const emailMatches = student.email
-            ? student.email.toLowerCase().includes(filterBySearchTerm)
-            : false;
-          const noteMatches = week.notes
-            ? week.notes.toLowerCase().includes(filterBySearchTerm)
-            : false;
-          return nameMatches || emailMatches || noteMatches;
+          return (
+            week.student.fullName.toLowerCase().includes(filterBySearchTerm) ||
+            week.student.email.toLowerCase().includes(filterBySearchTerm) ||
+            week.notes?.toLowerCase().includes(filterBySearchTerm) ||
+            false
+          );
         });
       }
       return weeks;
     },
-    [filterBySearchTerm, getStudentFromMembershipId],
+    [filterBySearchTerm],
   );
   const filterByCompletionFunction = useCallback(
-    (weeks: Week[]) => {
+    (weeks: FurnishedWeekWithCoach[]) => {
       if (filterByCompletion === 'incompleteOnly') {
-        return weeks.filter((week) => !week.recordsComplete);
+        return weeks.filter((week) => !week.recordComplete);
       } else if (filterByCompletion === 'completeOnly') {
-        return weeks.filter((week) => week.recordsComplete);
+        return weeks.filter((week) => week.recordComplete);
       }
       return weeks;
     },
@@ -425,7 +416,7 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
   }, [sortByStudent, sortDirection]);
 
   const sortWeeks = useCallback(
-    (weeksToSort: Week[]) => {
+    (weeksToSort: FurnishedWeekWithCoach[]) => {
       if (!sortByStudent) {
         return weeksToSort;
       }
@@ -436,22 +427,20 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
       return [...weeksToSort].sort((a, b) => {
         let comparison = 0;
         // Foreign Key lookup, form data in backend?
-        const studentA = getStudentFromMembershipId(a.relatedMembership);
+        const studentA = a.student.fullName;
         // Foreign Key lookup, form data in backend?
-        const studentB = getStudentFromMembershipId(b.relatedMembership);
-        comparison = (studentB?.fullName || '').localeCompare(
-          studentA?.fullName || '',
-        );
+        const studentB = b.student.fullName;
+        comparison = studentB.localeCompare(studentA);
 
         return sortDirection === 'ascending' ? -comparison : comparison;
       });
     },
-    [sortByStudent, sortDirection, getStudentFromMembershipId],
+    [sortByStudent, sortDirection],
   );
 
   const filterWeeks = useCallback(
-    (weeksToFilter: Week[]) => {
-      if (!dataReady) {
+    (weeksToFilter: FurnishedWeekWithCoach[]) => {
+      if (srCoursesLoading || !srCourses) {
         console.error('Data not ready, cannot filter weeks');
         return weeksToFilter;
       }
@@ -474,7 +463,8 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
       return sortWeeks(filteredBySearchTerm);
     },
     [
-      dataReady,
+      srCoursesLoading,
+      srCourses,
       filterByCoachFunction,
       filterByCourseFunction,
       filterByHoldWeeksFunction,
@@ -489,36 +479,35 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
 
   // Initial data load, set filterByCoach to current user
   useEffect(() => {
-    if (!rendered.current && weeksQuery.isSuccess && coachListQuery.isSuccess) {
-      const defaultCoach = getLoggedInCoach(
-        authUser.email || '',
-        coachListQuery.data || [],
+    if (!rendered.current && coaches && srCourses) {
+      const defaultCoach = coaches.find(
+        (coach) => coach.email === authUser?.email,
       );
       if (defaultCoach) setFilterByCoach(defaultCoach);
       rendered.current = true;
     }
-  }, [weeksQuery, coachListQuery, authUser, isAuthenticated]);
+  }, [coaches, srCourses, authUser, isAuthenticated]);
 
   // Filtering useEffect
-  useEffect(() => {
-    if (dataReady && rendered.current) {
-      const filteredWeeks = filterWeeks(weeksQuery.data);
-      setWeeks(filteredWeeks);
-    }
-  }, [dataReady, filterWeeks, weeksQuery.data]);
+  // useEffect(() => {
+  //   if (dataReady && rendered.current) {
+  //     const filteredWeeks = filterWeeks(weeksQuery.data);
+  //     setWeeks(filteredWeeks);
+  //   }
+  // }, [dataReady, filterWeeks, weeksQuery.data]);
 
   return (
     <div className="newCoachingWrapper">
-      {initialDataLoad && <Loading message={'Loading Coaching Data...'} />}
-      {dataError && <p>Error loading data</p>}
-      {rendered.current && (
+      {srCoursesLoading && <Loading message={'Loading Coaching Data...'} />}
+      {/* {srCoursesError && <p>Error loading data</p>} */}
+      {coaches && srCourses && rendered.current && (
         <>
           {tableEditMode ? (
             <h2>Edit Weekly Records</h2>
           ) : (
             <h2>Weekly Student Records</h2>
           )}
-          {!tableEditMode && (
+          {/* {!tableEditMode && (
             <div className="filterWrapper">
               <CoachingFilter
                 dataReady={!!weeks}
@@ -540,29 +529,29 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
                 }
               />
             </div>
-          )}
+          )} */}
           <WeeksTable
             weeks={weeks}
             tableEditMode={tableEditMode}
-            setTableEditMode={setTableEditMode}
+            // setTableEditMode={setTableEditMode}
             hiddenFields={hiddenFields}
             sortByStudent={sortByStudent}
             handleUpdateSortByStudent={handleUpdateSortByStudent}
             sortDirection={sortDirection}
           />
-          {contextual.startsWith('week') && (
+          {/* {contextual.startsWith('week') && (
             <ViewWeekRecord
               week={weeks?.find(
                 (week) => week.recordId === Number(contextual.split('week')[1]),
               )}
             />
-          )}
-          {contextual === 'newGroupSession' && (
+          )} */}
+          {/* {contextual === 'newGroupSession' && (
             <GroupSessionView
               groupSession={{ recordId: -1 } as GroupSession}
               newRecord
             />
-          )}
+          )} */}
           {/* {contextual === 'newAssignment' && (
             <NewAssignmentView weekStartsDefaultValue={startDate} />
           )} */}
@@ -576,7 +565,7 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
 export default function WeeksRecordsSection() {
   return (
     <DateRangeProvider>
-      <WeeksRecordsReadOnlyContent />
+      <_WeeksRecordsContent />
     </DateRangeProvider>
   );
 }

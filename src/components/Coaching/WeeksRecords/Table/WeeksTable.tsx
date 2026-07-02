@@ -10,26 +10,26 @@ import { Pagination, QuantifiedRecords } from 'src/components/Table/components';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useBackendHelpers } from 'src/hooks/useBackend';
 import { WeeksTableItemWithSiingleRecordEdit } from './WeeksTableItem';
-interface WeekWithFailedToUpdate extends Week {
-  failedToUpdate?: boolean;
-}
+// interface WeekWithFailedToUpdate extends Week {
+//   failedToUpdate?: boolean;
+// }
 
-interface WeekForUpdate {
-  notes: string;
-  holdWeek: boolean;
-  recordsComplete: boolean;
-  offTrack: boolean;
-  primaryCoachWhenCreated: string;
-  recordId: number;
-  currentLesson: number | undefined;
-}
+// interface WeekForUpdate {
+//   notes: string;
+//   holdWeek: boolean;
+//   recordsComplete: boolean;
+//   offTrack: boolean;
+//   primaryCoachWhenCreated: string;
+//   recordId: number;
+//   currentLesson: number | undefined;
+// }
 
 type SortDirection = 'none' | 'ascending' | 'descending';
 
 interface NewTableProps {
   weeks: FurnishedWeekWithCoach[] | undefined;
   tableEditMode: boolean;
-  setTableEditMode: (tableEditMode: boolean) => void;
+  // setTableEditMode: (tableEditMode: boolean) => void;
   hiddenFields: string[];
   sortByStudent: boolean;
   handleUpdateSortByStudent: () => void;
@@ -39,7 +39,7 @@ interface NewTableProps {
 export default function WeeksTable({
   weeks,
   tableEditMode,
-  setTableEditMode,
+  // setTableEditMode,
   hiddenFields,
   sortByStudent,
   handleUpdateSortByStudent,
@@ -298,10 +298,10 @@ export default function WeeksTable({
   }, [displayOrderSegment]);
 
   return (
-    weeks &&
-    // (isLoading ? (
-    //   <Loading message={'Retrieving records data...'} />
-    // ) : (
+    weeks && (
+      // (isLoading ? (
+      //   <Loading message={'Retrieving records data...'} />
+      // ) : (
       <>
         {!tableEditMode && (
           <>
@@ -337,9 +337,9 @@ export default function WeeksTable({
                 </button>
               </>
             ) : ( */}
-              {/* <> */}
-                {/* Legacy CRUD disabled until week updates are migrated to hexagon. */}
-                {/*
+            {/* <> */}
+            {/* Legacy CRUD disabled until week updates are migrated to hexagon. */}
+            {/*
               <button
                 type="button"
                 onClick={() => setTableEditMode(!tableEditMode)}
@@ -347,10 +347,10 @@ export default function WeeksTable({
                 Enable Edit Mode
               </button>
               */}
-                <button type="button" disabled>
-                  Enable Edit Mode
-                </button>
-              {/* </> */}
+            <button type="button" disabled>
+              Enable Edit Mode
+            </button>
+            {/* </> */}
             {/* )} */}
           </div>
         )}
@@ -393,16 +393,16 @@ export default function WeeksTable({
                   key={week.weekId}
                   week={week}
                   tableEditMode={tableEditMode}
-                  updateActiveDataWeek={updateActiveDataWeek}
-                  failedToUpdate={week.failedToUpdate}
+                  // updateActiveDataWeek={updateActiveDataWeek}
+                  // failedToUpdate={week.failedToUpdate}
                   hiddenFields={hiddenFields}
-                  allowSingleRecordUpdate={!tableEditMode}
+                  // allowSingleRecordUpdate={!tableEditMode}
                 />
               ))}
             </tbody>
           </table>
         </div>
       </>
-    ))
+    )
   );
 }

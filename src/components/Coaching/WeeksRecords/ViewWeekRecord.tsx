@@ -1,16 +1,13 @@
-import type { Week } from 'src/types/CoachingTypes';
+import type { FurnishedWeekWithCoach } from 'src/types/CoachingTypes';
 import { useMemo } from 'react';
 
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
-  const { getStudentFromMembershipId } = useCoaching();
-  // Foreign Key lookup, form data in backend
-  const student = useMemo(
-    () => getStudentFromMembershipId(week?.relatedMembership),
-    [getStudentFromMembershipId, week?.relatedMembership],
-  );
-
+export default function ViewWeekRecord({
+  week,
+}: {
+  week: FurnishedWeekWithCoach | undefined;
+}) {
   if (!week) {
     console.error('Week record is undefined');
     return (
@@ -21,7 +18,7 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
       </div>
     );
   }
-  if (!student) {
+  if (!week.student) {
     console.error('Student record is undefined');
     return (
       <div className="contextualWrapper">
@@ -36,7 +33,7 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
     <ContextualView key={`week${week.recordId}`}>
       <div className="lineWrapper">
         <p className="label">Student:</p>
-        <p className="content">{student.fullName}</p>
+        <p className="content">{week.student.fullName}</p>
       </div>
       <div className="lineWrapper">
         <p className="label">Email:</p>

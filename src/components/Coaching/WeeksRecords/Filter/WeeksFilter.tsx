@@ -1,5 +1,7 @@
-import type { Coach, Course } from 'src/types/CoachingTypes';
+import type { SrCourse } from '@learncraft-spanish/shared';
+import type { Coach } from 'src/types/CoachingTypes';
 
+import { useAllSrCoursesQuery } from '@application/queries/CoachingStudentQueries/useAllSrCoursesQuery';
 import { Dropdown } from '@interface/components/FormComponents';
 import React, { useMemo, useState } from 'react';
 import { CoachDropdown_LEGACY } from 'src/components/FormComponents';
@@ -14,7 +16,7 @@ interface CoachingFilterProps {
   dataReady: boolean;
   filterByCoach: Coach | undefined;
   updateCoachFilter: (value: string) => void;
-  filterByCourse: Course | undefined;
+  filterByCourse: SrCourse | undefined;
   updateCourseFilter: (value: string) => void;
   filterCoachless: boolean | undefined;
   updateCoachlessFilter: (value: boolean) => void;
@@ -44,7 +46,8 @@ export default function WeeksFilter({
   filterByOneMonthChallenge,
   updateFilterByOneMonthChallenge,
 }: CoachingFilterProps) {
-  const { courseListQuery, activeMembershipsQuery } = useCoaching();
+  const { srCourses, isLoading: srCoursesLoading } = useAllSrCoursesQuery();
+  const { activeMembershipsQuery } = useCoaching();
   const { setStartDate, startDate } = useDateRange();
   const [numWeeks, setNumWeeks] = useState(4); // Start with 4 weeks
   const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
@@ -63,19 +66,18 @@ export default function WeeksFilter({
   };
 
   const coursesWithActiveMemberships = useMemo(() => {
-    if (!courseListQuery.isSuccess || !activeMembershipsQuery.isSuccess)
+    if (srCoursesLoading || !srCourses || !activeMembershipsQuery.isSuccess)
       return [];
-    return courseListQuery.data.filter((course) => {
-      // Foreign Key lookup, filter in backend
+    return srCourses.filter((course) => {
       return (
         activeMembershipsQuery.data.filter(
-          (membership) => membership.relatedCourse === course.recordId,
+          (membership) => membership.relatedCourse === course.srCourseId,
         ).length > 0
       );
     });
   }, [
-    courseListQuery.data,
-    courseListQuery.isSuccess,
+    srCourses,
+    srCoursesLoading,
     activeMembershipsQuery.data,
     activeMembershipsQuery.isSuccess,
   ]);
