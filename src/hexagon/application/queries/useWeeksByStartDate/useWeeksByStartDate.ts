@@ -5,12 +5,15 @@ import {
   queryDefaults,
 } from '@application/utils/queryUtils';
 import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react';
 
 export interface UseWeeksByStartDateResult {
   weeks: FurnishedWeekWithCoach[];
   loading: boolean;
   error: Error | null;
   refetch: () => void;
+
+  getWeekById: (weekId: number) => FurnishedWeekWithCoach | undefined;
 }
 
 export function useWeeksByStartDate(
@@ -30,10 +33,19 @@ export function useWeeksByStartDate(
     ...queryDefaults.entityData,
   });
 
+  const getWeekById = useCallback(
+    (weekId: number): FurnishedWeekWithCoach | undefined => {
+      return data.find((week) => week.weekId === weekId);
+    },
+    [data],
+  );
+
   return {
     weeks: data,
     loading: isLoading,
     error: normalizeQueryError(error),
     refetch,
+    // helper function to get a week by its id
+    getWeekById,
   };
 }

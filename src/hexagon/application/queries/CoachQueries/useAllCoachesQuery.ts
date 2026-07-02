@@ -7,14 +7,16 @@ import { useQuery } from '@tanstack/react-query';
 export const ALL_COACHES_QUERY_KEY = ['allCoaches'] as const;
 
 export interface UseAllCoachesQueryReturn {
-  allCoachesQuery: UseQueryResult<Coach[]>;
+  coaches: Coach[] | undefined;
+  isLoading: boolean;
+  error: Error | null;
 }
 
 export function useAllCoachesQuery(): UseAllCoachesQueryReturn {
   const adapter = useCoachAdapter();
   const { isCoach, isAdmin } = useAuthAdapter();
 
-  const allCoachesQuery = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ALL_COACHES_QUERY_KEY,
     queryFn: async () => {
       const data = await adapter.getAllCoaches();
@@ -24,5 +26,5 @@ export function useAllCoachesQuery(): UseAllCoachesQueryReturn {
     enabled: isCoach || isAdmin,
   });
 
-  return { allCoachesQuery };
+  return { coaches: data, isLoading, error };
 }

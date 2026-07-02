@@ -1,3 +1,4 @@
+import type { FurnishedWeekWithCoach } from '@learncraft-spanish/shared';
 import type { Week } from 'src/types/CoachingTypes';
 import { Loading } from '@interface/components/Loading';
 import { useModal } from '@interface/hooks/useModal';
@@ -9,7 +10,6 @@ import { Pagination, QuantifiedRecords } from 'src/components/Table/components';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useBackendHelpers } from 'src/hooks/useBackend';
 import { WeeksTableItemWithSiingleRecordEdit } from './WeeksTableItem';
-
 interface WeekWithFailedToUpdate extends Week {
   failedToUpdate?: boolean;
 }
@@ -27,7 +27,7 @@ interface WeekForUpdate {
 type SortDirection = 'none' | 'ascending' | 'descending';
 
 interface NewTableProps {
-  weeks: WeekWithFailedToUpdate[] | undefined;
+  weeks: FurnishedWeekWithCoach[] | undefined;
   tableEditMode: boolean;
   setTableEditMode: (tableEditMode: boolean) => void;
   hiddenFields: string[];
@@ -45,41 +45,41 @@ export default function WeeksTable({
   handleUpdateSortByStudent,
   sortDirection,
 }: NewTableProps) {
-  const {
-    weeksQuery,
-    groupSessionsQuery,
-    groupAttendeesQuery,
-    assignmentsQuery,
-    privateCallsQuery,
-    getStudentFromMembershipId,
-  } = useCoaching();
-  const { newPutFactory } = useBackendHelpers();
-  const { openModal } = useModal();
+  // const {
+  //   weeksQuery,
+  //   groupSessionsQuery,
+  //   groupAttendeesQuery,
+  //   assignmentsQuery,
+  //   privateCallsQuery,
+  //   getStudentFromMembershipId,
+  // } = useCoaching();
+  // const { newPutFactory } = useBackendHelpers();
+  // const { openModal } = useModal();
 
-  const isLoading =
-    weeksQuery.isLoading ||
-    groupSessionsQuery.isLoading ||
-    groupAttendeesQuery.isLoading ||
-    assignmentsQuery.isLoading ||
-    privateCallsQuery.isLoading;
+  // const isLoading =
+  //   weeksQuery.isLoading ||
+  //   groupSessionsQuery.isLoading ||
+  //   groupAttendeesQuery.isLoading ||
+  //   assignmentsQuery.isLoading ||
+  //   privateCallsQuery.isLoading;
 
-  const [activeData, setActiveData] = useState<WeekWithFailedToUpdate[]>([]);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [activeData, setActiveData] = useState<FurnishedWeekWithCoach[]>([]);
+  // const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  const updateManyWeeksMutation = useMutation({
-    mutationFn: (weeks: WeekForUpdate[]) => {
-      const promise = newPutFactory<number[]>({
-        path: `coaching/update-many-weeks`,
-        body: { weeks },
-      });
-      toast.promise(promise, {
-        pending: 'Updating weeks...',
-        error: 'Failed to update weeks',
-        success: 'Weeks updated successfully',
-      });
-      return promise;
-    },
-  });
+  // const updateManyWeeksMutation = useMutation({
+  //   mutationFn: (weeks: WeekForUpdate[]) => {
+  //     const promise = newPutFactory<number[]>({
+  //       path: `coaching/update-many-weeks`,
+  //       body: { weeks },
+  //     });
+  //     toast.promise(promise, {
+  //       pending: 'Updating weeks...',
+  //       error: 'Failed to update weeks',
+  //       success: 'Weeks updated successfully',
+  //     });
+  //     return promise;
+  //   },
+  // });
 
   /*      Pagination      */
   const [page, setPage] = useState(1);
@@ -107,182 +107,180 @@ export default function WeeksTable({
   }, [page]);
 
   /*      Edit Mode      */
-  const updateActiveDataWeek = useCallback((week: Week) => {
-    setActiveData((prev) => {
-      const newData = prev.map((w) =>
-        w.recordId === week.recordId ? { ...w, ...week } : w,
-      );
-      setHasUnsavedChanges(true);
-      return newData;
-    });
-  }, []);
+  // const updateActiveDataWeek = useCallback((week: Week) => {
+  //   setActiveData((prev) => {
+  //     const newData = prev.map((w) =>
+  //       w.recordId === week.recordId ? { ...w, ...week } : w,
+  //     );
+  //     setHasUnsavedChanges(true);
+  //     return newData;
+  //   });
+  // }, []);
 
-  const recordChanged = useCallback(
-    (week: Week) => {
-      const prevWeek = displayOrderSegment.find(
-        (w) => w.recordId === week.recordId,
-      );
-      if (
-        prevWeek?.notes !== week.notes ||
-        prevWeek?.holdWeek !== week.holdWeek ||
-        prevWeek?.recordsComplete !== week.recordsComplete ||
-        prevWeek?.currentLesson !== week.currentLesson
-      ) {
-        return true;
-      }
-      return false;
-    },
-    [displayOrderSegment],
-  );
+  // const recordChanged = useCallback(
+  //   (week: Week) => {
+  //     const prevWeek = displayOrderSegment.find(
+  //       (w) => w.recordId === week.recordId,
+  //     );
+  //     if (
+  //       prevWeek?.notes !== week.notes ||
+  //       prevWeek?.holdWeek !== week.holdWeek ||
+  //       prevWeek?.recordsComplete !== week.recordsComplete ||
+  //       prevWeek?.currentLesson !== week.currentLesson
+  //     ) {
+  //       return true;
+  //     }
+  //     return false;
+  //   },
+  //   [displayOrderSegment],
+  // );
 
   // Validate that records marked as complete meet the requirements
-  const validateRecordsCompleteable = useCallback(
-    (changedWeeks: WeekWithFailedToUpdate[]) => {
-      const invalidWeeks: WeekWithFailedToUpdate[] = [];
+  // const validateRecordsCompleteable = useCallback(
+  //   (changedWeeks: WeekWithFailedToUpdate[]) => {
+  //     const invalidWeeks: WeekWithFailedToUpdate[] = [];
 
-      changedWeeks.forEach((week) => {
-        if (!week.recordsComplete) return; // Skip validation for weeks not marked complete
+  //     changedWeeks.forEach((week) => {
+  //       if (!week.recordsComplete) return; // Skip validation for weeks not marked complete
 
-        // Skip week 0
-        if (week.week === 0) return;
+  //       // Skip week 0
+  //       if (week.week === 0) return;
 
-        // Need current lesson
-        if (!week.currentLesson) {
-          invalidWeeks.push(week);
-          return;
-        }
+  //       // Need current lesson
+  //       if (!week.currentLesson) {
+  //         invalidWeeks.push(week);
+  //         return;
+  //       }
 
-        // Need either private calls, group sessions, or notes
-        // Foreign Key lookup, form data in backend
-        const privateCalls = privateCallsQuery.data?.filter(
-          (call) => call.relatedWeek === week.recordId,
-        );
+  //       // Need either private calls, group sessions, or notes
+  //       // Foreign Key lookup, form data in backend
+  //       const privateCalls = week
 
-        // For group sessions, we need to check the group attendees to find sessions related to this week
-        // Foreign Key lookup, form data in backend
+  //       // For group sessions, we need to check the group attendees to find sessions related to this week
+  //       // Foreign Key lookup, form data in backend
 
-        const groupSessionIds = groupAttendeesQuery.data
-          ?.filter((attendee) => attendee.student === week.recordId)
-          .map((attendee) => attendee.groupSession);
+  //       const groupSessionIds = groupAttendeesQuery.data
+  //         ?.filter((attendee) => attendee.student === week.recordId)
+  //         .map((attendee) => attendee.groupSession);
 
-        // Foreign Key lookup, form data in backend
-        const groupSessions = groupSessionsQuery.data?.filter((session) =>
-          groupSessionIds?.includes(session.recordId),
-        );
+  //       // Foreign Key lookup, form data in backend
+  //       const groupSessions = groupSessionsQuery.data?.filter((session) =>
+  //         groupSessionIds?.includes(session.recordId),
+  //       );
 
-        if (
-          (!privateCalls || privateCalls.length === 0) &&
-          (!groupSessions || groupSessions.length === 0) &&
-          week.notes === ''
-        ) {
-          invalidWeeks.push(week);
-        }
-      });
+  //       if (
+  //         (!privateCalls || privateCalls.length === 0) &&
+  //         (!groupSessions || groupSessions.length === 0) &&
+  //         week.notes === ''
+  //       ) {
+  //         invalidWeeks.push(week);
+  //       }
+  //     });
 
-      return invalidWeeks;
-    },
-    [privateCallsQuery.data, groupSessionsQuery.data, groupAttendeesQuery.data],
-  );
+  //     return invalidWeeks;
+  //   },
+  //   [privateCallsQuery.data, groupSessionsQuery.data, groupAttendeesQuery.data],
+  // );
 
-  const handleApplyChanges = useCallback(() => {
-    const changedWeeks = activeData.filter((week) => recordChanged(week));
+  // const handleApplyChanges = useCallback(() => {
+  //   const changedWeeks = activeData.filter((week) => recordChanged(week));
 
-    if (changedWeeks.length === 0) {
-      toast.info('No changes to apply');
-      return;
-    }
+  //   if (changedWeeks.length === 0) {
+  //     toast.info('No changes to apply');
+  //     return;
+  //   }
 
-    // Validate completeable records
-    const invalidWeeks = validateRecordsCompleteable(changedWeeks);
-    if (invalidWeeks.length > 0) {
-      // Format student names for display
-      const studentNames = invalidWeeks
-        .map((week) => {
-          // Get student name or fallback to a default label
-          let label = `Week ${week.week}`;
+  //   // Validate completeable records
+  //   const invalidWeeks = validateRecordsCompleteable(changedWeeks);
+  //   if (invalidWeeks.length > 0) {
+  //     // Format student names for display
+  //     const studentNames = invalidWeeks
+  //       .map((week) => {
+  //         // Get student name or fallback to a default label
+  //         let label = `Week ${week.week}`;
 
-          // Try to find student info through getStudentFromMembershipId
-          // Foreign Key lookup, orm data in backend
-          const student = getStudentFromMembershipId(week.relatedMembership);
-          if (student) {
-            label = `${student.fullName} (Week ${week.week})`;
-          } else {
-            label = `Student ID: ${week.relatedMembership} (Week ${week.week})`;
-          }
+  //         // Try to find student info through getStudentFromMembershipId
+  //         // Foreign Key lookup, orm data in backend
+  //         const student = getStudentFromMembershipId(week.relatedMembership);
+  //         if (student) {
+  //           label = `${student.fullName} (Week ${week.week})`;
+  //         } else {
+  //           label = `Student ID: ${week.relatedMembership} (Week ${week.week})`;
+  //         }
 
-          return `- ${label}`;
-        })
-        .join('\n');
+  //         return `- ${label}`;
+  //       })
+  //       .join('\n');
 
-      openModal({
-        title: 'Cannot Complete Records',
-        body: `The following student records cannot be marked as complete without a current lesson, a private or group call, or a note if no calls were made:\n\n${studentNames}`,
-        type: 'error',
-      });
-      return;
-    }
+  //     openModal({
+  //       title: 'Cannot Complete Records',
+  //       body: `The following student records cannot be marked as complete without a current lesson, a private or group call, or a note if no calls were made:\n\n${studentNames}`,
+  //       type: 'error',
+  //     });
+  //     return;
+  //   }
 
-    const weeksFormattedForUpdate: WeekForUpdate[] = changedWeeks.map(
-      (week) => ({
-        notes: week.notes,
-        holdWeek: week.holdWeek,
-        recordsComplete: week.recordsComplete,
-        offTrack: week.offTrack,
-        primaryCoachWhenCreated: week.primaryCoachWhenCreated,
-        recordId: week.recordId,
-        currentLesson: week.currentLesson ?? undefined,
-      }),
-    );
+  //   const weeksFormattedForUpdate: WeekForUpdate[] = changedWeeks.map(
+  //     (week) => ({
+  //       notes: week.notes,
+  //       holdWeek: week.holdWeek,
+  //       recordsComplete: week.recordsComplete,
+  //       offTrack: week.offTrack,
+  //       primaryCoachWhenCreated: week.primaryCoachWhenCreated,
+  //       recordId: week.recordId,
+  //       currentLesson: week.currentLesson ?? undefined,
+  //     }),
+  //   );
 
-    updateManyWeeksMutation.mutate(weeksFormattedForUpdate, {
-      onSuccess: (data: number[], variables: WeekForUpdate[]) => {
-        if (data.length < changedWeeks.length) {
-          toast.error('Some weeks failed to update');
-          const identifyingFailedWeeks = displayOrderSegment.map((week) => {
-            if (data.includes(week.recordId)) {
-              return week;
-            }
-            const weekFromVariables = variables.find(
-              (v) => v.recordId === week.recordId,
-            );
-            return { ...week, failedToUpdate: true, ...weekFromVariables };
-          });
-          setActiveData(identifyingFailedWeeks);
-        } else {
-          weeksQuery.refetch();
-          setHasUnsavedChanges(false);
-        }
-      },
-    });
-  }, [
-    activeData,
-    displayOrderSegment,
-    recordChanged,
-    validateRecordsCompleteable,
-    updateManyWeeksMutation,
-    weeksQuery,
-    openModal,
-    getStudentFromMembershipId,
-  ]);
+  //   updateManyWeeksMutation.mutate(weeksFormattedForUpdate, {
+  //     onSuccess: (data: number[], variables: WeekForUpdate[]) => {
+  //       if (data.length < changedWeeks.length) {
+  //         toast.error('Some weeks failed to update');
+  //         const identifyingFailedWeeks = displayOrderSegment.map((week) => {
+  //           if (data.includes(week.recordId)) {
+  //             return week;
+  //           }
+  //           const weekFromVariables = variables.find(
+  //             (v) => v.recordId === week.recordId,
+  //           );
+  //           return { ...week, failedToUpdate: true, ...weekFromVariables };
+  //         });
+  //         setActiveData(identifyingFailedWeeks);
+  //       } else {
+  //         weeksQuery.refetch();
+  //         setHasUnsavedChanges(false);
+  //       }
+  //     },
+  //   });
+  // }, [
+  //   activeData,
+  //   displayOrderSegment,
+  //   recordChanged,
+  //   validateRecordsCompleteable,
+  //   updateManyWeeksMutation,
+  //   weeksQuery,
+  //   openModal,
+  //   getStudentFromMembershipId,
+  // ]);
 
-  const handleDisableEditMode = useCallback(() => {
-    // Check if there are unsaved changes before disabling edit mode
-    if (hasUnsavedChanges) {
-      openModal({
-        title: 'Unsaved Changes',
-        body: 'You have unsaved changes. Are you sure you want to disable edit mode? All changes will be lost.',
-        type: 'confirm',
-        confirmFunction: () => {
-          setTableEditMode(false);
-          setActiveData(displayOrderSegment);
-          setHasUnsavedChanges(false);
-        },
-      });
-    } else {
-      setTableEditMode(false);
-      setActiveData(displayOrderSegment);
-    }
-  }, [displayOrderSegment, setTableEditMode, hasUnsavedChanges, openModal]);
+  // const handleDisableEditMode = useCallback(() => {
+  //   // Check if there are unsaved changes before disabling edit mode
+  //   if (hasUnsavedChanges) {
+  //     openModal({
+  //       title: 'Unsaved Changes',
+  //       body: 'You have unsaved changes. Are you sure you want to disable edit mode? All changes will be lost.',
+  //       type: 'confirm',
+  //       confirmFunction: () => {
+  //         setTableEditMode(false);
+  //         setActiveData(displayOrderSegment);
+  //         setHasUnsavedChanges(false);
+  //       },
+  //     });
+  //   } else {
+  //     setTableEditMode(false);
+  //     setActiveData(displayOrderSegment);
+  //   }
+  // }, [displayOrderSegment, setTableEditMode, hasUnsavedChanges, openModal]);
 
   /*      Pagination      */
   useEffect(() => {
@@ -295,15 +293,15 @@ export default function WeeksTable({
   useEffect(() => {
     if (displayOrderSegment) {
       setActiveData(displayOrderSegment);
-      setHasUnsavedChanges(false);
+      // setHasUnsavedChanges(false);
     }
   }, [displayOrderSegment]);
 
   return (
     weeks &&
-    (isLoading ? (
-      <Loading message={'Retrieving records data...'} />
-    ) : (
+    // (isLoading ? (
+    //   <Loading message={'Retrieving records data...'} />
+    // ) : (
       <>
         {!tableEditMode && (
           <>
@@ -324,7 +322,7 @@ export default function WeeksTable({
         )}
         {activeData.length > 0 && (
           <div className="editModeToggle">
-            {tableEditMode ? (
+            {/* {tableEditMode ? (
               <>
                 <button
                   type="button"
@@ -338,8 +336,8 @@ export default function WeeksTable({
                   Disable Edit Mode
                 </button>
               </>
-            ) : (
-              <>
+            ) : ( */}
+              {/* <> */}
                 {/* Legacy CRUD disabled until week updates are migrated to hexagon. */}
                 {/*
               <button
@@ -352,8 +350,8 @@ export default function WeeksTable({
                 <button type="button" disabled>
                   Enable Edit Mode
                 </button>
-              </>
-            )}
+              {/* </> */}
+            {/* )} */}
           </div>
         )}
         <div className="tableWrapper">
@@ -392,7 +390,7 @@ export default function WeeksTable({
             <tbody>
               {activeData.map((week) => (
                 <WeeksTableItemWithSiingleRecordEdit
-                  key={week.recordId}
+                  key={week.weekId}
                   week={week}
                   tableEditMode={tableEditMode}
                   updateActiveDataWeek={updateActiveDataWeek}
