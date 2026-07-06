@@ -1,5 +1,6 @@
 import type { PrivateCallData } from 'src/components/AdminDashboard/CallsByCoach/PrivateCallsByCoach/types';
 import { useQuery } from '@tanstack/react-query';
+import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
 // import { useBackendHelpers } from '../useBackend';
 export default function usePrivateCallsByCoach() {
   // const { getFactory } = useBackendHelpers();
@@ -12,7 +13,8 @@ export default function usePrivateCallsByCoach() {
   const privateCallsByCoachQuery = useQuery({
     queryKey: ['private-calls-by-coach'],
     queryFn: getPrivateCallsByCoach,
-    staleTime: Infinity,
+    // staleTime: Infinity,
+    ...deprecatedAdminReportQueryOptions,
   });
 
   return { privateCallsByCoachQuery };

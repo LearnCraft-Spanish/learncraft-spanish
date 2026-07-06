@@ -157,21 +157,12 @@ export default function Menu() {
           {isAdmin && (
             <>
               <h3>Admin Tools</h3>
-              {/* Not available at this time */}
-              {/* <div className="buttonBox">
+              <div className="buttonBox">
                 <Link className="linkButton" to="/admin-dashboard">
                   Admin Dashboard
                 </Link>
-              </div> */}
-              <div className="buttonBox">
-                <button
-                  className="linkButton disabledButton"
-                  disabled
-                  type="button"
-                >
-                  Admin Dashboard
-                </button>
               </div>
+
               <div className="buttonBox">
                 <Link className="linkButton" to="/example-manager/search">
                   Example Manager

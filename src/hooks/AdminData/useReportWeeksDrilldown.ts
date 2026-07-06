@@ -1,5 +1,6 @@
 import type { CoachSummaryDrilldownData } from 'src/components/AdminDashboard/WeeklyCoachSummaries/types';
 import { useQuery } from '@tanstack/react-query';
+import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
 // import { useBackendHelpers } from '../useBackend';
 
 export default function useReportWeeksDrilldown(
@@ -21,7 +22,8 @@ export default function useReportWeeksDrilldown(
   const reportWeeksDrilldownQuery = useQuery({
     queryKey: ['weeks-report-drilldown', coachId, report],
     queryFn: () => getReportWeeksDrilldown(coachId, report),
-    staleTime: Infinity,
+    // staleTime: Infinity,
+    ...deprecatedAdminReportQueryOptions,
   });
 
   return {

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
 // import { useBackendHelpers } from '../useBackend';
 
 export default function useStudentsBeyond150ByCoach(
@@ -16,8 +17,9 @@ export default function useStudentsBeyond150ByCoach(
   const studentsBeyond150ByCoachQuery = useQuery({
     queryKey: ['students-beyond-150-by-coach', coachId],
     queryFn: getStudentsBeyond150ByCoach,
-    staleTime: Infinity,
-    enabled: !!coachId,
+    // staleTime: Infinity,
+    // enabled: !!coachId,
+    ...deprecatedAdminReportQueryOptions,
   });
 
   return { studentsBeyond150ByCoachQuery };

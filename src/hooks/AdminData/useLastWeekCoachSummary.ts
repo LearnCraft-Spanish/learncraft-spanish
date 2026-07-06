@@ -1,5 +1,6 @@
 import type { CoachSummaryData } from 'src/components/AdminDashboard/WeeklyCoachSummaries/types';
 import { useQuery } from '@tanstack/react-query';
+import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
 // import { useBackendHelpers } from '../useBackend';
 
 export default function useLastWeekCoachSummary() {
@@ -13,7 +14,8 @@ export default function useLastWeekCoachSummary() {
   const lastWeekCoachSummaryQuery = useQuery({
     queryKey: ['last-week-coach-summary'],
     queryFn: getLastWeekCoachSummary,
-    staleTime: Infinity,
+    // staleTime: Infinity,
+    ...deprecatedAdminReportQueryOptions,
   });
 
   return { lastWeekCoachSummaryQuery };

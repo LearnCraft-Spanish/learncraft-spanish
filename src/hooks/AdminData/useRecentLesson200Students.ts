@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
 // import { useBackendHelpers } from '../useBackend';
 
 export default function useRecentLesson200Students() {
@@ -12,7 +13,8 @@ export default function useRecentLesson200Students() {
   const recentLesson200StudentsQuery = useQuery({
     queryKey: ['recent-lesson-200-students'],
     queryFn: getRecentLesson200Students,
-    staleTime: Infinity,
+    // staleTime: Infinity,
+    ...deprecatedAdminReportQueryOptions,
   });
 
   return { recentLesson200StudentsQuery };

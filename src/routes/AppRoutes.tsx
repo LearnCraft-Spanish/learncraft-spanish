@@ -42,8 +42,7 @@ const StudentDrillDown = lazy(
 // );
 
 // Admin-only pages
-// Not available at this time
-// const AdminDashboard = lazy(() => import('src/sections/AdminDashboard'));
+const AdminDashboard = lazy(() => import('src/sections/AdminDashboard'));
 const DatabaseTables = lazy(() => import('src/sections/DatabaseTables'));
 const ExampleManagerRouter = lazy(
   () => import('src/hexagon/interface/pages/ExampleManagerPage'),
@@ -110,11 +109,9 @@ export default function AppRoutes() {
         />
         <Route path="/example-manager/*" element={<ExampleManagerRouter />} />
         <Route path="/*" element={<NotFoundPage />} />
-        {/* Not available at this time */}
-        {/* <Route path="/admin-dashboard" element={isAdmin && <AdminDashboard />} /> */}
         <Route
           path="/admin-dashboard"
-          element={isAdmin && <NotAvailablePage />}
+          element={isAdmin && <AdminDashboard />}
         />
       </SentryRoutes>
     </Suspense>

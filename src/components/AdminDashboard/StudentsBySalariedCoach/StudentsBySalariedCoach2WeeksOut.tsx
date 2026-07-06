@@ -1,19 +1,22 @@
-import type { CoachStudentData } from './types';
+import type { MembershipsByCoach } from '@learncraft-spanish/shared';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
-import useStudentsBySalariedCoach2WeeksOut from 'src/hooks/AdminData/useStudentsBySalariedCoach2WeeksOut';
+import useMembershipsBySalariedCoachTwoWeeksOutReport from 'src/hooks/AdminData/useMembershipsBySalariedCoachTwoWeeksOutReport';
 
-function renderRow(row: CoachStudentData, onClickFunc?: (str: string) => void) {
+function renderRow(
+  row: MembershipsByCoach,
+  onClickFunc?: (str: string) => void,
+) {
   return (
-    <tr key={row.coachName}>
+    <tr key={row.coach.coach_id}>
       <td
         onClick={() => {
           if (onClickFunc) {
-            onClickFunc(`${row.coachName}_2 Weeks Out`);
+            onClickFunc(`${row.coach.coach_id}_2 Weeks Out`);
           }
         }}
       >
-        {row.coachName}
+        {row.coach.fullName}
       </td>
       <td>{row.totalWeeklyPrivateCalls}</td>
     </tr>
@@ -29,8 +32,8 @@ export default function StudentsBySalariedCoach2WeeksOut({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
-  const { studentsBySalariedCoach2WeeksOutQuery } =
-    useStudentsBySalariedCoach2WeeksOut();
+  const { membershipsBySalariedCoachTwoWeeksOutReportQuery } =
+    useMembershipsBySalariedCoachTwoWeeksOutReport();
   const headers = ['Coach Name', 'Total Weekly Private Calls'];
 
   return (
@@ -43,7 +46,7 @@ export default function StudentsBySalariedCoach2WeeksOut({
       {isOpen && (
         <DisplayOnlyTable
           headers={headers}
-          data={studentsBySalariedCoach2WeeksOutQuery.data ?? []}
+          data={membershipsBySalariedCoachTwoWeeksOutReportQuery.data ?? []}
           renderRow={renderRow}
           onClickFunc={setSelectedReport}
         />
