@@ -1,13 +1,13 @@
-import type { SrCourse } from '@learncraft-spanish/shared';
-import type { Coach } from 'src/types/CoachingTypes';
+import type { Coach, SrCourse } from '@learncraft-spanish/shared';
 
 import { useAllSrCoursesQuery } from '@application/queries/CoachingStudentQueries/useAllSrCoursesQuery';
+import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
 import { Dropdown } from '@interface/components/FormComponents';
 import React, { useMemo, useState } from 'react';
-import { CoachDropdown_LEGACY } from 'src/components/FormComponents';
+import { CoachDropdown } from 'src/components/FormComponents';
+import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
 import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-
 import getDateRange from '../../general/functions/dateRange';
 import useDateRange from '../useDateRange';
 import '../../coaching.scss';
@@ -47,10 +47,12 @@ export default function WeeksFilter({
   updateFilterByOneMonthChallenge,
 }: CoachingFilterProps) {
   const { srCourses, isLoading: srCoursesLoading } = useAllSrCoursesQuery();
-  const { activeMembershipsQuery } = useCoaching();
+  const { coaches } = useAllCoachesQuery();
+  // const { activeMembershipsQuery } = useCoaching();
   const { setStartDate, startDate } = useDateRange();
   const [numWeeks, setNumWeeks] = useState(4); // Start with 4 weeks
   const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
+  const { weeks } = useWeeksByStartDate(startDate);
 
   const handleLoadMore = () => {
     setNumWeeks((prev) => prev * 2);
@@ -66,29 +68,25 @@ export default function WeeksFilter({
   };
 
   const coursesWithActiveMemberships = useMemo(() => {
-    if (srCoursesLoading || !srCourses || !activeMembershipsQuery.isSuccess)
-      return [];
+    if (srCoursesLoading || !srCourses || !weeks) return [];
     return srCourses.filter((course) => {
       return (
-        activeMembershipsQuery.data.filter(
-          (membership) => membership.relatedCourse === course.srCourseId,
-        ).length > 0
+        weeks.filter((week) => week.srCourseName === course.name).length > 0
       );
     });
-  }, [
-    srCourses,
-    srCoursesLoading,
-    activeMembershipsQuery.data,
-    activeMembershipsQuery.isSuccess,
-  ]);
+  }, [srCourses, srCoursesLoading, weeks]);
 
   return (
     dataReady && (
       <div className="coachingFilterSection">
         <div className="simpleFiltering">
-          <CoachDropdown_LEGACY
-            coachEmail={filterByCoach?.user.email || ''}
-            onChange={updateCoachFilter}
+          <CoachDropdown
+            coachId={filterByCoach?.coach_id || 0}
+            onChange={(value) =>
+              updateCoachFilter(
+                coaches?.find((coach) => coach.coach_id === value)?.email || '',
+              )
+            }
             editMode
             defaultOptionText="Select Coach"
           />

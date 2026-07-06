@@ -1,33 +1,20 @@
 import type {
   BasePrivateCall,
-  FurnishedWeekWithCoach,
   MinimalCoachingStudent,
 } from '@learncraft-spanish/shared';
-import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { Dropdown } from '@interface/components/FormComponents';
-import { getWeekEnds } from 'mocks/data/serverlike/studentRecords/scripts/functions';
-import React, { useEffect, useMemo, useState } from 'react';
-import x_dark from 'src/assets/icons/x_dark.svg';
-import CustomStudentSelector from 'src/components/Coaching/general/CustomStudentSelector';
-import getDateRange from 'src/components/Coaching/general/functions/dateRange';
+import React, { useState } from 'react';
 import {
   CoachDropdown_LEGACY,
   DateInput,
-  DeleteRecord,
   FormControls,
   LinkInput,
   TextAreaInput,
-  verifyRequiredInputs,
 } from 'src/components/FormComponents';
-import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import { usePrivateCallLookupsQuery } from 'src/hexagon/application/queries/usePrivateCallLookupsQuery';
 import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import { useModal } from 'src/hexagon/interface/hooks/useModal';
-import { useWeeks } from 'src/hooks/CoachingData/queries';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 
 // const ratingOptions = [
 //   'Excellent',

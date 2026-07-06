@@ -4,43 +4,26 @@ import type {
   FurnishedWeekWithCoach,
 } from '@learncraft-spanish/shared';
 
-import type {
-  GroupAttendees,
-  GroupSession,
-  Week,
-} from 'src/types/CoachingTypes';
+
+
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { Dropdown } from '@interface/components/FormComponents';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import CustomGroupAttendeeSelector from 'src/components/Coaching/general/CustomGroupAttendeeSelector';
-import getWeekEnds from 'src/components/Coaching/general/functions/getWeekEnds';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   CoachDropdown,
   DateInput,
-  DeleteRecord,
   FormControls,
   LinkInput,
   TextAreaInput,
-  verifyRequiredInputs,
 } from 'src/components/FormComponents';
-import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
 
 import { useGroupCallLookupsQuery } from 'src/hexagon/application/queries/useGroupCallLookupsQuery';
 import getLoggedInCoach from 'src/hexagon/domain/functions/getLoggedInCoach';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import { useModal } from 'src/hexagon/interface/hooks/useModal';
-import * as helpers from 'src/hooks/CoachingData/helperFunctions';
-import {
-  useActiveMemberships,
-  useActiveStudents,
-  useCoachList,
-  useGroupSessions,
-  useWeeks,
-} from 'src/hooks/CoachingData/queries';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import CustomGroupSessionTopicSelector from '../../general/CustomGroupSessionTopicSelector';
+
+
 // const sessionTypeOptions = [
 //   '1MC',
 //   '2MC',

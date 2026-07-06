@@ -1,15 +1,8 @@
 import type { FurnishedWeekWithCoach } from '@learncraft-spanish/shared';
-import type { Week } from 'src/types/CoachingTypes';
-import { useModal } from '@interface/hooks/useModal';
-import { useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
+import { useMemo } from 'react';
 
 import checkmark from 'src/assets/icons/checkmark_green.svg';
-import pencil from 'src/assets/icons/pencil.svg';
-import x from 'src/assets/icons/x_dark.svg';
-import { SearchableDropdown, Switch } from 'src/components/FormComponents';
 
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
 import AssignmentsCell from './AssignmentsCell';
 import GroupSessionsCell from './GroupSessionsCell';

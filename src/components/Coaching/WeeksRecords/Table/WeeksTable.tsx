@@ -1,14 +1,7 @@
 import type { FurnishedWeekWithCoach } from '@learncraft-spanish/shared';
-import type { Week } from 'src/types/CoachingTypes';
-import { Loading } from '@interface/components/Loading';
-import { useModal } from '@interface/hooks/useModal';
-import { useMutation } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
 import arrowUp from 'src/assets/icons/arrow-up.svg';
 import { Pagination, QuantifiedRecords } from 'src/components/Table/components';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useBackendHelpers } from 'src/hooks/useBackend';
 import { WeeksTableItemWithSiingleRecordEdit } from './WeeksTableItem';
 // interface WeekWithFailedToUpdate extends Week {
 //   failedToUpdate?: boolean;

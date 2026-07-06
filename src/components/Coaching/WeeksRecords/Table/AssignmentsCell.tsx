@@ -2,35 +2,19 @@ import type {
   BaseAssignment,
   FurnishedWeekWithCoach,
 } from '@learncraft-spanish/shared';
-import type { Week } from 'src/types/CoachingTypes';
-import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useAssignmentLookupsQuery } from '@application/queries/useAssignmentLookupsQuery';
 import { Dropdown } from '@interface/components/FormComponents';
-import { useMemo, useState } from 'react';
-import x_dark from 'src/assets/icons/x_dark.svg';
+import { useState } from 'react';
 import {
   CoachDropdown_LEGACY,
-  DeleteRecord,
-  FormControls,
   LinkInput,
   TextAreaInput,
-  verifyRequiredInputs,
 } from 'src/components/FormComponents';
-import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
-import { useWeeksByStartDate } from 'src/hexagon/application/queries/useWeeksByStartDate/useWeeksByStartDate';
-import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
 
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import { useModal } from 'src/hexagon/interface/hooks/useModal';
-import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import CustomStudentSelector from '../../general/CustomStudentSelector';
 
-import getDateRange from '../../general/functions/dateRange';
-import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
-import getWeekEnds from '../../general/functions/getWeekEnds';
 // const assignmentTypes = [
 //   'Pronunciation',
 //   'Writing',

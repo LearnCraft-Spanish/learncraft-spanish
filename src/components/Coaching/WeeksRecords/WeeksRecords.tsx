@@ -3,12 +3,7 @@ import type {
   FurnishedWeekWithCoach,
   SrCourse,
 } from '@learncraft-spanish/shared';
-import type {
-  // Coach,
-  // Course,
-  GroupSession,
-  Week,
-} from '../../../types/CoachingTypes';
+
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
 import { Loading } from '@interface/components/Loading';
@@ -23,16 +18,12 @@ import { useAllSrCoursesQuery } from 'src/hexagon/application/queries/CoachingSt
 import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
 import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import getDateRange from '../general/functions/dateRange';
-import getLoggedInCoach from '../general/functions/getLoggedInCoach';
 import { DateRangeProvider } from './DateRangeProvider';
-import CoachingFilter from './Filter/WeeksFilter';
+import WeeksFilter from './Filter/WeeksFilter';
 // import { NewAssignmentView } from './Table/AssignmentsCell';
-import { GroupSessionView } from './Table/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
 import useDateRange from './useDateRange';
-import ViewWeekRecord from './ViewWeekRecord';
 import '../coaching.scss';
 
 type SortDirection = 'none' | 'ascending' | 'descending';
@@ -222,7 +213,7 @@ function WeeksRecordsReadOnlyContent() {
 const _WeeksRecordsContent = function WeeksRecordsContent() {
   const { isAuthenticated, isLoading, authUser } = useAuthAdapter();
   const { startDate } = useDateRange();
-  const { weeks } = useWeeksByStartDate(startDate);
+  const { weeks: unfilteredWeeks } = useWeeksByStartDate(startDate);
   const { coaches } = useAllCoachesQuery();
   const { srCourses, isLoading: srCoursesLoading } = useAllSrCoursesQuery();
   // const {
@@ -252,7 +243,9 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
   const [filterBySearchTerm, setFilterBySearchTerm] = useState<string>();
 
   // State for the weeks to display
-  // const [weeks, setWeeks] = useState<FurnishedWeekWithCoach[] | undefined>();
+  const [filteredWeeks, setFilteredWeeks] = useState<
+    FurnishedWeekWithCoach[] | undefined
+  >();
   const rendered = useRef(false);
   const { contextual } = useContextualMenu();
   const [tableEditMode, setTableEditMode] = useState(false);
@@ -369,7 +362,7 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
     (weeks: FurnishedWeekWithCoach[]) => {
       if (!filterByCoachless) return weeks;
       return weeks.filter((week) => {
-        return week?.coach === undefined || week?.coach === null;
+        return week?.coach.coach_id > 0;
       });
     },
     [filterByCoachless, filterByCoach],
@@ -445,9 +438,10 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
         return weeksToFilter;
       }
       const filteredByCoach = filterByCoachFunction(weeksToFilter);
-      const filteredByWeeksAgo = filterWeeksByWeeksAgoFunction(filteredByCoach);
+      // const filteredByWeeksAgo = filterWeeksByWeeksAgoFunction(filteredByCoach);
       const filteredByOneMonthChallenge =
-        filterByOneMonthChallengeFunction(filteredByWeeksAgo);
+        filterByOneMonthChallengeFunction(filteredByCoach);
+
       const filteredByCourse = filterByCourseFunction(
         filteredByOneMonthChallenge,
       );
@@ -489,12 +483,18 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
   }, [coaches, srCourses, authUser, isAuthenticated]);
 
   // Filtering useEffect
-  // useEffect(() => {
-  //   if (dataReady && rendered.current) {
-  //     const filteredWeeks = filterWeeks(weeksQuery.data);
-  //     setWeeks(filteredWeeks);
-  //   }
-  // }, [dataReady, filterWeeks, weeksQuery.data]);
+  useEffect(() => {
+    if (!srCoursesLoading && srCourses && rendered.current) {
+      const filteredWeeks = filterWeeks(unfilteredWeeks);
+      setFilteredWeeks(filteredWeeks);
+    }
+  }, [
+    srCoursesLoading,
+    srCourses,
+    unfilteredWeeks,
+    rendered.current,
+    filterWeeks,
+  ]);
 
   return (
     <div className="newCoachingWrapper">
@@ -507,10 +507,10 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
           ) : (
             <h2>Weekly Student Records</h2>
           )}
-          {/* {!tableEditMode && (
+          {!tableEditMode && (
             <div className="filterWrapper">
-              <CoachingFilter
-                dataReady={!!weeks}
+              <WeeksFilter
+                dataReady={!!filteredWeeks}
                 filterByCoach={filterByCoach}
                 updateCoachFilter={updateCoachFilter}
                 filterByCourse={filterByCourse}
@@ -529,9 +529,9 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
                 }
               />
             </div>
-          )} */}
+          )}
           <WeeksTable
-            weeks={weeks}
+            weeks={filteredWeeks}
             tableEditMode={tableEditMode}
             // setTableEditMode={setTableEditMode}
             hiddenFields={hiddenFields}
