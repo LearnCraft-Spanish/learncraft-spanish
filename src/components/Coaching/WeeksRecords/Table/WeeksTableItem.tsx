@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 
 import checkmark from 'src/assets/icons/checkmark_green.svg';
 
-
 import AssignmentsCell from './AssignmentsCell';
 import GroupSessionsCell from './GroupSessionsCell';
 import ReadOnlyPrivateCallsCell from './NEW_readOnlyPrivateCallsCell';

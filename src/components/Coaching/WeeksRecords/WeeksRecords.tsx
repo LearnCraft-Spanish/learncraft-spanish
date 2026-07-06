@@ -16,9 +16,6 @@ import React, {
 } from 'react';
 import { useAllSrCoursesQuery } from 'src/hexagon/application/queries/CoachingStudentQueries/useAllSrCoursesQuery';
 import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
-import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
-import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import getDateRange from '../general/functions/dateRange';
 import { DateRangeProvider } from './DateRangeProvider';
 import WeeksFilter from './Filter/WeeksFilter';
 // import { NewAssignmentView } from './Table/AssignmentsCell';
@@ -28,190 +25,8 @@ import '../coaching.scss';
 
 type SortDirection = 'none' | 'ascending' | 'descending';
 
-function formatNullable(value: string | Date | null | undefined): string {
-  if (!value) return '';
-  if (value instanceof Date) return value.toISOString().split('T')[0];
-  return value;
-}
-
-function formatAssignments(week: FurnishedWeekWithCoach): string {
-  if (week.assignments.length === 0) return 'None';
-
-  return week.assignments
-    .map(
-      (assignment) =>
-        `${assignment.assignmentType.assignmentType}: ${assignment.assignmentRating.assignmentRating}`,
-    )
-    .join(', ');
-}
-
-function formatPrivateCalls(week: FurnishedWeekWithCoach): string {
-  if (week.privateCalls.length === 0) return 'None';
-
-  return week.privateCalls
-    .map((call) => `${call.callRating.rating} (${call.callType.callType})`)
-    .join(', ');
-}
-
-function formatGroupCalls(week: FurnishedWeekWithCoach): string {
-  if (week.groupCalls.length === 0) return 'None';
-
-  return week.groupCalls
-    .map((groupCall) => {
-      const sessionType =
-        groupCall.groupSessionType?.groupSessionType ?? 'Group Call';
-      const attendeeCount = groupCall.attendees.length;
-      return `${sessionType} (${attendeeCount} attendees)`;
-    })
-    .join(', ');
-}
-
-function WeeksRecordsReadOnlyContent() {
-  const { startDate, setStartDate } = useDateRange();
-  const { weeks, loading, error, refetch } = useWeeksByStartDate(startDate);
-  const [numWeeks, setNumWeeks] = useState(4);
-  const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
-
-  const totalAssignments = useMemo(
-    () => weeks.reduce((total, week) => total + week.assignments.length, 0),
-    [weeks],
-  );
-  const totalPrivateCalls = useMemo(
-    () => weeks.reduce((total, week) => total + week.privateCalls.length, 0),
-    [weeks],
-  );
-  const totalGroupCalls = useMemo(
-    () => weeks.reduce((total, week) => total + week.groupCalls.length, 0),
-    [weeks],
-  );
-
-  function handleWeeksAgoChange(value: string) {
-    if (value === 'loadMore') {
-      setNumWeeks((prev) => prev * 2);
-      return;
-    }
-
-    setStartDate(value);
-  }
-
-  return (
-    <div className="newCoachingWrapper">
-      <h2>Weekly Student Records</h2>
-      <p>
-        Read-only legacy interface powered by the new weekly records route. CRUD
-        operations remain disabled until their workflows are migrated.
-      </p>
-
-      <div className="filterWrapper">
-        <div className="coachingFilterSection">
-          <div className="simpleFiltering">
-            <div className="weekSelector">
-              <label htmlFor="weekRangeFilter">Week:</label>
-              <select
-                id="weekRangeFilter"
-                onChange={(event) => handleWeeksAgoChange(event.target.value)}
-                value={startDate}
-              >
-                {Array.from({ length: numWeeks }, (_, i) => {
-                  const dateKey =
-                    i === 0
-                      ? 'thisWeekDate'
-                      : i === 1
-                        ? 'lastSundayDate'
-                        : i === 2
-                          ? 'twoSundaysAgoDate'
-                          : `${i + 1}SundaysAgoDate`;
-                  const date = dateRange[dateKey];
-                  const label =
-                    i === 0
-                      ? 'This Week'
-                      : i === 1
-                        ? 'Last Week'
-                        : i === 2
-                          ? 'Two Weeks Ago'
-                          : toReadableMonthDay(date);
-
-                  return (
-                    <option key={date} value={date}>
-                      {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
-                    </option>
-                  );
-                })}
-                <option value="loadMore" className="loadMoreOption">
-                  Load More Dates...
-                </option>
-              </select>
-            </div>
-            <button type="button" disabled={loading} onClick={refetch}>
-              Refresh Weeks
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {loading && <Loading message="Loading weekly records..." />}
-      {error && <p>Error loading weekly records: {error.message}</p>}
-      {!loading && !error && (
-        <>
-          <div className="numberShowing">
-            <p>
-              Showing {weeks.length} weekly records for{' '}
-              {toReadableMonthDay(startDate)}
-            </p>
-            <p>
-              Assignments: {totalAssignments} | Private calls:{' '}
-              {totalPrivateCalls} | Group calls: {totalGroupCalls}
-            </p>
-          </div>
-          <div className="tableWrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Membership</th>
-                  <th>Coach</th>
-                  <th>Week</th>
-                  <th>Assignments</th>
-                  <th>Group Calls</th>
-                  <th>Private Calls</th>
-                  <th>Notes</th>
-                  <th>Current Lesson</th>
-                  <th>Hold Week</th>
-                  <th>Records Complete</th>
-                </tr>
-              </thead>
-              <tbody>
-                {weeks.map((week) => (
-                  <tr key={week.weekId}>
-                    <td>{week.membershipId ?? 'No membership'}</td>
-                    <td>{week.coach.fullName}</td>
-                    <td>
-                      Week {week.weekNumber}
-                      <br />
-                      {formatNullable(week.weekStarts)}
-                    </td>
-                    <td>{formatAssignments(week)}</td>
-                    <td>{formatGroupCalls(week)}</td>
-                    <td>{formatPrivateCalls(week)}</td>
-                    <td>{week.notes ?? ''}</td>
-                    <td>{week.lesson?.lessonName ?? ''}</td>
-                    <td>{week.holdWeek ? 'Yes' : 'No'}</td>
-                    <td>{week.recordComplete ? 'Yes' : 'No'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {weeks.length === 0 && (
-              <p>No weekly records were returned for this week.</p>
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
 const _WeeksRecordsContent = function WeeksRecordsContent() {
-  const { isAuthenticated, isLoading, authUser } = useAuthAdapter();
+  const { isAuthenticated, authUser } = useAuthAdapter();
   const { startDate } = useDateRange();
   const { weeks: unfilteredWeeks } = useWeeksByStartDate(startDate);
   const { coaches } = useAllCoachesQuery();
@@ -247,8 +62,9 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
     FurnishedWeekWithCoach[] | undefined
   >();
   const rendered = useRef(false);
-  const { contextual } = useContextualMenu();
-  const [tableEditMode, setTableEditMode] = useState(false);
+  // const { contextual } = useContextualMenu();
+  // const [tableEditMode, setTableEditMode] = useState(false);
+  const tableEditMode = false;
 
   // State for sorting
   const [sortByStudent, setSortByStudent] = useState<boolean>(false);

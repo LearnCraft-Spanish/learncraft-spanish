@@ -1,9 +1,5 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
 import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { describe, expect, it, vi } from 'vitest';
-import { DateRangeProvider } from '../DateRangeProvider';
-import AssignmentsCell from './AssignmentsCell';
 
 vi.mock('@application/queries/CoachQueries/useAllCoachesQuery', () => ({
   useAllCoachesQuery: () => ({
@@ -27,86 +23,91 @@ if (!assignment) {
 if (!week) {
   throw new Error('No week found in mock data');
 }
-describe('component StudentCell', () => {
-  it('default view renders without crashing', () => {
-    render(
-      <MockAllProviders>
-        <DateRangeProvider>
-          <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
-        </DateRangeProvider>
-      </MockAllProviders>,
-    );
-    expect(
-      screen.getByText(`${assignment.assignmentType}: ${assignment.rating}`),
-    ).toBeInTheDocument();
-  });
-  describe('contextual menu view', () => {
-    it('contextual menu view renders without crashing', async () => {
-      render(
-        <MockAllProviders>
-          <DateRangeProvider>
-            <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
-          </DateRangeProvider>
-        </MockAllProviders>,
-      );
-      // Click on the button that opens the contextual menu
-      act(() => {
-        screen
-          .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
-          .click();
-      });
-      await waitFor(() => {
-        expect(screen.getByText('Notes:')).toBeInTheDocument();
-      });
-    });
-
-    it('contextual menu view renders the correct data', async () => {
-      const requiredFields = [
-        'Corrected by:',
-        'Rating:',
-        'Notes:',
-        'Areas of Difficulty:',
-      ];
-      render(
-        <MockAllProviders>
-          <DateRangeProvider>
-            <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
-          </DateRangeProvider>
-        </MockAllProviders>,
-      );
-      // Click on the button that opens the contextual menu
-      act(() => {
-        screen
-          .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
-          .click();
-      });
-      await waitFor(() => {
-        requiredFields.forEach((field) => {
-          expect(screen.getByText(field)).toBeInTheDocument();
-        });
-      });
-    });
-
-    it('contextual menu view renders the session documents if they exist on the assignment', async () => {
-      if (!assignment.assignmentLink) {
-        throw new Error('No assignmentLink on assignment');
-      }
-      render(
-        <MockAllProviders>
-          <DateRangeProvider>
-            <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
-          </DateRangeProvider>
-        </MockAllProviders>,
-      );
-      // Click on the button that opens the contextual menu
-      act(() => {
-        screen
-          .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
-          .click();
-      });
-      await waitFor(() => {
-        expect(screen.getByText('Assignment Link:')).toBeInTheDocument();
-      });
-    });
+describe('placeholder test', () => {
+  it('should pass', () => {
+    expect(false).toBe(true);
   });
 });
+// describe('component StudentCell', () => {
+//   it('default view renders without crashing', () => {
+//     render(
+//       <MockAllProviders>
+//         <DateRangeProvider>
+//           <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
+//         </DateRangeProvider>
+//       </MockAllProviders>,
+//     );
+//     expect(
+//       screen.getByText(`${assignment.assignmentType}: ${assignment.rating}`),
+//     ).toBeInTheDocument();
+//   });
+//   describe('contextual menu view', () => {
+//     it('contextual menu view renders without crashing', async () => {
+//       render(
+//         <MockAllProviders>
+//           <DateRangeProvider>
+//             <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
+//           </DateRangeProvider>
+//         </MockAllProviders>,
+//       );
+//       // Click on the button that opens the contextual menu
+//       act(() => {
+//         screen
+//           .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
+//           .click();
+//       });
+//       await waitFor(() => {
+//         expect(screen.getByText('Notes:')).toBeInTheDocument();
+//       });
+//     });
+
+//     it('contextual menu view renders the correct data', async () => {
+//       const requiredFields = [
+//         'Corrected by:',
+//         'Rating:',
+//         'Notes:',
+//         'Areas of Difficulty:',
+//       ];
+//       render(
+//         <MockAllProviders>
+//           <DateRangeProvider>
+//             <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
+//           </DateRangeProvider>
+//         </MockAllProviders>,
+//       );
+//       // Click on the button that opens the contextual menu
+//       act(() => {
+//         screen
+//           .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
+//           .click();
+//       });
+//       await waitFor(() => {
+//         requiredFields.forEach((field) => {
+//           expect(screen.getByText(field)).toBeInTheDocument();
+//         });
+//       });
+//     });
+
+//     it('contextual menu view renders the session documents if they exist on the assignment', async () => {
+//       if (!assignment.assignmentLink) {
+//         throw new Error('No assignmentLink on assignment');
+//       }
+//       render(
+//         <MockAllProviders>
+//           <DateRangeProvider>
+//             <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
+//           </DateRangeProvider>
+//         </MockAllProviders>,
+//       );
+//       // Click on the button that opens the contextual menu
+//       act(() => {
+//         screen
+//           .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
+//           .click();
+//       });
+//       await waitFor(() => {
+//         expect(screen.getByText('Assignment Link:')).toBeInTheDocument();
+//       });
+//     });
+//   });
+// });

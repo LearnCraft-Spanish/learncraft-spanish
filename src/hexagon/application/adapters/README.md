@@ -83,7 +83,9 @@ import { vi } from 'vitest';
 
 vi.mock('../adapters/subcategoryAdapter', () => ({
   useSubcategoryAdapter: () => ({
-    getSubcategories: vi.fn().mockResolvedValue([/* mocked data */]),
+    getSubcategories: vi.fn().mockResolvedValue([
+      /* mocked data */
+    ]),
   }),
 }));
 ```

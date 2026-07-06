@@ -41,94 +41,100 @@ if (!(relatedGroupSession.callDocument || relatedGroupSession.zoomLink)) {
   throw new Error('mock Group Session is missing required fields');
 }
 
-describe.skip('component StudentCell', () => {
-  it('renders with valid data', async () => {
-    render(
-      <MockAllProviders>
-        <DateRangeProvider>
-          <GroupSessionsCell
-            week={week}
-            groupSessions={[relatedGroupSession]}
-            tableEditMode={false}
-          />
-        </DateRangeProvider>
-      </MockAllProviders>,
-    );
-
-    // Wait for the component to render (component only renders when groupSessionsQuery.isSuccess)
-    // Use a more flexible matcher and longer timeout to handle query loading
-    await waitFor(
-      () => {
-        expect(
-          screen.getByText(relatedGroupSession.sessionType),
-        ).toBeInTheDocument();
-      },
-      { timeout: 10000, interval: 100 },
-    );
-  });
-  describe('contextual menu view', () => {
-    // Helper function for successful render
-    async function renderWithPopupActive() {
-      render(
-        <MockAllProviders>
-          <DateRangeProvider>
-            <GroupSessionsCell
-              week={week}
-              groupSessions={[relatedGroupSession]}
-              tableEditMode={false}
-            />
-          </DateRangeProvider>
-        </MockAllProviders>,
-      );
-
-      // Wait for the component to render (component only renders when groupSessionsQuery.isSuccess)
-      await waitFor(
-        () => {
-          expect(
-            screen.getByText(relatedGroupSession.sessionType),
-          ).toBeInTheDocument();
-        },
-        { timeout: 10000, interval: 100 },
-      );
-      act(() => {
-        screen.getByText(relatedGroupSession.sessionType).click();
-      });
-      await waitFor(() => {
-        expect(
-          screen.getByText('Session:', { exact: false }),
-        ).toBeInTheDocument();
-      });
-    }
-
-    it('contextual menu view renders without crashing', async () => {
-      await renderWithPopupActive();
-      await waitFor(() => {
-        expect(screen.getByText('Attendees:')).toBeInTheDocument();
-      });
-    });
-
-    it('contextual menu view renders the correct data', async () => {
-      await renderWithPopupActive();
-      const requiredFields = [
-        'Session:',
-        'Coach:',
-        'Topic:',
-        'Comments:',
-        'Attendees:',
-      ];
-      await waitFor(() => {
-        requiredFields.forEach((field) => {
-          expect(screen.getByText(field, { exact: false })).toBeInTheDocument();
-        });
-      });
-    });
-
-    it('contextual menu view renders the session documents if they exist on the Group Session', async () => {
-      await renderWithPopupActive();
-      await waitFor(() => {
-        expect(screen.getByText('Zoom Link:')).toBeInTheDocument();
-        expect(screen.getByText('Call Document:')).toBeInTheDocument();
-      });
-    });
+describe('placeholder test', () => {
+  it('should pass', () => {
+    expect(false).toBe(true);
   });
 });
+
+// describe.skip('component StudentCell', () => {
+//   it('renders with valid data', async () => {
+//     render(
+//       <MockAllProviders>
+//         <DateRangeProvider>
+//           <GroupSessionsCell
+//             week={week}
+//             groupSessions={[relatedGroupSession]}
+//             tableEditMode={false}
+//           />
+//         </DateRangeProvider>
+//       </MockAllProviders>,
+//     );
+
+//     // Wait for the component to render (component only renders when groupSessionsQuery.isSuccess)
+//     // Use a more flexible matcher and longer timeout to handle query loading
+//     await waitFor(
+//       () => {
+//         expect(
+//           screen.getByText(relatedGroupSession.sessionType),
+//         ).toBeInTheDocument();
+//       },
+//       { timeout: 10000, interval: 100 },
+//     );
+//   });
+//   describe('contextual menu view', () => {
+//     // Helper function for successful render
+//     async function renderWithPopupActive() {
+//       render(
+//         <MockAllProviders>
+//           <DateRangeProvider>
+//             <GroupSessionsCell
+//               week={week}
+//               groupSessions={[relatedGroupSession]}
+//               tableEditMode={false}
+//             />
+//           </DateRangeProvider>
+//         </MockAllProviders>,
+//       );
+
+//       // Wait for the component to render (component only renders when groupSessionsQuery.isSuccess)
+//       await waitFor(
+//         () => {
+//           expect(
+//             screen.getByText(relatedGroupSession.sessionType),
+//           ).toBeInTheDocument();
+//         },
+//         { timeout: 10000, interval: 100 },
+//       );
+//       act(() => {
+//         screen.getByText(relatedGroupSession.sessionType).click();
+//       });
+//       await waitFor(() => {
+//         expect(
+//           screen.getByText('Session:', { exact: false }),
+//         ).toBeInTheDocument();
+//       });
+//     }
+
+//     it('contextual menu view renders without crashing', async () => {
+//       await renderWithPopupActive();
+//       await waitFor(() => {
+//         expect(screen.getByText('Attendees:')).toBeInTheDocument();
+//       });
+//     });
+
+//     it('contextual menu view renders the correct data', async () => {
+//       await renderWithPopupActive();
+//       const requiredFields = [
+//         'Session:',
+//         'Coach:',
+//         'Topic:',
+//         'Comments:',
+//         'Attendees:',
+//       ];
+//       await waitFor(() => {
+//         requiredFields.forEach((field) => {
+//           expect(screen.getByText(field, { exact: false })).toBeInTheDocument();
+//         });
+//       });
+//     });
+
+//     it('contextual menu view renders the session documents if they exist on the Group Session', async () => {
+//       await renderWithPopupActive();
+//       await waitFor(() => {
+//         expect(screen.getByText('Zoom Link:')).toBeInTheDocument();
+//         expect(screen.getByText('Call Document:')).toBeInTheDocument();
+//       });
+//     });
+//   });
+// });

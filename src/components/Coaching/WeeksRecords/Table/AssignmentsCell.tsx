@@ -86,7 +86,7 @@ export function AssignmentView({
   _tableEditMode?: boolean;
   _onSuccess?: () => void;
 }) {
-  const { coaches, isLoading, error } = useAllCoachesQuery();
+  const { coaches } = useAllCoachesQuery();
   // const {
   //   getStudentFromMembershipId,
   //   coachListQuery,

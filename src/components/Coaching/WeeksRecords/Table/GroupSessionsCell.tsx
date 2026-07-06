@@ -4,8 +4,6 @@ import type {
   FurnishedWeekWithCoach,
 } from '@learncraft-spanish/shared';
 
-
-
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { Dropdown } from '@interface/components/FormComponents';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -22,7 +20,6 @@ import { useGroupCallLookupsQuery } from 'src/hexagon/application/queries/useGro
 import getLoggedInCoach from 'src/hexagon/domain/functions/getLoggedInCoach';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-
 
 // const sessionTypeOptions = [
 //   '1MC',
