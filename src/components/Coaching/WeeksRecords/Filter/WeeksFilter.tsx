@@ -7,7 +7,6 @@ import React, { useMemo, useState } from 'react';
 import { CoachDropdown } from 'src/components/FormComponents';
 import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
 import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import getDateRange from '../../general/functions/dateRange';
 import useDateRange from '../useDateRange';
 import '../../coaching.scss';
