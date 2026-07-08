@@ -147,17 +147,11 @@ export default function WeeksFilter({
               New Assignment
             </button>
 
-            {/* Legacy CRUD disabled until group call creation is migrated to hexagon. */}
-            {/*
             <button
               type="button"
               className="greenButton"
               onClick={() => openContextual('newGroupSession')}
             >
-              New Group Call
-            </button>
-            */}
-            <button type="button" className="greenButton" disabled>
               New Group Call
             </button>
           </div>

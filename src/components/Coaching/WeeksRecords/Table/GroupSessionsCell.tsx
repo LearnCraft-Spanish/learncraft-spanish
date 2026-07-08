@@ -2,88 +2,106 @@ import type {
   BaseGroupSession,
   Coach,
   FurnishedWeekWithCoach,
+  GroupSessionTopic,
+  GroupSessionType,
 } from '@learncraft-spanish/shared';
-
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { Dropdown } from '@interface/components/FormComponents';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   CoachDropdown,
   DateInput,
+  DeleteRecord,
   FormControls,
   LinkInput,
   TextAreaInput,
+  verifyRequiredInputs,
 } from 'src/components/FormComponents';
+import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
-
+import { useGroupCallMutations } from 'src/hexagon/application/queries/GroupCallQueries/useGroupCallMutations';
 import { useGroupCallLookupsQuery } from 'src/hexagon/application/queries/useGroupCallLookupsQuery';
-import getLoggedInCoach from 'src/hexagon/domain/functions/getLoggedInCoach';
+import { useWeeksByStartDate } from 'src/hexagon/application/queries/useWeeksByStartDate/useWeeksByStartDate';
+import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 
-// const sessionTypeOptions = [
-//   '1MC',
-//   '2MC',
-//   'Modules 1 & 2',
-//   'Level 1',
-//   'Level 2',
-//   'Level 3',
-//   'Level 4',
-//   'Level 5',
-//   'Level 6',
-//   'Module 3',
-//   'Module 4',
-//   'LCS Cohort',
-//   'Advanced',
-//   'Conversation',
-// ];
+interface AttendeeSelection {
+  weekId: number;
+  studentFullName: string;
+}
+
+function formatDateInput(date: Date | string | null | undefined): string {
+  if (!date) {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  if (date instanceof Date) {
+    return date.toISOString().split('T')[0];
+  }
+
+  return date.split('T')[0];
+}
+
+function getSortedWeekIds(attendees: AttendeeSelection[]): number[] {
+  return attendees.map((attendee) => attendee.weekId).sort((a, b) => a - b);
+}
+
+function hasSameAttendeeWeekIds(
+  currentAttendees: AttendeeSelection[],
+  originalWeekIds: number[],
+): boolean {
+  const currentWeekIds = getSortedWeekIds(currentAttendees);
+  const sortedOriginalWeekIds = [...originalWeekIds].sort((a, b) => a - b);
+
+  return (
+    currentWeekIds.length === sortedOriginalWeekIds.length &&
+    currentWeekIds.every(
+      (weekId, index) => weekId === sortedOriginalWeekIds[index],
+    )
+  );
+}
+
+function getDefaultCoachId(
+  coaches: Coach[] | undefined,
+  email: string,
+): number {
+  return coaches?.find((coach) => coach.email === email)?.coach_id || 0;
+}
+
+function formatAttendeeOption(week: FurnishedWeekWithCoach): string {
+  return `${week.student?.fullName || 'No Student'} (${week.weekId})`;
+}
+
+function parseAttendeeOptionWeekId(option: string): number {
+  const weekIdMatch = option.match(/\((\d+)\)$/);
+  return weekIdMatch ? Number(weekIdMatch[1]) : Number.NaN;
+}
 
 function GroupSessionCell({
   groupSession,
   week,
-  newRecord,
-  // tableEditMode,
+  tableEditMode,
 }: {
   groupSession: BaseGroupSession;
   week: FurnishedWeekWithCoach;
-  newRecord?: boolean;
-  // tableEditMode: boolean;
+  tableEditMode: boolean;
 }) {
   const { contextual, openContextual } = useContextualMenu();
+  const contextualKey = `groupSession${groupSession.groupSessionId}week${week.weekId}`;
+
   return (
     <div className="cellWithContextual">
-      {/* {newRecord ? (
-        <button
-          type="button"
-          className="greenButton"
-          onClick={() =>
-            openContextual(
-              `groupSession${groupSession.groupSessionId}week${week.weekId}`,
-            )
-          }
-          disabled={tableEditMode}
-        >
-          New
-        </button> */}
-      {/* ) : ( */}
-      <button
-        type="button"
-        onClick={() =>
-          openContextual(
-            `groupSession${groupSession.groupSessionId}week${week.weekId}`,
-          )
-        }
-      >
-        {groupSession.groupSessionType?.groupSessionType}
+      <button type="button" onClick={() => openContextual(contextualKey)}>
+        {groupSession.groupSessionType?.groupSessionType || 'Group Session'}
       </button>
-      {/* )} */}
 
-      {contextual ===
-        `groupSession${groupSession.groupSessionId}week${week.weekId}` && (
+      {contextual === contextualKey && (
         <GroupSessionView
+          week={week}
           groupSession={groupSession}
-          newRecord={newRecord}
-          // tableEditMode={tableEditMode}
+          tableEditMode={tableEditMode}
         />
       )}
     </div>
@@ -91,636 +109,619 @@ function GroupSessionCell({
 }
 
 export function GroupSessionView({
+  week,
   groupSession,
-  newRecord,
-  // tableEditMode,
-  // onSuccess,
+  tableEditMode,
+  onSuccess,
 }: {
+  week: FurnishedWeekWithCoach;
   groupSession: BaseGroupSession;
-  newRecord?: boolean;
-  // tableEditMode?: boolean;
-  // onSuccess?: () => void;
+  tableEditMode: boolean;
+  onSuccess?: () => void;
 }) {
-  // const { authUser, isAdmin } = useAuthAdapter();
-  const { authUser } = useAuthAdapter();
-  // const { closeContextual, openContextual, updateDisableClickOutside } =
-  //   useContextualMenu();
-  // const { openModal, closeModal } = useModal();
-  const { coaches } = useAllCoachesQuery();
-  // const {
-  //   getAttendeesFromGroupSessionId,
-  //   // createGroupSessionMutation,
-  //   // updateGroupSessionMutation,
-  //   // deleteGroupSessionMutation,
-  //   // createGroupAttendeesMutation,
-  //   // deleteGroupAttendeesMutation,
-  // } = useCoaching();
-
+  const { isAdmin } = useAuthAdapter();
+  const { closeContextual, updateDisableClickOutside } = useContextualMenu();
+  const { closeModal, openModal } = useModal();
+  const { updateGroupCallMutation, deleteGroupCallMutation } =
+    useGroupCallMutations();
   const { groupSessionTypes, groupSessionTopics } = useGroupCallLookupsQuery();
-  const [date, setDate] = useState<string>(
-    newRecord
-      ? new Date().toISOString().split('T')[0]
-      : typeof groupSession.callDate === 'string'
-        ? groupSession.callDate
-        : new Date(groupSession.callDate).toISOString().split('T')[0],
+  const { weeks } = useWeeksByStartDate(formatDateInput(week.weekStarts));
+
+  const [editMode, setEditMode] = useState(false);
+  const [coachId, setCoachId] = useState(groupSession.coach.coach_id);
+  const [date, setDate] = useState(formatDateInput(groupSession.callDate));
+  const [sessionType, setSessionType] = useState<GroupSessionType | undefined>(
+    groupSession.groupSessionType,
+  );
+  const [topic, setTopic] = useState<GroupSessionTopic | null | undefined>(
+    groupSession.groupSessionTopic,
+  );
+  const [comments, setComments] = useState(groupSession.comments || '');
+  const [callDocument, setCallDocument] = useState(
+    groupSession.callDocument || '',
+  );
+  const [zoomLink, setZoomLink] = useState(groupSession.zoomLink || '');
+  const [attendees, setAttendees] = useState<AttendeeSelection[]>(
+    groupSession.attendees.map((attendee) => ({
+      weekId: attendee.weekId,
+      studentFullName: attendee.studentFullName,
+    })),
   );
 
-  // const relatedWeekStarts = useMemo(() => {
-  //   const selectedDate = new Date(date);
-  //   const day = selectedDate.getUTCDay(); // 0 = Sunday, 1 = Monday, etc.
-  //   const weekStart = new Date(selectedDate);
-  //   weekStart.setDate(selectedDate.getDate() - day); // Go back to previous Sunday
-  //   return weekStart.toISOString().split('T')[0];
-  // }, [date]);
+  const attendeeOptions = useMemo(
+    () =>
+      weeks
+        .filter(
+          (possibleWeek) =>
+            !attendees.some(
+              (attendee) => attendee.weekId === possibleWeek.weekId,
+            ),
+        )
+        .map(formatAttendeeOption),
+    [attendees, weeks],
+  );
 
-  // const { coachListQuery } = useCoachList();
-  // const { activeMembershipsQuery } = useActiveMemberships({
-  //   startDate: relatedWeekStarts,
-  //   endDate: getWeekEnds(relatedWeekStarts),
-  // });
-  // const { activeStudentsQuery } = useActiveStudents({
-  //   startDate: relatedWeekStarts,
-  //   endDate: getWeekEnds(relatedWeekStarts),
-  // });
-  // const { weeksQuery } = useWeeks(
-  //   relatedWeekStarts,
-  //   getWeekEnds(relatedWeekStarts),
-  // );
-  // const {
-  //   groupSessionsTopicFieldOptionsQuery,
-  //   createGroupSessionsTopicFieldOptionsMutation,
-  // } = useGroupSessions(relatedWeekStarts, getWeekEnds(relatedWeekStarts));
-
-  // Rendering
-  // const dataReady =
-  // coachListQuery.isSuccess &&
-  // groupSessionsTopicFieldOptionsQuery.isSuccess &&
-  // activeMembershipsQuery.isSuccess &&
-  // activeStudentsQuery.isSuccess &&
-  // weeksQuery.isSuccess;
-
-  const rendered = useRef(false);
-
-  // State management
-  // const [editMode, setEditMode] = useState<boolean>(!!newRecord);
-  const editMode = false;
-
-  // const recordId = useMemo(
-  //   () => (newRecord ? -1 : groupSession.groupSessionId),
-  //   [newRecord, groupSession.groupSessionId],
-  // );
-
-  const [sessionType, setSessionType] = useState<string>('');
-  // temp default values, will fix later
-  const [coach, setCoach] = useState<Coach | null>(null);
-  const [topic, setTopic] = useState<string>('');
-  const [comments, setComments] = useState<string>('');
-  const [callDocument, setCallDocument] = useState<string>('');
-  const [zoomLink, setZoomLink] = useState<string>('');
-
-  interface attendeeChangesObj {
-    name: string;
-    relatedWeek: number;
-    action?: 'add' | 'remove';
+  function resetState() {
+    setCoachId(groupSession.coach.coach_id);
+    setDate(formatDateInput(groupSession.callDate));
+    setSessionType(groupSession.groupSessionType);
+    setTopic(groupSession.groupSessionTopic);
+    setComments(groupSession.comments || '');
+    setCallDocument(groupSession.callDocument || '');
+    setZoomLink(groupSession.zoomLink || '');
+    setAttendees(
+      groupSession.attendees.map((attendee) => ({
+        weekId: attendee.weekId,
+        studentFullName: attendee.studentFullName,
+      })),
+    );
   }
-  const [attendees, setAttendees] = useState<attendeeChangesObj[]>([]);
 
-  // Edit or Update State
-  const setInitialState = useCallback(() => {
-    const defaultCoachForNewRecord =
-      getLoggedInCoach(authUser.email || '', coaches || []) || null;
-    setSessionType(
-      newRecord ? '' : groupSession.groupSessionType?.groupSessionType || '',
-    );
+  function enableEditMode() {
+    setEditMode(true);
+    updateDisableClickOutside(true);
+  }
 
-    const formattedDate = groupSession.callDate
-      ? typeof groupSession.callDate === 'string'
-        ? groupSession.callDate
-        : new Date(groupSession.callDate).toISOString().split('T')[0]
-      : new Date().toISOString().split('T')[0];
-    setDate(formattedDate);
-    setCoach(newRecord ? defaultCoachForNewRecord : groupSession.coach);
-    setTopic(
-      newRecord ? '' : groupSession.groupSessionTopic?.groupSessionTopic || '',
-    );
-    setComments(newRecord ? '' : groupSession.comments || '');
-    setCallDocument(newRecord ? '' : groupSession.callDocument || '');
-    setZoomLink(newRecord ? '' : groupSession.zoomLink || '');
+  function disableEditMode() {
+    setEditMode(false);
+    updateDisableClickOutside(false);
+  }
 
-    setAttendees(() => {
-      if (newRecord) {
-        return [];
-      }
+  function cancelEdit() {
+    disableEditMode();
+    resetState();
+  }
 
-      return (
-        groupSession.attendees?.map((attendee) => ({
-          name: attendee.studentFullName,
-          relatedWeek: attendee.weekId,
-        })) ?? []
-      );
-    });
-  }, [groupSession, newRecord, coaches, authUser.email]);
-
-  // function handleAddAttendee(weekRecordId: number) {
-  //   if (weekRecordId === -1) {
-  //     setAttendees([{ name: 'No Attendees', relatedWeek: -1, action: 'add' }]);
-  //     return;
-  //   }
-
-  //   // If adding a real attendee, first remove any "No Attendees" entry
-  //   setAttendees((prev) =>
-  //     prev.filter((attendee) => attendee.relatedWeek !== -1),
-  //   );
-  //   // Foreign Key lookup, orm data in backend
-  //   const membership = helpers.getMembershipFromWeekRecordId(
-  //     weekRecordId,
-  //     weeksQuery.data || [],
-  //     activeMembershipsQuery.data || [],
-  //   );
-
-  //   if (!membership) {
-  //     console.error('No membership found with week recordId:', weekRecordId);
-  //     return;
-  //   }
-  //   // Foreign Key lookup, orm data in backend
-  //   const student = helpers.getStudentFromMembershipId(
-  //     membership.recordId,
-  //     activeMembershipsQuery.data || [],
-  //     activeStudentsQuery.data || [],
-  //   );
-
-  //   if (!student) {
-  //     console.error('No student found with membershipId:', membership.recordId);
-  //     return;
-  //   }
-
-  //   // if the student is already in the list, don't add it again
-  //   if (attendees.find((attendee) => attendee.name === student.fullName)) {
-  //     if (
-  //       attendees.find((attendee) => attendee.name === student.fullName)
-  //         ?.action === 'remove'
-  //     ) {
-  //       // if the student was previously removed, remove the 'remove' action
-  //       setAttendees((prev) =>
-  //         prev.map((attendee) =>
-  //           attendee.name === student.fullName
-  //             ? { ...attendee, action: undefined }
-  //             : attendee,
-  //         ),
-  //       );
-  //       return;
-  //     }
-  //     return;
-  //   }
-  //   // Add the new attendee to the list
-  //   setAttendees((prev) => [
-  //     ...prev,
-  //     {
-  //       name: student.fullName,
-  //       relatedWeek: weekRecordId,
-  //       action: 'add',
-  //     },
-  //   ]);
-  // }
-
-  // function handleRemoveAttendee(relatedWeek: number | string) {
-  //   const recordId = Number.parseInt(relatedWeek as string);
-
-  //   const attendeeToRemove = attendees.find(
-  //     (attendee) => attendee.relatedWeek === recordId,
-  //   );
-  //   if (!attendeeToRemove) {
-  //     console.error('No attendee found with week recordId:', recordId);
-  //     return;
-  //   }
-  //   if (attendeeToRemove.action === 'add') {
-  //     // remove the attendee from the list, if it was added in this session
-  //     setAttendees((prev) =>
-  //       prev.filter((attendee) => attendee.relatedWeek !== recordId),
-  //     );
-  //   } else {
-  //     // set the action of the attendee to remove, since it was already in the list
-  //     setAttendees((prev) =>
-  //       prev.map((attendee) =>
-  //         attendee.relatedWeek === recordId
-  //           ? { ...attendee, action: 'remove' }
-  //           : attendee,
-  //       ),
-  //     );
-  //   }
-  // }
-
-  // function updateCoach(email: string) {
-  //   const corrector = coachListQuery.data?.find(
-  //     (coach) => coach.user.email === email,
-  //   );
-  //   if (!corrector) {
-  //     console.error('No coach found with email:', email);
-  //     return;
-  //   }
-  //   setCoach(corrector.user.email);
-  // }
-  //Helper funcs
-  // function checkAttendeeChanges() {
-  //   // check if any attendees were added or removed
-  //   return attendees.some(
-  //     (attendee) =>
-  //       attendee.action &&
-  //       (attendee.action === 'add' || attendee.action === 'remove'),
-  //   );
-  // }
-  // function checkInputChanges() {
-  //   return !(
-  //     date === groupSession.date &&
-  //     coach === groupSession.coach.email &&
-  //     sessionType === groupSession.sessionType &&
-  //     topic === groupSession.topic &&
-  //     comments === groupSession.comments &&
-  //     callDocument === groupSession.callDocument &&
-  //     zoomLink === groupSession.zoomLink
-  //   );
-  // }
-
-  // Editing Functions
-
-  // function enableEditMode() {
-  //   setEditMode(true);
-  //   updateDisableClickOutside(true);
-  // }
-  // function disableEditMode() {
-  //   setEditMode(false);
-  //   updateDisableClickOutside(false);
-  // }
-
-  // function cancelEdit() {
-  //   if (newRecord) {
-  //     closeContextual();
-  //     return;
-  //   }
-  //   disableEditMode();
-  //   setInitialState();
-  // }
-  // function toggleEditMode() {
-  //   if (editMode) {
-  //     cancelEdit();
-  //   } else {
-  //     enableEditMode();
-  //   }
-  // }
-  // function deleteRecordFunction() {
-  //   // attendee records to delete afterwards
-  //   // Use preloaded attendees if available, otherwise do Foreign Key lookup from backend
-  //   const attendeesToRemove =
-  //     groupSession.attendees ?? getAttendeesFromGroupSessionId(recordId);
-  //   deleteGroupSessionMutation.mutate(recordId, {
-  //     onSuccess: () => {
-  //       if (attendeesToRemove && attendeesToRemove.length > 0) {
-  //         deleteGroupAttendeesMutation.mutate(
-  //           attendeesToRemove?.map((attendee) => attendee.recordId),
-  //         );
-  //       }
-  //     },
-  //     onSettled: () => {
-  //       closeModal();
-  //       cancelEdit();
-  //       closeContextual();
-  //       onSuccess?.();
-  //     },
-  //   });
-  // }
-
-  // function captureSubmitForm() {
-  //   // verify required fields
-  //   const badInput = verifyRequiredInputs([
-  //     { value: date, label: 'Date' },
-  //     { value: coach, label: 'Coach' },
-  //     { value: sessionType, label: 'Session Type' },
-  //   ]);
-  //   if (badInput) {
-  //     openModal({
-  //       title: 'Error',
-  //       body: `${badInput} is a required field`,
-  //       type: 'error',
-  //     });
-  //     return;
-  //   }
-  //   if (callDocument && !isValidUrl(callDocument)) {
-  //     openModal({
-  //       title: 'Error',
-  //       body: 'Call Document must be a valid url',
-  //       type: 'error',
-  //     });
-  //     return;
-  //   }
-  //   if (attendees.length === 0) {
-  //     openModal({
-  //       title: 'Error',
-  //       body: 'At least one attendee is required',
-  //       type: 'error',
-  //     });
-  //     return;
-  //   }
-  //   if (attendees.some((attendee) => attendee.name === 'No Attendees')) {
-  //     openModal({
-  //       title: 'Warning',
-  //       body: 'You have marked that there are no attendees for this group session. Once you submit, you will not be able to add attendees.',
-  //       type: 'confirm',
-  //       confirmFunction: () => {
-  //         submitCreationOrUpdate();
-  //         closeModal();
-  //       },
-  //     });
-  //     return;
-  //   }
-
-  //   submitCreationOrUpdate();
-  // }
-
-  // function submitCreationOrUpdate() {
-  //   disableEditMode();
-  //   disableEditMode();
-  //   if (newRecord) {
-  //     createGroupSessionMutation.mutate(
-  //       {
-  //         date,
-  //         coach,
-  //         sessionType,
-  //         topic,
-  //         comments,
-  //         callDocument,
-  //         zoomLink,
-  //       },
-  //       {
-  //         onSuccess: (data: GroupSession) => {
-  //           // data will be an array of record ID's created
-  //           if (!data) {
-  //             console.error('Error creating group session');
-  //             return;
-  //           }
-  //           const newRecordId = data.recordId;
-  //           if (
-  //             attendees.some((attendee) => attendee.name === 'No Attendees')
-  //           ) {
-  //             return;
-  //           }
-  //           // once it is created, add the attendees
-  //           const attendeesToAdd = attendees.filter(
-  //             (attendee) => attendee.action === 'add',
-  //           );
-  //           createGroupAttendeesMutation.mutate(
-  //             attendeesToAdd.map((attendee) => ({
-  //               groupSession: newRecordId,
-  //               student: attendee.relatedWeek,
-  //             })),
-  //             {
-  //               onSuccess: (data: GroupAttendees[]) => {
-  //                 // data will be an array of record ID's created
-  //                 if (data.length !== attendeesToAdd.length) {
-  //                   console.error('Error creating group attendees');
-  //                   return;
-  //                 }
-  //                 // open correct contextual for new record
-  //                 setTimeout(() => {
-  //                   openContextual(
-  //                     `groupSession${newRecordId}week${attendeesToAdd[0].relatedWeek}`,
-  //                   );
-  //                 }, 200);
-  //                 onSuccess?.();
-  //               },
-  //               onError: (error) => {
-  //                 console.error('Error creating group attendees', error);
-  //               },
-  //             },
-  //           );
-  //         },
-  //         onError: (error) => {
-  //           console.error('Error creating group session', error);
-  //         },
-  //       },
-  //     );
-  //     // IMPORTANT! must await the creation of the group session
-  //   } else {
-  //     // verify if any changes were made
-  //     if (!checkInputChanges() && !checkAttendeeChanges()) {
-  //       console.error('No changes detected');
-  //       disableEditMode();
-  //       return;
-  //     }
-  //     if (checkInputChanges()) {
-  //       updateGroupSessionMutation.mutate(
-  //         {
-  //           recordId,
-  //           date,
-  //           coach,
-  //           sessionType,
-  //           topic,
-  //           comments,
-  //           callDocument,
-  //           zoomLink,
-  //         },
-  //         {
-  //           onSuccess: () => {
-  //             onSuccess?.();
-  //           },
-  //         },
-  //       );
-  //     }
-  //     if (checkAttendeeChanges()) {
-  //       // Use preloaded attendees if available, otherwise do Foreign Key lookup from backend
-  //       const currentAttendeeRecords =
-  //         groupSession.attendees ?? getAttendeesFromGroupSessionId(recordId);
-  //       const attendeesToAdd = attendees.filter(
-  //         (attendee) => attendee.action === 'add',
-  //       );
-  //       const attendeesToRemove_StepOne = attendees.filter(
-  //         (attendee) => attendee.action === 'remove',
-  //       );
-  //       const attendeesToRemove = currentAttendeeRecords?.filter((attendee) =>
-  //         attendeesToRemove_StepOne.find(
-  //           (remove) => remove.relatedWeek === attendee.student,
-  //         ),
-  //       );
-  //       if (attendeesToAdd && attendeesToAdd.length > 0) {
-  //         createGroupAttendeesMutation.mutate(
-  //           attendeesToAdd.map((attendee) => ({
-  //             groupSession: recordId,
-  //             student: attendee.relatedWeek,
-  //           })),
-  //           {
-  //             onSuccess: () => {
-  //               onSuccess?.();
-  //             },
-  //           },
-  //         );
-  //       }
-  //       if (attendeesToRemove && attendeesToRemove.length > 0) {
-  //         deleteGroupAttendeesMutation.mutate(
-  //           attendeesToRemove.map((attendee) => attendee.recordId),
-  //           {
-  //             onSuccess: () => {
-  //               onSuccess?.();
-  //             },
-  //           },
-  //         );
-  //       }
-  //     }
-  //     disableEditMode();
-  //   }
-  // }
-  // // Clear attendees when week changes
-  // useEffect(() => {
-  //   if (newRecord) {
-  //     setAttendees([]);
-  //   }
-  // }, [newRecord, relatedWeekStarts]);
-
-  useEffect(() => {
-    if (coaches && !rendered.current) {
-      setInitialState();
-      rendered.current = true;
+  function toggleEditMode() {
+    if (editMode) {
+      cancelEdit();
+    } else {
+      enableEditMode();
     }
-  }, [coaches, sessionType, setInitialState]);
+  }
+
+  function addAttendee(option: string) {
+    const weekId = parseAttendeeOptionWeekId(option);
+    const selectedWeek = weeks.find(
+      (possibleWeek) => possibleWeek.weekId === weekId,
+    );
+
+    if (!selectedWeek) {
+      return;
+    }
+
+    setAttendees((prev) => [
+      ...prev,
+      {
+        weekId: selectedWeek.weekId,
+        studentFullName: selectedWeek.student?.fullName || 'No Student',
+      },
+    ]);
+  }
+
+  function removeAttendee(weekId: number) {
+    setAttendees((prev) =>
+      prev.filter((attendee) => attendee.weekId !== weekId),
+    );
+  }
+
+  function deleteRecordFunction() {
+    deleteGroupCallMutation.mutate(
+      { groupSessionId: groupSession.groupSessionId },
+      {
+        onSuccess: () => {
+          closeModal();
+          cancelEdit();
+          closeContextual();
+          onSuccess?.();
+        },
+      },
+    );
+  }
+
+  function hasInputChanges() {
+    return (
+      coachId !== groupSession.coach.coach_id ||
+      date !== formatDateInput(groupSession.callDate) ||
+      sessionType?.groupSessionTypeId !==
+        groupSession.groupSessionType?.groupSessionTypeId ||
+      topic?.groupSessionTopicId !==
+        groupSession.groupSessionTopic?.groupSessionTopicId ||
+      comments !== (groupSession.comments || '') ||
+      callDocument !== (groupSession.callDocument || '') ||
+      zoomLink !== (groupSession.zoomLink || '') ||
+      !hasSameAttendeeWeekIds(
+        attendees,
+        groupSession.attendees.map((attendee) => attendee.weekId),
+      )
+    );
+  }
+
+  function captureSubmitForm() {
+    if (!hasInputChanges()) {
+      cancelEdit();
+      return;
+    }
+
+    const badInput = verifyRequiredInputs([
+      { value: date, label: 'Date' },
+      { value: coachId ? String(coachId) : '', label: 'Coach' },
+      {
+        value: sessionType?.groupSessionType || '',
+        label: 'Session Type',
+      },
+      { value: topic?.groupSessionTopic || '', label: 'Topic' },
+    ]);
+
+    if (badInput) {
+      openModal({
+        title: 'Error',
+        body: `${badInput} is a required field`,
+        type: 'error',
+      });
+      return;
+    }
+
+    if (attendees.length === 0) {
+      openModal({
+        title: 'Error',
+        body: 'At least one attendee is required',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (callDocument && !isValidUrl(callDocument)) {
+      openModal({
+        title: 'Error',
+        body: 'Call Document must be a valid url',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (zoomLink && !isValidUrl(zoomLink)) {
+      openModal({
+        title: 'Error',
+        body: 'Zoom Link must be a valid url',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (!sessionType || !topic) {
+      return;
+    }
+
+    updateGroupCallMutation.mutate(
+      {
+        groupSessionId: groupSession.groupSessionId,
+        coach: coachId,
+        callDate: date,
+        groupSessionType: sessionType,
+        groupSessionTopic: topic,
+        comments,
+        callDocument,
+        zoomLink,
+        attendeeWeekIds: getSortedWeekIds(attendees),
+      },
+      {
+        onSuccess: () => {
+          disableEditMode();
+          onSuccess?.();
+        },
+      },
+    );
+  }
 
   return (
-    // <ContextualView editFunction={tableEditMode ? undefined : toggleEditMode}>
-    <ContextualView>
+    <ContextualView editFunction={tableEditMode ? undefined : toggleEditMode}>
       {editMode ? (
-        newRecord ? (
-          <h3>New Group Session</h3>
-        ) : (
-          <h3>Edit Group Session</h3>
-        )
+        <h4>Edit Group Session</h4>
       ) : (
-        <h3>{`Session: ${sessionType} on ${date}`}</h3>
+        <h4>
+          {sessionType?.groupSessionType || 'Group Session'} on{' '}
+          {toReadableMonthDay(date)}
+        </h4>
       )}
-      <div>
-        <CoachDropdown
-          coachId={coach?.coach_id || 0}
-          onChange={(coachId) =>
-            setCoach(
-              coaches?.find((coach) => coach.coach_id === coachId) || null,
-            )
-          }
-          editMode={editMode}
-          required
-        />
-        {editMode && <DateInput value={date} onChange={setDate} required />}
-        {editMode && (
-          <Dropdown
-            label="Session Type"
-            value={sessionType}
-            onChange={setSessionType}
-            options={
-              groupSessionTypes?.map((type) => type.groupSessionType) || []
-            }
-            editMode
-            required
-          />
-        )}
-      </div>
-      {/* <Dropdown
-        value={topic}
-        onChange={setTopic}
+
+      <CoachDropdown
+        coachId={coachId}
+        onChange={setCoachId}
         editMode={editMode}
-        options={
-          groupSessionsTopicFieldOptionsQuery.data
-            ? groupSessionsTopicFieldOptionsQuery.data.sort((a, b) => {
-                if (a && b) {
-                  const aString = a.replace(/^"/g, '').toLowerCase();
-                  const bString = b.replace(/^"/g, '').toLowerCase();
-                  if (aString > bString) return 1;
-                  else return -1;
-                }
-                return 0;
-              })
-            : []
-        }
-        label="Topic"
-      /> */}
-      {/* <CustomGroupSessionTopicSelector
-        selectedTopic={topic}
-        selectTopicFunction={setTopic}
-        topicOptions={groupSessionsTopicFieldOptionsQuery.data || []}
-        addNewTopicFunction={
-          createGroupSessionsTopicFieldOptionsMutation.mutate
-        }
-        removeSelectedTopicFunction={() => setTopic('')}
-        isLoading={groupSessionsTopicFieldOptionsQuery.isLoading}
-      /> */}
+        required
+      />
+
+      <DateInput value={date} onChange={setDate} required editMode={editMode} />
+
+      <Dropdown
+        label="Session Type"
+        value={sessionType?.groupSessionType || ''}
+        onChange={(value) => {
+          const selectedType = groupSessionTypes?.find(
+            (type) => type.groupSessionType === value,
+          );
+          if (!selectedType) {
+            console.error('No group session type found with value:', value);
+            return;
+          }
+          setSessionType(selectedType);
+        }}
+        options={groupSessionTypes?.map((type) => type.groupSessionType) || []}
+        editMode={editMode}
+        required
+      />
+
       <Dropdown
         label="Topic"
-        value={topic}
-        onChange={setTopic}
+        value={topic?.groupSessionTopic || ''}
+        onChange={(value) => {
+          const selectedTopic = groupSessionTopics?.find(
+            (topic) => topic.groupSessionTopic === value,
+          );
+          if (!selectedTopic) {
+            console.error('No group session topic found with value:', value);
+            return;
+          }
+          setTopic(selectedTopic);
+        }}
         options={
           groupSessionTopics?.map((topic) => topic.groupSessionTopic) || []
         }
-        editMode
+        editMode={editMode}
         required
       />
+
       <TextAreaInput
         label="Comments"
         value={comments}
         onChange={setComments}
         editMode={editMode}
       />
+
       <LinkInput
         label="Call Document"
         value={callDocument}
         onChange={setCallDocument}
         editMode={editMode}
       />
+
       <LinkInput
         label="Zoom Link"
         value={zoomLink}
         onChange={setZoomLink}
         editMode={editMode}
       />
-      {/* {editMode && (
-        <div className="lineWrapper">
-          <label className="label">Add Attendees:</label>
-          <div className="content">
-            <CustomGroupAttendeeSelector
-              weekStarts={relatedWeekStarts}
-              onChange={handleAddAttendee}
-            />
-          </div>
-        </div>
-      )} */}
+
+      {editMode && (
+        <Dropdown
+          label="Add Attendee"
+          value=""
+          onChange={addAttendee}
+          options={attendeeOptions}
+          editMode
+        />
+      )}
+
       <div className="lineWrapper">
         <label className="label">Attendees:</label>
         <div className="content">
-          {attendees &&
-            attendees.map(
-              (attendee) =>
-                // if attendee is to be removed, don't display it
-                attendee.action !== 'remove' && (
-                  <div key={attendee.relatedWeek} className="attendee-wrapper">
-                    <p> {attendee.name}</p>
-                    {/* {editMode && (
-                      <button
-                        type="button"
-                        className="redButton"
-                        onClick={() =>
-                          handleRemoveAttendee(attendee.relatedWeek)
-                        }
-                      >
-                        Remove Attendee
-                      </button>
-                    )} */}
-                  </div>
-                ),
-            )}
+          {attendees.map((attendee) => (
+            <div key={attendee.weekId} className="attendee-wrapper">
+              <p>{attendee.studentFullName}</p>
+              {editMode && (
+                <button
+                  type="button"
+                  className="redButton"
+                  onClick={() => removeAttendee(attendee.weekId)}
+                >
+                  Remove Attendee
+                </button>
+              )}
+            </div>
+          ))}
         </div>
       </div>
-      {/* {editMode && !newRecord && isAdmin && (
+
+      {editMode && isAdmin && (
         <DeleteRecord deleteFunction={deleteRecordFunction} />
-      )} */}
+      )}
+
       <FormControls
         editMode={editMode}
-        // cancelEdit={cancelEdit}
-        cancelEdit={() => {}}
-        // captureSubmitForm={captureSubmitForm}
-        captureSubmitForm={() => {}}
+        cancelEdit={cancelEdit}
+        captureSubmitForm={captureSubmitForm}
+      />
+    </ContextualView>
+  );
+}
+
+export function NewGroupSessionView({
+  onSuccess,
+  weekStartsDefaultValue,
+}: {
+  onSuccess?: () => void;
+  weekStartsDefaultValue: string;
+}) {
+  const { createGroupCallMutation } = useGroupCallMutations();
+  const { groupSessionTypes, groupSessionTopics } = useGroupCallLookupsQuery();
+  const { closeContextual, openContextual } = useContextualMenu();
+  const { openModal } = useModal();
+  const { authUser } = useAuthAdapter();
+  const { coaches } = useAllCoachesQuery();
+  const { weeks } = useWeeksByStartDate(weekStartsDefaultValue);
+
+  const defaultCoachId = getDefaultCoachId(coaches, authUser.email || '');
+  const [editMode, setEditMode] = useState(true);
+  const [coachId, setCoachId] = useState(defaultCoachId);
+  const [date, setDate] = useState(weekStartsDefaultValue);
+  const [sessionType, setSessionType] = useState<GroupSessionType>();
+  const [topic, setTopic] = useState<GroupSessionTopic>();
+  const [comments, setComments] = useState('');
+  const [callDocument, setCallDocument] = useState('');
+  const [zoomLink, setZoomLink] = useState('');
+  const [attendees, setAttendees] = useState<AttendeeSelection[]>([]);
+
+  useEffect(() => {
+    if (coachId === 0 && defaultCoachId !== 0) {
+      setCoachId(defaultCoachId);
+    }
+  }, [coachId, defaultCoachId]);
+
+  const attendeeOptions = useMemo(
+    () =>
+      weeks
+        .filter(
+          (possibleWeek) =>
+            !attendees.some(
+              (attendee) => attendee.weekId === possibleWeek.weekId,
+            ),
+        )
+        .map(formatAttendeeOption),
+    [attendees, weeks],
+  );
+
+  function addAttendee(option: string) {
+    const weekId = parseAttendeeOptionWeekId(option);
+    const selectedWeek = weeks.find(
+      (possibleWeek) => possibleWeek.weekId === weekId,
+    );
+
+    if (!selectedWeek) {
+      return;
+    }
+
+    setAttendees((prev) => [
+      ...prev,
+      {
+        weekId: selectedWeek.weekId,
+        studentFullName: selectedWeek.student?.fullName || 'No Student',
+      },
+    ]);
+  }
+
+  function removeAttendee(weekId: number) {
+    setAttendees((prev) =>
+      prev.filter((attendee) => attendee.weekId !== weekId),
+    );
+  }
+
+  function createNewGroupSession() {
+    const badInput = verifyRequiredInputs([
+      { value: date, label: 'Date' },
+      { value: coachId ? String(coachId) : '', label: 'Coach' },
+      {
+        value: sessionType?.groupSessionType || '',
+        label: 'Session Type',
+      },
+      { value: topic?.groupSessionTopic || '', label: 'Topic' },
+    ]);
+
+    if (badInput) {
+      openModal({
+        title: 'Error',
+        body: `${badInput} is a required field`,
+        type: 'error',
+      });
+      return;
+    }
+
+    if (attendees.length === 0) {
+      openModal({
+        title: 'Error',
+        body: 'At least one attendee is required',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (callDocument && !isValidUrl(callDocument)) {
+      openModal({
+        title: 'Error',
+        body: 'Call Document must be a valid url',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (zoomLink && !isValidUrl(zoomLink)) {
+      openModal({
+        title: 'Error',
+        body: 'Zoom Link must be a valid url',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (!sessionType || !topic) {
+      return;
+    }
+
+    setEditMode(false);
+    createGroupCallMutation.mutate(
+      {
+        coach: coachId,
+        callDate: date,
+        groupSessionType: sessionType,
+        groupSessionTopic: topic,
+        comments,
+        callDocument,
+        zoomLink,
+        attendeeWeekIds: getSortedWeekIds(attendees),
+      },
+      {
+        onSuccess: (newGroupCall) => {
+          onSuccess?.();
+          const firstAttendeeWeekId = newGroupCall.attendees[0]?.weekId;
+          if (!firstAttendeeWeekId) {
+            closeContextual();
+            return;
+          }
+          openContextual(
+            `groupSession${newGroupCall.groupSessionId}week${firstAttendeeWeekId}`,
+          );
+        },
+      },
+    );
+  }
+
+  function toggleEditMode() {
+    setEditMode((prev) => !prev);
+  }
+
+  return (
+    <ContextualView editFunction={toggleEditMode}>
+      {editMode ? (
+        <h4>Create Group Session</h4>
+      ) : (
+        <h4>
+          {sessionType?.groupSessionType || 'Group Session'} on{' '}
+          {toReadableMonthDay(date)}
+        </h4>
+      )}
+
+      <CoachDropdown
+        coachId={coachId}
+        onChange={setCoachId}
+        editMode={editMode}
+        required
+      />
+
+      <DateInput value={date} onChange={setDate} required editMode={editMode} />
+
+      <Dropdown
+        label="Session Type"
+        value={sessionType?.groupSessionType || ''}
+        onChange={(value) => {
+          const selectedType = groupSessionTypes?.find(
+            (type) => type.groupSessionType === value,
+          );
+          if (!selectedType) {
+            console.error('No group session type found with value:', value);
+            return;
+          }
+          setSessionType(selectedType);
+        }}
+        options={groupSessionTypes?.map((type) => type.groupSessionType) || []}
+        editMode={editMode}
+        required
+      />
+
+      <Dropdown
+        label="Topic"
+        value={topic?.groupSessionTopic || ''}
+        onChange={(value) => {
+          const selectedTopic = groupSessionTopics?.find(
+            (topic) => topic.groupSessionTopic === value,
+          );
+          if (!selectedTopic) {
+            console.error('No group session topic found with value:', value);
+            return;
+          }
+          setTopic(selectedTopic);
+        }}
+        options={
+          groupSessionTopics?.map((topic) => topic.groupSessionTopic) || []
+        }
+        editMode={editMode}
+        required
+      />
+
+      <TextAreaInput
+        label="Comments"
+        value={comments}
+        onChange={setComments}
+        editMode={editMode}
+      />
+
+      <LinkInput
+        label="Call Document"
+        value={callDocument}
+        onChange={setCallDocument}
+        editMode={editMode}
+      />
+
+      <LinkInput
+        label="Zoom Link"
+        value={zoomLink}
+        onChange={setZoomLink}
+        editMode={editMode}
+      />
+
+      {editMode && (
+        <Dropdown
+          label="Add Attendee"
+          value=""
+          onChange={addAttendee}
+          options={attendeeOptions}
+          editMode
+        />
+      )}
+
+      <div className="lineWrapper">
+        <label className="label">Attendees:</label>
+        <div className="content">
+          {attendees.map((attendee) => (
+            <div key={attendee.weekId} className="attendee-wrapper">
+              <p>{attendee.studentFullName}</p>
+              {editMode && (
+                <button
+                  type="button"
+                  className="redButton"
+                  onClick={() => removeAttendee(attendee.weekId)}
+                >
+                  Remove Attendee
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <FormControls
+        captureSubmitForm={createNewGroupSession}
+        cancelEdit={() => closeContextual()}
+        editMode={editMode}
       />
     </ContextualView>
   );
@@ -729,26 +730,22 @@ export function GroupSessionView({
 export default function GroupSessionsCell({
   week,
   groupSessions,
-  // tableEditMode,
+  tableEditMode,
 }: {
   week: FurnishedWeekWithCoach;
   groupSessions: BaseGroupSession[] | null;
-  // tableEditMode: boolean;
+  tableEditMode: boolean;
 }) {
-  // const { groupSessionsQuery } = useCoaching();
-
-  // const dataReady = groupSessionsQuery.isSuccess;
   return (
-    // dataReady && (
-    <>
+    <div className="callBox">
       {groupSessions?.map((groupSession) => (
         <GroupSessionCell
           groupSession={groupSession}
           key={groupSession.groupSessionId}
           week={week}
-          // tableEditMode={tableEditMode}
+          tableEditMode={tableEditMode}
         />
       ))}
-    </>
+    </div>
   );
 }

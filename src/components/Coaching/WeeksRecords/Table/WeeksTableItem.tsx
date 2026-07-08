@@ -106,7 +106,7 @@ export default function WeeksTableItem({
           <GroupSessionsCell
             week={week}
             groupSessions={groupSessions}
-            // tableEditMode={editMode}
+            tableEditMode={editMode}
           />
         )}
       </td>

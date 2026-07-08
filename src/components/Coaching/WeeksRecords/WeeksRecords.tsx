@@ -20,6 +20,7 @@ import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu
 import { DateRangeProvider } from './DateRangeProvider';
 import WeeksFilter from './Filter/WeeksFilter';
 import { NewAssignmentView } from './Table/AssignmentsCell';
+import { NewGroupSessionView } from './Table/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
 import useDateRange from './useDateRange';
 import '../coaching.scss';
@@ -363,12 +364,9 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
               )}
             />
           )} */}
-          {/* {contextual === 'newGroupSession' && (
-            <GroupSessionView
-              groupSession={{ recordId: -1 } as GroupSession}
-              newRecord
-            />
-          )} */}
+          {contextual === 'newGroupSession' && (
+            <NewGroupSessionView weekStartsDefaultValue={startDate} />
+          )}
           {contextual === 'newAssignment' && (
             <NewAssignmentView weekStartsDefaultValue={startDate} />
           )}
