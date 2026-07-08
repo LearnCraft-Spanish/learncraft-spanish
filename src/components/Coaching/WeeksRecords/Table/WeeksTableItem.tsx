@@ -5,9 +5,7 @@ import checkmark from 'src/assets/icons/checkmark_green.svg';
 
 import AssignmentsCell from './AssignmentsCell';
 import GroupSessionsCell from './GroupSessionsCell';
-import ReadOnlyPrivateCallsCell from './NEW_readOnlyPrivateCallsCell';
-
-// import PrivateCallsCell from './PrivateCallsCell';
+import PrivateCallsCell from './PrivateCallsCell';
 import StudentCell from './StudentCell';
 
 export default function WeeksTableItem({
@@ -120,12 +118,10 @@ export default function WeeksTableItem({
 
           We should implement this when we update the data parsing to be handleled on the backend
            */}
-        <ReadOnlyPrivateCallsCell
-          // week={week}
+        <PrivateCallsCell
+          week={week}
           calls={privateCalls}
-          // tableEditMode={editMode}
-          // Foreign Key lookup, form data in backend
-          student={week.student}
+          tableEditMode={editMode}
         />
       </td>
       <td className="notesCell">

@@ -34,7 +34,7 @@ export function createPrivateCallsInfrastructure(
       const response = await httpClient.post<BasePrivateCall>(
         createPrivateCallEndpoint.path,
         createPrivateCallEndpoint.requiredScopes,
-        privateCall,
+        { privateCall },
       );
       return createPrivateCallEndpoint.response.parse(response);
     },
@@ -42,17 +42,14 @@ export function createPrivateCallsInfrastructure(
       const response = await httpClient.put<BasePrivateCall>(
         updatePrivateCallEndpoint.path,
         updatePrivateCallEndpoint.requiredScopes,
-        privateCall,
+        { privateCall },
       );
       return updatePrivateCallEndpoint.response.parse(response);
     },
     deletePrivateCall: async (data: DeletePrivateCallCommand) => {
       await httpClient.delete<void>(
-        deletePrivateCallEndpoint.path,
+        deletePrivateCallEndpoint.path.replace(':callId', String(data.callId)),
         deletePrivateCallEndpoint.requiredScopes,
-        {
-          params: data,
-        },
       );
     },
   };
