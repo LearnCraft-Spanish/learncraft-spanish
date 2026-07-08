@@ -7,6 +7,7 @@ import React, { useMemo, useState } from 'react';
 import { CoachDropdown } from 'src/components/FormComponents';
 import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
 import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import getDateRange from '../../general/functions/dateRange';
 import useDateRange from '../useDateRange';
 import '../../coaching.scss';
@@ -52,6 +53,7 @@ export default function WeeksFilter({
   const [numWeeks, setNumWeeks] = useState(4); // Start with 4 weeks
   const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
   const { weeks } = useWeeksByStartDate(startDate);
+  const { openContextual } = useContextualMenu();
 
   const handleLoadMore = () => {
     setNumWeeks((prev) => prev * 2);
@@ -137,8 +139,6 @@ export default function WeeksFilter({
         </div>
         <div className="advancedFilters">
           <div className="buttonBox">
-            {/* Legacy CRUD disabled until assignment creation is migrated to hexagon. */}
-            {/*
             <button
               type="button"
               className="greenButton"
@@ -146,10 +146,7 @@ export default function WeeksFilter({
             >
               New Assignment
             </button>
-            */}
-            <button type="button" className="greenButton" disabled>
-              New Assignment
-            </button>
+
             {/* Legacy CRUD disabled until group call creation is migrated to hexagon. */}
             {/*
             <button

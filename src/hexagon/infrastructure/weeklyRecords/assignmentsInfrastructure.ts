@@ -33,7 +33,9 @@ export function createAssignmentsInfrastructure(
       const response = await httpClient.post<BaseAssignment>(
         createAssignmentEndpoint.path,
         createAssignmentEndpoint.requiredScopes,
-        assignment,
+        {
+          assignment,
+        },
       );
       return createAssignmentEndpoint.response.parse(response);
     },
@@ -41,17 +43,17 @@ export function createAssignmentsInfrastructure(
       const response = await httpClient.put<BaseAssignment>(
         updateAssignmentEndpoint.path,
         updateAssignmentEndpoint.requiredScopes,
-        assignment,
+        { assignment },
       );
       return updateAssignmentEndpoint.response.parse(response);
     },
     deleteAssignment: async (data: DeleteAssignmentCommand) => {
       await httpClient.delete<void>(
-        deleteAssignmentEndpoint.path,
+        deleteAssignmentEndpoint.path.replace(
+          ':assignmentId',
+          String(data.assignmentId),
+        ),
         deleteAssignmentEndpoint.requiredScopes,
-        {
-          params: data,
-        },
       );
     },
   };

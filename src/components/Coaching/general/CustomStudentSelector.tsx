@@ -6,6 +6,7 @@ when a list of students is needed where:
 
 the bones of this component are based on the StudentSearch component, but the list of students is filtered based on the weekStarts date
 */
+import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
 import { InlineLoading } from '@interface/components/Loading';
 import { useMemo, useState } from 'react';
 import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
@@ -13,7 +14,7 @@ import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import getWeekEnds from './functions/getWeekEnds';
 
-export default function CustomStudentSelector({
+export default function CustomStudentSelector_LEGACY({
   weekStarts,
   onChange,
 }: {
@@ -59,6 +60,66 @@ export default function CustomStudentSelector({
   return (
     <div id="searchStudentWrapper" className="customSearchStudentWrapper">
       {isLoading ? (
+        <InlineLoading message="Loading student data..." />
+      ) : (
+        <>
+          <input
+            type="text"
+            placeholder="Search for a student by name"
+            onChange={(e) => setSearchString(e.target.value)}
+          />
+          {searchStudentOptions.length > 0 && (
+            <div id="optionsWrapper">
+              {searchStudentOptions.map((student) => (
+                <div
+                  key={student.weekRecordId}
+                  className="searchResultItem"
+                  onClick={() => onChange(student.weekRecordId)}
+                >
+                  {student.studentFullName} - {student.weekStarts}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+export function CustomStudentSelector({
+  weekStarts,
+  onChange,
+}: {
+  weekStarts: string;
+  onChange: (weekRecordId: number) => void;
+}) {
+  const { weeks, loading } = useWeeksByStartDate(weekStarts);
+  const [searchString, setSearchString] = useState('');
+
+  const listOfStudents = useMemo(() => {
+    return weeks.map((week) => ({
+      studentFullName: week.student.fullName,
+      weekRecordId: week.weekId,
+      weekStarts:
+        week.weekStarts instanceof Date
+          ? toISODate(week.weekStarts)
+          : (week.weekStarts ?? ''),
+    }));
+  }, [weeks]);
+
+  const searchStudentOptions = useMemo(() => {
+    if (searchString === '') return [];
+    return listOfStudents.filter((student) =>
+      student.studentFullName
+        .toLowerCase()
+        .includes(searchString.toLowerCase()),
+    );
+  }, [listOfStudents, searchString]);
+
+  return (
+    <div id="searchStudentWrapper" className="customSearchStudentWrapper">
+      {loading ? (
         <InlineLoading message="Loading student data..." />
       ) : (
         <>

@@ -16,9 +16,10 @@ import React, {
 } from 'react';
 import { useAllSrCoursesQuery } from 'src/hexagon/application/queries/CoachingStudentQueries/useAllSrCoursesQuery';
 import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { DateRangeProvider } from './DateRangeProvider';
 import WeeksFilter from './Filter/WeeksFilter';
-// import { NewAssignmentView } from './Table/AssignmentsCell';
+import { NewAssignmentView } from './Table/AssignmentsCell';
 import WeeksTable from './Table/WeeksTable';
 import useDateRange from './useDateRange';
 import '../coaching.scss';
@@ -62,7 +63,7 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
     FurnishedWeekWithCoach[] | undefined
   >();
   const rendered = useRef(false);
-  // const { contextual } = useContextualMenu();
+  const { contextual } = useContextualMenu();
   // const [tableEditMode, setTableEditMode] = useState(false);
   const tableEditMode = false;
 
@@ -368,9 +369,9 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
               newRecord
             />
           )} */}
-          {/* {contextual === 'newAssignment' && (
+          {contextual === 'newAssignment' && (
             <NewAssignmentView weekStartsDefaultValue={startDate} />
-          )} */}
+          )}
         </>
       )}
     </div>
