@@ -1,11 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react';
 import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { act } from 'react';
-import { DateRangeProvider } from 'src/components/Coaching/WeeksRecords/DateRangeProvider';
 import { describe, expect, it, vi } from 'vitest';
-import GroupSessionsCell from './GroupSessionsCell';
 
 vi.mock('@application/queries/CoachQueries/useAllCoachesQuery', () => ({
   useAllCoachesQuery: () => ({

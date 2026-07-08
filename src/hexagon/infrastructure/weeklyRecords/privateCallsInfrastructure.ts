@@ -1,8 +1,19 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { PrivateCallsPort } from '@application/ports/privateCallsPort';
-import type { PrivateCallLookups } from '@learncraft-spanish/shared';
+import type {
+  BasePrivateCall,
+  CreatePrivateCallCommand,
+  DeletePrivateCallCommand,
+  PrivateCallLookups,
+  UpdatePrivateCallCommand,
+} from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
-import { getPrivateCallLookupsEndpoint } from '@learncraft-spanish/shared';
+import {
+  createPrivateCallEndpoint,
+  deletePrivateCallEndpoint,
+  getPrivateCallLookupsEndpoint,
+  updatePrivateCallEndpoint,
+} from '@learncraft-spanish/shared';
 
 export function createPrivateCallsInfrastructure(
   apiUrl: string,
@@ -18,6 +29,31 @@ export function createPrivateCallsInfrastructure(
       );
 
       return getPrivateCallLookupsEndpoint.response.parse(response);
+    },
+    createPrivateCall: async (privateCall: CreatePrivateCallCommand) => {
+      const response = await httpClient.post<BasePrivateCall>(
+        createPrivateCallEndpoint.path,
+        createPrivateCallEndpoint.requiredScopes,
+        privateCall,
+      );
+      return createPrivateCallEndpoint.response.parse(response);
+    },
+    updatePrivateCall: async (privateCall: UpdatePrivateCallCommand) => {
+      const response = await httpClient.put<BasePrivateCall>(
+        updatePrivateCallEndpoint.path,
+        updatePrivateCallEndpoint.requiredScopes,
+        privateCall,
+      );
+      return updatePrivateCallEndpoint.response.parse(response);
+    },
+    deletePrivateCall: async (data: DeletePrivateCallCommand) => {
+      await httpClient.delete<void>(
+        deletePrivateCallEndpoint.path,
+        deletePrivateCallEndpoint.requiredScopes,
+        {
+          params: data,
+        },
+      );
     },
   };
 }

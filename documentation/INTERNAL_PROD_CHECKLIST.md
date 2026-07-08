@@ -29,17 +29,17 @@ This checklist ensures both the **technical stability** of the release and that 
 ### 🗓️ 2–3 Days Before the Release
 
 - [ ] **Walkthrough videos** are recorded and ready for internal or public distribution  
-       _Demo key changes in UI, workflows, or major behaviors_
+      _Demo key changes in UI, workflows, or major behaviors_
 
 - [ ] Draft **Slack Announcement** prepared for internal announcement, to be posted in **#tech-announcements**  
-       _Should link walkthrough videos if applicable_
+      _Should link walkthrough videos if applicable_
 
 - [ ] **New Release Email** is written, reviewed, and shared with the admin team for distribution
       _Format: Clear, non-technical language suitable for support & marketing_
       _Should link walkthrough if applicable_
 
 - [ ] Draft **email** announcement prepared for external users  
-       _Targeted to students; reviewed admin or marketing team_
+      _Targeted to students; reviewed admin or marketing team_
       _Should link walkthrough if applicable_
 
 - [ ] (Optional) Draft a **Slack announcement** for cohorts and other student slack channels, if relevant

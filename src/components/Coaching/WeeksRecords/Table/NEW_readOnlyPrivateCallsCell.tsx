@@ -11,7 +11,7 @@ import {
   LinkInput,
   TextAreaInput,
 } from 'src/components/FormComponents';
-import { usePrivateCallLookupsQuery } from 'src/hexagon/application/queries/usePrivateCallLookupsQuery';
+import { usePrivateCallLookupsQuery } from 'src/hexagon/application/queries/PrivateCallQueries/usePrivateCallLookupsQuery';
 import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';

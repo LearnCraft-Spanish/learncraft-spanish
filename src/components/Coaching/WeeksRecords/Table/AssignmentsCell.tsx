@@ -2,7 +2,7 @@ import type {
   BaseAssignment,
   FurnishedWeekWithCoach,
 } from '@learncraft-spanish/shared';
-import { useAssignmentLookupsQuery } from '@application/queries/useAssignmentLookupsQuery';
+import { useAssignmentLookupsQuery } from '@application/queries/AssignmentsQueries/useAssignmentLookupsQuery';
 import { Dropdown } from '@interface/components/FormComponents';
 import { useState } from 'react';
 import {

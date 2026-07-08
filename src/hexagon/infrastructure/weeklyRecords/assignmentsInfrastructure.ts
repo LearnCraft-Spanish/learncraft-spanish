@@ -1,8 +1,19 @@
 import type { AssignmentsPort } from '@application/ports/assignmentsPort';
 import type { AuthPort } from '@application/ports/authPort';
-import type { AssignmentLookups } from '@learncraft-spanish/shared';
+import type {
+  AssignmentLookups,
+  BaseAssignment,
+  CreateAssignmentCommand,
+  DeleteAssignmentCommand,
+  UpdateAssignmentCommand,
+} from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
-import { getAssignmentLookupsEndpoint } from '@learncraft-spanish/shared';
+import {
+  createAssignmentEndpoint,
+  deleteAssignmentEndpoint,
+  getAssignmentLookupsEndpoint,
+  updateAssignmentEndpoint,
+} from '@learncraft-spanish/shared';
 export function createAssignmentsInfrastructure(
   apiUrl: string,
   auth: AuthPort,
@@ -17,6 +28,31 @@ export function createAssignmentsInfrastructure(
       );
 
       return getAssignmentLookupsEndpoint.response.parse(response);
+    },
+    createAssignment: async (assignment: CreateAssignmentCommand) => {
+      const response = await httpClient.post<BaseAssignment>(
+        createAssignmentEndpoint.path,
+        createAssignmentEndpoint.requiredScopes,
+        assignment,
+      );
+      return createAssignmentEndpoint.response.parse(response);
+    },
+    updateAssignment: async (assignment: UpdateAssignmentCommand) => {
+      const response = await httpClient.put<BaseAssignment>(
+        updateAssignmentEndpoint.path,
+        updateAssignmentEndpoint.requiredScopes,
+        assignment,
+      );
+      return updateAssignmentEndpoint.response.parse(response);
+    },
+    deleteAssignment: async (data: DeleteAssignmentCommand) => {
+      await httpClient.delete<void>(
+        deleteAssignmentEndpoint.path,
+        deleteAssignmentEndpoint.requiredScopes,
+        {
+          params: data,
+        },
+      );
     },
   };
 }
