@@ -51,7 +51,7 @@ export function createGroupCallsInfrastructure(
     deleteGroupCall: async (data: DeleteGroupSessionCommand) => {
       await httpClient.delete<void>(
         deleteGroupCallEndpoint.path.replace(
-          ':groupSessionId',
+          ':groupCallId',
           String(data.groupSessionId),
         ),
         deleteGroupCallEndpoint.requiredScopes,

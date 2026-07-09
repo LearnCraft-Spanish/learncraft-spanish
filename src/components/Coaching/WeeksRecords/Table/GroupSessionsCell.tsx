@@ -5,9 +5,11 @@ import type {
   GroupSessionTopic,
   GroupSessionType,
 } from '@learncraft-spanish/shared';
+import type { SetStateAction } from 'react';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { Dropdown } from '@interface/components/FormComponents';
 import { useEffect, useMemo, useState } from 'react';
+import { CustomStudentSelector } from 'src/components/Coaching/general/CustomStudentSelector';
 import {
   CoachDropdown,
   DateInput,
@@ -48,6 +50,34 @@ function getSortedWeekIds(attendees: AttendeeSelection[]): number[] {
   return attendees.map((attendee) => attendee.weekId).sort((a, b) => a - b);
 }
 
+function normalizeStudentName(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+function remapAttendeesByName(
+  attendeeNames: string[],
+  weeks: FurnishedWeekWithCoach[],
+): AttendeeSelection[] {
+  return attendeeNames.flatMap((attendeeName) => {
+    const matchedWeek = weeks.find(
+      (week) =>
+        normalizeStudentName(week.student?.fullName || '') ===
+        normalizeStudentName(attendeeName),
+    );
+
+    if (!matchedWeek) {
+      return [];
+    }
+
+    return [
+      {
+        weekId: matchedWeek.weekId,
+        studentFullName: matchedWeek.student?.fullName || attendeeName,
+      },
+    ];
+  });
+}
+
 function hasSameAttendeeWeekIds(
   currentAttendees: AttendeeSelection[],
   originalWeekIds: number[],
@@ -70,13 +100,15 @@ function getDefaultCoachId(
   return coaches?.find((coach) => coach.email === email)?.coach_id || 0;
 }
 
-function formatAttendeeOption(week: FurnishedWeekWithCoach): string {
-  return `${week.student?.fullName || 'No Student'} (${week.weekId})`;
-}
-
-function parseAttendeeOptionWeekId(option: string): number {
-  const weekIdMatch = option.match(/\((\d+)\)$/);
-  return weekIdMatch ? Number(weekIdMatch[1]) : Number.NaN;
+function getWeekStartsFromDate(dateString: string): string {
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  date.setDate(date.getDate() - date.getDay());
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-');
 }
 
 function GroupSessionCell({
@@ -99,7 +131,6 @@ function GroupSessionCell({
 
       {contextual === contextualKey && (
         <GroupSessionView
-          week={week}
           groupSession={groupSession}
           tableEditMode={tableEditMode}
         />
@@ -109,12 +140,10 @@ function GroupSessionCell({
 }
 
 export function GroupSessionView({
-  week,
   groupSession,
   tableEditMode,
   onSuccess,
 }: {
-  week: FurnishedWeekWithCoach;
   groupSession: BaseGroupSession;
   tableEditMode: boolean;
   onSuccess?: () => void;
@@ -125,7 +154,6 @@ export function GroupSessionView({
   const { updateGroupCallMutation, deleteGroupCallMutation } =
     useGroupCallMutations();
   const { groupSessionTypes, groupSessionTopics } = useGroupCallLookupsQuery();
-  const { weeks } = useWeeksByStartDate(formatDateInput(week.weekStarts));
 
   const [editMode, setEditMode] = useState(false);
   const [coachId, setCoachId] = useState(groupSession.coach.coach_id);
@@ -147,19 +175,21 @@ export function GroupSessionView({
       studentFullName: attendee.studentFullName,
     })),
   );
+  const [pendingAttendeeRemapNames, setPendingAttendeeRemapNames] = useState<
+    string[] | null
+  >(null);
+  const activeWeekStarts = useMemo(() => getWeekStartsFromDate(date), [date]);
+  const { weeks, loading: weeksLoading } =
+    useWeeksByStartDate(activeWeekStarts);
 
-  const attendeeOptions = useMemo(
-    () =>
-      weeks
-        .filter(
-          (possibleWeek) =>
-            !attendees.some(
-              (attendee) => attendee.weekId === possibleWeek.weekId,
-            ),
-        )
-        .map(formatAttendeeOption),
-    [attendees, weeks],
-  );
+  useEffect(() => {
+    if (!pendingAttendeeRemapNames || weeksLoading) {
+      return;
+    }
+
+    setAttendees(remapAttendeesByName(pendingAttendeeRemapNames, weeks));
+    setPendingAttendeeRemapNames(null);
+  }, [pendingAttendeeRemapNames, weeks, weeksLoading]);
 
   function resetState() {
     setCoachId(groupSession.coach.coach_id);
@@ -175,6 +205,7 @@ export function GroupSessionView({
         studentFullName: attendee.studentFullName,
       })),
     );
+    setPendingAttendeeRemapNames(null);
   }
 
   function enableEditMode() {
@@ -200,8 +231,7 @@ export function GroupSessionView({
     }
   }
 
-  function addAttendee(option: string) {
-    const weekId = parseAttendeeOptionWeekId(option);
+  function addAttendee(weekId: number) {
     const selectedWeek = weeks.find(
       (possibleWeek) => possibleWeek.weekId === weekId,
     );
@@ -217,6 +247,36 @@ export function GroupSessionView({
         studentFullName: selectedWeek.student?.fullName || 'No Student',
       },
     ]);
+  }
+
+  function applyDateChange(nextDate: string) {
+    setPendingAttendeeRemapNames(
+      attendees.map((attendee) => attendee.studentFullName),
+    );
+    setDate(nextDate);
+  }
+
+  function updateDate(value: SetStateAction<string>) {
+    const nextDate = typeof value === 'function' ? value(date) : value;
+    const nextWeekStarts = getWeekStartsFromDate(nextDate);
+
+    if (nextWeekStarts === activeWeekStarts) {
+      setDate(nextDate);
+      return;
+    }
+
+    openModal({
+      title: 'Confirm Date Change',
+      body: 'Changing the date will attempt to move what weeks this group session is related to. Some students currently assigned to this group call may not be updated properly. Please double check that all attendees marked after this date change are correct.',
+      type: 'confirm',
+      confirmFunction: () => {
+        applyDateChange(nextDate);
+        closeModal();
+      },
+      cancelFunction: () => {
+        closeModal();
+      },
+    });
   }
 
   function removeAttendee(weekId: number) {
@@ -352,7 +412,12 @@ export function GroupSessionView({
         required
       />
 
-      <DateInput value={date} onChange={setDate} required editMode={editMode} />
+      <DateInput
+        value={date}
+        onChange={updateDate}
+        required
+        editMode={editMode}
+      />
 
       <Dropdown
         label="Session Type"
@@ -414,13 +479,19 @@ export function GroupSessionView({
       />
 
       {editMode && (
-        <Dropdown
-          label="Add Attendee"
-          value=""
-          onChange={addAttendee}
-          options={attendeeOptions}
-          editMode
-        />
+        <div className="lineWrapper">
+          <label className="label" htmlFor="editGroupCallAttendee">
+            Add Attendee:
+          </label>
+          <div className="content" id="editGroupCallAttendee">
+            <CustomStudentSelector
+              weekStarts={activeWeekStarts}
+              onChange={addAttendee}
+              excludedWeekIds={attendees.map((attendee) => attendee.weekId)}
+              displayWeekStarts={false}
+            />
+          </div>
+        </div>
       )}
 
       <div className="lineWrapper">
@@ -469,18 +540,22 @@ export function NewGroupSessionView({
   const { openModal } = useModal();
   const { authUser } = useAuthAdapter();
   const { coaches } = useAllCoachesQuery();
-  const { weeks } = useWeeksByStartDate(weekStartsDefaultValue);
 
   const defaultCoachId = getDefaultCoachId(coaches, authUser.email || '');
   const [editMode, setEditMode] = useState(true);
   const [coachId, setCoachId] = useState(defaultCoachId);
-  const [date, setDate] = useState(weekStartsDefaultValue);
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [sessionType, setSessionType] = useState<GroupSessionType>();
   const [topic, setTopic] = useState<GroupSessionTopic>();
   const [comments, setComments] = useState('');
   const [callDocument, setCallDocument] = useState('');
   const [zoomLink, setZoomLink] = useState('');
   const [attendees, setAttendees] = useState<AttendeeSelection[]>([]);
+  const activeWeekStarts = useMemo(
+    () => (date ? getWeekStartsFromDate(date) : weekStartsDefaultValue),
+    [date, weekStartsDefaultValue],
+  );
+  const { weeks } = useWeeksByStartDate(activeWeekStarts);
 
   useEffect(() => {
     if (coachId === 0 && defaultCoachId !== 0) {
@@ -488,21 +563,12 @@ export function NewGroupSessionView({
     }
   }, [coachId, defaultCoachId]);
 
-  const attendeeOptions = useMemo(
-    () =>
-      weeks
-        .filter(
-          (possibleWeek) =>
-            !attendees.some(
-              (attendee) => attendee.weekId === possibleWeek.weekId,
-            ),
-        )
-        .map(formatAttendeeOption),
-    [attendees, weeks],
-  );
+  function updateDate(value: SetStateAction<string>) {
+    setDate(value);
+    setAttendees([]);
+  }
 
-  function addAttendee(option: string) {
-    const weekId = parseAttendeeOptionWeekId(option);
+  function addAttendee(weekId: number) {
     const selectedWeek = weeks.find(
       (possibleWeek) => possibleWeek.weekId === weekId,
     );
@@ -627,7 +693,12 @@ export function NewGroupSessionView({
         required
       />
 
-      <DateInput value={date} onChange={setDate} required editMode={editMode} />
+      <DateInput
+        value={date}
+        onChange={updateDate}
+        required
+        editMode={editMode}
+      />
 
       <Dropdown
         label="Session Type"
@@ -689,13 +760,19 @@ export function NewGroupSessionView({
       />
 
       {editMode && (
-        <Dropdown
-          label="Add Attendee"
-          value=""
-          onChange={addAttendee}
-          options={attendeeOptions}
-          editMode
-        />
+        <div className="lineWrapper">
+          <label className="label" htmlFor="groupCallAttendee">
+            Add Attendee:
+          </label>
+          <div className="content" id="groupCallAttendee">
+            <CustomStudentSelector
+              weekStarts={activeWeekStarts}
+              onChange={addAttendee}
+              excludedWeekIds={attendees.map((attendee) => attendee.weekId)}
+              displayWeekStarts={false}
+            />
+          </div>
+        </div>
       )}
 
       <div className="lineWrapper">

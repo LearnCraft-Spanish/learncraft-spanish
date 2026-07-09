@@ -14,6 +14,8 @@ import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import getWeekEnds from './functions/getWeekEnds';
 
+const EMPTY_EXCLUDED_WEEK_IDS: number[] = [];
+
 export default function CustomStudentSelector_LEGACY({
   weekStarts,
   onChange,
@@ -90,9 +92,13 @@ export default function CustomStudentSelector_LEGACY({
 export function CustomStudentSelector({
   weekStarts,
   onChange,
+  excludedWeekIds = EMPTY_EXCLUDED_WEEK_IDS,
+  displayWeekStarts = true,
 }: {
   weekStarts: string;
   onChange: (weekRecordId: number) => void;
+  excludedWeekIds?: number[];
+  displayWeekStarts?: boolean;
 }) {
   const { weeks, loading } = useWeeksByStartDate(weekStarts);
   const [searchString, setSearchString] = useState('');
@@ -110,12 +116,14 @@ export function CustomStudentSelector({
 
   const searchStudentOptions = useMemo(() => {
     if (searchString === '') return [];
-    return listOfStudents.filter((student) =>
-      student.studentFullName
-        .toLowerCase()
-        .includes(searchString.toLowerCase()),
+    return listOfStudents.filter(
+      (student) =>
+        !excludedWeekIds.includes(student.weekRecordId) &&
+        student.studentFullName
+          .toLowerCase()
+          .includes(searchString.toLowerCase()),
     );
-  }, [listOfStudents, searchString]);
+  }, [excludedWeekIds, listOfStudents, searchString]);
 
   return (
     <div id="searchStudentWrapper" className="customSearchStudentWrapper">
@@ -136,7 +144,9 @@ export function CustomStudentSelector({
                   className="searchResultItem"
                   onClick={() => onChange(student.weekRecordId)}
                 >
-                  {student.studentFullName} - {student.weekStarts}
+                  {displayWeekStarts
+                    ? `${student.studentFullName} - ${student.weekStarts}`
+                    : student.studentFullName}
                 </div>
               ))}
             </div>
