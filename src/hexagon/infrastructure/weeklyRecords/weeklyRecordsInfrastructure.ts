@@ -1,7 +1,11 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { WeeklyRecordsPort } from '@application/ports/weeklyRecordsPort';
+import type { BaseWeek } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
-import { getWeeksByStartDateEndpoint } from '@learncraft-spanish/shared';
+import {
+  getWeeksByStartDateEndpoint,
+  updateWeeksEndpoint,
+} from '@learncraft-spanish/shared';
 
 export function createWeeklyRecordsInfrastructure(
   apiUrl: string,
@@ -22,6 +26,15 @@ export function createWeeklyRecordsInfrastructure(
       );
 
       return getWeeksByStartDateEndpoint.response.parse(response);
+    },
+    updateWeeks: async (weeks) => {
+      const response = await httpClient.put<BaseWeek[]>(
+        updateWeeksEndpoint.path,
+        updateWeeksEndpoint.requiredScopes,
+        { weeks },
+      );
+
+      return updateWeeksEndpoint.response.parse(response);
     },
   };
 }

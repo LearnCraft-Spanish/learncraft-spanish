@@ -1,21 +1,83 @@
-import type { FurnishedWeekWithCoach } from '@learncraft-spanish/shared';
+import type {
+  FurnishedWeekWithCoach,
+  UpdateWeekCommand,
+} from '@learncraft-spanish/shared';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 import arrowUp from 'src/assets/icons/arrow-up.svg';
-import { Pagination, QuantifiedRecords } from 'src/components/Table/components';
-import { WeeksTableItemWithSiingleRecordEdit } from './WeeksTableItem';
-// interface WeekWithFailedToUpdate extends Week {
-//   failedToUpdate?: boolean;
-// }
+import { QuantifiedRecords } from 'src/components/Table/components';
+import { useSrLessonsQuery } from 'src/hexagon/application/queries/useSrLessonsQuery';
+import { useWeekMutations } from 'src/hexagon/application/queries/WeekQueries/useWeekMutations';
+import { Pagination } from 'src/hexagon/interface/components/general';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
+import WeeksTableItem, {
+  WeeksTableItemWithSiingleRecordEdit,
+} from './WeeksTableItem';
 
-// interface WeekForUpdate {
-//   notes: string;
-//   holdWeek: boolean;
-//   recordsComplete: boolean;
-//   offTrack: boolean;
-//   primaryCoachWhenCreated: string;
-//   recordId: number;
-//   currentLesson: number | undefined;
-// }
+function toUpdateWeekCommand(week: FurnishedWeekWithCoach): UpdateWeekCommand {
+  const updateWeekCommand: UpdateWeekCommand = {
+    weekId: week.weekId,
+    notes: week.notes,
+    holdWeek: week.holdWeek,
+    recordComplete: week.recordComplete,
+  };
+  if (week.lesson) {
+    updateWeekCommand.lesson = week.lesson;
+  }
+  return updateWeekCommand;
+}
+
+function mergeUpdateIntoWeek(
+  week: FurnishedWeekWithCoach,
+  updatedWeek: UpdateWeekCommand,
+): FurnishedWeekWithCoach {
+  return {
+    ...week,
+    notes: updatedWeek.notes,
+    holdWeek: updatedWeek.holdWeek,
+    recordComplete: updatedWeek.recordComplete,
+    lesson: updatedWeek.lesson,
+  };
+}
+
+function recordChanged(
+  originalWeek: FurnishedWeekWithCoach | undefined,
+  activeWeek: FurnishedWeekWithCoach,
+): boolean {
+  return (
+    originalWeek?.notes !== activeWeek.notes ||
+    originalWeek?.holdWeek !== activeWeek.holdWeek ||
+    originalWeek?.recordComplete !== activeWeek.recordComplete ||
+    originalWeek?.lesson?.srLessonId !== activeWeek.lesson?.srLessonId
+  );
+}
+
+function validateRecordCompleteable(week: FurnishedWeekWithCoach): boolean {
+  if (week.weekNumber === 0) {
+    return true;
+  }
+  if (!week.lesson?.srLessonId) {
+    return false;
+  }
+  if (
+    week.privateCalls.length === 0 &&
+    (week.notes ?? '').trim() === '' &&
+    week.groupCalls.length === 0
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function formatInvalidWeeks(invalidWeeks: FurnishedWeekWithCoach[]): string {
+  return invalidWeeks
+    .map(
+      (week) =>
+        `- ${week.student.fullName || 'Unknown student'} (Week ${week.weekNumber})`,
+    )
+    .join('\n');
+}
 
 type SortDirection = 'none' | 'ascending' | 'descending';
 
@@ -38,41 +100,12 @@ export default function WeeksTable({
   handleUpdateSortByStudent,
   sortDirection,
 }: NewTableProps) {
-  // const {
-  //   weeksQuery,
-  //   groupSessionsQuery,
-  //   groupAttendeesQuery,
-  //   assignmentsQuery,
-  //   privateCallsQuery,
-  //   getStudentFromMembershipId,
-  // } = useCoaching();
-  // const { newPutFactory } = useBackendHelpers();
-  // const { openModal } = useModal();
-
-  // const isLoading =
-  //   weeksQuery.isLoading ||
-  //   groupSessionsQuery.isLoading ||
-  //   groupAttendeesQuery.isLoading ||
-  //   assignmentsQuery.isLoading ||
-  //   privateCallsQuery.isLoading;
-
+  const { closeModal, openModal } = useModal();
+  const { data: srLessons } = useSrLessonsQuery();
+  const { updateWeekMutation } = useWeekMutations();
   const [activeData, setActiveData] = useState<FurnishedWeekWithCoach[]>([]);
-  // const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-
-  // const updateManyWeeksMutation = useMutation({
-  //   mutationFn: (weeks: WeekForUpdate[]) => {
-  //     const promise = newPutFactory<number[]>({
-  //       path: `coaching/update-many-weeks`,
-  //       body: { weeks },
-  //     });
-  //     toast.promise(promise, {
-  //       pending: 'Updating weeks...',
-  //       error: 'Failed to update weeks',
-  //       success: 'Weeks updated successfully',
-  //     });
-  //     return promise;
-  //   },
-  // });
+  const [bulkEditMode, setBulkEditMode] = useState(false);
+  const effectiveTableEditMode = tableEditMode || bulkEditMode;
 
   /*      Pagination      */
   const [page, setPage] = useState(1);
@@ -98,6 +131,95 @@ export default function WeeksTable({
     }
     setPage(page - 1);
   }, [page]);
+
+  const changedWeeks = useMemo(() => {
+    return activeData.filter((week) =>
+      recordChanged(
+        displayOrderSegment.find((original) => original.weekId === week.weekId),
+        week,
+      ),
+    );
+  }, [activeData, displayOrderSegment]);
+
+  const hasUnsavedChanges = changedWeeks.length > 0;
+
+  const updateActiveDataWeek = useCallback((week: UpdateWeekCommand) => {
+    setActiveData((prev) =>
+      prev.map((activeWeek) =>
+        activeWeek.weekId === week.weekId
+          ? mergeUpdateIntoWeek(activeWeek, week)
+          : activeWeek,
+      ),
+    );
+  }, []);
+
+  function handleRecordCompleteableChange(
+    week: FurnishedWeekWithCoach,
+    newValue: boolean,
+  ): void {
+    const updatedWeek = {
+      ...week,
+      recordComplete: newValue,
+    };
+    if (newValue && !validateRecordCompleteable(updatedWeek)) {
+      openModal({
+        title: 'Error',
+        body: 'Cannot mark record as complete without a current lesson, a private or group call, or a note if no calls were made.',
+        type: 'error',
+      });
+      return;
+    }
+    updateActiveDataWeek(toUpdateWeekCommand(updatedWeek));
+  }
+
+  function handleApplyChanges(): void {
+    if (changedWeeks.length === 0) {
+      toast.info('No changes to apply');
+      return;
+    }
+
+    const invalidWeeks = changedWeeks.filter(
+      (week) => week.recordComplete && !validateRecordCompleteable(week),
+    );
+    if (invalidWeeks.length > 0) {
+      openModal({
+        title: 'Cannot Complete Records',
+        body: `The following student records cannot be marked as complete without a current lesson, a private or group call, or a note if no calls were made:\n\n${formatInvalidWeeks(invalidWeeks)}`,
+        type: 'error',
+      });
+      return;
+    }
+
+    updateWeekMutation.mutate(changedWeeks.map(toUpdateWeekCommand), {
+      onSuccess: () => {
+        toast.success('Weeks updated successfully');
+        setBulkEditMode(false);
+      },
+      onError: () => {
+        toast.error('Failed to update weeks');
+      },
+    });
+  }
+
+  function disableBulkEditMode(): void {
+    setBulkEditMode(false);
+    setActiveData(displayOrderSegment);
+    closeModal();
+  }
+
+  function handleDisableEditMode(): void {
+    if (hasUnsavedChanges) {
+      openModal({
+        title: 'Unsaved Changes',
+        body: 'You have unsaved changes. Are you sure you want to disable edit mode? All changes will be lost.',
+        type: 'confirm',
+        confirmFunction: () => disableBulkEditMode(),
+      });
+      return;
+    }
+
+    disableBulkEditMode();
+  }
 
   /*      Edit Mode      */
   // const updateActiveDataWeek = useCallback((week: Week) => {
@@ -296,7 +418,7 @@ export default function WeeksTable({
       //   <Loading message={'Retrieving records data...'} />
       // ) : (
       <>
-        {!tableEditMode && (
+        {!effectiveTableEditMode && (
           <>
             <div className="numberShowing">
               <QuantifiedRecords
@@ -315,13 +437,13 @@ export default function WeeksTable({
         )}
         {activeData.length > 0 && (
           <div className="editModeToggle">
-            {/* {tableEditMode ? (
+            {effectiveTableEditMode ? (
               <>
                 <button
                   type="button"
                   onClick={handleApplyChanges}
                   className="greenButton"
-                  disabled={!hasUnsavedChanges}
+                  disabled={!hasUnsavedChanges || updateWeekMutation.isPending}
                 >
                   Apply Changes
                 </button>
@@ -329,22 +451,11 @@ export default function WeeksTable({
                   Disable Edit Mode
                 </button>
               </>
-            ) : ( */}
-            {/* <> */}
-            {/* Legacy CRUD disabled until week updates are migrated to hexagon. */}
-            {/*
-              <button
-                type="button"
-                onClick={() => setTableEditMode(!tableEditMode)}
-              >
+            ) : (
+              <button type="button" onClick={() => setBulkEditMode(true)}>
                 Enable Edit Mode
               </button>
-              */}
-            <button type="button" disabled>
-              Enable Edit Mode
-            </button>
-            {/* </> */}
-            {/* )} */}
+            )}
           </div>
         )}
         <div className="tableWrapper">
@@ -377,21 +488,32 @@ export default function WeeksTable({
                 <th>Current Lesson</th>
                 <th>Hold Week</th>
                 <th>Records Complete</th>
-                {!tableEditMode && <th>Edit</th>}
+                {!effectiveTableEditMode && <th>Edit</th>}
               </tr>
             </thead>
             <tbody>
-              {activeData.map((week) => (
-                <WeeksTableItemWithSiingleRecordEdit
-                  key={week.weekId}
-                  week={week}
-                  tableEditMode={tableEditMode}
-                  // updateActiveDataWeek={updateActiveDataWeek}
-                  // failedToUpdate={week.failedToUpdate}
-                  hiddenFields={hiddenFields}
-                  // allowSingleRecordUpdate={!tableEditMode}
-                />
-              ))}
+              {activeData.map((week) =>
+                effectiveTableEditMode ? (
+                  <WeeksTableItem
+                    key={week.weekId}
+                    week={week}
+                    updateActiveDataWeek={updateActiveDataWeek}
+                    editMode={effectiveTableEditMode}
+                    hiddenFields={hiddenFields}
+                    srLessons={srLessons}
+                    handleRecordCompleteableChange={(newValue) =>
+                      handleRecordCompleteableChange(week, newValue)
+                    }
+                  />
+                ) : (
+                  <WeeksTableItemWithSiingleRecordEdit
+                    key={week.weekId}
+                    week={week}
+                    tableEditMode={effectiveTableEditMode}
+                    hiddenFields={hiddenFields}
+                  />
+                ),
+              )}
             </tbody>
           </table>
         </div>
