@@ -1,135 +1,184 @@
-import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
-
+import type {
+  BaseGroupSession,
+  FurnishedWeekWithCoach,
+} from '@learncraft-spanish/shared';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { baseGroupSessionFactory } from 'src/hexagon/testing/factories/groupCallsFactory';
 import { describe, expect, it, vi } from 'vitest';
+import GroupSessionsCell from './GroupSessionsCell';
 
-vi.mock('@application/queries/CoachQueries/useAllCoachesQuery', () => ({
-  useAllCoachesQuery: () => ({
-    allCoachesQuery: {
-      isSuccess: true,
-      data: [],
-    },
+vi.mock('@application/adapters/authAdapter', () => ({
+  useAuthAdapter: () => ({
+    isAdmin: true,
+    authUser: { email: 'coach@example.com' },
   }),
 }));
 
-const week = generatedMockData.weeks.find(
-  (week) => week.groupCallComments.length > 0,
-)!;
-// const relatedGroupSession = mockData.groupSessions.find((groupSession) => {
-//   return groupSession.related === week.relatedGroupSession;
-// });
+vi.mock('@application/queries/CoachQueries/useAllCoachesQuery', () => ({
+  useAllCoachesQuery: () => ({
+    coaches: [
+      {
+        coach_id: 1,
+        fullName: 'Coach Example',
+        email: 'coach@example.com',
+      },
+    ],
+    isLoading: false,
+    error: null,
+  }),
+}));
 
-// Same flow useCoaching helper function uses to get related group session(s) to week
-const attendeeList = generatedMockData.groupAttendees.filter(
-  (attendee) => attendee.student === week.recordId,
+vi.mock(
+  'src/hexagon/application/queries/GroupCallQueries/useGroupCallMutations',
+  () => ({
+    useGroupCallMutations: () => ({
+      createGroupCallMutation: { mutate: vi.fn() },
+      updateGroupCallMutation: { mutate: vi.fn() },
+      deleteGroupCallMutation: { mutate: vi.fn() },
+    }),
+  }),
 );
-const groupSessionList = generatedMockData.groupSessions.filter(
-  (groupSession) =>
-    attendeeList.find(
-      (attendee) => attendee.groupSession === groupSession.recordId,
-    ),
-);
-if (groupSessionList.length === 0) {
-  throw new Error('No group session related to week record');
-}
-const relatedGroupSession = groupSessionList[0];
-if (!(relatedGroupSession.callDocument || relatedGroupSession.zoomLink)) {
-  throw new Error('mock Group Session is missing required fields');
-}
 
-describe('placeholder test', () => {
-  it('should pass', () => {
-    expect(false).toBe(true);
-  });
+vi.mock('src/hexagon/application/queries/useGroupCallLookupsQuery', () => ({
+  useGroupCallLookupsQuery: () => ({
+    groupSessionTypes: [
+      {
+        groupSessionTypeId: 1,
+        groupSessionType: 'Grammar',
+      },
+    ],
+    groupSessionTopics: [
+      {
+        groupSessionTopicId: 1,
+        groupSessionTopic: 'Preterite',
+      },
+    ],
+    isLoading: false,
+    error: null,
+  }),
+}));
+
+vi.mock(
+  'src/hexagon/application/queries/useWeeksByStartDate/useWeeksByStartDate',
+  () => ({
+    useWeeksByStartDate: () => ({
+      weeks: [],
+      loading: false,
+      error: null,
+      refetch: vi.fn(),
+      getWeekById: vi.fn(),
+    }),
+  }),
+);
+
+const week = {
+  weekId: 1,
+  student: {
+    student_id: 1,
+    fullName: 'Student Example',
+    email: 'student@example.com',
+  },
+} as unknown as FurnishedWeekWithCoach;
+
+const groupSession = baseGroupSessionFactory({
+  groupSessionId: 1,
+  coach: {
+    coach_id: 1,
+    fullName: 'Coach Example',
+    email: 'coach@example.com',
+  },
+  comments: 'Great class participation',
+  zoomLink: 'https://example.com/zoom',
+  callDocument: 'https://example.com/document',
+  callDate: '2026-07-08',
+  groupSessionType: {
+    groupSessionTypeId: 1,
+    groupSessionType: 'Grammar',
+  },
+  groupSessionTopic: {
+    groupSessionTopicId: 1,
+    groupSessionTopic: 'Preterite',
+  },
+  attendees: [
+    {
+      groupAttendeeId: 1,
+      groupSessionId: 1,
+      weekId: 1,
+      studentFullName: 'Student Example',
+    },
+  ],
 });
 
-// describe.skip('component StudentCell', () => {
-//   it('renders with valid data', async () => {
-//     render(
-//       <MockAllProviders>
-//         <DateRangeProvider>
-//           <GroupSessionsCell
-//             week={week}
-//             groupSessions={[relatedGroupSession]}
-//             tableEditMode={false}
-//           />
-//         </DateRangeProvider>
-//       </MockAllProviders>,
-//     );
+describe('component GroupSessionsCell', () => {
+  function renderComponent(session: BaseGroupSession = groupSession) {
+    render(
+      <MockAllProviders>
+        <GroupSessionsCell
+          week={week}
+          groupSessions={[session]}
+          tableEditMode={false}
+        />
+      </MockAllProviders>,
+    );
+  }
 
-//     // Wait for the component to render (component only renders when groupSessionsQuery.isSuccess)
-//     // Use a more flexible matcher and longer timeout to handle query loading
-//     await waitFor(
-//       () => {
-//         expect(
-//           screen.getByText(relatedGroupSession.sessionType),
-//         ).toBeInTheDocument();
-//       },
-//       { timeout: 10000, interval: 100 },
-//     );
-//   });
-//   describe('contextual menu view', () => {
-//     // Helper function for successful render
-//     async function renderWithPopupActive() {
-//       render(
-//         <MockAllProviders>
-//           <DateRangeProvider>
-//             <GroupSessionsCell
-//               week={week}
-//               groupSessions={[relatedGroupSession]}
-//               tableEditMode={false}
-//             />
-//           </DateRangeProvider>
-//         </MockAllProviders>,
-//       );
+  async function renderWithPopupActive() {
+    renderComponent();
+    expect(
+      screen.getByText(groupSession.groupSessionType!.groupSessionType),
+    ).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByText(groupSession.groupSessionType!.groupSessionType),
+    );
+    await waitFor(() => {
+      expect(screen.getByText('Attendees:')).toBeInTheDocument();
+    });
+  }
 
-//       // Wait for the component to render (component only renders when groupSessionsQuery.isSuccess)
-//       await waitFor(
-//         () => {
-//           expect(
-//             screen.getByText(relatedGroupSession.sessionType),
-//           ).toBeInTheDocument();
-//         },
-//         { timeout: 10000, interval: 100 },
-//       );
-//       act(() => {
-//         screen.getByText(relatedGroupSession.sessionType).click();
-//       });
-//       await waitFor(() => {
-//         expect(
-//           screen.getByText('Session:', { exact: false }),
-//         ).toBeInTheDocument();
-//       });
-//     }
+  it('default view renders without crashing', () => {
+    renderComponent();
+    expect(
+      screen.getByText(groupSession.groupSessionType!.groupSessionType),
+    ).toBeInTheDocument();
+  });
 
-//     it('contextual menu view renders without crashing', async () => {
-//       await renderWithPopupActive();
-//       await waitFor(() => {
-//         expect(screen.getByText('Attendees:')).toBeInTheDocument();
-//       });
-//     });
+  describe('contextual menu view', () => {
+    it('contextual menu view renders without crashing', async () => {
+      await renderWithPopupActive();
+      expect(screen.getByText('Student Example')).toBeInTheDocument();
+    });
 
-//     it('contextual menu view renders the correct data', async () => {
-//       await renderWithPopupActive();
-//       const requiredFields = [
-//         'Session:',
-//         'Coach:',
-//         'Topic:',
-//         'Comments:',
-//         'Attendees:',
-//       ];
-//       await waitFor(() => {
-//         requiredFields.forEach((field) => {
-//           expect(screen.getByText(field, { exact: false })).toBeInTheDocument();
-//         });
-//       });
-//     });
+    it('contextual menu view renders the correct data', async () => {
+      await renderWithPopupActive();
+      const requiredFields = [
+        'Coach:',
+        'Date:',
+        'Session Type:',
+        'Topic:',
+        'Comments:',
+        'Attendees:',
+      ];
+      requiredFields.forEach((field) => {
+        expect(screen.getByText(field)).toBeInTheDocument();
+      });
+      expect(screen.getByText('Coach Example')).toBeInTheDocument();
+      expect(screen.getAllByText('Grammar').length).toBeGreaterThan(0);
+      expect(screen.getByText('Preterite')).toBeInTheDocument();
+      expect(screen.getByText('Great class participation')).toBeInTheDocument();
+    });
 
-//     it('contextual menu view renders the session documents if they exist on the Group Session', async () => {
-//       await renderWithPopupActive();
-//       await waitFor(() => {
-//         expect(screen.getByText('Zoom Link:')).toBeInTheDocument();
-//         expect(screen.getByText('Call Document:')).toBeInTheDocument();
-//       });
-//     });
-//   });
-// });
+    it('contextual menu view renders the session documents if they exist on the group session', async () => {
+      await renderWithPopupActive();
+      expect(screen.getByText('Zoom Link:')).toBeInTheDocument();
+      expect(screen.getByText('Call Document:')).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Zoom Link' })).toHaveAttribute(
+        'href',
+        groupSession.zoomLink,
+      );
+      expect(
+        screen.getByRole('link', { name: 'Call Document' }),
+      ).toHaveAttribute('href', groupSession.callDocument);
+    });
+  });
+});

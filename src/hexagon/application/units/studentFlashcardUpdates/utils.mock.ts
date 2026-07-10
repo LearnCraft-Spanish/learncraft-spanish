@@ -4,7 +4,8 @@ import { vi } from 'vitest';
 
 interface UseStudentFlashcardUpdatesUtilsReturn {
   getPendingFlashcardUpdateObjectsFromLocalStorage: () =>
-    PendingFlashcardUpdateObject[] | undefined;
+    | PendingFlashcardUpdateObject[]
+    | undefined;
   setPendingFlashcardUpdateObjectsInLocalStorage: (
     pendingFlashcardUpdateObjects: PendingFlashcardUpdateObject[],
   ) => void;

@@ -5,4 +5,8 @@ export type NewLesson = Omit<Lesson, 'recordId'>;
 
 /* ------------------ EditLessonView ------------------ */
 export type LessonType =
-  'LCSP' | '1MC/2MC' | 'ACCSP' | 'COMPREHENSION' | 'ADVANCED';
+  | 'LCSP'
+  | '1MC/2MC'
+  | 'ACCSP'
+  | 'COMPREHENSION'
+  | 'ADVANCED';
