@@ -125,6 +125,7 @@ const AudioControl = function AudioControl({
       audioRef.current.currentTime = 0;
     }
     setIsPlaying(false);
+    setHasLoadError(false);
   }, [audioLink]);
 
   // Cleanup on unmount
@@ -142,16 +143,28 @@ const AudioControl = function AudioControl({
     isPlaying,
   ]);
 
-  // Show error state if audio failed to load
-  if (hasLoadError && audioLink) {
-    return <span style={{ color: '#d32f2f' }}>error</span>;
-  }
+  const hasAudioLink = audioLink.length > 0;
+  const showAudioError = hasAudioLink && (!isValidAudio || hasLoadError);
 
   return (
-    audioLink &&
-    audioLink.length > 0 && (
+    hasAudioLink && (
       <>
-        {isValidAudio && (
+        {showAudioError && (
+          <button
+            type="button"
+            className="audioControlPlayPauseButton audioControlPlayPauseButtonError"
+            aria-label="error loading audio"
+            title="error loading audio"
+            disabled
+          >
+            <img
+              className="audioControlPlayPauseButtonErrorIcon"
+              src={play}
+              alt="error loading audio"
+            />
+          </button>
+        )}
+        {isValidAudio && !showAudioError && (
           <>
             <audio ref={setAudioRef} src={audioLink}></audio>
             <button
@@ -164,7 +177,6 @@ const AudioControl = function AudioControl({
             </button>
           </>
         )}
-        {!isValidAudio && <span style={{ color: '#d32f2f' }}>error</span>}
       </>
     )
   );

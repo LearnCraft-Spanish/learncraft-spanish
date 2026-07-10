@@ -1,6 +1,12 @@
 import type { AudioControlHandle } from '@interface/components/general/AudioControl/AudioControl';
 import AudioControl from '@interface/components/general/AudioControl/AudioControl';
-import { act, render, renderHook, screen } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+} from '@testing-library/react';
 import React, { useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -13,12 +19,33 @@ describe('audioControl', () => {
     expect(screen.getByLabelText('Play/Pause')).toBeInTheDocument();
   });
 
-  it('should not render if audioLink is not valid', () => {
+  it('should render disabled error play button if audioLink is not valid', () => {
     render(<AudioControl audioLink={'not-a-valid-audio-link'} />);
 
     expect(screen.queryByLabelText('Play/Pause')).not.toBeInTheDocument();
-    expect(screen.queryByText('error')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'error loading audio' }),
+    ).toBeDisabled();
+    expect(screen.getByAltText('error loading audio')).toBeInTheDocument();
+    expect(screen.queryByText('error')).not.toBeInTheDocument();
   });
+
+  it('should render disabled error play button when audio fails to load', () => {
+    const { container } = render(<AudioControl audioLink={audioLink} />);
+    const audioElement = container.querySelector('audio');
+
+    expect(audioElement).toBeInTheDocument();
+
+    fireEvent.error(audioElement as HTMLAudioElement);
+
+    expect(screen.queryByLabelText('Play/Pause')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'error loading audio' }),
+    ).toBeDisabled();
+    expect(screen.getByAltText('error loading audio')).toBeInTheDocument();
+    expect(screen.queryByText('error')).not.toBeInTheDocument();
+  });
+
   it('should render nothing if audioLink is not provided', () => {
     render(<AudioControl audioLink={''} />);
 
