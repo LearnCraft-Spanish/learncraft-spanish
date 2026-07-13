@@ -10,6 +10,10 @@ import {
   resetMockAdminReportsAdapter,
 } from '@application/adapters/AdminReports/adminReportsAdapter.mock';
 import {
+  mockAssignmentsAdapter,
+  resetMockAssignmentsAdapter,
+} from '@application/adapters/assignmentAdapter.mock';
+import {
   mockAuthAdapter,
   resetMockAuthAdapter,
 } from '@application/adapters/authAdapter.mock';
@@ -34,6 +38,10 @@ import {
   resetMockFlashcardAdapter,
 } from '@application/adapters/flashcardAdapter.mock';
 import {
+  mockGroupCallsAdapter,
+  resetMockGroupCallsAdapter,
+} from '@application/adapters/groupCallsAdapter.mock';
+import {
   mockLocalStorageAdapter,
   resetMockLocalStorageAdapter,
 } from '@application/adapters/localStorageAdapter.mock';
@@ -46,9 +54,17 @@ import {
   resetMockPMFSurveyFrequencyAdapter,
 } from '@application/adapters/pmfSurveyFrequencyAdapter.mock';
 import {
+  mockPrivateCallsAdapter,
+  resetMockPrivateCallsAdapter,
+} from '@application/adapters/privateCallsAdapter.mock';
+import {
   mockSkillTagsAdapter,
   resetMockSkillTagsAdapter,
 } from '@application/adapters/skillTagsAdapter.mock';
+import {
+  mockSrLessonsAdapter,
+  resetMockSrLessonsAdapter,
+} from '@application/adapters/srLessonsAdapter.mock';
 import {
   mockStudentsAdapter,
   resetMockStudentsAdapter,
@@ -61,6 +77,10 @@ import {
   mockVocabularyAdapter,
   resetMockVocabularyAdapter,
 } from '@application/adapters/vocabularyAdapter.mock';
+import {
+  mockWeeklyRecordsAdapter,
+  resetMockWeeklyRecordsAdapter,
+} from '@application/adapters/weeklyRecordsAdapter.mock';
 import {
   mockWeeksAdapter,
   resetMockWeeksAdapter,
@@ -153,6 +173,26 @@ vi.mock('@application/adapters/AdminReports/adminReportsAdapter', () => ({
   useAdminReportsAdapter: vi.fn(() => mockAdminReportsAdapter),
 }));
 
+vi.mock('@application/adapters/assignmentAdapter', () => ({
+  useAssignmentsAdapter: vi.fn(() => mockAssignmentsAdapter),
+}));
+
+vi.mock('@application/adapters/groupCallsAdapter', () => ({
+  useGroupCallsAdapter: vi.fn(() => mockGroupCallsAdapter),
+}));
+
+vi.mock('@application/adapters/privateCallsAdapter', () => ({
+  usePrivateCallsAdapter: vi.fn(() => mockPrivateCallsAdapter),
+}));
+
+vi.mock('@application/adapters/srLessonsAdapter', () => ({
+  useSrLessonsAdapter: vi.fn(() => mockSrLessonsAdapter),
+}));
+
+vi.mock('@application/adapters/weeklyRecordsAdapter', () => ({
+  useWeeklyRecordsAdapter: vi.fn(() => mockWeeklyRecordsAdapter),
+}));
+
 vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
   useActiveStudent: vi.fn(() => mockActiveStudent),
 }));
@@ -193,6 +233,11 @@ const resetGlobalMocks = () => {
   resetMockCoachingStudentsAdapter();
   resetMockWeeksAdapter();
   resetMockAdminReportsAdapter();
+  resetMockAssignmentsAdapter();
+  resetMockGroupCallsAdapter();
+  resetMockPrivateCallsAdapter();
+  resetMockSrLessonsAdapter();
+  resetMockWeeklyRecordsAdapter();
   resetMockUseStudentFlashcards();
   resetMockUseSpellingsKnownForLesson();
 
