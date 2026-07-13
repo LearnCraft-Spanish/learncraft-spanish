@@ -180,7 +180,7 @@ const _WeeksRecordsContent = function WeeksRecordsContent() {
     (weeks: FurnishedWeekWithCoach[]) => {
       if (!filterByCoachless) return weeks;
       return weeks.filter((week) => {
-        return week?.coach.coach_id > 0;
+        return week?.coach?.coach_id && week.coach.coach_id > 0;
       });
     },
     [filterByCoachless, filterByCoach],

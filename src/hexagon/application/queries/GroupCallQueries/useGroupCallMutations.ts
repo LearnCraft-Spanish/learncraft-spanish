@@ -7,8 +7,8 @@ import type {
 } from '@learncraft-spanish/shared';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useGroupCallsAdapter } from '@application/adapters/groupCallsAdapter';
+import { weekAttendsGroupSession } from '@domain/functions/weekAttendsGroupSession';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-
 const WEEKS_QUERY_KEY = ['weeklyRecords', 'weeksByStartDate'];
 
 export interface UseGroupCallMutationsReturn {
@@ -29,13 +29,6 @@ export interface UseGroupCallMutationsReturn {
   >;
 }
 
-function groupSessionAttendsWeek(
-  groupSession: BaseGroupSession,
-  weekId: number,
-): boolean {
-  return groupSession.attendees.some((attendee) => attendee.weekId === weekId);
-}
-
 export function useGroupCallMutations(): UseGroupCallMutationsReturn {
   const { createGroupCall, updateGroupCall, deleteGroupCall } =
     useGroupCallsAdapter();
@@ -50,7 +43,12 @@ export function useGroupCallMutations(): UseGroupCallMutationsReturn {
         (weeks) => {
           if (!weeks) return weeks;
           return weeks.map((week) => {
-            if (!groupSessionAttendsWeek(newGroupCall, week.weekId)) {
+            if (
+              !weekAttendsGroupSession({
+                groupSession: newGroupCall,
+                weekId: week.weekId,
+              })
+            ) {
               return week;
             }
             if (
@@ -82,7 +80,12 @@ export function useGroupCallMutations(): UseGroupCallMutationsReturn {
             const withoutOldGroupCall = week.groupCalls.filter(
               (call) => call.groupSessionId !== updatedGroupCall.groupSessionId,
             );
-            if (groupSessionAttendsWeek(updatedGroupCall, week.weekId)) {
+            if (
+              weekAttendsGroupSession({
+                groupSession: updatedGroupCall,
+                weekId: week.weekId,
+              })
+            ) {
               return {
                 ...week,
                 groupCalls: [...withoutOldGroupCall, updatedGroupCall],
