@@ -1,16 +1,17 @@
 import type {
-  GroupAttendees,
-  GroupSession,
-  Week,
-} from 'src/types/CoachingTypes';
-
+  BaseGroupSession,
+  Coach,
+  FurnishedWeekWithCoach,
+  GroupSessionTopic,
+  GroupSessionType,
+} from '@learncraft-spanish/shared';
+import type { SetStateAction } from 'react';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { Dropdown } from '@interface/components/FormComponents';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import CustomGroupAttendeeSelector from 'src/components/Coaching/general/CustomGroupAttendeeSelector';
-import getWeekEnds from 'src/components/Coaching/general/functions/getWeekEnds';
+import { useEffect, useMemo, useState } from 'react';
+import { CustomStudentSelector } from 'src/components/Coaching/general/CustomStudentSelector';
 import {
-  CoachDropdown_LEGACY,
+  CoachDropdown,
   DateInput,
   DeleteRecord,
   FormControls,
@@ -19,85 +20,118 @@ import {
   verifyRequiredInputs,
 } from 'src/components/FormComponents';
 import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
-
+import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
+import { useGroupCallMutations } from 'src/hexagon/application/queries/GroupCallQueries/useGroupCallMutations';
+import { useGroupCallLookupsQuery } from 'src/hexagon/application/queries/useGroupCallLookupsQuery';
+import { useWeeksByStartDate } from 'src/hexagon/application/queries/useWeeksByStartDate/useWeeksByStartDate';
+import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
-
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
-import * as helpers from 'src/hooks/CoachingData/helperFunctions';
-import {
-  useActiveMemberships,
-  useActiveStudents,
-  useCoachList,
-  useGroupSessions,
-  useWeeks,
-} from 'src/hooks/CoachingData/queries';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import CustomGroupSessionTopicSelector from '../../general/CustomGroupSessionTopicSelector';
-import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 
-const sessionTypeOptions = [
-  '1MC',
-  '2MC',
-  'Modules 1 & 2',
-  'Level 1',
-  'Level 2',
-  'Level 3',
-  'Level 4',
-  'Level 5',
-  'Level 6',
-  'Module 3',
-  'Module 4',
-  'LCS Cohort',
-  'Advanced',
-  'Conversation',
-];
+interface AttendeeSelection {
+  weekId: number;
+  studentFullName: string;
+}
+
+function formatDateInput(date: Date | string | null | undefined): string {
+  if (!date) {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  if (date instanceof Date) {
+    return date.toISOString().split('T')[0];
+  }
+
+  return date.split('T')[0];
+}
+
+function getSortedWeekIds(attendees: AttendeeSelection[]): number[] {
+  return attendees.map((attendee) => attendee.weekId).sort((a, b) => a - b);
+}
+
+function normalizeStudentName(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+function remapAttendeesByName(
+  attendeeNames: string[],
+  weeks: FurnishedWeekWithCoach[],
+): AttendeeSelection[] {
+  return attendeeNames.flatMap((attendeeName) => {
+    const matchedWeek = weeks.find(
+      (week) =>
+        normalizeStudentName(week.student?.fullName || '') ===
+        normalizeStudentName(attendeeName),
+    );
+
+    if (!matchedWeek) {
+      return [];
+    }
+
+    return [
+      {
+        weekId: matchedWeek.weekId,
+        studentFullName: matchedWeek.student?.fullName || attendeeName,
+      },
+    ];
+  });
+}
+
+function hasSameAttendeeWeekIds(
+  currentAttendees: AttendeeSelection[],
+  originalWeekIds: number[],
+): boolean {
+  const currentWeekIds = getSortedWeekIds(currentAttendees);
+  const sortedOriginalWeekIds = [...originalWeekIds].sort((a, b) => a - b);
+
+  return (
+    currentWeekIds.length === sortedOriginalWeekIds.length &&
+    currentWeekIds.every(
+      (weekId, index) => weekId === sortedOriginalWeekIds[index],
+    )
+  );
+}
+
+function getDefaultCoachId(
+  coaches: Coach[] | undefined,
+  email: string,
+): number {
+  return coaches?.find((coach) => coach.email === email)?.coach_id || 0;
+}
+
+function getWeekStartsFromDate(dateString: string): string {
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  date.setDate(date.getDate() - date.getDay());
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-');
+}
 
 function GroupSessionCell({
   groupSession,
   week,
-  newRecord,
   tableEditMode,
 }: {
-  groupSession: GroupSession;
-  week: Week;
-  newRecord?: boolean;
+  groupSession: BaseGroupSession;
+  week: FurnishedWeekWithCoach;
   tableEditMode: boolean;
 }) {
   const { contextual, openContextual } = useContextualMenu();
+  const contextualKey = `groupSession${groupSession.groupSessionId}week${week.weekId}`;
+
   return (
     <div className="cellWithContextual">
-      {newRecord ? (
-        <button
-          type="button"
-          className="greenButton"
-          onClick={() =>
-            openContextual(
-              `groupSession${groupSession.recordId}week${week.recordId}`,
-            )
-          }
-          disabled={tableEditMode}
-        >
-          New
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={() =>
-            openContextual(
-              `groupSession${groupSession.recordId}week${week.recordId}`,
-            )
-          }
-        >
-          {groupSession.sessionType}
-        </button>
-      )}
+      <button type="button" onClick={() => openContextual(contextualKey)}>
+        {groupSession.groupSessionType?.groupSessionType || 'Group Session'}
+      </button>
 
-      {contextual ===
-        `groupSession${groupSession.recordId}week${week.recordId}` && (
+      {contextual === contextualKey && (
         <GroupSessionView
           groupSession={groupSession}
-          newRecord={newRecord}
           tableEditMode={tableEditMode}
         />
       )}
@@ -107,268 +141,88 @@ function GroupSessionCell({
 
 export function GroupSessionView({
   groupSession,
-  newRecord,
   tableEditMode,
   onSuccess,
 }: {
-  groupSession: GroupSession;
-  newRecord?: boolean;
-  tableEditMode?: boolean;
+  groupSession: BaseGroupSession;
+  tableEditMode: boolean;
   onSuccess?: () => void;
 }) {
-  const { authUser, isAdmin } = useAuthAdapter();
-  const { closeContextual, openContextual, updateDisableClickOutside } =
-    useContextualMenu();
-  const { openModal, closeModal } = useModal();
+  const { isAdmin } = useAuthAdapter();
+  const { closeContextual, updateDisableClickOutside } = useContextualMenu();
+  const { closeModal, openModal } = useModal();
+  const { updateGroupCallMutation, deleteGroupCallMutation } =
+    useGroupCallMutations();
+  const { groupSessionTypes, groupSessionTopics } = useGroupCallLookupsQuery();
 
-  const {
-    getAttendeesFromGroupSessionId,
-    createGroupSessionMutation,
-    updateGroupSessionMutation,
-    deleteGroupSessionMutation,
-    createGroupAttendeesMutation,
-    deleteGroupAttendeesMutation,
-  } = useCoaching();
-  const [date, setDate] = useState<string>(
-    newRecord
-      ? new Date().toISOString().split('T')[0]
-      : typeof groupSession.date === 'string'
-        ? groupSession.date
-        : new Date(groupSession.date).toISOString().split('T')[0],
+  const [editMode, setEditMode] = useState(false);
+  const [coachId, setCoachId] = useState(groupSession.coach.coach_id);
+  const [date, setDate] = useState(formatDateInput(groupSession.callDate));
+  const [sessionType, setSessionType] = useState<GroupSessionType | undefined>(
+    groupSession.groupSessionType,
   );
-
-  const relatedWeekStarts = useMemo(() => {
-    const selectedDate = new Date(date);
-    const day = selectedDate.getUTCDay(); // 0 = Sunday, 1 = Monday, etc.
-    const weekStart = new Date(selectedDate);
-    weekStart.setDate(selectedDate.getDate() - day); // Go back to previous Sunday
-    return weekStart.toISOString().split('T')[0];
-  }, [date]);
-
-  const { coachListQuery } = useCoachList();
-  const { activeMembershipsQuery } = useActiveMemberships({
-    startDate: relatedWeekStarts,
-    endDate: getWeekEnds(relatedWeekStarts),
-  });
-  const { activeStudentsQuery } = useActiveStudents({
-    startDate: relatedWeekStarts,
-    endDate: getWeekEnds(relatedWeekStarts),
-  });
-  const { weeksQuery } = useWeeks(
-    relatedWeekStarts,
-    getWeekEnds(relatedWeekStarts),
+  const [topic, setTopic] = useState<GroupSessionTopic | null | undefined>(
+    groupSession.groupSessionTopic,
   );
-  const {
-    groupSessionsTopicFieldOptionsQuery,
-    createGroupSessionsTopicFieldOptionsMutation,
-  } = useGroupSessions(relatedWeekStarts, getWeekEnds(relatedWeekStarts));
-
-  // Rendering
-  const dataReady =
-    coachListQuery.isSuccess &&
-    groupSessionsTopicFieldOptionsQuery.isSuccess &&
-    activeMembershipsQuery.isSuccess &&
-    activeStudentsQuery.isSuccess &&
-    weeksQuery.isSuccess;
-
-  const rendered = useRef(false);
-
-  // State management
-  const [editMode, setEditMode] = useState<boolean>(!!newRecord);
-  const recordId = useMemo(
-    () => (newRecord ? -1 : groupSession.recordId),
-    [newRecord, groupSession.recordId],
+  const [comments, setComments] = useState(groupSession.comments || '');
+  const [callDocument, setCallDocument] = useState(
+    groupSession.callDocument || '',
   );
+  const [zoomLink, setZoomLink] = useState(groupSession.zoomLink || '');
+  const [attendees, setAttendees] = useState<AttendeeSelection[]>(
+    groupSession.attendees.map((attendee) => ({
+      weekId: attendee.weekId,
+      studentFullName: attendee.studentFullName,
+    })),
+  );
+  const [pendingAttendeeRemapNames, setPendingAttendeeRemapNames] = useState<
+    string[] | null
+  >(null);
+  const activeWeekStarts = useMemo(() => getWeekStartsFromDate(date), [date]);
+  const { weeks, loading: weeksLoading } =
+    useWeeksByStartDate(activeWeekStarts);
 
-  const [sessionType, setSessionType] = useState<string>('');
-  const [coach, setCoach] = useState<string>('');
-  const [topic, setTopic] = useState<string>('');
-  const [comments, setComments] = useState<string>('');
-  const [callDocument, setCallDocument] = useState<string>('');
-  const [zoomLink, setZoomLink] = useState<string>('');
-
-  interface attendeeChangesObj {
-    name: string;
-    relatedWeek: number;
-    action?: 'add' | 'remove';
-  }
-  const [attendees, setAttendees] = useState<attendeeChangesObj[]>([]);
-
-  // Edit or Update State
-  const setInitialState = useCallback(() => {
-    const defaultCoachForNewRecord =
-      getLoggedInCoach(authUser.email || '', coachListQuery.data || [])?.user
-        .email || '';
-    setSessionType(newRecord ? '' : groupSession.sessionType);
-
-    const formattedDate = groupSession.date
-      ? typeof groupSession.date === 'string'
-        ? groupSession.date
-        : new Date(groupSession.date).toISOString().split('T')[0]
-      : new Date().toISOString().split('T')[0];
-    setDate(formattedDate);
-    setCoach(newRecord ? defaultCoachForNewRecord : groupSession.coach.email);
-    setCoach(newRecord ? defaultCoachForNewRecord : groupSession.coach.email);
-    setTopic(newRecord ? '' : groupSession.topic);
-    setComments(newRecord ? '' : groupSession.comments);
-    setCallDocument(newRecord ? '' : groupSession.callDocument);
-    setZoomLink(newRecord ? '' : groupSession.zoomLink);
-
-    setAttendees(() => {
-      if (newRecord) {
-        return [];
-      }
-      // Use preloaded attendees if available, otherwise do Foreign Key lookup from backend
-      const attendeesData =
-        groupSession.attendees ?? getAttendeesFromGroupSessionId(recordId);
-      return (
-        attendeesData?.map((attendee) => ({
-          name: attendee.weekStudent,
-          relatedWeek: attendee.student,
-        })) ?? []
-      );
-    });
-  }, [getAttendeesFromGroupSessionId, groupSession, newRecord, recordId]);
-
-  function handleAddAttendee(weekRecordId: number) {
-    if (weekRecordId === -1) {
-      setAttendees([{ name: 'No Attendees', relatedWeek: -1, action: 'add' }]);
+  useEffect(() => {
+    if (!pendingAttendeeRemapNames || weeksLoading) {
       return;
     }
 
-    // If adding a real attendee, first remove any "No Attendees" entry
-    setAttendees((prev) =>
-      prev.filter((attendee) => attendee.relatedWeek !== -1),
-    );
-    // Foreign Key lookup, orm data in backend
-    const membership = helpers.getMembershipFromWeekRecordId(
-      weekRecordId,
-      weeksQuery.data || [],
-      activeMembershipsQuery.data || [],
-    );
+    setAttendees(remapAttendeesByName(pendingAttendeeRemapNames, weeks));
+    setPendingAttendeeRemapNames(null);
+  }, [pendingAttendeeRemapNames, weeks, weeksLoading]);
 
-    if (!membership) {
-      console.error('No membership found with week recordId:', weekRecordId);
-      return;
-    }
-    // Foreign Key lookup, orm data in backend
-    const student = helpers.getStudentFromMembershipId(
-      membership.recordId,
-      activeMembershipsQuery.data || [],
-      activeStudentsQuery.data || [],
+  function resetState() {
+    setCoachId(groupSession.coach.coach_id);
+    setDate(formatDateInput(groupSession.callDate));
+    setSessionType(groupSession.groupSessionType);
+    setTopic(groupSession.groupSessionTopic);
+    setComments(groupSession.comments || '');
+    setCallDocument(groupSession.callDocument || '');
+    setZoomLink(groupSession.zoomLink || '');
+    setAttendees(
+      groupSession.attendees.map((attendee) => ({
+        weekId: attendee.weekId,
+        studentFullName: attendee.studentFullName,
+      })),
     );
-
-    if (!student) {
-      console.error('No student found with membershipId:', membership.recordId);
-      return;
-    }
-
-    // if the student is already in the list, don't add it again
-    if (attendees.find((attendee) => attendee.name === student.fullName)) {
-      if (
-        attendees.find((attendee) => attendee.name === student.fullName)
-          ?.action === 'remove'
-      ) {
-        // if the student was previously removed, remove the 'remove' action
-        setAttendees((prev) =>
-          prev.map((attendee) =>
-            attendee.name === student.fullName
-              ? { ...attendee, action: undefined }
-              : attendee,
-          ),
-        );
-        return;
-      }
-      return;
-    }
-    // Add the new attendee to the list
-    setAttendees((prev) => [
-      ...prev,
-      {
-        name: student.fullName,
-        relatedWeek: weekRecordId,
-        action: 'add',
-      },
-    ]);
+    setPendingAttendeeRemapNames(null);
   }
-
-  function handleRemoveAttendee(relatedWeek: number | string) {
-    const recordId = Number.parseInt(relatedWeek as string);
-
-    const attendeeToRemove = attendees.find(
-      (attendee) => attendee.relatedWeek === recordId,
-    );
-    if (!attendeeToRemove) {
-      console.error('No attendee found with week recordId:', recordId);
-      return;
-    }
-    if (attendeeToRemove.action === 'add') {
-      // remove the attendee from the list, if it was added in this session
-      setAttendees((prev) =>
-        prev.filter((attendee) => attendee.relatedWeek !== recordId),
-      );
-    } else {
-      // set the action of the attendee to remove, since it was already in the list
-      setAttendees((prev) =>
-        prev.map((attendee) =>
-          attendee.relatedWeek === recordId
-            ? { ...attendee, action: 'remove' }
-            : attendee,
-        ),
-      );
-    }
-  }
-
-  function updateCoach(email: string) {
-    const corrector = coachListQuery.data?.find(
-      (coach) => coach.user.email === email,
-    );
-    if (!corrector) {
-      console.error('No coach found with email:', email);
-      return;
-    }
-    setCoach(corrector.user.email);
-  }
-  //Helper funcs
-  function checkAttendeeChanges() {
-    // check if any attendees were added or removed
-    return attendees.some(
-      (attendee) =>
-        attendee.action &&
-        (attendee.action === 'add' || attendee.action === 'remove'),
-    );
-  }
-  function checkInputChanges() {
-    return !(
-      date === groupSession.date &&
-      coach === groupSession.coach.email &&
-      sessionType === groupSession.sessionType &&
-      topic === groupSession.topic &&
-      comments === groupSession.comments &&
-      callDocument === groupSession.callDocument &&
-      zoomLink === groupSession.zoomLink
-    );
-  }
-
-  // Editing Functions
 
   function enableEditMode() {
     setEditMode(true);
     updateDisableClickOutside(true);
   }
+
   function disableEditMode() {
     setEditMode(false);
     updateDisableClickOutside(false);
   }
 
   function cancelEdit() {
-    if (newRecord) {
-      closeContextual();
-      return;
-    }
     disableEditMode();
-    setInitialState();
+    resetState();
   }
+
   function toggleEditMode() {
     if (editMode) {
       cancelEdit();
@@ -376,35 +230,109 @@ export function GroupSessionView({
       enableEditMode();
     }
   }
-  function deleteRecordFunction() {
-    // attendee records to delete afterwards
-    // Use preloaded attendees if available, otherwise do Foreign Key lookup from backend
-    const attendeesToRemove =
-      groupSession.attendees ?? getAttendeesFromGroupSessionId(recordId);
-    deleteGroupSessionMutation.mutate(recordId, {
-      onSuccess: () => {
-        if (attendeesToRemove && attendeesToRemove.length > 0) {
-          deleteGroupAttendeesMutation.mutate(
-            attendeesToRemove?.map((attendee) => attendee.recordId),
-          );
-        }
+
+  function addAttendee(weekId: number) {
+    const selectedWeek = weeks.find(
+      (possibleWeek) => possibleWeek.weekId === weekId,
+    );
+
+    if (!selectedWeek) {
+      return;
+    }
+
+    setAttendees((prev) => [
+      ...prev,
+      {
+        weekId: selectedWeek.weekId,
+        studentFullName: selectedWeek.student?.fullName || 'No Student',
       },
-      onSettled: () => {
+    ]);
+  }
+
+  function applyDateChange(nextDate: string) {
+    setPendingAttendeeRemapNames(
+      attendees.map((attendee) => attendee.studentFullName),
+    );
+    setDate(nextDate);
+  }
+
+  function updateDate(value: SetStateAction<string>) {
+    const nextDate = typeof value === 'function' ? value(date) : value;
+    const nextWeekStarts = getWeekStartsFromDate(nextDate);
+
+    if (nextWeekStarts === activeWeekStarts) {
+      setDate(nextDate);
+      return;
+    }
+
+    openModal({
+      title: 'Confirm Date Change',
+      body: 'Changing the date will attempt to move what weeks this group session is related to. Some students currently assigned to this group call may not be updated properly. Please double check that all attendees marked after this date change are correct.',
+      type: 'confirm',
+      confirmFunction: () => {
+        applyDateChange(nextDate);
         closeModal();
-        cancelEdit();
-        closeContextual();
-        onSuccess?.();
+      },
+      cancelFunction: () => {
+        closeModal();
       },
     });
   }
 
+  function removeAttendee(weekId: number) {
+    setAttendees((prev) =>
+      prev.filter((attendee) => attendee.weekId !== weekId),
+    );
+  }
+
+  function deleteRecordFunction() {
+    deleteGroupCallMutation.mutate(
+      { groupSessionId: groupSession.groupSessionId },
+      {
+        onSuccess: () => {
+          closeModal();
+          cancelEdit();
+          closeContextual();
+          onSuccess?.();
+        },
+      },
+    );
+  }
+
+  function hasInputChanges() {
+    return (
+      coachId !== groupSession.coach.coach_id ||
+      date !== formatDateInput(groupSession.callDate) ||
+      sessionType?.groupSessionTypeId !==
+        groupSession.groupSessionType?.groupSessionTypeId ||
+      topic?.groupSessionTopicId !==
+        groupSession.groupSessionTopic?.groupSessionTopicId ||
+      comments !== (groupSession.comments || '') ||
+      callDocument !== (groupSession.callDocument || '') ||
+      zoomLink !== (groupSession.zoomLink || '') ||
+      !hasSameAttendeeWeekIds(
+        attendees,
+        groupSession.attendees.map((attendee) => attendee.weekId),
+      )
+    );
+  }
+
   function captureSubmitForm() {
-    // verify required fields
+    if (!hasInputChanges()) {
+      cancelEdit();
+      return;
+    }
+
     const badInput = verifyRequiredInputs([
       { value: date, label: 'Date' },
-      { value: coach, label: 'Coach' },
-      { value: sessionType, label: 'Session Type' },
+      { value: coachId ? String(coachId) : '', label: 'Coach' },
+      {
+        value: sessionType?.groupSessionType || '',
+        label: 'Session Type',
+      },
+      { value: topic?.groupSessionTopic || '', label: 'Topic' },
     ]);
+
     if (badInput) {
       openModal({
         title: 'Error',
@@ -413,14 +341,7 @@ export function GroupSessionView({
       });
       return;
     }
-    if (callDocument && !isValidUrl(callDocument)) {
-      openModal({
-        title: 'Error',
-        body: 'Call Document must be a valid url',
-        type: 'error',
-      });
-      return;
-    }
+
     if (attendees.length === 0) {
       openModal({
         title: 'Error',
@@ -429,288 +350,455 @@ export function GroupSessionView({
       });
       return;
     }
-    if (attendees.some((attendee) => attendee.name === 'No Attendees')) {
+
+    if (callDocument && !isValidUrl(callDocument)) {
       openModal({
-        title: 'Warning',
-        body: 'You have marked that there are no attendees for this group session. Once you submit, you will not be able to add attendees.',
-        type: 'confirm',
-        confirmFunction: () => {
-          submitCreationOrUpdate();
-          closeModal();
-        },
+        title: 'Error',
+        body: 'Call Document must be a valid url',
+        type: 'error',
       });
       return;
     }
 
-    submitCreationOrUpdate();
-  }
+    if (zoomLink && !isValidUrl(zoomLink)) {
+      openModal({
+        title: 'Error',
+        body: 'Zoom Link must be a valid url',
+        type: 'error',
+      });
+      return;
+    }
 
-  function submitCreationOrUpdate() {
-    disableEditMode();
-    disableEditMode();
-    if (newRecord) {
-      createGroupSessionMutation.mutate(
-        {
-          date,
-          coach,
-          sessionType,
-          topic,
-          comments,
-          callDocument,
-          zoomLink,
-        },
-        {
-          onSuccess: (data: GroupSession) => {
-            // data will be an array of record ID's created
-            if (!data) {
-              console.error('Error creating group session');
-              return;
-            }
-            const newRecordId = data.recordId;
-            if (
-              attendees.some((attendee) => attendee.name === 'No Attendees')
-            ) {
-              return;
-            }
-            // once it is created, add the attendees
-            const attendeesToAdd = attendees.filter(
-              (attendee) => attendee.action === 'add',
-            );
-            createGroupAttendeesMutation.mutate(
-              attendeesToAdd.map((attendee) => ({
-                groupSession: newRecordId,
-                student: attendee.relatedWeek,
-              })),
-              {
-                onSuccess: (data: GroupAttendees[]) => {
-                  // data will be an array of record ID's created
-                  if (data.length !== attendeesToAdd.length) {
-                    console.error('Error creating group attendees');
-                    return;
-                  }
-                  // open correct contextual for new record
-                  setTimeout(() => {
-                    openContextual(
-                      `groupSession${newRecordId}week${attendeesToAdd[0].relatedWeek}`,
-                    );
-                  }, 200);
-                  onSuccess?.();
-                },
-                onError: (error) => {
-                  console.error('Error creating group attendees', error);
-                },
-              },
-            );
-          },
-          onError: (error) => {
-            console.error('Error creating group session', error);
-          },
-        },
-      );
-      // IMPORTANT! must await the creation of the group session
-    } else {
-      // verify if any changes were made
-      if (!checkInputChanges() && !checkAttendeeChanges()) {
-        console.error('No changes detected');
-        disableEditMode();
-        return;
-      }
-      if (checkInputChanges()) {
-        updateGroupSessionMutation.mutate(
-          {
-            recordId,
-            date,
-            coach,
-            sessionType,
-            topic,
-            comments,
-            callDocument,
-            zoomLink,
-          },
-          {
-            onSuccess: () => {
-              onSuccess?.();
-            },
-          },
-        );
-      }
-      if (checkAttendeeChanges()) {
-        // Use preloaded attendees if available, otherwise do Foreign Key lookup from backend
-        const currentAttendeeRecords =
-          groupSession.attendees ?? getAttendeesFromGroupSessionId(recordId);
-        const attendeesToAdd = attendees.filter(
-          (attendee) => attendee.action === 'add',
-        );
-        const attendeesToRemove_StepOne = attendees.filter(
-          (attendee) => attendee.action === 'remove',
-        );
-        const attendeesToRemove = currentAttendeeRecords?.filter((attendee) =>
-          attendeesToRemove_StepOne.find(
-            (remove) => remove.relatedWeek === attendee.student,
-          ),
-        );
-        if (attendeesToAdd && attendeesToAdd.length > 0) {
-          createGroupAttendeesMutation.mutate(
-            attendeesToAdd.map((attendee) => ({
-              groupSession: recordId,
-              student: attendee.relatedWeek,
-            })),
-            {
-              onSuccess: () => {
-                onSuccess?.();
-              },
-            },
-          );
-        }
-        if (attendeesToRemove && attendeesToRemove.length > 0) {
-          deleteGroupAttendeesMutation.mutate(
-            attendeesToRemove.map((attendee) => attendee.recordId),
-            {
-              onSuccess: () => {
-                onSuccess?.();
-              },
-            },
-          );
-        }
-      }
-      disableEditMode();
+    if (!sessionType || !topic) {
+      return;
     }
-  }
-  // Clear attendees when week changes
-  useEffect(() => {
-    if (newRecord) {
-      setAttendees([]);
-    }
-  }, [newRecord, relatedWeekStarts]);
 
-  useEffect(() => {
-    if (dataReady && !rendered.current) {
-      setInitialState();
-      rendered.current = true;
-    }
-  }, [dataReady, sessionType, setInitialState]);
+    updateGroupCallMutation.mutate(
+      {
+        groupSessionId: groupSession.groupSessionId,
+        coach: coachId,
+        callDate: date,
+        groupSessionType: sessionType,
+        groupSessionTopic: topic,
+        comments,
+        callDocument,
+        zoomLink,
+        attendeeWeekIds: getSortedWeekIds(attendees),
+      },
+      {
+        onSuccess: () => {
+          disableEditMode();
+          onSuccess?.();
+        },
+      },
+    );
+  }
 
   return (
     <ContextualView editFunction={tableEditMode ? undefined : toggleEditMode}>
       {editMode ? (
-        newRecord ? (
-          <h3>New Group Session</h3>
-        ) : (
-          <h3>Edit Group Session</h3>
-        )
+        <h4>Edit Group Session</h4>
       ) : (
-        <h3>{`Session: ${sessionType} on ${date}`}</h3>
+        <h4>
+          {sessionType?.groupSessionType || 'Group Session'} on{' '}
+          {toReadableMonthDay(date)}
+        </h4>
       )}
-      <div>
-        <CoachDropdown_LEGACY
-          coachEmail={coach}
-          onChange={updateCoach}
-          editMode={editMode}
-          required
-        />
-        {editMode && <DateInput value={date} onChange={setDate} required />}
-        {editMode && (
-          <Dropdown
-            label="Session Type"
-            value={sessionType}
-            onChange={setSessionType}
-            options={sessionTypeOptions}
-            editMode
-            required
-          />
-        )}
-      </div>
-      {/* <Dropdown
-        value={topic}
-        onChange={setTopic}
+
+      <CoachDropdown
+        coachId={coachId}
+        onChange={setCoachId}
         editMode={editMode}
-        options={
-          groupSessionsTopicFieldOptionsQuery.data
-            ? groupSessionsTopicFieldOptionsQuery.data.sort((a, b) => {
-                if (a && b) {
-                  const aString = a.replace(/^"/g, '').toLowerCase();
-                  const bString = b.replace(/^"/g, '').toLowerCase();
-                  if (aString > bString) return 1;
-                  else return -1;
-                }
-                return 0;
-              })
-            : []
-        }
-        label="Topic"
-      /> */}
-      <CustomGroupSessionTopicSelector
-        selectedTopic={topic}
-        selectTopicFunction={setTopic}
-        topicOptions={groupSessionsTopicFieldOptionsQuery.data || []}
-        addNewTopicFunction={
-          createGroupSessionsTopicFieldOptionsMutation.mutate
-        }
-        removeSelectedTopicFunction={() => setTopic('')}
-        isLoading={groupSessionsTopicFieldOptionsQuery.isLoading}
+        required
       />
+
+      <DateInput
+        value={date}
+        onChange={updateDate}
+        required
+        editMode={editMode}
+      />
+
+      <Dropdown
+        label="Session Type"
+        value={sessionType?.groupSessionType || ''}
+        onChange={(value) => {
+          const selectedType = groupSessionTypes?.find(
+            (type) => type.groupSessionType === value,
+          );
+          if (!selectedType) {
+            console.error('No group session type found with value:', value);
+            return;
+          }
+          setSessionType(selectedType);
+        }}
+        options={groupSessionTypes?.map((type) => type.groupSessionType) || []}
+        editMode={editMode}
+        required
+      />
+
+      <Dropdown
+        label="Topic"
+        value={topic?.groupSessionTopic || ''}
+        onChange={(value) => {
+          const selectedTopic = groupSessionTopics?.find(
+            (topic) => topic.groupSessionTopic === value,
+          );
+          if (!selectedTopic) {
+            console.error('No group session topic found with value:', value);
+            return;
+          }
+          setTopic(selectedTopic);
+        }}
+        options={
+          groupSessionTopics?.map((topic) => topic.groupSessionTopic) || []
+        }
+        editMode={editMode}
+        required
+      />
+
       <TextAreaInput
         label="Comments"
         value={comments}
         onChange={setComments}
         editMode={editMode}
       />
+
       <LinkInput
         label="Call Document"
         value={callDocument}
         onChange={setCallDocument}
         editMode={editMode}
       />
+
       <LinkInput
         label="Zoom Link"
         value={zoomLink}
         onChange={setZoomLink}
         editMode={editMode}
       />
+
       {editMode && (
         <div className="lineWrapper">
-          <label className="label">Add Attendees:</label>
-          <div className="content">
-            <CustomGroupAttendeeSelector
-              weekStarts={relatedWeekStarts}
-              onChange={handleAddAttendee}
+          <label className="label" htmlFor="editGroupCallAttendee">
+            Add Attendee:
+          </label>
+          <div className="content" id="editGroupCallAttendee">
+            <CustomStudentSelector
+              weekStarts={activeWeekStarts}
+              onChange={addAttendee}
+              excludedWeekIds={attendees.map((attendee) => attendee.weekId)}
+              displayWeekStarts={false}
             />
           </div>
         </div>
       )}
+
       <div className="lineWrapper">
         <label className="label">Attendees:</label>
         <div className="content">
-          {attendees &&
-            attendees.map(
-              (attendee) =>
-                // if attendee is to be removed, don't display it
-                attendee.action !== 'remove' && (
-                  <div key={attendee.relatedWeek} className="attendee-wrapper">
-                    <p> {attendee.name}</p>
-                    {editMode && (
-                      <button
-                        type="button"
-                        className="redButton"
-                        onClick={() =>
-                          handleRemoveAttendee(attendee.relatedWeek)
-                        }
-                      >
-                        Remove Attendee
-                      </button>
-                    )}
-                  </div>
-                ),
-            )}
+          {attendees.map((attendee) => (
+            <div key={attendee.weekId} className="attendee-wrapper">
+              <p>{attendee.studentFullName}</p>
+              {editMode && (
+                <button
+                  type="button"
+                  className="redButton"
+                  onClick={() => removeAttendee(attendee.weekId)}
+                >
+                  Remove Attendee
+                </button>
+              )}
+            </div>
+          ))}
         </div>
       </div>
-      {editMode && !newRecord && isAdmin && (
+
+      {editMode && isAdmin && (
         <DeleteRecord deleteFunction={deleteRecordFunction} />
       )}
+
       <FormControls
         editMode={editMode}
         cancelEdit={cancelEdit}
         captureSubmitForm={captureSubmitForm}
+      />
+    </ContextualView>
+  );
+}
+
+export function NewGroupSessionView({
+  onSuccess,
+  weekStartsDefaultValue,
+}: {
+  onSuccess?: () => void;
+  weekStartsDefaultValue: string;
+}) {
+  const { createGroupCallMutation } = useGroupCallMutations();
+  const { groupSessionTypes, groupSessionTopics } = useGroupCallLookupsQuery();
+  const { closeContextual, openContextual } = useContextualMenu();
+  const { openModal } = useModal();
+  const { authUser } = useAuthAdapter();
+  const { coaches } = useAllCoachesQuery();
+
+  const defaultCoachId = getDefaultCoachId(coaches, authUser.email || '');
+  const [editMode, setEditMode] = useState(true);
+  const [coachId, setCoachId] = useState(defaultCoachId);
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [sessionType, setSessionType] = useState<GroupSessionType>();
+  const [topic, setTopic] = useState<GroupSessionTopic>();
+  const [comments, setComments] = useState('');
+  const [callDocument, setCallDocument] = useState('');
+  const [zoomLink, setZoomLink] = useState('');
+  const [attendees, setAttendees] = useState<AttendeeSelection[]>([]);
+  const activeWeekStarts = useMemo(
+    () => (date ? getWeekStartsFromDate(date) : weekStartsDefaultValue),
+    [date, weekStartsDefaultValue],
+  );
+  const { weeks } = useWeeksByStartDate(activeWeekStarts);
+
+  useEffect(() => {
+    if (coachId === 0 && defaultCoachId !== 0) {
+      setCoachId(defaultCoachId);
+    }
+  }, [coachId, defaultCoachId]);
+
+  function updateDate(value: SetStateAction<string>) {
+    setDate(value);
+    setAttendees([]);
+  }
+
+  function addAttendee(weekId: number) {
+    const selectedWeek = weeks.find(
+      (possibleWeek) => possibleWeek.weekId === weekId,
+    );
+
+    if (!selectedWeek) {
+      return;
+    }
+
+    setAttendees((prev) => [
+      ...prev,
+      {
+        weekId: selectedWeek.weekId,
+        studentFullName: selectedWeek.student?.fullName || 'No Student',
+      },
+    ]);
+  }
+
+  function removeAttendee(weekId: number) {
+    setAttendees((prev) =>
+      prev.filter((attendee) => attendee.weekId !== weekId),
+    );
+  }
+
+  function createNewGroupSession() {
+    const badInput = verifyRequiredInputs([
+      { value: date, label: 'Date' },
+      { value: coachId ? String(coachId) : '', label: 'Coach' },
+      {
+        value: sessionType?.groupSessionType || '',
+        label: 'Session Type',
+      },
+      { value: topic?.groupSessionTopic || '', label: 'Topic' },
+    ]);
+
+    if (badInput) {
+      openModal({
+        title: 'Error',
+        body: `${badInput} is a required field`,
+        type: 'error',
+      });
+      return;
+    }
+
+    if (attendees.length === 0) {
+      openModal({
+        title: 'Error',
+        body: 'At least one attendee is required',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (callDocument && !isValidUrl(callDocument)) {
+      openModal({
+        title: 'Error',
+        body: 'Call Document must be a valid url',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (zoomLink && !isValidUrl(zoomLink)) {
+      openModal({
+        title: 'Error',
+        body: 'Zoom Link must be a valid url',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (!sessionType || !topic) {
+      return;
+    }
+
+    setEditMode(false);
+    createGroupCallMutation.mutate(
+      {
+        coach: coachId,
+        callDate: date,
+        groupSessionType: sessionType,
+        groupSessionTopic: topic,
+        comments,
+        callDocument,
+        zoomLink,
+        attendeeWeekIds: getSortedWeekIds(attendees),
+      },
+      {
+        onSuccess: (newGroupCall) => {
+          onSuccess?.();
+          const firstAttendeeWeekId = newGroupCall.attendees[0]?.weekId;
+          if (!firstAttendeeWeekId) {
+            closeContextual();
+            return;
+          }
+          openContextual(
+            `groupSession${newGroupCall.groupSessionId}week${firstAttendeeWeekId}`,
+          );
+        },
+      },
+    );
+  }
+
+  function toggleEditMode() {
+    setEditMode((prev) => !prev);
+  }
+
+  return (
+    <ContextualView editFunction={toggleEditMode}>
+      {editMode ? (
+        <h4>Create Group Session</h4>
+      ) : (
+        <h4>
+          {sessionType?.groupSessionType || 'Group Session'} on{' '}
+          {toReadableMonthDay(date)}
+        </h4>
+      )}
+
+      <CoachDropdown
+        coachId={coachId}
+        onChange={setCoachId}
+        editMode={editMode}
+        required
+      />
+
+      <DateInput
+        value={date}
+        onChange={updateDate}
+        required
+        editMode={editMode}
+      />
+
+      <Dropdown
+        label="Session Type"
+        value={sessionType?.groupSessionType || ''}
+        onChange={(value) => {
+          const selectedType = groupSessionTypes?.find(
+            (type) => type.groupSessionType === value,
+          );
+          if (!selectedType) {
+            console.error('No group session type found with value:', value);
+            return;
+          }
+          setSessionType(selectedType);
+        }}
+        options={groupSessionTypes?.map((type) => type.groupSessionType) || []}
+        editMode={editMode}
+        required
+      />
+
+      <Dropdown
+        label="Topic"
+        value={topic?.groupSessionTopic || ''}
+        onChange={(value) => {
+          const selectedTopic = groupSessionTopics?.find(
+            (topic) => topic.groupSessionTopic === value,
+          );
+          if (!selectedTopic) {
+            console.error('No group session topic found with value:', value);
+            return;
+          }
+          setTopic(selectedTopic);
+        }}
+        options={
+          groupSessionTopics?.map((topic) => topic.groupSessionTopic) || []
+        }
+        editMode={editMode}
+        required
+      />
+
+      <TextAreaInput
+        label="Comments"
+        value={comments}
+        onChange={setComments}
+        editMode={editMode}
+      />
+
+      <LinkInput
+        label="Call Document"
+        value={callDocument}
+        onChange={setCallDocument}
+        editMode={editMode}
+      />
+
+      <LinkInput
+        label="Zoom Link"
+        value={zoomLink}
+        onChange={setZoomLink}
+        editMode={editMode}
+      />
+
+      {editMode && (
+        <div className="lineWrapper">
+          <label className="label" htmlFor="groupCallAttendee">
+            Add Attendee:
+          </label>
+          <div className="content" id="groupCallAttendee">
+            <CustomStudentSelector
+              weekStarts={activeWeekStarts}
+              onChange={addAttendee}
+              excludedWeekIds={attendees.map((attendee) => attendee.weekId)}
+              displayWeekStarts={false}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="lineWrapper">
+        <label className="label">Attendees:</label>
+        <div className="content">
+          {attendees.map((attendee) => (
+            <div key={attendee.weekId} className="attendee-wrapper">
+              <p>{attendee.studentFullName}</p>
+              {editMode && (
+                <button
+                  type="button"
+                  className="redButton"
+                  onClick={() => removeAttendee(attendee.weekId)}
+                >
+                  Remove Attendee
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <FormControls
+        captureSubmitForm={createNewGroupSession}
+        cancelEdit={() => closeContextual()}
+        editMode={editMode}
       />
     </ContextualView>
   );
@@ -721,32 +809,20 @@ export default function GroupSessionsCell({
   groupSessions,
   tableEditMode,
 }: {
-  week: Week;
-  groupSessions: GroupSession[] | null;
+  week: FurnishedWeekWithCoach;
+  groupSessions: BaseGroupSession[] | null;
   tableEditMode: boolean;
 }) {
-  const { groupSessionsQuery } = useCoaching();
-
-  const dataReady = groupSessionsQuery.isSuccess;
   return (
-    dataReady && (
-      <>
-        {groupSessions?.map((groupSession) => (
-          <GroupSessionCell
-            groupSession={groupSession}
-            key={groupSession.recordId}
-            week={week}
-            tableEditMode={tableEditMode}
-          />
-        ))}
-        {/* {week.membershipCourseHasGroupCalls && (
-          <GroupSessionCell
-            groupSession={{ recordId: -1 } as GroupSession}
-            newRecord
-            week={week}
-          />
-        )} */}
-      </>
-    )
+    <div className="callBox">
+      {groupSessions?.map((groupSession) => (
+        <GroupSessionCell
+          groupSession={groupSession}
+          key={groupSession.groupSessionId}
+          week={week}
+          tableEditMode={tableEditMode}
+        />
+      ))}
+    </div>
   );
 }

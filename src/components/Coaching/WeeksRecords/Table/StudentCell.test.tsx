@@ -1,74 +1,70 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
-
+import type {
+  FurnishedWeekWithCoach,
+  MinimalCoachingStudent,
+} from '@learncraft-spanish/shared';
+import { render, screen } from '@testing-library/react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { describe, expect, it } from 'vitest';
-import { DateRangeProvider } from '../DateRangeProvider';
 import StudentCell from './StudentCell';
 
-const week = generatedMockData.weeks[0];
-const membership = generatedMockData.memberships.find((membership) => {
-  return membership.recordId === week.relatedMembership;
-});
-if (!membership) {
-  throw new Error('No membership related to week record');
-}
-const student = generatedMockData.studentList.find((student) => {
-  return student.recordId === membership.relatedStudent;
-});
+const week = {
+  weekId: 1,
+  coach: {
+    coach_id: 1,
+    fullName: 'Coach Example',
+    email: 'coach@example.com',
+  },
+  srCourseName: 'Level 1',
+} as unknown as FurnishedWeekWithCoach;
 
-if (!student) {
-  throw new Error('No student related to week record');
-}
-// Needs membership table & activeStudents table to be mocked
+const student = {
+  fullName: 'Jane Doe',
+  email: 'jane.doe@example.com',
+} as unknown as MinimalCoachingStudent;
+
 describe('component StudentCell', () => {
-  // Write better tests, delete skipped ones
-  it('renders with valid data', async () => {
+  it('renders with valid data', () => {
     render(
       <MockAllProviders>
-        <DateRangeProvider>
-          <StudentCell week={week} student={student} hiddenFields={[]} />
-        </DateRangeProvider>
+        <StudentCell week={week} student={student} hiddenFields={[]} />
       </MockAllProviders>,
     );
-    // Student Name related to the week record
-    await waitFor(() => {
-      expect(screen.getByText(student.fullName)).toBeInTheDocument();
-    });
-  });
-  it('does not render with invalid data', async () => {
-    render(
-      <MockAllProviders>
-        <DateRangeProvider>
-          <StudentCell week={week} student={null} hiddenFields={[]} />
-        </DateRangeProvider>
-      </MockAllProviders>,
-    );
-    // Student Name related to the week record
-    await waitFor(() => {
-      expect(screen.queryByText(student.fullName)).not.toBeInTheDocument();
-    });
+    expect(screen.getByText(student.fullName)).toBeInTheDocument();
   });
 
-  it('renders with the correct data', async () => {
+  it('does not render with invalid data', () => {
     render(
       <MockAllProviders>
-        <DateRangeProvider>
-          <StudentCell week={week} student={student} hiddenFields={[]} />
-        </DateRangeProvider>
+        <StudentCell week={week} student={null} hiddenFields={[]} />
       </MockAllProviders>,
     );
-    // Student Name related to the week record
-    await waitFor(() => {
-      expect(screen.getByText(student.fullName)).toBeInTheDocument();
-      expect(screen.getByText(student.email)).toBeInTheDocument();
-      expect(screen.getByText(student.primaryCoach.name)).toBeInTheDocument();
-      expect(screen.getByText(week.level)).toBeInTheDocument();
-    });
+    expect(screen.queryByText(student.fullName)).not.toBeInTheDocument();
   });
 
-  it.skip('contextual menu', () => {
-    // Unable to test here, as the contextual menu is not part of the StudentCell component
-    // (it lives in the parent component)
+  it('renders the correct student details', () => {
+    render(
+      <MockAllProviders>
+        <StudentCell week={week} student={student} hiddenFields={[]} />
+      </MockAllProviders>,
+    );
+    expect(screen.getByText(student.fullName)).toBeInTheDocument();
+    expect(screen.getByText(student.email)).toBeInTheDocument();
+    expect(screen.getByText(week.coach.fullName)).toBeInTheDocument();
+    expect(screen.getByText(week.srCourseName)).toBeInTheDocument();
+  });
+
+  it('hides fields configured by the parent table', () => {
+    render(
+      <MockAllProviders>
+        <StudentCell
+          week={week}
+          student={student}
+          hiddenFields={['primaryCoach', 'level']}
+        />
+      </MockAllProviders>,
+    );
+    expect(screen.getByText(student.fullName)).toBeInTheDocument();
+    expect(screen.queryByText(week.coach.fullName)).not.toBeInTheDocument();
+    expect(screen.queryByText(week.srCourseName)).not.toBeInTheDocument();
   });
 });

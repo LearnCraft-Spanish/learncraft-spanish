@@ -1,5 +1,4 @@
 import type { SrCourse } from '@learncraft-spanish/shared';
-import type { UseQueryResult } from '@tanstack/react-query';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useCoachingStudentsAdapter } from '@application/adapters/coachingStudentsAdapter';
 import { useQuery } from '@tanstack/react-query';
@@ -7,19 +6,24 @@ import { useQuery } from '@tanstack/react-query';
 export const ALL_SR_COURSES_QUERY_KEY = ['allSrCourses'] as const;
 
 export interface UseAllSrCoursesQueryReturn {
-  allSrCoursesQuery: UseQueryResult<SrCourse[]>;
+  srCourses: SrCourse[] | undefined;
+  isLoading: boolean;
+  error: Error | null;
 }
 
 export function useAllSrCoursesQuery(): UseAllSrCoursesQueryReturn {
   const adapter = useCoachingStudentsAdapter();
   const { isCoach, isAdmin } = useAuthAdapter();
 
-  const allSrCoursesQuery = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ALL_SR_COURSES_QUERY_KEY,
-    queryFn: () => adapter.getAllSrCourses(),
+    queryFn: async () => {
+      const courses = await adapter.getAllSrCourses();
+      return courses.sort((a, b) => a.name.localeCompare(b.name));
+    },
     staleTime: Infinity,
     enabled: isCoach || isAdmin,
   });
 
-  return { allSrCoursesQuery };
+  return { srCourses: data, isLoading, error };
 }

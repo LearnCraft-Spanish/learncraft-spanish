@@ -15,7 +15,11 @@ import './StudentDrillDown.scss';
 
 export default function StudentDrillDown() {
   const { allCoachingStudentsQuery } = useAllCoachingStudentsQuery();
-  const { allCoachesQuery } = useAllCoachesQuery();
+  const {
+    coaches,
+    isLoading: coachesLoading,
+    error: coachesError,
+  } = useAllCoachesQuery();
 
   const {
     isLoading: authLoading,
@@ -25,17 +29,13 @@ export default function StudentDrillDown() {
   } = useAuthAdapter();
 
   const isLoading =
-    allCoachingStudentsQuery.isLoading ||
-    allCoachesQuery.isLoading ||
-    authLoading;
+    allCoachingStudentsQuery.isLoading || coachesLoading || authLoading;
 
   const isError =
-    allCoachingStudentsQuery.isError || allCoachesQuery.isError || authLoading;
+    allCoachingStudentsQuery.isError || coachesError || authLoading;
 
   const isSuccess =
-    allCoachingStudentsQuery.isSuccess &&
-    allCoachesQuery.isSuccess &&
-    isAuthenticated;
+    allCoachingStudentsQuery.isSuccess && !coachesLoading && isAuthenticated;
 
   const [selectedStudentId, setSelectedStudentId] = useState<
     number | undefined
@@ -68,7 +68,7 @@ export default function StudentDrillDown() {
     ];
 
     if (authUser?.email) {
-      const currentUserCoach = allCoachesQuery.data?.find((coach) => {
+      const currentUserCoach = coaches?.find((coach) => {
         const emailPrefix = authUser.email.split('@')[0].toLowerCase();
         for (const domain of possibleEmailDomains) {
           if (coach.email.toLowerCase() === emailPrefix + domain) {
@@ -79,7 +79,7 @@ export default function StudentDrillDown() {
       });
       if (currentUserCoach) return currentUserCoach;
     }
-  }, [authUser, allCoachesQuery.data]);
+  }, [authUser, coaches]);
 
   return (
     <div className="student-deep-dive">

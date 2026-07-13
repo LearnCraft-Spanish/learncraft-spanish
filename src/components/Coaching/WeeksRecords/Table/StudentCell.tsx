@@ -1,6 +1,7 @@
-import type { CoachingStudent, Week } from 'src/types/CoachingTypes';
-import eye from 'src/assets/icons/eye.svg';
-import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import type {
+  FurnishedWeekWithCoach,
+  MinimalCoachingStudent,
+} from '@learncraft-spanish/shared';
 // import pencil from 'src/resources/icons/pencil.svg';
 
 export default function StudentCell({
@@ -8,12 +9,10 @@ export default function StudentCell({
   student,
   hiddenFields,
 }: {
-  week: Week;
-  student: CoachingStudent | null | undefined;
+  week: FurnishedWeekWithCoach;
+  student: MinimalCoachingStudent | null | undefined;
   hiddenFields: string[];
 }) {
-  const { openContextual } = useContextualMenu();
-
   if (!student) {
     return null;
   }
@@ -22,25 +21,20 @@ export default function StudentCell({
     student && (
       <div className="studentCell">
         <div className="studentCellControlls">
-          <img
+          {/* <img
             src={eye}
             alt="view record"
             className="icon"
-            onClick={() => openContextual(`week${week.recordId}`)}
-          />
-          {/* <img src={pencil} alt="edit record" className="icon" /> */}
+            onClick={() => openContextual(`week${week.weekId}`)}
+          /> */}
         </div>
         <div className="content">
           <h4>{student.fullName}</h4>
           <p>{student.email}</p>
           {!hiddenFields.includes('primaryCoach') && (
-            <p>
-              {student.primaryCoach
-                ? student.primaryCoach.name
-                : 'No Coach Found'}
-            </p>
+            <p>{week.coach ? week.coach.fullName : 'No Coach Found'}</p>
           )}
-          {!hiddenFields.includes('level') && <p>{week.level}</p>}
+          {!hiddenFields.includes('level') && <p>{week.srCourseName}</p>}
         </div>
       </div>
     )

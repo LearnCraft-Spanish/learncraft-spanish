@@ -1,16 +1,11 @@
-import type { Week } from 'src/types/CoachingTypes';
-import { useMemo } from 'react';
+import type { FurnishedWeekWithCoach } from '@learncraft-spanish/shared';
 
-import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
-  const { getStudentFromMembershipId } = useCoaching();
-  // Foreign Key lookup, form data in backend
-  const student = useMemo(
-    () => getStudentFromMembershipId(week?.relatedMembership),
-    [getStudentFromMembershipId, week?.relatedMembership],
-  );
-
+// import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+export default function ViewWeekRecord({
+  week,
+}: {
+  week: FurnishedWeekWithCoach | undefined;
+}) {
   if (!week) {
     console.error('Week record is undefined');
     return (
@@ -21,7 +16,7 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
       </div>
     );
   }
-  if (!student) {
+  if (!week.student) {
     console.error('Student record is undefined');
     return (
       <div className="contextualWrapper">
@@ -31,51 +26,53 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
       </div>
     );
   }
-
-  return (
-    <ContextualView key={`week${week.recordId}`}>
-      <div className="lineWrapper">
-        <p className="label">Student:</p>
-        <p className="content">{student.fullName}</p>
-      </div>
-      <div className="lineWrapper">
-        <p className="label">Email:</p>
-        <p className="content">{student.email}</p>
-      </div>
-      <div className="lineWrapper">
-        <p className="label">Time Zone:</p>
-        <p className="content">{student.timeZone}</p>
-      </div>
-      <div className="lineWrapper">
-        <p className="label">Pronouns:</p>
-        <p className="content">{student.pronoun}</p>
-      </div>
-      <div className="lineWrapper">
-        <p className="label">Learning Disabilities:</p>
-        <p className="content">{student.learningDisabilities}</p>
-      </div>
-
-      <div className="lineWrapper">
-        <p className="label">Primary Coach:</p>
-        <p className="content">{student.primaryCoach.name}</p>
-      </div>
-
-      <div className="lineWrapper">
-        <p className="label">Fluency Goal:</p>
-        <p className="content">{student.fluencyGoal}</p>
-      </div>
-      <div className="lineWrapper">
-        <p className="label">Starting Level:</p>
-        <p className="content">{student.startingLevel}</p>
-      </div>
-      <div className="lineWrapper">
-        <p className="label">Week #: </p>
-        <p className="content"> {week.week}</p>
-      </div>
-      <div className="lineWrapper">
-        <p className="label">Current Lesson: </p>
-        <p className="content"> {week.currentLessonName}</p>
-      </div>
-    </ContextualView>
-  );
+  return null;
 }
+
+//   return (
+//     <ContextualView key={`week${week.recordId}`}>
+//       <div className="lineWrapper">
+//         <p className="label">Student:</p>
+//         <p className="content">{week.student.fullName}</p>
+//       </div>
+//       <div className="lineWrapper">
+//         <p className="label">Email:</p>
+//         <p className="content">{student.email}</p>
+//       </div>
+//       <div className="lineWrapper">
+//         <p className="label">Time Zone:</p>
+//         <p className="content">{student.timeZone}</p>
+//       </div>
+//       <div className="lineWrapper">
+//         <p className="label">Pronouns:</p>
+//         <p className="content">{student.pronoun}</p>
+//       </div>
+//       <div className="lineWrapper">
+//         <p className="label">Learning Disabilities:</p>
+//         <p className="content">{student.learningDisabilities}</p>
+//       </div>
+
+//       <div className="lineWrapper">
+//         <p className="label">Primary Coach:</p>
+//         <p className="content">{student.primaryCoach.name}</p>
+//       </div>
+
+//       <div className="lineWrapper">
+//         <p className="label">Fluency Goal:</p>
+//         <p className="content">{student.fluencyGoal}</p>
+//       </div>
+//       <div className="lineWrapper">
+//         <p className="label">Starting Level:</p>
+//         <p className="content">{student.startingLevel}</p>
+//       </div>
+//       <div className="lineWrapper">
+//         <p className="label">Week #: </p>
+//         <p className="content"> {week.week}</p>
+//       </div>
+//       <div className="lineWrapper">
+//         <p className="label">Current Lesson: </p>
+//         <p className="content"> {week.currentLessonName}</p>
+//       </div>
+//     </ContextualView>
+//   );
+// }

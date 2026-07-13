@@ -16,16 +16,14 @@ export function CoachDropdown({
   defaultOptionText?: string;
   required?: boolean;
 }) {
-  const { allCoachesQuery } = useAllCoachesQuery();
+  const { coaches, isLoading } = useAllCoachesQuery();
 
-  const dataReady = allCoachesQuery.isSuccess;
+  const dataReady = !isLoading && coaches && coaches.length > 0;
 
   const coachName = useMemo(() => {
-    const corrector = allCoachesQuery.data?.find(
-      (coach) => coach.coach_id === coachId,
-    );
+    const corrector = coaches?.find((coach) => coach.coach_id === coachId);
     return corrector ? corrector.fullName : 'No Coach Found';
-  }, [coachId, allCoachesQuery.data]);
+  }, [coachId, coaches]);
 
   return (
     dataReady && (
@@ -45,7 +43,7 @@ export function CoachDropdown({
           >
             <option value={''}>{defaultOptionText || 'Select'}</option>
 
-            {allCoachesQuery.data?.map((coach) => (
+            {coaches?.map((coach) => (
               <option key={coach.coach_id} value={coach.coach_id}>
                 {coach.fullName}
               </option>
@@ -74,16 +72,14 @@ export function CoachDropdown_LEGACY({
   defaultOptionText?: string;
   required?: boolean;
 }) {
-  const { allCoachesQuery } = useAllCoachesQuery();
+  const { coaches, isLoading } = useAllCoachesQuery();
 
-  const dataReady = allCoachesQuery.isSuccess;
+  const dataReady = !isLoading && coaches && coaches.length > 0;
 
   const coachName = useMemo(() => {
-    const corrector = allCoachesQuery.data?.find(
-      (coach) => coach.email === coachEmail,
-    );
+    const corrector = coaches?.find((coach) => coach.email === coachEmail);
     return corrector ? corrector.fullName : 'No Coach Found';
-  }, [coachEmail, allCoachesQuery.data]);
+  }, [coachEmail, coaches]);
 
   return (
     dataReady && (
@@ -103,7 +99,7 @@ export function CoachDropdown_LEGACY({
           >
             <option value={''}>{defaultOptionText || 'Select'}</option>
 
-            {allCoachesQuery.data?.map((coach) => (
+            {coaches?.map((coach) => (
               <option key={coach.email} value={coach.email}>
                 {coach.fullName}
               </option>

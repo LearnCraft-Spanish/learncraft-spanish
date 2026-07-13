@@ -131,7 +131,7 @@ export function StudentInfoContextual({
   isAdmin: boolean;
 }) {
   const { updateCoachingStudentMutation } = useUpdateCoachingStudentMutation();
-  const { allCoachesQuery } = useAllCoachesQuery();
+  const { coaches } = useAllCoachesQuery();
   const { allTimeZonesQuery } = useAllTimeZonesQuery();
 
   const { closeContextual } = useContextualMenu();
@@ -154,8 +154,8 @@ export function StudentInfoContextual({
     let primaryCoach: number | undefined =
       student?.primaryCoach?.coach_id || undefined;
     if (data.primaryCoachId) {
-      const coach = allCoachesQuery.data?.find(
-        (coach) => coach.coach_id === data.primaryCoachId,
+      const coach = coaches?.find(
+        (coach: Coach) => coach.coach_id === data.primaryCoachId,
       );
       if (coach) {
         primaryCoach = coach.coach_id;

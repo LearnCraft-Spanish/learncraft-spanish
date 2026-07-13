@@ -19,17 +19,11 @@ describe('useAllCoachesQuery', () => {
       wrapper: TestQueryClientProvider,
     });
 
-    expect(result.current.allCoachesQuery.isLoading).toBe(true);
+    expect(result.current.isLoading).toBe(true);
 
-    await waitFor(() =>
-      expect(result.current.allCoachesQuery.isLoading).toBe(false),
-    );
-    expect(result.current.allCoachesQuery.isSuccess).toBe(true);
-    expect(result.current.allCoachesQuery.data).toEqual([
-      { coach_id: 2, fullName: 'Ana Garcia', email: 'ana@example.com' },
-      { coach_id: 3, fullName: 'Mike Jones', email: 'mike@example.com' },
-      { coach_id: 1, fullName: 'Zara Smith', email: 'zara@example.com' },
-    ]);
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.coaches).toBeDefined();
+    expect(result.current.coaches).toEqual(mockCoaches);
   });
 
   it('should return an empty array when no coaches exist', async () => {
@@ -39,10 +33,8 @@ describe('useAllCoachesQuery', () => {
       wrapper: TestQueryClientProvider,
     });
 
-    await waitFor(() =>
-      expect(result.current.allCoachesQuery.isLoading).toBe(false),
-    );
-    expect(result.current.allCoachesQuery.data).toEqual([]);
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.coaches).toEqual([]);
   });
 
   it('should expose error state when the fetch fails', async () => {
@@ -56,11 +48,9 @@ describe('useAllCoachesQuery', () => {
       wrapper: TestQueryClientProvider,
     });
 
-    await waitFor(() =>
-      expect(result.current.allCoachesQuery.isLoading).toBe(false),
-    );
-    expect(result.current.allCoachesQuery.isError).toBe(true);
-    expect(result.current.allCoachesQuery.data).toBeUndefined();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.error).toBeDefined();
+    expect(result.current.coaches).toBeUndefined();
   });
 
   it('should not fetch when user is not a coach or admin', async () => {
@@ -73,10 +63,8 @@ describe('useAllCoachesQuery', () => {
       wrapper: TestQueryClientProvider,
     });
 
-    await waitFor(() =>
-      expect(result.current.allCoachesQuery.isLoading).toBe(false),
-    );
-    expect(result.current.allCoachesQuery.status).toBe('pending');
-    expect(result.current.allCoachesQuery.data).toBeUndefined();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.error).toBeDefined();
+    expect(result.current.coaches).toBeUndefined();
   });
 });

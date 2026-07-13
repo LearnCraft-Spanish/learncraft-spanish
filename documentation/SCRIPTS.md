@@ -6,12 +6,15 @@ _Complete guide to all npm/pnpm scripts in LearnCraft Spanish_
 
 ## Quick Reference
 
-| Script                    | Use Case                                     |
-| ------------------------- | -------------------------------------------- |
-| `pnpm start`              | Start development server                     |
-| `pnpm test:hexagon:watch` | Test while developing                        |
-| `pnpm validate`           | Pre-commit check (lint + format + typecheck) |
-| `pnpm build`              | Build for production                         |
+| Script                    | Use Case                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| `pnpm start`              | Start development server                                                            |
+| `pnpm install:ci`         | Install from CI lockfile (published shared)                                         |
+| `pnpm install:local`      | Install CI deps, build local `../lcs-shared`, stage `dist/` only (keeps `tsc` fast) |
+| `pnpm install:published`  | Restore published `@learncraft-spanish/shared`                                      |
+| `pnpm test:hexagon:watch` | Test while developing                                                               |
+| `pnpm validate`           | Pre-commit check (lint + format + typecheck)                                        |
+| `pnpm build`              | Build for production                                                                |
 
 ---
 
@@ -361,41 +364,15 @@ pnpm validate
 
 ## Dependency Management Scripts
 
-### `pnpm install:local`
-
-**What it does:** Installs dependencies for local development (non-frozen lockfile).
-
-**When to use:**
-
-- Initial project setup
-- Adding new dependencies
-- Updating dependency versions
-
-**Details:**
-
-- Deletes existing lockfile
-- Creates new lockfile in `lockfiles/local/`
-- Allows version resolution changes
-- **Use this for local development**
-
-**Example:**
-
-```bash
-pnpm install:local
-# Installing dependencies...
-```
-
----
-
 ### `pnpm install:ci`
 
-**What it does:** Installs dependencies with frozen lockfile (CI mode).
+**What it does:** Installs dependencies with frozen lockfile from `lockfiles/ci/` (published `@learncraft-spanish/shared`, same as CI).
 
 **When to use:**
 
 - CI/CD pipelines
 - Ensuring reproducible installs
-- When you want exact versions from lockfile
+- Default install when you want the published shared package
 
 **Details:**
 
@@ -408,6 +385,62 @@ pnpm install:local
 ```bash
 pnpm install:ci
 # Installing from frozen lockfile...
+```
+
+---
+
+### `pnpm install:local`
+
+**What it does:** Installs CI dependencies, builds local `../lcs-shared`, stages a dist-only copy to `.local-shared-staging/`, then symlinks `node_modules/@learncraft-spanish/shared` to that staging dir.
+
+**When to use:**
+
+- Developing frontend and shared package together
+- Testing unreleased shared types or contracts locally
+
+**Prerequisites:**
+
+- `lcs-shared` cloned as a sibling repo (`../lcs-shared`), or set `LCS_SHARED_PATH`
+
+**Details:**
+
+- Runs `install:ci` first (published deps from CI lockfile)
+- Builds local shared package (`pnpm install && pnpm build` in `lcs-shared`)
+- Stages `package.json` + `dist/` only to `.local-shared-staging/` (same layout as the published package)
+- Symlinks staged package into `node_modules` (keeps `tsc` fast — no shared `src/` or declaration-map source resolution)
+- Creates `.shared-local-mode` marker file with the source repo path
+- Does not modify `package.json` or lockfiles
+
+**Example:**
+
+```bash
+pnpm install:local
+# Local shared mode enabled (dist-only staging)
+```
+
+**Note:** After changing shared source, rebuild and refresh staging: `cd ../lcs-shared && pnpm build`, then re-run `pnpm install:local`.
+
+---
+
+### `pnpm install:published`
+
+**What it does:** Restores the published `@learncraft-spanish/shared` package from the CI lockfile.
+
+**When to use:**
+
+- Before opening a PR (ensure published shared, not local symlink)
+- Switching back from local shared development
+
+**Details:**
+
+- Removes `.shared-local-mode` marker
+- Runs frozen install from `lockfiles/ci/`
+
+**Example:**
+
+```bash
+pnpm install:published
+# Published shared mode enabled
 ```
 
 ---
@@ -627,11 +660,27 @@ git commit -m "chore: add <package-name>"
 
 ---
 
+### Shared Package Development
+
+```bash
+# Default / CI-like — published shared
+pnpm install:published
+
+# Developing shared + frontend together
+pnpm install:local
+# edit lcs-shared → cd ../lcs-shared && pnpm build → pnpm install:local to refresh staging
+
+# Before opening a PR (ensure published shared)
+pnpm install:published
+```
+
+---
+
 ### After Pulling Latest Code
 
 ```bash
-# 1. Install any new dependencies
-pnpm install:local
+# 1. Install dependencies (published shared, matches CI)
+pnpm install:published
 
 # 2. Verify everything works
 pnpm validate
@@ -685,7 +734,7 @@ npm install -g pnpm
 ```bash
 # Clean install
 rm -rf node_modules
-pnpm install:local
+pnpm install:published
 ```
 
 ---

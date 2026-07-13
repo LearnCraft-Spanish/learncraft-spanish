@@ -17,13 +17,12 @@ describe('useAllSrCoursesQuery', () => {
       wrapper: TestQueryClientProvider,
     });
 
-    expect(result.current.allSrCoursesQuery.isLoading).toBe(true);
+    expect(result.current.isLoading).toBe(true);
 
-    await waitFor(() =>
-      expect(result.current.allSrCoursesQuery.isLoading).toBe(false),
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.srCourses).toEqual(
+      [...mockData].sort((a, b) => a.name.localeCompare(b.name)),
     );
-    expect(result.current.allSrCoursesQuery.isSuccess).toBe(true);
-    expect(result.current.allSrCoursesQuery.data).toEqual(mockData);
   });
 
   it('should return empty array when no SR courses exist', async () => {
@@ -33,10 +32,8 @@ describe('useAllSrCoursesQuery', () => {
       wrapper: TestQueryClientProvider,
     });
 
-    await waitFor(() =>
-      expect(result.current.allSrCoursesQuery.isLoading).toBe(false),
-    );
-    expect(result.current.allSrCoursesQuery.data).toEqual([]);
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.srCourses).toEqual([]);
   });
 
   it('should expose error state when the fetch fails', async () => {
@@ -50,11 +47,9 @@ describe('useAllSrCoursesQuery', () => {
       wrapper: TestQueryClientProvider,
     });
 
-    await waitFor(() =>
-      expect(result.current.allSrCoursesQuery.isLoading).toBe(false),
-    );
-    expect(result.current.allSrCoursesQuery.isError).toBe(true);
-    expect(result.current.allSrCoursesQuery.data).toBeUndefined();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.error).toBeTruthy();
+    expect(result.current.srCourses).toBeUndefined();
   });
 
   it('should not fetch when user is not a coach or admin', async () => {
@@ -64,10 +59,7 @@ describe('useAllSrCoursesQuery', () => {
       wrapper: TestQueryClientProvider,
     });
 
-    await waitFor(() =>
-      expect(result.current.allSrCoursesQuery.isLoading).toBe(false),
-    );
-    expect(result.current.allSrCoursesQuery.status).toBe('pending');
-    expect(result.current.allSrCoursesQuery.data).toBeUndefined();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.srCourses).toBeUndefined();
   });
 });
