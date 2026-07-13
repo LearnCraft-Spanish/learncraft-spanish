@@ -1,12 +1,7 @@
 // import type { ReactNode } from 'react';
 import '@interface/components/ExampleManager/ExampleManagerSubNav.scss';
 export type ExampleSearchMode =
-  | 'filter'
-  | 'quiz'
-  | 'text'
-  | 'ids'
-  | 'recentlyEdited'
-  | 'max-frequency';
+  'filter' | 'quiz' | 'text' | 'ids' | 'recentlyEdited' | 'max-frequency';
 
 interface NavOption {
   mode: ExampleSearchMode;

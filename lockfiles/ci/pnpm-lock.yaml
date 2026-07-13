@@ -202,7 +202,7 @@ importers:
         specifier: ^2.7.3
         version: 2.15.0(@types/node@22.20.1)(typescript@5.9.3)
       prettier:
-        specifier: ^3.7.3
+        specifier: 3.9.5
         version: 3.9.5
       sass-embedded:
         specifier: ^1.85.1

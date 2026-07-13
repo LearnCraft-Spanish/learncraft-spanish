@@ -4,8 +4,7 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 interface UsePrivateCallLookupsQueryReturn {
   callTypes: ReturnType<typeof privateCallsFactory>['callTypes'] | undefined;
   callRatings:
-    | ReturnType<typeof privateCallsFactory>['callRatings']
-    | undefined;
+    ReturnType<typeof privateCallsFactory>['callRatings'] | undefined;
   isLoading: boolean;
   error: Error | null;
 }

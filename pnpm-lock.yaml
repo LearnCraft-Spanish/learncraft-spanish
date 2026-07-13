@@ -202,8 +202,8 @@ importers:
         specifier: ^2.7.3
         version: 2.10.4(@types/node@22.17.0)(typescript@5.8.3)
       prettier:
-        specifier: ^3.7.3
-        version: 3.7.3
+        specifier: 3.9.5
+        version: 3.9.5
       sass-embedded:
         specifier: ^1.85.1
         version: 1.89.2
@@ -4791,8 +4791,8 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
-  prettier@3.7.3:
-    resolution: {integrity: sha512-QgODejq9K3OzoBbuyobZlUhznP5SKwPqp+6Q6xw6o8gnhr4O85L2U915iM2IDcfF2NPXVaM9zlo9tdwipnYwzg==}
+  prettier@3.9.5:
+    resolution: {integrity: sha512-/FVl766LpUfB5vXgCYOYa0MeV/441Ia99AeICQIQFTY/Nw0roZwULcXpku5i1/m5kt/baz+s4Zogspd839HSMg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -11463,7 +11463,7 @@ snapshots:
 
   prettier@3.6.2: {}
 
-  prettier@3.7.3: {}
+  prettier@3.9.5: {}
 
   pretty-format@27.5.1:
     dependencies:

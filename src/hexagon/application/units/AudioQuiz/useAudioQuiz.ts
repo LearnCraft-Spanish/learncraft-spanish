@@ -36,11 +36,7 @@ export interface AudioQuizReturn {
   currentExampleReady: boolean;
   currentStep: AudioQuizStep;
   currentStepValue:
-    | AudioQuizQuestion
-    | AudioQuizGuess
-    | AudioQuizHint
-    | AudioQuizAnswer
-    | null;
+    AudioQuizQuestion | AudioQuizGuess | AudioQuizHint | AudioQuizAnswer | null;
   nextExampleReady: boolean;
   previousExampleReady: boolean;
   progressStatus: number;
@@ -354,9 +350,7 @@ export function useAudioQuiz({
   }, [nextAudioExample]);
 
   const previousAudioExample:
-    | SpeakingQuizExample
-    | ListeningQuizExample
-    | null = useMemo(() => {
+    SpeakingQuizExample | ListeningQuizExample | null = useMemo(() => {
     if (!previousExampleMemo) {
       return null;
     }

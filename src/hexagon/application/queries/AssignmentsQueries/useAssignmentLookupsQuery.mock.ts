@@ -3,11 +3,9 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 interface UseAssignmentLookupsQueryReturn {
   assignmentTypes:
-    | ReturnType<typeof assignmentsFactory>['assignmentTypes']
-    | undefined;
+    ReturnType<typeof assignmentsFactory>['assignmentTypes'] | undefined;
   assignmentRatings:
-    | ReturnType<typeof assignmentsFactory>['assignmentRatings']
-    | undefined;
+    ReturnType<typeof assignmentsFactory>['assignmentRatings'] | undefined;
   isLoading: boolean;
   error: Error | null;
 }

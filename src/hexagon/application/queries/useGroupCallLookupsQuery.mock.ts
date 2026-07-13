@@ -3,11 +3,9 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 interface UseGroupCallLookupsQueryReturn {
   groupSessionTypes:
-    | ReturnType<typeof groupCallsFactory>['groupSessionTypes']
-    | undefined;
+    ReturnType<typeof groupCallsFactory>['groupSessionTypes'] | undefined;
   groupSessionTopics:
-    | ReturnType<typeof groupCallsFactory>['groupSessionTopics']
-    | undefined;
+    ReturnType<typeof groupCallsFactory>['groupSessionTopics'] | undefined;
   isLoading: boolean;
   error: Error | null;
 }
