@@ -15,8 +15,6 @@ export default function StudentCell({
   student: MinimalCoachingStudent | null | undefined;
   hiddenFields: string[];
 }) {
-  const { openContextual } = useContextualMenu();
-
   if (!student) {
     return null;
   }
@@ -25,13 +23,12 @@ export default function StudentCell({
     student && (
       <div className="studentCell">
         <div className="studentCellControlls">
-          <img
+          {/* <img
             src={eye}
             alt="view record"
             className="icon"
             onClick={() => openContextual(`week${week.weekId}`)}
-          />
-          {/* <img src={pencil} alt="edit record" className="icon" /> */}
+          /> */}
         </div>
         <div className="content">
           <h4>{student.fullName}</h4>
