@@ -2,8 +2,6 @@ import type {
   FurnishedWeekWithCoach,
   MinimalCoachingStudent,
 } from '@learncraft-spanish/shared';
-import eye from 'src/assets/icons/eye.svg';
-import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 // import pencil from 'src/resources/icons/pencil.svg';
 
 export default function StudentCell({
