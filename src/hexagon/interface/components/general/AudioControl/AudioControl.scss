@@ -8,3 +8,18 @@
   width: 24px;
   height: 24px;
 }
+
+.audioControlPlayPauseButton:disabled {
+  cursor: not-allowed;
+
+  &:hover {
+    background-color: transparent;
+    filter: invert(23%) sepia(99%) saturate(2029%) hue-rotate(341deg)
+      brightness(89%) contrast(89%);
+  }
+}
+
+.audioControlPlayPauseButtonErrorIcon {
+  filter: invert(23%) sepia(99%) saturate(2029%) hue-rotate(341deg)
+    brightness(89%) contrast(89%);
+}
