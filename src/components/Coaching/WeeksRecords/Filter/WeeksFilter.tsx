@@ -1,12 +1,13 @@
-import type { Coach, Course } from 'src/types/CoachingTypes';
+import type { Coach, SrCourse } from '@learncraft-spanish/shared';
 
+import { useAllSrCoursesQuery } from '@application/queries/CoachingStudentQueries/useAllSrCoursesQuery';
+import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
 import { Dropdown } from '@interface/components/FormComponents';
 import React, { useMemo, useState } from 'react';
-import { CoachDropdown_LEGACY } from 'src/components/FormComponents';
+import { CoachDropdown } from 'src/components/FormComponents';
+import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
 import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-
 import getDateRange from '../../general/functions/dateRange';
 import useDateRange from '../useDateRange';
 import '../../coaching.scss';
@@ -15,7 +16,7 @@ interface CoachingFilterProps {
   dataReady: boolean;
   filterByCoach: Coach | undefined;
   updateCoachFilter: (value: string) => void;
-  filterByCourse: Course | undefined;
+  filterByCourse: SrCourse | undefined;
   updateCourseFilter: (value: string) => void;
   filterCoachless: boolean | undefined;
   updateCoachlessFilter: (value: boolean) => void;
@@ -45,11 +46,14 @@ export default function WeeksFilter({
   filterByOneMonthChallenge,
   updateFilterByOneMonthChallenge,
 }: CoachingFilterProps) {
-  const { courseListQuery, activeMembershipsQuery } = useCoaching();
-  const { openContextual } = useContextualMenu();
+  const { srCourses, isLoading: srCoursesLoading } = useAllSrCoursesQuery();
+  const { coaches } = useAllCoachesQuery();
+  // const { activeMembershipsQuery } = useCoaching();
   const { setStartDate, startDate } = useDateRange();
   const [numWeeks, setNumWeeks] = useState(4); // Start with 4 weeks
   const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
+  const { weeks } = useWeeksByStartDate(startDate);
+  const { openContextual } = useContextualMenu();
 
   const handleLoadMore = () => {
     setNumWeeks((prev) => prev * 2);
@@ -65,30 +69,25 @@ export default function WeeksFilter({
   };
 
   const coursesWithActiveMemberships = useMemo(() => {
-    if (!courseListQuery.isSuccess || !activeMembershipsQuery.isSuccess)
-      return [];
-    return courseListQuery.data.filter((course) => {
-      // Foreign Key lookup, filter in backend
+    if (srCoursesLoading || !srCourses || !weeks) return [];
+    return srCourses.filter((course) => {
       return (
-        activeMembershipsQuery.data.filter(
-          (membership) => membership.relatedCourse === course.recordId,
-        ).length > 0
+        weeks.filter((week) => week.srCourseName === course.name).length > 0
       );
     });
-  }, [
-    courseListQuery.data,
-    courseListQuery.isSuccess,
-    activeMembershipsQuery.data,
-    activeMembershipsQuery.isSuccess,
-  ]);
+  }, [srCourses, srCoursesLoading, weeks]);
 
   return (
     dataReady && (
       <div className="coachingFilterSection">
         <div className="simpleFiltering">
-          <CoachDropdown_LEGACY
-            coachEmail={filterByCoach?.user.email || ''}
-            onChange={updateCoachFilter}
+          <CoachDropdown
+            coachId={filterByCoach?.coach_id || 0}
+            onChange={(value) =>
+              updateCoachFilter(
+                coaches?.find((coach) => coach.coach_id === value)?.email || '',
+              )
+            }
             editMode
             defaultOptionText="Select Coach"
           />
@@ -147,6 +146,7 @@ export default function WeeksFilter({
             >
               New Assignment
             </button>
+
             <button
               type="button"
               className="greenButton"

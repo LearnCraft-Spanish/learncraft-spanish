@@ -1,297 +1,273 @@
-import type { Week } from 'src/types/CoachingTypes';
-import { useModal } from '@interface/hooks/useModal';
-import { useMemo, useState } from 'react';
+import type {
+  FurnishedWeekWithCoach,
+  SrLesson,
+  UpdateWeekCommand,
+} from '@learncraft-spanish/shared';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import checkmark from 'src/assets/icons/checkmark_green.svg';
 
+import checkmark from 'src/assets/icons/checkmark_green.svg';
 import pencil from 'src/assets/icons/pencil.svg';
-import x from 'src/assets/icons/x_dark.svg';
+import x from 'src/assets/icons/x.svg';
 import { SearchableDropdown, Switch } from 'src/components/FormComponents';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useSrLessonsQuery } from 'src/hexagon/application/queries/useSrLessonsQuery';
+import { useWeekMutations } from 'src/hexagon/application/queries/WeekQueries/useWeekMutations';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 
 import AssignmentsCell from './AssignmentsCell';
-
 import GroupSessionsCell from './GroupSessionsCell';
 import PrivateCallsCell from './PrivateCallsCell';
 import StudentCell from './StudentCell';
 
-interface WeekWithFailedToUpdate extends Week {
-  failedToUpdate?: boolean;
+function toUpdateWeekCommand(week: FurnishedWeekWithCoach): UpdateWeekCommand {
+  const updateWeekCommand: UpdateWeekCommand = {
+    weekId: week.weekId,
+    notes: week.notes,
+    holdWeek: week.holdWeek,
+    recordComplete: week.recordComplete,
+  };
+  if (week.lesson) {
+    updateWeekCommand.lesson = week.lesson;
+  }
+  return updateWeekCommand;
+}
+
+function hasWeekChanges(
+  originalWeek: FurnishedWeekWithCoach,
+  localWeek: UpdateWeekCommand,
+): boolean {
+  return (
+    localWeek.notes !== originalWeek.notes ||
+    localWeek.holdWeek !== originalWeek.holdWeek ||
+    localWeek.recordComplete !== originalWeek.recordComplete ||
+    localWeek.lesson?.srLessonId !== originalWeek.lesson?.srLessonId
+  );
+}
+
+interface WeeksTableItemProps {
+  week: FurnishedWeekWithCoach;
+  updateActiveDataWeek?: (week: UpdateWeekCommand) => void;
+  editMode: boolean;
+  hiddenFields: string[];
+  srLessons?: SrLesson[];
+  allowSingleRecordUpdate?: boolean;
+  toggleEditMode?: () => void;
+  cancelEdit?: () => void;
+  handleSubmit?: () => void;
+  handleRecordCompleteableChange?: (newValue: boolean) => void;
+  submitDisabled?: boolean;
 }
 
 export default function WeeksTableItem({
   week,
   updateActiveDataWeek,
   editMode,
-  failedToUpdate,
   hiddenFields,
+  srLessons,
   allowSingleRecordUpdate,
   toggleEditMode,
   cancelEdit,
   handleSubmit,
-}: {
-  week: WeekWithFailedToUpdate;
-  updateActiveDataWeek: (week: Week) => void;
-  editMode: boolean;
-  failedToUpdate: boolean | undefined;
-  hiddenFields: string[];
-  allowSingleRecordUpdate?: boolean;
-  toggleEditMode?: () => void;
-  cancelEdit?: () => void;
-  handleSubmit?: () => void;
-}) {
-  const {
-    studentRecordsLessonsQuery,
-    getAssignmentsFromWeekRecordId,
-    getGroupSessionsFromWeekRecordId,
-    getPrivateCallsFromWeekRecordId,
-    getStudentFromMembershipId,
-  } = useCoaching();
-  const { openModal } = useModal();
-
-  const dataReady = studentRecordsLessonsQuery.isSuccess;
+  handleRecordCompleteableChange,
+  submitDisabled,
+}: WeeksTableItemProps) {
   // Foreign Key lookup, form data in backend
-  const assignments = useMemo(
-    () => getAssignmentsFromWeekRecordId(week.recordId),
-    [getAssignmentsFromWeekRecordId, week.recordId],
-  );
+  const assignments = useMemo(() => week.assignments, [week.assignments]);
   // Foreign Key lookup, form data in backend
-  const groupSessions = useMemo(
-    () => getGroupSessionsFromWeekRecordId(week.recordId),
-    [getGroupSessionsFromWeekRecordId, week.recordId],
-  );
+  const groupSessions = useMemo(() => week.groupCalls, [week.groupCalls]);
   // Foreign Key lookup, form data in backend
-  const privateCalls = useMemo(
-    () => getPrivateCallsFromWeekRecordId(week.recordId),
-    [getPrivateCallsFromWeekRecordId, week.recordId],
+  const privateCalls = useMemo(() => week.privateCalls, [week.privateCalls]);
+  const lessonOptions = useMemo(
+    () =>
+      srLessons?.map((lesson) => ({
+        label: lesson.lessonName,
+        value: lesson.srLessonId.toString(),
+      })) || [],
+    [srLessons],
   );
 
-  // This is the same logic as the formula for record Completeable in the database
-  function validateRecordCompleteable() {
-    if (week.week === 0) {
-      return true;
-    }
-    if (!week.currentLesson) {
-      return false;
-    }
-    if (
-      privateCalls?.length === 0 &&
-      week.notes === '' &&
-      groupSessions?.length === 0
-    ) {
-      return false;
-    }
-
-    return true;
+  function getUpdatedWeekCommand(
+    updates: Partial<UpdateWeekCommand>,
+  ): UpdateWeekCommand {
+    return {
+      weekId: week.weekId,
+      notes: week.notes,
+      holdWeek: week.holdWeek,
+      recordComplete: week.recordComplete,
+      lesson: week.lesson,
+      ...updates,
+    };
   }
 
-  const handleRecordCompleteableChange = (newValue: boolean) => {
-    if (newValue) {
-      if (!validateRecordCompleteable()) {
-        openModal({
-          title: 'Error',
-          body: 'Cannot mark record as complete without a current lesson, a private or group call, or a note if no calls were made.',
-          type: 'error',
-        });
-        return;
-      }
-    }
-    updateActiveDataWeek({
-      ...week,
-      recordsComplete: newValue,
-    });
-  };
-
   return (
-    dataReady && (
-      <tr className={failedToUpdate ? 'failedToUpdate' : ''}>
-        <td>
-          <StudentCell
+    <tr>
+      <td>
+        <StudentCell
+          week={week}
+          // Foreign Key lookup, form data in backend
+          student={week.student}
+          hiddenFields={hiddenFields}
+        />
+      </td>
+      <td>
+        <AssignmentsCell
+          week={week}
+          assignments={assignments}
+          tableEditMode={editMode}
+        />
+      </td>
+      <td>
+        {groupSessions && (
+          <GroupSessionsCell
             week={week}
-            // Foreign Key lookup, form data in backend
-            student={getStudentFromMembershipId(week.relatedMembership)}
-            hiddenFields={hiddenFields}
+            groupSessions={groupSessions}
+            tableEditMode={editMode}
           />
-        </td>
-        {/* <td>{week.weekStarts.toString()}</td> */}
-        <td>
-          <AssignmentsCell assignments={assignments} tableEditMode={editMode} />
-        </td>
-        <td>
-          {groupSessions && (
-            <GroupSessionsCell
-              week={week}
-              groupSessions={groupSessions}
-              tableEditMode={editMode}
-            />
-          )}
-        </td>
-        <td>
-          {/* We should only show the private calls if:
+        )}
+      </td>
+      <td>
+        {/* We should only show the private calls if:
           - the student has private calls
           OR
           - they have valid bundle credits
 
           We should implement this when we update the data parsing to be handleled on the backend
            */}
-          <PrivateCallsCell
-            week={week}
-            calls={privateCalls}
-            tableEditMode={editMode}
-            // Foreign Key lookup, form data in backend
-            student={getStudentFromMembershipId(week.relatedMembership)}
+        <PrivateCallsCell
+          week={week}
+          calls={privateCalls}
+          tableEditMode={editMode}
+        />
+      </td>
+      <td className="notesCell">
+        {editMode ? (
+          <textarea
+            value={week.notes ?? ''}
+            onChange={(e) =>
+              updateActiveDataWeek?.(
+                getUpdatedWeekCommand({ notes: e.target.value }),
+              )
+            }
+            disabled={!editMode}
           />
-        </td>
-        <td className="notesCell">
-          {editMode ? (
-            <textarea
-              value={week.notes}
-              onChange={(e) =>
-                updateActiveDataWeek({ ...week, notes: e.target.value })
-              }
-              disabled={!editMode}
-            />
-          ) : (
-            <p>{week.notes}</p>
-          )}
-        </td>
-        <td>
-          {editMode ? (
-            <SearchableDropdown
-              value={week.currentLesson ? week.currentLesson.toString() : '0'}
-              valueText={week.currentLessonName}
-              onChange={(value) =>
-                updateActiveDataWeek({
-                  ...week,
-                  currentLesson: value ? Number.parseInt(value) : undefined,
-                  currentLessonName:
-                    studentRecordsLessonsQuery.data?.find(
-                      (lesson) => lesson.recordId === Number.parseInt(value),
-                    )?.lessonName ?? '',
-                })
-              }
-              options={
-                studentRecordsLessonsQuery.data?.map((lesson) => ({
-                  label: lesson.lessonName,
-                  value: lesson.recordId.toString(),
-                })) || []
-              }
-            />
-          ) : (
-            week.currentLessonName
-          )}
-        </td>
-        <td className="checkboxCell">
-          {editMode ? (
-            <Switch
-              htmlFor={`holdWeek-${week.recordId}`}
-              value={week.holdWeek}
-              onChange={() =>
-                updateActiveDataWeek({ ...week, holdWeek: !week.holdWeek })
-              }
-            />
-          ) : (
-            week.holdWeek && (
-              <img className="checkmark" src={checkmark} alt="Checkmark" />
-            )
-          )}
-        </td>
-        <td className="checkboxCell">
-          {editMode ? (
-            <Switch
-              htmlFor={`recordCompleteable-${week.recordId}`}
-              value={week.recordsComplete}
-              onChange={() =>
-                handleRecordCompleteableChange(!week.recordsComplete)
-              }
-            />
-          ) : (
-            week.recordsComplete && (
-              <img className="checkmark" src={checkmark} alt="Checkmark" />
-            )
-          )}
-        </td>
-        {allowSingleRecordUpdate && (
-          <td className="editIconCell">
-            {editMode ? (
-              <>
-                <img
-                  src={x}
-                  alt="Cancel Edit"
-                  onClick={cancelEdit}
-                  className="cancelEditIcon"
-                />
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  className="submitEditButton"
-                >
-                  Submit Changes
-                </button>
-              </>
-            ) : (
-              <img
-                src={pencil}
-                className="editIconRowRecord"
-                alt="Edit Record"
-                onClick={() => toggleEditMode?.()}
-              />
-            )}
-          </td>
+        ) : (
+          <p>{week.notes}</p>
         )}
-      </tr>
-    )
+      </td>
+      <td>
+        {editMode ? (
+          <SearchableDropdown
+            value={week.lesson?.srLessonId.toString() ?? '0'}
+            valueText={week.lesson?.lessonName ?? ''}
+            onChange={(value) => {
+              const selectedLesson = srLessons?.find(
+                (lesson) => lesson.srLessonId === Number.parseInt(value),
+              );
+              updateActiveDataWeek?.(
+                getUpdatedWeekCommand({ lesson: selectedLesson }),
+              );
+            }}
+            options={lessonOptions}
+          />
+        ) : (
+          week.lesson?.lessonName
+        )}
+      </td>
+      <td className="checkboxCell">
+        {editMode ? (
+          <Switch
+            htmlFor={`holdWeek-${week.weekId}`}
+            value={week.holdWeek}
+            onChange={(value) =>
+              updateActiveDataWeek?.(getUpdatedWeekCommand({ holdWeek: value }))
+            }
+          />
+        ) : (
+          week.holdWeek && (
+            <img className="checkmark" src={checkmark} alt="Checkmark" />
+          )
+        )}
+      </td>
+      <td className="checkboxCell">
+        {editMode ? (
+          <Switch
+            htmlFor={`recordCompleteable-${week.weekId}`}
+            value={week.recordComplete}
+            onChange={(value) => handleRecordCompleteableChange?.(value)}
+          />
+        ) : (
+          week.recordComplete && (
+            <img className="checkmark" src={checkmark} alt="Checkmark" />
+          )
+        )}
+      </td>
+      {allowSingleRecordUpdate && (
+        <td className="editIconCell">
+          {editMode ? (
+            <>
+              <img
+                src={x}
+                alt="Cancel Edit"
+                onClick={cancelEdit}
+                className="cancelEditIcon"
+              />
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="submitEditButton"
+                disabled={submitDisabled}
+              >
+                Submit Changes
+              </button>
+            </>
+          ) : (
+            <img
+              src={pencil}
+              className="editIconRowRecord"
+              alt="Edit Record"
+              onClick={() => toggleEditMode?.()}
+            />
+          )}
+        </td>
+      )}
+    </tr>
   );
-}
-
-interface WeekWithFailedToUpdate extends Week {
-  failedToUpdate?: boolean;
 }
 
 export function WeeksTableItemWithSiingleRecordEdit({
   week,
-  updateActiveDataWeek,
   tableEditMode,
-  failedToUpdate,
   hiddenFields,
-  allowSingleRecordUpdate,
 }: {
-  week: WeekWithFailedToUpdate;
-  updateActiveDataWeek: (week: Week) => void;
+  week: FurnishedWeekWithCoach;
   tableEditMode: boolean;
-  failedToUpdate: boolean | undefined;
   hiddenFields: string[];
-  allowSingleRecordUpdate?: boolean;
 }) {
-  const {
-    studentRecordsLessonsQuery,
-    updateWeekMutation,
-    getPrivateCallsFromWeekRecordId,
-    getGroupSessionsFromWeekRecordId,
-  } = useCoaching();
   const { closeModal, openModal } = useModal();
+  const { data: srLessons } = useSrLessonsQuery();
+  const { updateWeekMutation } = useWeekMutations();
+  const [editMode, setEditMode] = useState(false);
+  const [localWeek, setLocalWeek] = useState<UpdateWeekCommand>(() =>
+    toUpdateWeekCommand(week),
+  );
 
-  const dataReady = studentRecordsLessonsQuery.isSuccess;
+  useEffect(() => {
+    setLocalWeek(toUpdateWeekCommand(week));
+  }, [week]);
 
-  const [editMode, setEditMode] = useState(tableEditMode);
-  const [localWeek, setLocalWeek] = useState<Week>({ ...week });
-
-  // This is the same logic as validateRecordCompleteable in WeeksTableItem
-  function validateRecordCompleteable() {
-    if (week.week === 0) {
+  function validateRecordCompleteable(
+    weekToValidate: UpdateWeekCommand,
+  ): boolean {
+    if (week.weekNumber === 0) {
       return true;
     }
-    if (!localWeek.currentLesson || localWeek.currentLesson === 0) {
+    if (!weekToValidate.lesson?.srLessonId) {
       return false;
     }
-
-    const privateCalls = getPrivateCallsFromWeekRecordId(week.recordId);
-    const groupSessions = getGroupSessionsFromWeekRecordId(week.recordId);
-
     if (
-      privateCalls?.length === 0 &&
-      localWeek.notes === '' &&
-      groupSessions?.length === 0
+      week.privateCalls.length === 0 &&
+      (weekToValidate.notes ?? '').trim() === '' &&
+      week.groupCalls.length === 0
     ) {
       return false;
     }
@@ -299,13 +275,24 @@ export function WeeksTableItemWithSiingleRecordEdit({
     return true;
   }
 
-  function captureCancelEdit() {
-    if (
-      localWeek.notes === week.notes &&
-      localWeek.holdWeek === week.holdWeek &&
-      localWeek.recordsComplete === week.recordsComplete &&
-      localWeek.currentLesson === week.currentLesson
-    ) {
+  function handleRecordCompleteableChange(newValue: boolean): void {
+    const updatedWeek = {
+      ...localWeek,
+      recordComplete: newValue,
+    };
+    if (newValue && !validateRecordCompleteable(updatedWeek)) {
+      openModal({
+        title: 'Error',
+        body: 'Cannot mark record as complete without a current lesson, a private or group call, or a note if no calls were made.',
+        type: 'error',
+      });
+      return;
+    }
+    setLocalWeek(updatedWeek);
+  }
+
+  function captureCancelEdit(): void {
+    if (!hasWeekChanges(week, localWeek)) {
       toast.info('No changes detected');
       setEditMode(false);
       return;
@@ -318,29 +305,20 @@ export function WeeksTableItemWithSiingleRecordEdit({
     });
   }
 
-  function cancelEdit() {
-    setLocalWeek({
-      ...week,
-    });
+  function cancelEdit(): void {
+    setLocalWeek(toUpdateWeekCommand(week));
     closeModal();
     setEditMode(false);
   }
 
-  function handleSubmit() {
-    // on no changes, do nothing
-    if (
-      localWeek.notes === week.notes &&
-      localWeek.holdWeek === week.holdWeek &&
-      localWeek.recordsComplete === week.recordsComplete &&
-      localWeek.currentLesson === week.currentLesson
-    ) {
+  function handleSubmit(): void {
+    if (!hasWeekChanges(week, localWeek)) {
       toast.info('No changes detected');
       setEditMode(false);
       return;
     }
 
-    // Validate record completeable
-    if (localWeek.recordsComplete && !validateRecordCompleteable()) {
+    if (localWeek.recordComplete && !validateRecordCompleteable(localWeek)) {
       openModal({
         title: 'Error',
         body: 'Cannot mark record as complete without a current lesson, a private or group call, or a note if no calls were made.',
@@ -348,72 +326,56 @@ export function WeeksTableItemWithSiingleRecordEdit({
       });
       return;
     }
-    updateWeekMutation.mutate(
-      {
-        notes: localWeek.notes,
-        holdWeek: localWeek.holdWeek,
-        recordsComplete: localWeek.recordsComplete,
-        offTrack: week.offTrack,
-        primaryCoachWhenCreated: week.primaryCoachWhenCreated,
-        recordId: week.recordId,
-        currentLesson: localWeek.currentLesson ?? undefined,
+
+    updateWeekMutation.mutate([localWeek], {
+      onSuccess: () => {
+        toast.success('Week updated!');
+        setEditMode(false);
       },
-      {
-        onSuccess: () => {
-          setEditMode(false);
-        },
+      onError: () => {
+        toast.error('Error updating week');
       },
-    );
+    });
   }
 
-  const handleDataUpdate = (week: Week) => {
-    // Handle updating the data object for the current item
+  function handleDataUpdate(updatedWeek: UpdateWeekCommand): void {
+    setLocalWeek(updatedWeek);
+  }
 
-    // If table edit mode is active, also update the activeData in the parent component
-    if (tableEditMode) {
-      updateActiveDataWeek(week);
-    }
-
-    setLocalWeek(week);
-  };
-
-  // Create a modifiedWeek object that combines dataObject properties with week
-  const modifiedWeek = {
+  const modifiedWeek: FurnishedWeekWithCoach = {
     ...week,
     notes: localWeek.notes,
     holdWeek: localWeek.holdWeek,
-    recordsComplete: localWeek.recordsComplete,
-    currentLesson: localWeek.currentLesson,
-    currentLessonName: localWeek.currentLessonName,
+    recordComplete: localWeek.recordComplete,
+    lesson: localWeek.lesson,
   };
 
-  function toggleEditMode() {
+  function toggleEditMode(): void {
     setEditMode(!editMode);
 
-    // When enabling edit mode, scroll the table wrapper to the far right
     if (!editMode) {
       setTimeout(() => {
         const tableWrapper = document.querySelector('.tableWrapper');
         if (tableWrapper) {
           tableWrapper.scrollLeft = tableWrapper.scrollWidth;
         }
-      }, 50); // Small delay to ensure DOM has updated with the wider content
+      }, 50);
     }
   }
 
   return (
-    dataReady && (
-      <WeeksTableItem
-        week={modifiedWeek}
-        updateActiveDataWeek={handleDataUpdate}
-        editMode={tableEditMode || editMode}
-        failedToUpdate={failedToUpdate}
-        hiddenFields={hiddenFields}
-        allowSingleRecordUpdate={allowSingleRecordUpdate}
-        toggleEditMode={toggleEditMode}
-        cancelEdit={captureCancelEdit}
-        handleSubmit={handleSubmit}
-      />
-    )
+    <WeeksTableItem
+      week={modifiedWeek}
+      updateActiveDataWeek={handleDataUpdate}
+      editMode={tableEditMode || editMode}
+      hiddenFields={hiddenFields}
+      srLessons={srLessons}
+      allowSingleRecordUpdate={!tableEditMode}
+      toggleEditMode={toggleEditMode}
+      cancelEdit={captureCancelEdit}
+      handleSubmit={handleSubmit}
+      handleRecordCompleteableChange={handleRecordCompleteableChange}
+      submitDisabled={updateWeekMutation.isPending}
+    />
   );
 }

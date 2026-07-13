@@ -35,7 +35,7 @@ export default function StudentMemberships({
   selectedMembershipId,
   onMembershipSelect,
 }: StudentMembershipsProps) {
-  const { allSrCoursesQuery } = useAllSrCoursesQuery();
+  const { isLoading: srCoursesLoading } = useAllSrCoursesQuery();
   const { studentMembershipsQuery } = useStudentMembershipsQuery(studentId);
   const { contextual, openContextual } = useContextualMenu();
   // Sort memberships only if we have data
@@ -51,10 +51,10 @@ export default function StudentMemberships({
   return (
     <div className="student-memberships">
       <h3>Memberships</h3>
-      {(!studentMembershipsQuery.isSuccess || !allSrCoursesQuery.isSuccess) && (
+      {(!studentMembershipsQuery.isSuccess || srCoursesLoading) && (
         <InlineLoading />
       )}
-      {studentMembershipsQuery.isSuccess && allSrCoursesQuery.isSuccess && (
+      {studentMembershipsQuery.isSuccess && !srCoursesLoading && (
         <>
           {sortedMemberships.length === 0 ? (
             <p>No memberships found</p>
@@ -200,7 +200,7 @@ function StudentMembershipContextual({
   membership: StudentMembership;
 }) {
   const { closeContextual } = useContextualMenu();
-  const { allSrCoursesQuery } = useAllSrCoursesQuery();
+  const { srCourses } = useAllSrCoursesQuery();
   const { openModal, closeModal } = useModal();
   const [startDate, setStartDate] = useState(membership.startDate as string);
   const [endDate, setEndDate] = useState(membership.endDate as string);
@@ -209,30 +209,26 @@ function StudentMembershipContextual({
     membership.relatedCourse.srCourseId,
   );
   const { isAdmin, authUser } = useAuthAdapter();
-  const { allCoachesQuery } = useAllCoachesQuery();
+  const { coaches } = useAllCoachesQuery();
   const queryClient = useQueryClient();
   const { updateMembershipMutation } = useStudentMemberships(
     membership.relatedStudent.student_id,
   );
   // const [advanced, setAdvanced] = useState(membership.advancedStudent);
   const courseOptions = useMemo(() => {
-    if (!allSrCoursesQuery.data) return [];
-    return allSrCoursesQuery.data.map((course) => course.name);
-  }, [allSrCoursesQuery.data]);
+    if (!srCourses) return [];
+    return srCourses.map((course) => course.name);
+  }, [srCourses]);
 
   const courseIdByName = useMemo(() => {
-    if (!allSrCoursesQuery.data) return new Map();
-    return new Map(
-      allSrCoursesQuery.data.map((course) => [course.name, course.srCourseId]),
-    );
-  }, [allSrCoursesQuery.data]);
+    if (!srCourses) return new Map();
+    return new Map(srCourses.map((course) => [course.name, course.srCourseId]));
+  }, [srCourses]);
 
   const courseNameById = useMemo(() => {
-    if (!allSrCoursesQuery.data) return new Map();
-    return new Map(
-      allSrCoursesQuery.data.map((course) => [course.srCourseId, course.name]),
-    );
-  }, [allSrCoursesQuery.data]);
+    if (!srCourses) return new Map();
+    return new Map(srCourses.map((course) => [course.srCourseId, course.name]));
+  }, [srCourses]);
 
   const cancelEdit = () => {
     setEndDate(membership.endDate as string);
@@ -269,7 +265,7 @@ function StudentMembershipContextual({
     ];
 
     if (authUser?.email) {
-      const currentUserCoach = allCoachesQuery.data?.find((coach) => {
+      const currentUserCoach = coaches?.find((coach) => {
         const emailPrefix = authUser.email.split('@')[0].toLowerCase();
         for (const domain of possibleEmailDomains) {
           if (coach.email.toLowerCase() === emailPrefix + domain) {
@@ -280,7 +276,7 @@ function StudentMembershipContextual({
       });
       if (currentUserCoach) return currentUserCoach;
     }
-  }, [authUser, allCoachesQuery.data]);
+  }, [authUser, coaches]);
 
   const handleCourseChange = (courseName: string) => {
     const newCourseId = courseIdByName.get(courseName);

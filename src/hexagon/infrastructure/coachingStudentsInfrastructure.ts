@@ -35,11 +35,14 @@ export function createCoachingStudentsInfrastructure(
         getAllCoachingStudentsEndpoint.path,
         getAllCoachingStudentsEndpoint.requiredScopes,
       ),
-    getAllSrCourses: () =>
-      httpClient.get<SrCourse[]>(
+    getAllSrCourses: async () => {
+      const response = await httpClient.get<SrCourse[]>(
         getAllSrCoursesEndpoint.path,
         getAllSrCoursesEndpoint.requiredScopes,
-      ),
+      );
+
+      return getAllSrCoursesEndpoint.response.parse(response);
+    },
     getStudentBundleCredits: (srStudentId: number) =>
       httpClient.get<BundleCredit[]>(
         getSrStudentBundleCreditsEndpoint.path.replace(

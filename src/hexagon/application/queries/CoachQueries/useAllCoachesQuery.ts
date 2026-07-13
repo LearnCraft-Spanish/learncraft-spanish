@@ -1,5 +1,4 @@
 import type { Coach } from '@learncraft-spanish/shared';
-import type { UseQueryResult } from '@tanstack/react-query';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useCoachAdapter } from '@application/adapters/coachAdapter';
 import { useQuery } from '@tanstack/react-query';
@@ -7,14 +6,16 @@ import { useQuery } from '@tanstack/react-query';
 export const ALL_COACHES_QUERY_KEY = ['allCoaches'] as const;
 
 export interface UseAllCoachesQueryReturn {
-  allCoachesQuery: UseQueryResult<Coach[]>;
+  coaches: Coach[] | undefined;
+  isLoading: boolean;
+  error: Error | null;
 }
 
 export function useAllCoachesQuery(): UseAllCoachesQueryReturn {
   const adapter = useCoachAdapter();
   const { isCoach, isAdmin } = useAuthAdapter();
 
-  const allCoachesQuery = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ALL_COACHES_QUERY_KEY,
     queryFn: async () => {
       const data = await adapter.getAllCoaches();
@@ -24,5 +25,5 @@ export function useAllCoachesQuery(): UseAllCoachesQueryReturn {
     enabled: isCoach || isAdmin,
   });
 
-  return { allCoachesQuery };
+  return { coaches: data, isLoading, error };
 }

@@ -5,6 +5,8 @@ node_modules/
 **/node_modules/
 /.pnp
 .pnp.js
+.shared-local-mode
+.local-shared-staging
 lockfiles/local/*
 
 # testing
@@ -19,6 +21,7 @@ buld/*
 
 # npm config
 .npmrc.*
+!.npmrc.local
 pnpm-workspace.yaml
 
 # misc

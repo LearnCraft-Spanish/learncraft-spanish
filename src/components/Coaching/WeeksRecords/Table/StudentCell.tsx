@@ -1,4 +1,7 @@
-import type { CoachingStudent, Week } from 'src/types/CoachingTypes';
+import type {
+  FurnishedWeekWithCoach,
+  MinimalCoachingStudent,
+} from '@learncraft-spanish/shared';
 import eye from 'src/assets/icons/eye.svg';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 // import pencil from 'src/resources/icons/pencil.svg';
@@ -8,8 +11,8 @@ export default function StudentCell({
   student,
   hiddenFields,
 }: {
-  week: Week;
-  student: CoachingStudent | null | undefined;
+  week: FurnishedWeekWithCoach;
+  student: MinimalCoachingStudent | null | undefined;
   hiddenFields: string[];
 }) {
   const { openContextual } = useContextualMenu();
@@ -26,7 +29,7 @@ export default function StudentCell({
             src={eye}
             alt="view record"
             className="icon"
-            onClick={() => openContextual(`week${week.recordId}`)}
+            onClick={() => openContextual(`week${week.weekId}`)}
           />
           {/* <img src={pencil} alt="edit record" className="icon" /> */}
         </div>
@@ -34,13 +37,9 @@ export default function StudentCell({
           <h4>{student.fullName}</h4>
           <p>{student.email}</p>
           {!hiddenFields.includes('primaryCoach') && (
-            <p>
-              {student.primaryCoach
-                ? student.primaryCoach.name
-                : 'No Coach Found'}
-            </p>
+            <p>{week.coach ? week.coach.fullName : 'No Coach Found'}</p>
           )}
-          {!hiddenFields.includes('level') && <p>{week.level}</p>}
+          {!hiddenFields.includes('level') && <p>{week.srCourseName}</p>}
         </div>
       </div>
     )

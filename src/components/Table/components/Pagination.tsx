@@ -17,7 +17,16 @@ export default function Pagination({
             Previous
           </button>
         )}
-        {page === 1 && <div className="label disabledButton">Previous</div>}
+        {page === 1 && (
+          <button
+            type="button"
+            onClick={() => {}}
+            disabled
+            className="disabledButton"
+          >
+            Previous
+          </button>
+        )}
         <p>
           Page {page} of {maxPage}
         </p>

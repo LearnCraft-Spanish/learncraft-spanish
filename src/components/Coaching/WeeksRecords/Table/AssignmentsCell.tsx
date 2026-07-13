@@ -1,64 +1,69 @@
-import type { Assignment, Week } from 'src/types/CoachingTypes';
+import type {
+  BaseAssignment,
+  BaseAssignmentRating,
+  BaseAssignmentType,
+  FurnishedWeekWithCoach,
+} from '@learncraft-spanish/shared';
+
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useAssignmentLookupsQuery } from '@application/queries/AssignmentsQueries/useAssignmentLookupsQuery';
 import { Dropdown } from '@interface/components/FormComponents';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
+import { CustomStudentSelector } from 'src/components/Coaching/general/CustomStudentSelector';
 import {
-  CoachDropdown_LEGACY,
-  DeleteRecord,
-  FormControls,
+  CoachDropdown,
   LinkInput,
   TextAreaInput,
-  verifyRequiredInputs,
 } from 'src/components/FormComponents';
-import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
-import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
+import DeleteRecord from 'src/components/FormComponents/DeleteRecord';
+import FormControls from 'src/components/FormComponents/FormControls';
+import verifyRequiredInputs, {
+  isValidUrl,
+} from 'src/components/FormComponents/functions/inputValidation';
+import { useAssignmentsMutations } from 'src/hexagon/application/queries/AssignmentsQueries/useAssignmentMutations';
+import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries/useAllCoachesQuery';
+import { useWeeksByStartDate } from 'src/hexagon/application/queries/useWeeksByStartDate/useWeeksByStartDate';
+
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
-import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
-
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import CustomStudentSelector from '../../general/CustomStudentSelector';
-import getDateRange from '../../general/functions/dateRange';
-import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
-import getWeekEnds from '../../general/functions/getWeekEnds';
-
-const assignmentTypes = [
-  'Pronunciation',
-  'Writing',
-  'placement test',
-  'journal',
-  'verbal tenses review',
-  'audio quiz',
-  'Student Testimonial',
-  '_other',
-];
-const ratings = [
-  'Excellent',
-  'Very Good',
-  'Good',
-  'Fair',
-  'Bad',
-  'Poor',
-  'Assigned to M3',
-  'No sound',
-  'Assigned to Level 2 (L6-9)',
-  'Assigned to Level 3 (L10-12)',
-  'Assigned to Level 1 (lessons 1-6)',
-  'Advanced group',
-  'Assigned to Level 1 (L1-L5)',
-  'Assigned to 1MC',
-  'Assigned to Level 4',
-  'New LCS course',
-  'Advanced',
-];
+//   'Pronunciation',
+//   'Writing',
+//   'placement test',
+//   'journal',
+//   'verbal tenses review',
+//   'audio quiz',
+//   'Student Testimonial',
+//   '_other',
+// ];
+// const ratings = [
+//   'Excellent',
+//   'Very Good',
+//   'Good',
+//   'Fair',
+//   'Bad',
+//   'Poor',
+//   'Assigned to M3',
+//   'No sound',
+//   'Assigned to Level 2 (L6-9)',
+//   'Assigned to Level 3 (L10-12)',
+//   'Assigned to Level 1 (lessons 1-6)',
+//   'Advanced group',
+//   'Assigned to Level 1 (L1-L5)',
+//   'Assigned to 1MC',
+//   'Assigned to Level 4',
+//   'New LCS course',
+//   'Advanced',
+// ];
 
 export function AssignmentCell({
+  week,
   assignment,
   tableEditMode,
 }: {
-  assignment: Assignment;
+  week: FurnishedWeekWithCoach;
+  assignment: BaseAssignment;
   tableEditMode: boolean;
 }) {
   const { openContextual, contextual } = useContextualMenu();
@@ -67,45 +72,58 @@ export function AssignmentCell({
     <div className="cellWithContextual">
       <button
         type="button"
-        onClick={() => openContextual(`assignment${assignment.recordId}`)}
+        onClick={() => openContextual(`assignment${assignment.assignmentId}`)}
       >
-        {`${assignment.assignmentType}: ${assignment.rating}`}
+        {`${assignment.assignmentType.assignmentType}: ${assignment.assignmentRating.assignmentRating}`}
       </button>
-      {contextual === `assignment${assignment.recordId}` && (
-        <AssignmentView assignment={assignment} tableEditMode={tableEditMode} />
+      {contextual === `assignment${assignment.assignmentId}` && (
+        <AssignmentView
+          week={week}
+          assignment={assignment}
+          tableEditMode={tableEditMode}
+        />
       )}
     </div>
   );
 }
 
 export function AssignmentView({
+  week,
   assignment,
   tableEditMode,
   onSuccess,
 }: {
-  assignment: Assignment;
-  tableEditMode?: boolean;
+  week: FurnishedWeekWithCoach;
+  assignment: BaseAssignment;
+  tableEditMode: boolean;
   onSuccess?: () => void;
 }) {
-  const {
-    getStudentFromMembershipId,
-    getMembershipFromWeekRecordId,
-    coachListQuery,
-    updateAssignmentMutation,
-    deleteAssignmentMutation,
-  } = useCoaching();
+  const { coaches } = useAllCoachesQuery();
+  // const {
+  //   getStudentFromMembershipId,
+  //   coachListQuery,
+  //   // updateAssignmentMutation,
+  //   // deleteAssignmentMutation,
+  // } = useCoaching();
+  const { updateAssignmentMutation, deleteAssignmentMutation } =
+    useAssignmentsMutations();
+
+  const { assignmentTypes, assignmentRatings } = useAssignmentLookupsQuery();
+
   const { closeContextual, updateDisableClickOutside } = useContextualMenu();
   const { closeModal, openModal } = useModal();
 
   const [editMode, setEditMode] = useState(false);
 
   const [homeworkCorrector, setHomeworkCorrector] = useState(
-    assignment.homeworkCorrector.email,
+    assignment.homeworkCorrector,
   );
   const [assignmentType, setAssignmentType] = useState(
     assignment.assignmentType,
   );
-  const [rating, setRating] = useState(assignment.rating);
+  const [assignmentRating, setAssignmentRating] = useState(
+    assignment.assignmentRating,
+  );
   const [notes, setNotes] = useState(assignment.notes);
   const [areasOfDifficulty, setAreasOfDifficulty] = useState(
     assignment.areasOfDifficulty,
@@ -114,15 +132,13 @@ export function AssignmentView({
     assignment.assignmentLink,
   );
 
-  function updateHomeworkCorrector(email: string) {
-    const corrector = coachListQuery.data?.find(
-      (coach) => coach.user.email === email,
-    );
+  function updateHomeworkCorrector(coachId: number) {
+    const corrector = coaches?.find((coach) => coach.coach_id === coachId);
     if (!corrector) {
-      console.error('No coach found with email:', email);
+      console.error('No coach found with id:', coachId);
       return;
     }
-    setHomeworkCorrector(corrector.user.email);
+    setHomeworkCorrector(corrector);
   }
 
   function enableEditMode() {
@@ -146,32 +162,36 @@ export function AssignmentView({
     disableEditMode();
 
     // reset states to assignment values
-    setHomeworkCorrector(assignment.homeworkCorrector.email);
+    setHomeworkCorrector(assignment.homeworkCorrector);
     setAssignmentType(assignment.assignmentType);
-    setRating(assignment.rating);
+    setAssignmentRating(assignment.assignmentRating);
     setNotes(assignment.notes);
     setAreasOfDifficulty(assignment.areasOfDifficulty);
     setAssignmentLink(assignment.assignmentLink);
   }
+
   function deleteRecordFunction() {
-    deleteAssignmentMutation.mutate(assignment.recordId, {
-      onSuccess: () => {
-        closeModal();
-        cancelEdit();
-        closeContextual();
-        onSuccess?.();
+    deleteAssignmentMutation.mutate(
+      { assignmentId: assignment.assignmentId },
+      {
+        onSuccess: () => {
+          closeModal();
+          cancelEdit();
+          closeContextual();
+          onSuccess?.();
+        },
       },
-    });
+    );
   }
 
   function submitEdit() {
     updateAssignmentMutation.mutate(
       {
-        relatedWeek: assignment.relatedWeek,
-        recordId: assignment.recordId,
-        homeworkCorrector,
+        weekId: assignment.weekId,
+        assignmentId: assignment.assignmentId,
+        homeworkCorrector: homeworkCorrector.coach_id,
         assignmentType,
-        rating,
+        assignmentRating,
         notes,
         areasOfDifficulty,
         assignmentLink,
@@ -189,9 +209,11 @@ export function AssignmentView({
     // check if any fields have changed from the original assignment
     // if not, do nothing
     if (
-      homeworkCorrector === assignment.homeworkCorrector.email &&
-      assignmentType === assignment.assignmentType &&
-      rating === assignment.rating &&
+      homeworkCorrector.coach_id === assignment.homeworkCorrector.coach_id &&
+      assignmentType.assignmentType ===
+        assignment.assignmentType.assignmentType &&
+      assignmentRating.assignmentRating ===
+        assignment.assignmentRating.assignmentRating &&
       notes === assignment.notes &&
       areasOfDifficulty === assignment.areasOfDifficulty &&
       assignmentLink === assignment.assignmentLink
@@ -201,9 +223,12 @@ export function AssignmentView({
     }
     //Check for all required fields
     const badInput = verifyRequiredInputs([
-      { label: 'Assignment Type', value: assignmentType },
-      { label: 'Homework Corrector', value: homeworkCorrector },
-      { label: 'Rating', value: rating },
+      { label: 'Assignment Type', value: assignmentType?.assignmentType || '' },
+      {
+        label: 'Homework Corrector',
+        value: homeworkCorrector?.coach_id.toString() || '',
+      },
+      { label: 'Rating', value: assignmentRating?.assignmentRating || '' },
     ]);
     if (badInput) {
       openModal({
@@ -225,36 +250,39 @@ export function AssignmentView({
   }
   return (
     <ContextualView
-      key={`assignment${assignment.recordId}`}
+      key={`assignment${assignment.assignmentId}`}
       editFunction={tableEditMode ? undefined : toggleEditMode}
     >
       {editMode ? (
         <h4>Edit Assignment</h4>
       ) : (
         <h4>
-          {assignmentType} by{' '}
-          {
-            // Foreign Key lookup, form data in backend
-            getStudentFromMembershipId(
-              getMembershipFromWeekRecordId(assignment.relatedWeek)?.recordId,
-            )?.fullName
-          }
+          {assignmentType.assignmentType} by {week.student?.fullName}
         </h4>
       )}
 
       <Dropdown
         label="Assignment Type"
         editMode={editMode}
-        value={assignmentType}
-        onChange={setAssignmentType}
-        options={assignmentTypes}
+        value={assignmentType.assignmentType}
+        onChange={(value) => {
+          const assignmentType = assignmentTypes?.find(
+            (type) => type.assignmentType === value,
+          );
+          if (!assignmentType) {
+            console.error('No assignment type found with value:', value);
+            return;
+          }
+          setAssignmentType(assignmentType);
+        }}
+        options={assignmentTypes?.map((type) => type.assignmentType) || []}
         required
       />
 
-      <CoachDropdown_LEGACY
+      <CoachDropdown
         label="Corrected by"
         editMode={editMode}
-        coachEmail={homeworkCorrector}
+        coachId={homeworkCorrector.coach_id}
         onChange={updateHomeworkCorrector}
         required
       />
@@ -262,29 +290,40 @@ export function AssignmentView({
       <Dropdown
         label="Rating"
         editMode={editMode}
-        value={rating}
-        onChange={setRating}
-        options={ratings}
+        value={assignmentRating.assignmentRating}
+        onChange={(value) => {
+          const assignmentRating = assignmentRatings?.find(
+            (rating) => rating.assignmentRating === value,
+          );
+          if (!assignmentRating) {
+            console.error('No assignment rating found with value:', value);
+            return;
+          }
+          setAssignmentRating(assignmentRating);
+        }}
+        options={
+          assignmentRatings?.map((rating) => rating.assignmentRating) || []
+        }
         required
       />
 
       <TextAreaInput
         label="Notes"
         editMode={editMode}
-        value={notes}
+        value={notes || ''}
         onChange={setNotes}
       />
 
       <TextAreaInput
         label="Areas of Difficulty"
         editMode={editMode}
-        value={areasOfDifficulty}
+        value={areasOfDifficulty || ''}
         onChange={setAreasOfDifficulty}
       />
 
       <LinkInput
         label="Assignment Link"
-        value={assignmentLink}
+        value={assignmentLink || ''}
         onChange={setAssignmentLink}
         editMode={editMode}
       />
@@ -300,11 +339,31 @@ export function AssignmentView({
   );
 }
 
+function subtractWeeks(dateStr: string, weeks: number): string {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const date = new Date(year, month - 1, day - weeks * 7);
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-');
+}
+
+function toReadableMonthDay(dateStr: string): string {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
 export default function AssignmentsCell({
+  week,
   assignments,
   tableEditMode,
 }: {
-  assignments: Assignment[] | null | undefined;
+  week: FurnishedWeekWithCoach;
+  assignments: BaseAssignment[] | null | undefined;
   tableEditMode: boolean;
 }) {
   return (
@@ -312,9 +371,10 @@ export default function AssignmentsCell({
       {!!assignments &&
         assignments.map((assignment) => (
           <AssignmentCell
+            week={week}
             assignment={assignment}
             tableEditMode={tableEditMode}
-            key={`assignment${assignment.recordId}`}
+            key={`assignment${assignment.assignmentId}`}
           />
         ))}
     </div>
@@ -329,64 +389,68 @@ export function NewAssignmentView({
   onSuccess?: () => void;
 }) {
   const { closeContextual } = useContextualMenu();
-  const { createAssignmentMutation } = useCoaching();
+  const { assignmentTypes, assignmentRatings } = useAssignmentLookupsQuery();
+  // const { createAssignmentMutation } = useCoaching();
   const { authUser } = useAuthAdapter();
-  const { getStudentFromMembershipId } = useCoaching();
+  // const { getStudentFromMembershipId } = useCoaching();
   const { openModal } = useModal();
   const [weekStarts, setWeekStarts] = useState(weekStartsDefaultValue);
   const [numWeeks, setNumWeeks] = useState(4);
-  const weekEnds = useMemo(() => getWeekEnds(weekStarts), [weekStarts]);
-  const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
-  const { weeksQuery } = useWeeks(weekStarts, weekEnds);
-  const { coachListQuery } = useCoaching();
+  const { weeks } = useWeeksByStartDate(weekStarts);
+  const { coaches } = useAllCoachesQuery();
 
   const [editMode, setEditMode] = useState(true);
+  const { createAssignmentMutation } = useAssignmentsMutations();
 
   const handleLoadMore = () => {
     setNumWeeks((prev) => prev * 2);
   };
 
+  const dateRangeList = Array.from({ length: numWeeks }, (_, i) =>
+    subtractWeeks(weekStartsDefaultValue, i),
+  );
+
   interface StudentObj {
     studentFullname: string;
-    relatedWeek: Week;
+    relatedWeek: FurnishedWeekWithCoach;
   }
   const [student, setStudent] = useState<StudentObj>();
-  const defaultHomeworkCorrector = useMemo(() => {
-    return (
-      getLoggedInCoach(authUser.email || '', coachListQuery.data || [])?.user
-        .email || ''
-    );
-  }, [authUser.email, coachListQuery.data]);
+  const defaultHomeworkCorrector = coaches?.find(
+    (coach) => coach.email === authUser.email,
+  );
 
   const [homeworkCorrector, setHomeworkCorrector] = useState(
     defaultHomeworkCorrector,
   );
-  const [assignmentType, setAssignmentType] = useState('');
-  const [rating, setRating] = useState('');
-  const [notes, setNotes] = useState('');
-  const [areasOfDifficulty, setAreasOfDifficulty] = useState('');
-  const [assignmentLink, setAssignmentLink] = useState('');
+  const [assignmentType, setAssignmentType] = useState<
+    BaseAssignmentType | undefined
+  >(undefined);
+  const [assignmentRating, setAssignmentRating] = useState<
+    BaseAssignmentRating | undefined
+  >(undefined);
+  const [notes, setNotes] = useState<string | null>(null);
+  const [areasOfDifficulty, setAreasOfDifficulty] = useState<string | null>(
+    null,
+  );
+  const [assignmentLink, setAssignmentLink] = useState<string | null>(null);
 
-  const updateHomeworkCorrector = (email: string) => {
-    setHomeworkCorrector(email);
+  const updateHomeworkCorrector = (coach_id: number) => {
+    setHomeworkCorrector(coaches?.find((coach) => coach.coach_id === coach_id));
   };
   const updateStudent = (relatedWeekId: number) => {
-    if (!weeksQuery.data) {
+    if (!weeks.length) {
       console.error('No weeks found');
       return;
     }
-    const studentWeek = weeksQuery.data.find(
-      (week: Week) => week.recordId === relatedWeekId,
+    const studentWeek = weeks.find(
+      (week: FurnishedWeekWithCoach) => week.weekId === relatedWeekId,
     );
     if (!studentWeek) {
       console.error('No student found with recordId:', relatedWeekId);
       return;
     }
     setStudent({
-      studentFullname:
-        // Foreign Key lookup, form data in backend
-        getStudentFromMembershipId(studentWeek.relatedMembership)?.fullName ||
-        '',
+      studentFullname: studentWeek.student?.fullName || '',
       relatedWeek: studentWeek,
     });
   };
@@ -410,12 +474,20 @@ export function NewAssignmentView({
       return;
     }
     setEditMode(false);
+    if (!assignmentType || !assignmentRating) {
+      openModal({
+        title: 'Error',
+        body: 'Assignment Type and Rating are required',
+        type: 'error',
+      });
+      return;
+    }
     createAssignmentMutation.mutate(
       {
-        relatedWeek: student.relatedWeek.recordId,
-        homeworkCorrector,
+        weekId: student.relatedWeek.weekId,
+        homeworkCorrector: homeworkCorrector?.coach_id || 0,
         assignmentType,
-        rating,
+        assignmentRating,
         notes,
         areasOfDifficulty,
         assignmentLink,
@@ -428,10 +500,29 @@ export function NewAssignmentView({
     );
   }
   function captureSubmitForm() {
+    if (!homeworkCorrector) {
+      openModal({
+        title: 'Error',
+        body: 'Homework Corrector is required',
+        type: 'error',
+      });
+      return;
+    }
+    if (!student) {
+      openModal({
+        title: 'Error',
+        body: 'Student is required',
+        type: 'error',
+      });
+      return;
+    }
     const badInput = verifyRequiredInputs([
-      { label: 'Assignment Type', value: assignmentType },
-      { label: 'Homework Corrector', value: homeworkCorrector },
-      { label: 'Rating', value: rating },
+      { label: 'Assignment Type', value: assignmentType?.assignmentType || '' },
+      {
+        label: 'Homework Corrector',
+        value: homeworkCorrector?.coach_id.toString() || '',
+      },
+      { label: 'Rating', value: assignmentRating?.assignmentRating || '' },
     ]);
     if (badInput) {
       openModal({
@@ -466,7 +557,7 @@ export function NewAssignmentView({
         <h4>Create Assignment</h4>
       ) : (
         <h4>
-          {assignmentType} by {student?.studentFullname}
+          {assignmentType?.assignmentType} by {student?.studentFullname}
         </h4>
       )}
       {editMode && (
@@ -475,7 +566,8 @@ export function NewAssignmentView({
             Assignment Name:
           </label>
           <div className="content" id="assignmentName">
-            {student && `${student.relatedWeek.weekName} - ${assignmentType}`}
+            {student &&
+              `${student.relatedWeek.weekStarts} - ${assignmentType?.assignmentType}`}
           </div>
         </div>
       )}
@@ -485,7 +577,7 @@ export function NewAssignmentView({
             Primary Coach:
           </label>
           <div className="content" id="primaryCoach">
-            {student && `${student.relatedWeek.primaryCoachWhenCreated}`}
+            {student && `${student.relatedWeek.coach?.fullName}`}
           </div>
         </div>
       )}
@@ -500,16 +592,7 @@ export function NewAssignmentView({
             value={weekStarts}
             onChange={(e) => updateWeekStarts(e.target.value)}
           >
-            {Array.from({ length: numWeeks }, (_, i) => {
-              const dateKey =
-                i === 0
-                  ? 'thisWeekDate'
-                  : i === 1
-                    ? 'lastSundayDate'
-                    : i === 2
-                      ? 'twoSundaysAgoDate'
-                      : `${i + 1}SundaysAgoDate`;
-              const date = dateRange[dateKey];
+            {dateRangeList.map((date, i) => {
               const label =
                 i === 0
                   ? 'This Week'
@@ -535,35 +618,7 @@ export function NewAssignmentView({
           <label className="label" htmlFor="student">
             Student:
           </label>
-          {/* <select
-            id="student"
-            className="content"
-            value={student?.relatedWeek.recordId || ''}
-            onChange={(e) => updateStudent(e.target.value)}
-          >
-            <option value="">Select</option>
-            {weeksQuery.data
-              ?.filter((filterWeek) => {
-                return filterWeek.weekStarts === weekStarts;
-              })
-              .map((studentWeek) => ({
-                ...studentWeek,
-                studentFullName: getStudentFromMembershipId(
-                  studentWeek.relatedMembership,
-                )?.fullName,
-              }))
-              .sort(
-                (a, b) =>
-                  a.studentFullName?.localeCompare(b.studentFullName || '') ||
-                  0,
-              )
-              .map((studentWeek) => (
-                <option key={studentWeek.recordId} value={studentWeek.recordId}>
-                  {studentWeek.studentFullName || 'No Name Found'}
-                  {` -- ${studentWeek.weekStarts}`}
-                </option>
-              ))}
-          </select> */}
+
           {student ? (
             <>
               <div className="content">{student.studentFullname}</div>
@@ -586,45 +641,65 @@ export function NewAssignmentView({
 
       <Dropdown
         label="Assignment Type"
-        value={assignmentType}
-        onChange={setAssignmentType}
-        options={assignmentTypes}
+        value={assignmentType?.assignmentType || ''}
+        onChange={(value) => {
+          const assignmentType = assignmentTypes?.find(
+            (type) => type.assignmentType === value,
+          );
+          if (!assignmentType) {
+            console.error('No assignment type found with value:', value);
+            return;
+          }
+          setAssignmentType(assignmentType);
+        }}
+        options={assignmentTypes?.map((type) => type.assignmentType) || []}
         editMode={editMode}
         required
       />
 
-      <CoachDropdown_LEGACY
+      <CoachDropdown
         label="Corrected by"
         editMode={editMode}
-        coachEmail={homeworkCorrector}
+        coachId={homeworkCorrector?.coach_id || 0}
         onChange={updateHomeworkCorrector}
         required
       />
 
       <Dropdown
         label="Rating"
-        value={rating}
-        onChange={setRating}
-        options={ratings}
+        value={assignmentRating?.assignmentRating || ''}
+        onChange={(value) => {
+          const assignmentRating = assignmentRatings?.find(
+            (rating) => rating.assignmentRating === value,
+          );
+          if (!assignmentRating) {
+            console.error('No assignment rating found with value:', value);
+            return;
+          }
+          setAssignmentRating(assignmentRating);
+        }}
+        options={
+          assignmentRatings?.map((rating) => rating.assignmentRating) || []
+        }
         editMode={editMode}
         required
       />
       <LinkInput
         label="Assignment Link"
-        value={assignmentLink}
+        value={assignmentLink || ''}
         onChange={setAssignmentLink}
         editMode={editMode}
       />
       <TextAreaInput
         label="Areas of Difficulty"
         editMode={editMode}
-        value={areasOfDifficulty}
+        value={areasOfDifficulty || ''}
         onChange={setAreasOfDifficulty}
       />
       <TextAreaInput
         label="Notes"
         editMode={editMode}
-        value={notes}
+        value={notes || ''}
         onChange={setNotes}
       />
       <FormControls
