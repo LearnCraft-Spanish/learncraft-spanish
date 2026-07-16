@@ -26,6 +26,14 @@ Sentry.init({
     }),
   ],
   tracesSampleRate: 1.0,
+  // Stale cached clients after deploy request hashed chunks that no longer exist.
+  // Handled by the vite:preloadError reload in index.tsx — not actionable noise.
+  ignoreErrors: [
+    /Failed to fetch dynamically imported module/,
+    /Importing a module script failed/,
+    /error loading dynamically imported module/,
+    /'text\/html' is not a valid JavaScript MIME type/,
+  ],
   denyUrls: [
     // Add URLs that shouldn't trigger Sentry
     /localhost/,
