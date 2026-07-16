@@ -1,8 +1,8 @@
 // canidate for refactor & move to hexagon
 
+import { usePMFData } from '@application/useCases/usePMFData';
 import React from 'react';
 import closeIcon from 'src/assets/icons/x_dark.svg';
-import { usePMFData } from 'src/hooks/UserData/usePMFData';
 import './PMFPopup.css';
 
 interface PMFPopupProps {

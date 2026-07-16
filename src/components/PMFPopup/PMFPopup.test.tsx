@@ -1,3 +1,4 @@
+import { overrideMockUsePMFData } from '@application/useCases/usePMFData.mock';
 import { render, screen, waitFor } from '@testing-library/react';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
@@ -6,14 +7,18 @@ import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAd
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import PMFPopup from './PMFPopup';
 
-vi.mock('src/hooks/UserData/usePMFData', () => ({
-  usePMFData: vi.fn(() => ({
-    canShowPMF: true,
-    createOrUpdatePMFData: vi.fn(),
-  })),
-}));
+vi.mock('@application/useCases/usePMFData', async () => {
+  const mockModule = await import('@application/useCases/usePMFData.mock');
+  return {
+    usePMFData: mockModule.mockUsePMFData,
+  };
+});
+
 describe('component PMFPopup', () => {
   beforeEach(() => {
+    overrideMockUsePMFData({
+      canShowPMF: true,
+    });
     overrideMockAuthAdapter({
       authUser: getAuthUserFromEmail('student-ser-estar@fake.not')!,
       isAuthenticated: true,
