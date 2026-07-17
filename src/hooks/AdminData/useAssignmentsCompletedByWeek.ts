@@ -1,24 +1,10 @@
-import type { AssignmentsCompletedByWeekData } from 'src/components/AdminDashboard/AssignmentsCompletedByWeek/types';
-import { useQuery } from '@tanstack/react-query';
-import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
-// import { useBackendHelpers } from '../useBackend';
+import { useAssignmentsCompletedByWeekReportQuery } from '@application/queries/AdminReportQueries/useAssignmentsCompletedByWeekReportQuery';
 
 export default function useAssignmentsCompletedByWeek() {
-  // const { getFactory } = useBackendHelpers();
+  const { assignmentsCompletedByWeekReportQuery } =
+    useAssignmentsCompletedByWeekReportQuery();
 
-  const getAssignmentsCompletedByWeek = (): Promise<
-    AssignmentsCompletedByWeekData[]
-  > => {
-    throw new Error('This feature is not available at this time.');
-    // return getFactory<AssignmentsCompletedByWeekData[]>('admin/report/assignments-completed-by-week');
+  return {
+    assignmentsCompletedByWeekQuery: assignmentsCompletedByWeekReportQuery,
   };
-
-  const assignmentsCompletedByWeekQuery = useQuery({
-    queryKey: ['assignments-completed-by-week'],
-    queryFn: getAssignmentsCompletedByWeek,
-    // staleTime: Infinity,
-    ...deprecatedAdminReportQueryOptions,
-  });
-
-  return { assignmentsCompletedByWeekQuery };
 }

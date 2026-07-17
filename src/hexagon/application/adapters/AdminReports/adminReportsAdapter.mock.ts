@@ -6,6 +6,7 @@ const defaultMockAdminReportsAdapter: AdminReportsPort = {
   getMembershipsByCoachTwoWeeksOutReport: async () => [],
   getMembershipsBySalariedCoachCurrentReport: async () => [],
   getMembershipsBySalariedCoachTwoWeeksOutReport: async () => [],
+  getAssignmentsCompletedByWeekReport: async () => [],
 };
 
 export const {

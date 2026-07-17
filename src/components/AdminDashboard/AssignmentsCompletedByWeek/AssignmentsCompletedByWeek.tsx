@@ -1,25 +1,23 @@
-import DeprecatedSectionHeader from '../DeprecatedSectionHeader';
-
-/* Deprecated — re-enable when admin reports are migrated to hexagon.
-import type { AssignmentsCompletedByWeekData } from './types';
+import type { AssignmentsCompletedByWeek as AssignmentsCompletedByWeekRow } from '@learncraft-spanish/shared';
 import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useAssignmentsCompletedByWeek from 'src/hooks/AdminData/useAssignmentsCompletedByWeek';
 
-function renderRow(row: AssignmentsCompletedByWeekData) {
+function renderRow(row: AssignmentsCompletedByWeekRow) {
   return (
-    <tr key={row.level}>
-      <td>{row.level}</td>
-      <td>{row.assignmentsCompletedAvg}</td>
+    <tr key={row.courseName}>
+      <td>{row.courseName}</td>
+      <td>{row.assignmentsCompleted}</td>
     </tr>
   );
 }
+
 export default function AssignmentsCompletedByWeek() {
   const { assignmentsCompletedByWeekQuery } = useAssignmentsCompletedByWeek();
 
   const [isOpen, setIsOpen] = useState(false);
-  const headers = ['Level', 'Assignments Completed (avg)'];
+  const headers = ['Course Name', 'Assignments Completed'];
 
   return (
     <div>
@@ -37,9 +35,4 @@ export default function AssignmentsCompletedByWeek() {
       )}
     </div>
   );
-}
-*/
-
-export default function AssignmentsCompletedByWeek() {
-  return <DeprecatedSectionHeader title="Assignments Completed By Week" />;
 }
