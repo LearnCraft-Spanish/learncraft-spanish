@@ -1,8 +1,12 @@
 import type { AdminReportsPort } from '@application/ports/AdminReports/adminReportsPort';
 import type { AuthPort } from '@application/ports/authPort';
-import type { MembershipsByCoach } from '@learncraft-spanish/shared';
+import type {
+  AssignmentsCompletedByWeek,
+  MembershipsByCoach,
+} from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
+  getAssignmentsCompletedByWeekReportEndpoint,
   getMembershipsByCoachCurrentReportEndpoint,
   getMembershipsByCoachTwoWeeksOutReportEndpoint,
   getMembershipsBySalariedCoachCurrentReportEndpoint,
@@ -34,6 +38,16 @@ export function createAdminReportsInfrastructure(
       httpClient.get<MembershipsByCoach[]>(
         getMembershipsBySalariedCoachTwoWeeksOutReportEndpoint.path,
         getMembershipsBySalariedCoachTwoWeeksOutReportEndpoint.requiredScopes,
+      ),
+    getAssignmentsCompletedByWeekReport: (weekStarts: string) =>
+      httpClient.get<AssignmentsCompletedByWeek[]>(
+        getAssignmentsCompletedByWeekReportEndpoint.path,
+        getAssignmentsCompletedByWeekReportEndpoint.requiredScopes,
+        {
+          params: {
+            startDate: weekStarts,
+          },
+        },
       ),
   };
 }
