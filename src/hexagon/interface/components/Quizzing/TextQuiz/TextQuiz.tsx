@@ -4,6 +4,7 @@ import type { SrsDifficulty } from '@domain/srs';
 import type { AudioControlHandle } from '@interface/components/general/AudioControl/AudioControl';
 import { MenuButton } from '@interface/components/general/Buttons';
 import Loading from '@interface/components/Loading/Loading';
+import PMFPopup from '@interface/components/PMFPopup';
 import {
   FlashcardDisplay,
   QuizButtons,
@@ -13,7 +14,6 @@ import { SRSButtons } from '@interface/components/Quizzing/general/SRSButtons';
 import TextQuizEnd from '@interface/components/Quizzing/general/TextQuizEnd';
 import NoDueFlashcards from '@interface/components/Quizzing/TextQuiz/NoDueFlashcards';
 import React, { useCallback, useEffect, useRef } from 'react';
-import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 
 export interface TextQuizComponentProps {
   quizTitle?: string;
