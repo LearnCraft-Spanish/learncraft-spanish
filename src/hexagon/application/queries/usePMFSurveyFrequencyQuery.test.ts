@@ -1,15 +1,13 @@
 import { overrideMockPMFSurveyFrequencyAdapter } from '@application/adapters/pmfSurveyFrequencyAdapter.mock';
+import { usePMFSurveyFrequencyQuery } from '@application/queries/usePMFSurveyFrequencyQuery';
 import { renderHook, waitFor } from '@testing-library/react';
+import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
+import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
 import {
   getAppUserFromEmail,
   getAuthUserFromEmail,
 } from 'mocks/data/serverlike/userTable';
-
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
-
 import { beforeEach, describe, expect, it } from 'vitest';
-import { usePMFData } from './usePMFData';
 
 const NINETY_DAYS_MS = 7776000000;
 
@@ -40,11 +38,11 @@ const sharedCreateUpdateMocks = {
 };
 
 /*
-The PMF adapter is mocked globally (see tests/setupTests.ts). Each scenario
-below overrides getPMFSurveyFrequency to match the former MSW behavior for
-that test user’s recordId.
+The PMF adapter is mocked globally (see hexagon/testing/setupTests.ts). Each
+scenario below overrides getPMFSurveyFrequency to match the former MSW
+behavior for that test user’s recordId.
 */
-describe('usePMFData', () => {
+describe('usePMFSurveyFrequencyQuery', () => {
   describe('when student-lcsp is logged in', () => {
     const lcsp = getAppUserFromEmail('student-lcsp@fake.not')!;
 
@@ -75,18 +73,20 @@ describe('usePMFData', () => {
         ...sharedCreateUpdateMocks,
       });
     });
+
     it('data is successfully fetched', async () => {
-      const { result } = renderHook(() => usePMFData(), {
-        wrapper: MockAllProviders,
+      const { result } = renderHook(() => usePMFSurveyFrequencyQuery(), {
+        wrapper: TestQueryClientProvider,
       });
       await waitFor(() =>
         expect(result.current.pmfDataQuery.isSuccess).toBe(true),
       );
       expect(result.current.pmfDataQuery.data?.lastContactDate).toBeDefined();
     });
+
     it('createOrUpdatePMFData works', async () => {
-      const { result } = renderHook(() => usePMFData(), {
-        wrapper: MockAllProviders,
+      const { result } = renderHook(() => usePMFSurveyFrequencyQuery(), {
+        wrapper: TestQueryClientProvider,
       });
       await waitFor(() =>
         expect(result.current.pmfDataQuery.isSuccess).toBe(true),
@@ -98,6 +98,7 @@ describe('usePMFData', () => {
       expect(result.current.pmfDataQuery.data).toBeDefined();
     });
   });
+
   describe('when student-ser-estar is logged in', () => {
     const serEstar = getAppUserFromEmail('student-ser-estar@fake.not')!;
 
@@ -130,9 +131,10 @@ describe('usePMFData', () => {
         ...sharedCreateUpdateMocks,
       });
     });
+
     it('data is successfully fetched', async () => {
-      const { result } = renderHook(() => usePMFData(), {
-        wrapper: MockAllProviders,
+      const { result } = renderHook(() => usePMFSurveyFrequencyQuery(), {
+        wrapper: TestQueryClientProvider,
       });
       await waitFor(() =>
         expect(result.current.pmfDataQuery.isSuccess).toBe(true),
@@ -140,6 +142,7 @@ describe('usePMFData', () => {
       expect(result.current.pmfDataQuery.data?.lastContactDate).toBeDefined();
     });
   });
+
   describe('when any other student is logged in', () => {
     beforeEach(() => {
       overrideAuthAndAppUser(
@@ -160,9 +163,10 @@ describe('usePMFData', () => {
         ...sharedCreateUpdateMocks,
       });
     });
+
     it('data is successfully fetched', async () => {
-      const { result } = renderHook(() => usePMFData(), {
-        wrapper: MockAllProviders,
+      const { result } = renderHook(() => usePMFSurveyFrequencyQuery(), {
+        wrapper: TestQueryClientProvider,
       });
       await waitFor(() =>
         expect(result.current.pmfDataQuery.isSuccess).toBe(true),
@@ -171,8 +175,8 @@ describe('usePMFData', () => {
     });
 
     it('createOrUpdatePMFData works', async () => {
-      const { result } = renderHook(() => usePMFData(), {
-        wrapper: MockAllProviders,
+      const { result } = renderHook(() => usePMFSurveyFrequencyQuery(), {
+        wrapper: TestQueryClientProvider,
       });
       await waitFor(() =>
         expect(result.current.pmfDataQuery.isSuccess).toBe(true),

@@ -64,40 +64,11 @@ export function useAuthInfrastructure(): AuthPort {
     },
 
     login: () => {
-      function generateRandomString(length: number) {
-        const charset =
-          '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz+/';
-        let result = '';
-
-        while (length > 0) {
-          const bytes = new Uint8Array(16);
-          const random = window.crypto.getRandomValues(bytes);
-
-          random.forEach((c) => {
-            if (length ? length === 0 : false) {
-              return;
-            }
-            if (c < charset.length) {
-              result += charset[c];
-              length--;
-            }
-          });
-        }
-        return result;
-      }
-
-      const randomString = generateRandomString(13);
-      const currentLocation = window.location.pathname;
-      const expiresAt = Date.now() + 300000;
-
-      const jsonToStore = JSON.stringify({
-        navigateToUrl: currentLocation,
-        expiresAt,
-      });
-      localStorage.setItem(randomString, jsonToStore);
-
+      // Auth0 persists appState through the redirect; Providers.onRedirectCallback
+      // navigates to targetUrl. Do not use localStorage — it throws SecurityError
+      // when storage is blocked (e.g. Safari private browsing) and is unused.
       loginWithRedirect({
-        appState: { targetUrl: currentLocation, state: randomString },
+        appState: { targetUrl: window.location.pathname },
       });
     },
 
