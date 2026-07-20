@@ -27,9 +27,9 @@ const defaultMockReturn: UseAssignmentsCompletedByWeekReportReturn = {
 };
 
 export const {
-  mock: mockUseAssignmentsCompletedByWeek,
-  override: overrideMockUseAssignmentsCompletedByWeek,
-  reset: resetMockUseAssignmentsCompletedByWeek,
+  mock: mockUseAssignmentsCompletedByWeekReport,
+  override: overrideMockUseAssignmentsCompletedByWeekReport,
+  reset: resetMockUseAssignmentsCompletedByWeekReport,
 } = createOverrideableMock(defaultMockReturn);
 
-export default mockUseAssignmentsCompletedByWeek;
+export default mockUseAssignmentsCompletedByWeekReport;

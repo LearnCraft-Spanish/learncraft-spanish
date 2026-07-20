@@ -4,17 +4,20 @@ import { useAssignmentsCompletedByWeekReportQuery } from '@application/queries/A
 import { renderHook, waitFor } from '@testing-library/react';
 import { createMockAssignmentsCompletedByWeekList } from '@testing/factories/adminReportsFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+const WEEK_STARTS = '2026-07-12';
 
 describe('useAssignmentsCompletedByWeekReportQuery', () => {
-  it('should fetch assignments completed by week grouped by course', async () => {
+  it('should fetch assignments completed by week for the given weekStarts', async () => {
     const mockData = createMockAssignmentsCompletedByWeekList(2);
+    const getReport = vi.fn(async () => mockData);
     overrideMockAdminReportsAdapter({
-      getAssignmentsCompletedByWeekReport: async () => mockData,
+      getAssignmentsCompletedByWeekReport: getReport,
     });
 
     const { result } = renderHook(
-      () => useAssignmentsCompletedByWeekReportQuery(),
+      () => useAssignmentsCompletedByWeekReportQuery(WEEK_STARTS),
       {
         wrapper: TestQueryClientProvider,
       },
@@ -32,6 +35,7 @@ describe('useAssignmentsCompletedByWeekReportQuery', () => {
     expect(result.current.assignmentsCompletedByWeekReportQuery.isSuccess).toBe(
       true,
     );
+    expect(getReport).toHaveBeenCalledWith(WEEK_STARTS);
     expect(result.current.assignmentsCompletedByWeekReportQuery.data).toEqual(
       [...mockData].sort((a, b) => a.courseName.localeCompare(b.courseName)),
     );
@@ -43,7 +47,7 @@ describe('useAssignmentsCompletedByWeekReportQuery', () => {
     });
 
     const { result } = renderHook(
-      () => useAssignmentsCompletedByWeekReportQuery(),
+      () => useAssignmentsCompletedByWeekReportQuery(WEEK_STARTS),
       {
         wrapper: TestQueryClientProvider,
       },
@@ -67,7 +71,7 @@ describe('useAssignmentsCompletedByWeekReportQuery', () => {
     });
 
     const { result } = renderHook(
-      () => useAssignmentsCompletedByWeekReportQuery(),
+      () => useAssignmentsCompletedByWeekReportQuery(WEEK_STARTS),
       {
         wrapper: TestQueryClientProvider,
       },
@@ -90,7 +94,7 @@ describe('useAssignmentsCompletedByWeekReportQuery', () => {
     overrideMockAuthAdapter({ isAdmin: false });
 
     const { result } = renderHook(
-      () => useAssignmentsCompletedByWeekReportQuery(),
+      () => useAssignmentsCompletedByWeekReportQuery(WEEK_STARTS),
       {
         wrapper: TestQueryClientProvider,
       },
@@ -107,5 +111,26 @@ describe('useAssignmentsCompletedByWeekReportQuery', () => {
     expect(
       result.current.assignmentsCompletedByWeekReportQuery.data,
     ).toBeUndefined();
+  });
+
+  it('should not fetch when weekStarts is empty', async () => {
+    const getReport = vi.fn(async () => []);
+    overrideMockAdminReportsAdapter({
+      getAssignmentsCompletedByWeekReport: getReport,
+    });
+
+    const { result } = renderHook(
+      () => useAssignmentsCompletedByWeekReportQuery(''),
+      {
+        wrapper: TestQueryClientProvider,
+      },
+    );
+
+    await waitFor(() =>
+      expect(
+        result.current.assignmentsCompletedByWeekReportQuery.isLoading,
+      ).toBe(false),
+    );
+    expect(getReport).not.toHaveBeenCalled();
   });
 });

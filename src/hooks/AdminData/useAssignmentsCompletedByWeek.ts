@@ -1,10 +1,5 @@
-import { useAssignmentsCompletedByWeekReportQuery } from '@application/queries/AdminReportQueries/useAssignmentsCompletedByWeekReportQuery';
+import { useAssignmentsCompletedByWeekReport } from '@application/units/useAssignmentsCompletedByWeekReport/useAssignmentsCompletedByWeekReport';
 
 export default function useAssignmentsCompletedByWeek() {
-  const { assignmentsCompletedByWeekReportQuery } =
-    useAssignmentsCompletedByWeekReportQuery();
-
-  return {
-    assignmentsCompletedByWeekQuery: assignmentsCompletedByWeekReportQuery,
-  };
+  return useAssignmentsCompletedByWeekReport();
 }

@@ -14,18 +14,21 @@ export interface UseAssignmentsCompletedByWeekReportQueryReturn {
   >;
 }
 
-export function useAssignmentsCompletedByWeekReportQuery(): UseAssignmentsCompletedByWeekReportQueryReturn {
+export function useAssignmentsCompletedByWeekReportQuery(
+  weekStarts: string,
+): UseAssignmentsCompletedByWeekReportQueryReturn {
   const adapter = useAdminReportsAdapter();
   const { isAdmin } = useAuthAdapter();
 
   const assignmentsCompletedByWeekReportQuery = useQuery({
-    queryKey: ASSIGNMENTS_COMPLETED_BY_WEEK_REPORT_QUERY_KEY,
+    queryKey: [...ASSIGNMENTS_COMPLETED_BY_WEEK_REPORT_QUERY_KEY, weekStarts],
     queryFn: async () => {
-      const data = await adapter.getAssignmentsCompletedByWeekReport();
+      const data =
+        await adapter.getAssignmentsCompletedByWeekReport(weekStarts);
       return data.sort((a, b) => a.courseName.localeCompare(b.courseName));
     },
     staleTime: Infinity,
-    enabled: isAdmin,
+    enabled: isAdmin && weekStarts.length > 0,
   });
 
   return { assignmentsCompletedByWeekReportQuery };

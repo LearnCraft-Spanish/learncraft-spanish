@@ -39,10 +39,15 @@ export function createAdminReportsInfrastructure(
         getMembershipsBySalariedCoachTwoWeeksOutReportEndpoint.path,
         getMembershipsBySalariedCoachTwoWeeksOutReportEndpoint.requiredScopes,
       ),
-    getAssignmentsCompletedByWeekReport: () =>
+    getAssignmentsCompletedByWeekReport: (weekStarts: string) =>
       httpClient.get<AssignmentsCompletedByWeek[]>(
         getAssignmentsCompletedByWeekReportEndpoint.path,
         getAssignmentsCompletedByWeekReportEndpoint.requiredScopes,
+        {
+          params: {
+            startDate: weekStarts,
+          },
+        },
       ),
   };
 }

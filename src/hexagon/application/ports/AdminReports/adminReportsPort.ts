@@ -12,7 +12,7 @@ export interface AdminReportsPort {
   getMembershipsBySalariedCoachTwoWeeksOutReport: () => Promise<
     MembershipsByCoach[]
   >;
-  getAssignmentsCompletedByWeekReport: () => Promise<
-    AssignmentsCompletedByWeek[]
-  >;
+  getAssignmentsCompletedByWeekReport: (
+    weekStarts: string,
+  ) => Promise<AssignmentsCompletedByWeek[]>;
 }

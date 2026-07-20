@@ -1,4 +1,5 @@
 import type { AssignmentsCompletedByWeek as AssignmentsCompletedByWeekRow } from '@learncraft-spanish/shared';
+import { LOAD_MORE_SENTINEL } from '@application/units/useAssignmentsCompletedByWeekReport/useAssignmentsCompletedByWeekReport';
 import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
@@ -14,7 +15,12 @@ function renderRow(row: AssignmentsCompletedByWeekRow) {
 }
 
 export default function AssignmentsCompletedByWeek() {
-  const { assignmentsCompletedByWeekQuery } = useAssignmentsCompletedByWeek();
+  const {
+    assignmentsCompletedByWeekQuery,
+    weekStarts,
+    weekOptions,
+    selectWeekStarts,
+  } = useAssignmentsCompletedByWeek();
 
   const [isOpen, setIsOpen] = useState(false);
   const headers = ['Course Name', 'Assignments Completed'];
@@ -27,11 +33,30 @@ export default function AssignmentsCompletedByWeek() {
         openFunction={() => setIsOpen(!isOpen)}
       />
       {isOpen && (
-        <DisplayOnlyTable
-          headers={headers}
-          data={assignmentsCompletedByWeekQuery.data ?? []}
-          renderRow={renderRow}
-        />
+        <>
+          <div className="weekSelector">
+            <label htmlFor="assignmentsCompletedByWeekFilter">Week:</label>
+            <select
+              id="assignmentsCompletedByWeekFilter"
+              onChange={(e) => selectWeekStarts(e.target.value)}
+              value={weekStarts}
+            >
+              {weekOptions.map((option) => (
+                <option key={option.weekStarts} value={option.weekStarts}>
+                  {option.label}
+                </option>
+              ))}
+              <option value={LOAD_MORE_SENTINEL} className="loadMoreOption">
+                Load More Dates...
+              </option>
+            </select>
+          </div>
+          <DisplayOnlyTable
+            headers={headers}
+            data={assignmentsCompletedByWeekQuery.data ?? []}
+            renderRow={renderRow}
+          />
+        </>
       )}
     </div>
   );
