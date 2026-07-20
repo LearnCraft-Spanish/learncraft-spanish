@@ -1,5 +1,6 @@
 import {
   activeMembershipSummarySchema,
+  assignmentsCompletedByWeekSchema,
   membershipsByCoachSchema,
 } from '@learncraft-spanish/shared';
 import {
@@ -19,4 +20,11 @@ export const createMockMembershipsByCoach = createZodFactory(
 );
 export const createMockMembershipsByCoachList = createZodListFactory(
   membershipsByCoachSchema,
+);
+
+export const createMockAssignmentsCompletedByWeek = createZodFactory(
+  assignmentsCompletedByWeekSchema,
+);
+export const createMockAssignmentsCompletedByWeekList = createZodListFactory(
+  assignmentsCompletedByWeekSchema,
 );

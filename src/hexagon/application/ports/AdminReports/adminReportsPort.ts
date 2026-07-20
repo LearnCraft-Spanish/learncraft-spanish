@@ -1,4 +1,7 @@
-import type { MembershipsByCoach } from '@learncraft-spanish/shared';
+import type {
+  AssignmentsCompletedByWeek,
+  MembershipsByCoach,
+} from '@learncraft-spanish/shared';
 
 export interface AdminReportsPort {
   getMembershipsByCoachCurrentReport: () => Promise<MembershipsByCoach[]>;
@@ -9,4 +12,7 @@ export interface AdminReportsPort {
   getMembershipsBySalariedCoachTwoWeeksOutReport: () => Promise<
     MembershipsByCoach[]
   >;
+  getAssignmentsCompletedByWeekReport: (
+    weekStarts: string,
+  ) => Promise<AssignmentsCompletedByWeek[]>;
 }
