@@ -5,6 +5,7 @@ import { createHttpClient } from '@infrastructure/http/client';
 import {
   getAllCoachesEndpoint,
   getAllCoachesForStudentEndpoint,
+  getRecentRecordsEndpoint,
 } from '@learncraft-spanish/shared';
 
 export function createCoachInfrastructure(
@@ -28,5 +29,19 @@ export function createCoachInfrastructure(
         getAllCoachesEndpoint.path,
         getAllCoachesEndpoint.requiredScopes,
       ),
+    getRecentRecords: async (coachId: string, monthYear: string) => {
+      const response = await httpClient.get<unknown>(
+        getRecentRecordsEndpoint.path,
+        getRecentRecordsEndpoint.requiredScopes,
+        {
+          params: {
+            coachId,
+            monthYear,
+          },
+        },
+      );
+
+      return getRecentRecordsEndpoint.response.parse(response);
+    },
   };
 }

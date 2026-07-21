@@ -1,11 +1,15 @@
 import type { CoachPort } from '@application/ports/coachPort';
-import { createMockCoachCallCountList } from '@testing/factories/coachFactory';
+import {
+  createMockCoachCallCountList,
+  createMockRecentRecords,
+} from '@testing/factories/coachFactory';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Create a default mock implementation
 export const defaultMockCoachAdapter: CoachPort = {
   getAllCoachesByStudent: async () => createMockCoachCallCountList(3),
   getAllCoaches: async () => [],
+  getRecentRecords: async () => createMockRecentRecords(),
 };
 
 // Create an overrideable mock with the default implementation

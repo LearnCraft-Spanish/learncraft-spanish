@@ -1,4 +1,8 @@
-import type { Coach, CoachCallCount } from '@learncraft-spanish/shared';
+import type {
+  Coach,
+  CoachCallCount,
+  RecentRecords,
+} from '@learncraft-spanish/shared';
 
 /**
  * Returns a list of coaches that have called the student
@@ -7,4 +11,8 @@ import type { Coach, CoachCallCount } from '@learncraft-spanish/shared';
 export interface CoachPort {
   getAllCoachesByStudent: (studentId: number) => Promise<CoachCallCount[]>;
   getAllCoaches: () => Promise<Coach[]>;
+  getRecentRecords: (
+    coachId: string,
+    monthYear: string,
+  ) => Promise<RecentRecords>;
 }

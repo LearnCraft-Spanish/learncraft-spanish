@@ -1,5 +1,9 @@
 import { useState } from 'react';
 
+function toYearMonth(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
 const generateMonthYears = (numMonthsToShow: number) => {
   const months = [];
   const currentDate = new Date();
@@ -12,12 +16,16 @@ const generateMonthYears = (numMonthsToShow: number) => {
     );
     months.push({
       name: `${date.toLocaleString('default', { month: 'long' })}, ${date.getFullYear()}`,
-      value: `${String(date.getMonth() + 1).padStart(2, '0')}:${date.getFullYear()}`,
+      value: toYearMonth(date),
     });
   }
 
   return months;
 };
+
+export function getDefaultMonthYear(): string {
+  return toYearMonth(new Date());
+}
 
 export default function MonthYearSelector({
   selectedMonthYear,
@@ -26,7 +34,7 @@ export default function MonthYearSelector({
   selectedMonthYear: string;
   setSelectedMonthYear: (monthYear: string) => void;
 }) {
-  const [numMonths, setNumMonths] = useState(12); // Start with 12 months
+  const [numMonths, setNumMonths] = useState(12);
   const months = generateMonthYears(numMonths);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

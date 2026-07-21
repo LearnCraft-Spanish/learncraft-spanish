@@ -1,29 +1,23 @@
-import type { GroupSession } from 'src/types/CoachingTypes';
-import eye from 'src/assets/icons/eye.svg';
-import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import type { RecentRecords } from '@learncraft-spanish/shared';
+
+type RecentGroupCall = RecentRecords['groupCalls'][number];
+
+function formatDate(date: string | Date): string {
+  if (typeof date === 'string') {
+    return date.split('T')[0];
+  }
+  return date.toLocaleDateString();
+}
 
 export default function GroupCallRecordRow({
   groupCall,
 }: {
-  groupCall: GroupSession;
+  groupCall: RecentGroupCall;
 }) {
-  const { openContextual } = useContextualMenu();
   return (
     <tr>
-      <td className="viewRecordIconCell">
-        <img
-          src={eye}
-          alt="view record"
-          className="viewRecordIcon"
-          onClick={() => openContextual(`group-call-${groupCall.recordId}`)}
-        />
-      </td>
-      <td>
-        {typeof groupCall.date === 'string'
-          ? groupCall.date
-          : groupCall.date.toLocaleDateString()}
-      </td>
-      <td>{groupCall.coach.name}</td>
+      <td>{formatDate(groupCall.callDate)}</td>
+      <td>{groupCall.coach.fullName}</td>
       <td>
         {groupCall.zoomLink && (
           <a
@@ -36,10 +30,8 @@ export default function GroupCallRecordRow({
           </a>
         )}
       </td>
-
-      <td>{groupCall.topic}</td>
+      <td>{groupCall.groupSessionTopic?.groupSessionTopic ?? '—'}</td>
       <td>{groupCall.comments}</td>
-      {/* <td>currently unavalible, check back after the next update!</td> */}
     </tr>
   );
 }

@@ -11,7 +11,9 @@ export interface AuthPort {
   /**
    * Get the current access token for authenticated requests
    */
-  getAccessToken: (scopes: string[] | null) => Promise<string | undefined>;
+  getAccessToken: (
+    scopes: readonly string[] | null,
+  ) => Promise<string | undefined>;
 
   /**
    * Login the user
