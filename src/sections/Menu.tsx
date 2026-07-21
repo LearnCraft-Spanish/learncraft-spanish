@@ -133,20 +133,12 @@ export default function Menu() {
                 </Link>
               </div>
               {/* Not available at this time */}
-              {/* <div className="buttonBox">
+              <div className="buttonBox">
                 <Link className="linkButton" to="/coaching-dashboard">
                   Coaching Dashboard
                 </Link>
-              </div> */}
-              <div className="buttonBox">
-                <button
-                  className="linkButton disabledButton"
-                  disabled
-                  type="button"
-                >
-                  Coaching Dashboard
-                </button>
               </div>
+
               <div className="buttonBox">
                 <Link className="linkButton" to="/get-help">
                   Get Help

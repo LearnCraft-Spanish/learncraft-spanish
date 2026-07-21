@@ -1,26 +1,23 @@
-import type { PrivateCall } from 'src/types/CoachingTypes';
-import eye from 'src/assets/icons/eye.svg';
-import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import type { RecentRecords } from '@learncraft-spanish/shared';
+
+type RecentPrivateCall = RecentRecords['privateCalls'][number];
+
+function formatDate(date: string | Date): string {
+  if (typeof date === 'string') {
+    return date.split('T')[0];
+  }
+  return date.toLocaleDateString();
+}
 
 export default function PrivateCallRecordRow({
   privateCall,
 }: {
-  privateCall: PrivateCall;
+  privateCall: RecentPrivateCall;
 }) {
-  const { openContextual } = useContextualMenu();
   return (
     <tr>
-      {/* update stuff to get weekName from backend */}
-      <td className="viewRecordIconCell">
-        <img
-          src={eye}
-          alt="view record"
-          className="viewRecordIcon"
-          onClick={() => openContextual(`private-call-${privateCall.recordId}`)}
-        />
-      </td>
-      <td>{privateCall.weekName}</td>
-      <td>{privateCall.rating}</td>
+      <td>{privateCall.weekId ?? '—'}</td>
+      <td>{privateCall.callRating.rating}</td>
       <td>{privateCall.areasOfDifficulty}</td>
       <td>{privateCall.notes}</td>
       <td>
@@ -35,13 +32,9 @@ export default function PrivateCallRecordRow({
           </a>
         )}
       </td>
-      <td>{privateCall.caller.name}</td>
-      <td>
-        {typeof privateCall.date === 'string'
-          ? privateCall.date
-          : privateCall.date.toLocaleDateString()}
-      </td>
-      <td>{privateCall.callType}</td>
+      <td>{privateCall.caller.fullName}</td>
+      <td>{formatDate(privateCall.callDate)}</td>
+      <td>{privateCall.callType.callType}</td>
     </tr>
   );
 }

@@ -1,14 +1,14 @@
 import { Loading } from '@interface/components/Loading';
-import { DateRangeProvider } from '../Coaching/WeeksRecords/DateRangeProvider';
-import IncompleteRecords from './components/IncompleteRecords';
-import MyStudents from './components/MyStudents/MyStudents';
-import MyStudentsBeyond150 from './components/MyStudentsBeyond150';
+// import { DateRangeProvider } from '../Coaching/WeeksRecords/DateRangeProvider';
+// import IncompleteRecords from './components/IncompleteRecords';
+// import MyStudents from './components/MyStudents/MyStudents';
+// import MyStudentsBeyond150 from './components/MyStudentsBeyond150';
 import RecentRecords from './components/RecentRecords';
 import useCoachingDashboard from './useCoachingDashboard';
 import './CoachingDashboard.scss';
 
 function CoachingDashboard() {
-  const { coach, states } = useCoachingDashboard();
+  const { currentCoach, states } = useCoachingDashboard();
 
   const isLoading = states.isLoading;
   const isError = states.isError;
@@ -23,23 +23,21 @@ function CoachingDashboard() {
           <h1>Error loading user data</h1>
         </div>
       )}
-      {dataReady && (
+      {dataReady && currentCoach && (
         <>
           <div className="coachingDashbaord__header">
             <h1 className="coachingDashbaord__header__title">
-              {`Welcome back, ${coach?.user.name}!`}
+              {`Welcome back, ${currentCoach.fullName}!`}
             </h1>
           </div>
           <div className="coachingDashbaordBody">
-            {/* Records to Complete */}
-            <IncompleteRecords />
-            {/* Student Drill Down */}
-            <MyStudents />
-            {/* Recent Activity */}
+            {/* Legacy — not yet reimplemented */}
+            {/* <IncompleteRecords /> */}
+            {/* <MyStudents /> */}
             <div className="coachingDashbaord__recentActivity">
-              <RecentRecords />
+              <RecentRecords coachId={currentCoach.coach_id} />
             </div>
-            {coach && <MyStudentsBeyond150 coachId={coach.recordId} />}
+            {/* <MyStudentsBeyond150 coachId={coach.recordId} /> */}
           </div>
         </>
       )}
@@ -48,9 +46,11 @@ function CoachingDashboard() {
 }
 
 export default function CoachingDashboardWrapper() {
-  return (
-    <DateRangeProvider>
-      <CoachingDashboard />
-    </DateRangeProvider>
-  );
+  // DateRangeProvider only needed for incomplete weekly records (legacy)
+  // return (
+  //   <DateRangeProvider>
+  //     <CoachingDashboard />
+  //   </DateRangeProvider>
+  // );
+  return <CoachingDashboard />;
 }
