@@ -7,6 +7,7 @@ import type {
 } from '@learncraft-spanish/shared';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { usePrivateCallsAdapter } from '@application/adapters/privateCallsAdapter';
+import { MEMBERSHIP_WEEKS_QUERY_KEY_ROOT } from '@application/queries/WeekQueries/useMembershipWeeksQuery';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const WEEKS_QUERY_KEY = ['weeklyRecords', 'weeksByStartDate'];
@@ -50,6 +51,9 @@ export function usePrivateCallMutations(): UsePrivateCallMutationsReturn {
           });
         },
       );
+      void queryClient.invalidateQueries({
+        queryKey: MEMBERSHIP_WEEKS_QUERY_KEY_ROOT,
+      });
     },
   });
   const updatePrivateCallMutation = useMutation({
@@ -73,6 +77,9 @@ export function usePrivateCallMutations(): UsePrivateCallMutationsReturn {
           });
         },
       );
+      void queryClient.invalidateQueries({
+        queryKey: MEMBERSHIP_WEEKS_QUERY_KEY_ROOT,
+      });
     },
   });
   const deletePrivateCallMutation = useMutation({
@@ -90,6 +97,9 @@ export function usePrivateCallMutations(): UsePrivateCallMutationsReturn {
           }));
         },
       );
+      void queryClient.invalidateQueries({
+        queryKey: MEMBERSHIP_WEEKS_QUERY_KEY_ROOT,
+      });
     },
   });
 
