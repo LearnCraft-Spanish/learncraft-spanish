@@ -188,7 +188,7 @@ export function PrivateCallView({
       call.caller.coach_id === caller &&
       formatDateInput(call.callDate) === date &&
       call.callRating.callRatingId === callRating.callRatingId &&
-      call.callType.callTypeId === callType.callTypeId &&
+      call.callType?.callTypeId === callType?.callTypeId &&
       (call.notes || '') === notes &&
       (call.areasOfDifficulty || '') === areasOfDifficulty &&
       (call.recording || '') === recording
