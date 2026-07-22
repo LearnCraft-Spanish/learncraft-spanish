@@ -18,8 +18,8 @@ importers:
         specifier: ^0.12.2
         version: 0.12.2
       '@learncraft-spanish/shared':
-        specifier: ^0.21.0
-        version: 0.21.0
+        specifier: ^0.22.0
+        version: 0.22.0
       '@sentry/cli':
         specifier: ^2.42.2
         version: 2.58.6
@@ -1288,8 +1288,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@learncraft-spanish/shared@0.21.0':
-    resolution: {integrity: sha512-2Dl1Tk72A5LCH/D345o/nA70kTwzGlLDqIcv2pIaJHawjD9MV9hVVGAxzYcbGp/bF60M4WeMkld8UcBg31FVrw==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.21.0/f448edb11ce3972110fa7bc5b8fc1f4e79ea8c5f}
+  '@learncraft-spanish/shared@0.22.0':
+    resolution: {integrity: sha512-cw6Bw/V9sNwSKjcxSyOAtsupmxsVhl1jfxKLXLMb0W8siRqW1U6vwMRqVWU3uY8z7omrZCNQdWT+g1F7z3ioxg==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.22.0/36d68c73495ee274b01e63166765680604ff0319}
 
   '@mswjs/interceptors@0.41.9':
     resolution: {integrity: sha512-VVPPgHyQ6ShqnrmDWuxjmUIsO9gWyOZFmuOfLd9LfBGQJwZfy0gvv9pbHSJuoFNIYC7ZDX9aoFwowjcdSC4E8w==}
@@ -2338,8 +2338,8 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
-  baseline-browser-mapping@2.11.11:
-    resolution: {integrity: sha512-/yImnXwyTvgMkhgekLHok/Rx5vO6E0BmStWlSqKWMVm2a2ITuZ1Tn+9bgLS+gZRdZmWtd8nxuhHpdmCUOWsTQQ==}
+  baseline-browser-mapping@2.11.12:
+    resolution: {integrity: sha512-r7WnVImvVCeFpf2DOXfy41aPWzeNg3H/A2X4dKmy1QL0MSyyk/e7z8ihJ3N6Nn2PsdhkVlqnEfnUE4a05P2aTA==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -7026,7 +7026,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@learncraft-spanish/shared@0.21.0':
+  '@learncraft-spanish/shared@0.22.0':
     dependencies:
       zod: 3.25.76
 
@@ -8160,7 +8160,7 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  baseline-browser-mapping@2.11.11: {}
+  baseline-browser-mapping@2.11.12: {}
 
   binary-extensions@2.3.0: {}
 
@@ -8191,7 +8191,7 @@ snapshots:
 
   browserslist@4.28.7:
     dependencies:
-      baseline-browser-mapping: 2.11.11
+      baseline-browser-mapping: 2.11.12
       caniuse-lite: 1.0.30001806
       electron-to-chromium: 1.5.399
       node-releases: 2.0.51

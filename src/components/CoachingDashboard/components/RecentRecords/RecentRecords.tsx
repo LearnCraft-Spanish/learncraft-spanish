@@ -1,6 +1,16 @@
+import type { RecentRecords as RecentRecordsData } from '@learncraft-spanish/shared';
 import { useRecentRecordsQuery } from '@application/queries/CoachQueries/useRecentRecordsQuery';
+import {
+  AssignmentView,
+  GroupSessionView,
+  NewAssignmentView,
+  NewGroupSessionView,
+  NewPrivateCallView,
+  PrivateCallView,
+} from '@interface/components/CoachingRecords';
 import Dropdown from '@interface/components/FormComponents/Dropdown/Dropdown';
 import { InlineLoading } from '@interface/components/Loading';
+import { useContextualMenu } from '@interface/hooks/useContextualMenu';
 import { useMemo, useState } from 'react';
 import SectionHeader from '../SectionHeader';
 import SubSectionHeader from '../SubSectionHeader';
@@ -9,6 +19,9 @@ import DisplayOnlyTable from './DisplayOnlyTable';
 import GroupCallRecordRow from './GroupCallRecordRow';
 import MonthYearSelector, { getDefaultMonthYear } from './MonthYearSelector';
 import PrivateCallRecordRow from './PrivateCallRecordRow';
+import { weekStartsFromMonthYear } from './weekStartsFromMonthYear';
+// Shared coaching form/table helpers (.lineWrapper used by sort controls, etc.)
+import 'src/components/Coaching/coaching.scss';
 import './RecentRecords.scss';
 
 interface CollapsibleMenuObject {
@@ -16,7 +29,23 @@ interface CollapsibleMenuObject {
   collapsibleMenuOpen: boolean;
 }
 
-function RecentRecords({ coachId }: { coachId: number }) {
+function parseAssignmentId(contextual: string): number | null {
+  const match = /^assignment(\d+)$/.exec(contextual);
+  return match ? Number(match[1]) : null;
+}
+
+function parseCallId(contextual: string): number | null {
+  const match = /^call(\d+)$/.exec(contextual);
+  return match ? Number(match[1]) : null;
+}
+
+function parseGroupSessionId(contextual: string): number | null {
+  const match = /^groupSession(\d+)week\d+$/.exec(contextual);
+  return match ? Number(match[1]) : null;
+}
+
+function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
+  const { contextual, openContextual } = useContextualMenu();
   const [selectedMonthYear, setSelectedMonthYear] = useState(
     getDefaultMonthYear(),
   );
@@ -34,6 +63,11 @@ function RecentRecords({ coachId }: { coachId: number }) {
   >('Caller Name');
   const [assignmentsSorting, setAssignmentsSorting] = useState<'Type' | 'Week'>(
     'Week',
+  );
+
+  const weekStartsDefaultValue = useMemo(
+    () => weekStartsFromMonthYear(selectedMonthYear),
+    [selectedMonthYear],
   );
 
   const updateCollapsibleMenuOpen = (title: string) => {
@@ -78,6 +112,24 @@ function RecentRecords({ coachId }: { coachId: number }) {
     return recentRecords?.groupCalls ?? [];
   }, [recentRecords]);
 
+  const activeAssignment = useMemo(() => {
+    const id = parseAssignmentId(contextual);
+    if (id === null) return undefined;
+    return assignments.find((assignment) => assignment.assignmentId === id);
+  }, [assignments, contextual]);
+
+  const activePrivateCall = useMemo(() => {
+    const id = parseCallId(contextual);
+    if (id === null) return undefined;
+    return privateCalls.find((call) => call.callId === id);
+  }, [contextual, privateCalls]);
+
+  const activeGroupSession = useMemo(() => {
+    const id = parseGroupSessionId(contextual);
+    if (id === null) return undefined;
+    return groupCalls.find((session) => session.groupSessionId === id);
+  }, [contextual, groupCalls]);
+
   return (
     <div>
       <MonthYearSelector
@@ -109,11 +161,21 @@ function RecentRecords({ coachId }: { coachId: number }) {
                 />
               </div>
             }
+            button={
+              <button
+                type="button"
+                className="newRecordButton"
+                onClick={() => openContextual('newAssignment')}
+              >
+                New Assignment
+              </button>
+            }
           />
           {collapsibleMenuObject.collapsibleMenuOpen &&
             collapsibleMenuObject.sectionTitle === 'Assignments' && (
               <DisplayOnlyTable
                 headers={[
+                  'View',
                   'Week',
                   'Type',
                   'Corrector',
@@ -123,7 +185,9 @@ function RecentRecords({ coachId }: { coachId: number }) {
                   'Notes',
                 ]}
                 data={assignments}
-                renderRow={(assignment) => (
+                renderRow={(
+                  assignment: RecentRecordsData['assignments'][number],
+                ) => (
                   <AssignmentRecordRow
                     key={assignment.assignmentId}
                     assignment={assignment}
@@ -152,11 +216,21 @@ function RecentRecords({ coachId }: { coachId: number }) {
                 />
               </div>
             }
+            button={
+              <button
+                type="button"
+                className="newRecordButton"
+                onClick={() => openContextual('newPrivateCall')}
+              >
+                New Private Call
+              </button>
+            }
           />
           {collapsibleMenuObject.collapsibleMenuOpen &&
             collapsibleMenuObject.sectionTitle === 'Private Calls' && (
               <DisplayOnlyTable
                 headers={[
+                  'View',
                   'Week',
                   'Rating',
                   'Areas of Difficulty',
@@ -167,7 +241,9 @@ function RecentRecords({ coachId }: { coachId: number }) {
                   'Call Type',
                 ]}
                 data={privateCalls}
-                renderRow={(privateCall) => (
+                renderRow={(
+                  privateCall: RecentRecordsData['privateCalls'][number],
+                ) => (
                   <PrivateCallRecordRow
                     key={privateCall.callId}
                     privateCall={privateCall}
@@ -183,13 +259,31 @@ function RecentRecords({ coachId }: { coachId: number }) {
               collapsibleMenuObject.sectionTitle === 'Group Sessions'
             }
             openFunction={updateCollapsibleMenuOpen}
+            button={
+              <button
+                type="button"
+                className="newRecordButton"
+                onClick={() => openContextual('newGroupSession')}
+              >
+                New Group Session
+              </button>
+            }
           />
           {collapsibleMenuObject.collapsibleMenuOpen &&
             collapsibleMenuObject.sectionTitle === 'Group Sessions' && (
               <DisplayOnlyTable
-                headers={['Date', 'Coach', 'Zoom Link', 'Topic', 'Comments']}
+                headers={[
+                  'View',
+                  'Date',
+                  'Coach',
+                  'Zoom Link',
+                  'Topic',
+                  'Comments',
+                ]}
                 data={groupCalls}
-                renderRow={(groupSession) => (
+                renderRow={(
+                  groupSession: RecentRecordsData['groupCalls'][number],
+                ) => (
                   <GroupCallRecordRow
                     key={groupSession.groupSessionId}
                     groupCall={groupSession}
@@ -197,13 +291,50 @@ function RecentRecords({ coachId }: { coachId: number }) {
                 )}
               />
             )}
+
+          {contextual === 'newAssignment' && (
+            <NewAssignmentView
+              weekStartsDefaultValue={weekStartsDefaultValue}
+            />
+          )}
+          {activeAssignment && (
+            <AssignmentView
+              assignment={activeAssignment}
+              tableEditMode={false}
+            />
+          )}
+
+          {contextual === 'newPrivateCall' && (
+            <NewPrivateCallView
+              weekStartsDefaultValue={weekStartsDefaultValue}
+            />
+          )}
+          {activePrivateCall && (
+            <PrivateCallView call={activePrivateCall} tableEditMode={false} />
+          )}
+
+          {contextual === 'newGroupSession' && (
+            <NewGroupSessionView
+              weekStartsDefaultValue={weekStartsDefaultValue}
+            />
+          )}
+          {activeGroupSession && (
+            <GroupSessionView
+              groupSession={activeGroupSession}
+              tableEditMode={false}
+            />
+          )}
         </>
       )}
     </div>
   );
 }
 
-export default function RecentRecordsWrapper({ coachId }: { coachId: number }) {
+export default function RecentRecordsWrapper({
+  coachId,
+}: {
+  coachId: number;
+}): React.JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div>
