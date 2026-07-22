@@ -2,11 +2,13 @@ import { overrideMockGroupCallsAdapter } from '@application/adapters/groupCallsA
 import { overrideMockWeeklyRecordsAdapter } from '@application/adapters/weeklyRecordsAdapter.mock';
 import { useGroupCallMutations } from '@application/queries/GroupCallQueries/useGroupCallMutations';
 import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
+import { MEMBERSHIP_WEEKS_QUERY_KEY_ROOT } from '@application/queries/WeekQueries/useMembershipWeeksQuery';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { baseGroupSessionFactory } from '@testing/factories/groupCallsFactory';
 import { createMockFurnishedWeekWithCoach } from '@testing/factories/weekFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
-import { describe, expect, it } from 'vitest';
+import { testQueryClient } from '@testing/utils/testQueryClient';
+import { describe, expect, it, vi } from 'vitest';
 
 const START_DATE = '2026-01-05';
 
@@ -327,5 +329,49 @@ describe('useGroupCallMutations', () => {
       ).toBeDefined();
       expect(updatedWeek2?.groupCalls).toHaveLength(0);
     });
+  });
+
+  it('should invalidate Student Drill Down membershipWeeks queries on create/update/delete', async () => {
+    const invalidateSpy = vi.spyOn(testQueryClient, 'invalidateQueries');
+    const session = baseGroupSessionFactory({
+      groupSessionId: 1,
+      attendees: [makeAttendee(101)],
+    });
+    overrideMockGroupCallsAdapter({
+      createGroupCall: async () => session,
+      updateGroupCall: async () => session,
+      deleteGroupCall: async () => {},
+    });
+
+    const { result } = renderHook(() => useGroupCallMutations(), {
+      wrapper: TestQueryClientProvider,
+    });
+
+    await act(() =>
+      result.current.createGroupCallMutation.mutateAsync(
+        makeCreateCmd(session),
+      ),
+    );
+    await act(() =>
+      result.current.updateGroupCallMutation.mutateAsync(
+        makeUpdateCmd(session),
+      ),
+    );
+    await act(() =>
+      result.current.deleteGroupCallMutation.mutateAsync({
+        groupSessionId: 1,
+      }),
+    );
+
+    await waitFor(() =>
+      expect(result.current.deleteGroupCallMutation.isSuccess).toBe(true),
+    );
+
+    const membershipWeekInvalidations = invalidateSpy.mock.calls.filter(
+      ([args]) =>
+        Array.isArray(args?.queryKey) &&
+        args.queryKey[0] === MEMBERSHIP_WEEKS_QUERY_KEY_ROOT[0],
+    );
+    expect(membershipWeekInvalidations).toHaveLength(3);
   });
 });

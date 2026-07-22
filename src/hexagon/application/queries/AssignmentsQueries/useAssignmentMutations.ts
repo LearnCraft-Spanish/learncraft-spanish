@@ -7,6 +7,7 @@ import type {
 } from '@learncraft-spanish/shared';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useAssignmentsAdapter } from '@application/adapters/assignmentAdapter';
+import { MEMBERSHIP_WEEKS_QUERY_KEY_ROOT } from '@application/queries/WeekQueries/useMembershipWeeksQuery';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const WEEKS_QUERY_KEY = ['weeklyRecords', 'weeksByStartDate'];
@@ -50,6 +51,9 @@ export function useAssignmentsMutations(): UseAssignmentsMutationsReturn {
           });
         },
       );
+      void queryClient.invalidateQueries({
+        queryKey: MEMBERSHIP_WEEKS_QUERY_KEY_ROOT,
+      });
     },
   });
 
@@ -74,6 +78,9 @@ export function useAssignmentsMutations(): UseAssignmentsMutationsReturn {
           });
         },
       );
+      void queryClient.invalidateQueries({
+        queryKey: MEMBERSHIP_WEEKS_QUERY_KEY_ROOT,
+      });
     },
   });
 
@@ -92,6 +99,9 @@ export function useAssignmentsMutations(): UseAssignmentsMutationsReturn {
           }));
         },
       );
+      void queryClient.invalidateQueries({
+        queryKey: MEMBERSHIP_WEEKS_QUERY_KEY_ROOT,
+      });
     },
   });
 

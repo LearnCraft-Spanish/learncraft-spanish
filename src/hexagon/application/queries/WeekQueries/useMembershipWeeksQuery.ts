@@ -3,8 +3,10 @@ import type { UseQueryResult } from '@tanstack/react-query';
 import { useWeeksAdapter } from '@application/adapters/weeksAdapter';
 import { useQuery } from '@tanstack/react-query';
 
+export const MEMBERSHIP_WEEKS_QUERY_KEY_ROOT = ['membershipWeeks'] as const;
+
 export const MEMBERSHIP_WEEKS_QUERY_KEY = (membershipId: number) =>
-  ['membershipWeeks', membershipId] as const;
+  [...MEMBERSHIP_WEEKS_QUERY_KEY_ROOT, membershipId] as const;
 
 export interface UseMembershipWeeksQueryReturn {
   membershipWeeksQuery: UseQueryResult<FurnishedWeek[]>;
