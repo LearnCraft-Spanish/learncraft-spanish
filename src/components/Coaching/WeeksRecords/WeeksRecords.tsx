@@ -6,6 +6,10 @@ import type {
 
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
+import {
+  NewAssignmentView,
+  NewGroupSessionView,
+} from '@interface/components/CoachingRecords';
 import { Loading } from '@interface/components/Loading';
 import React, {
   useCallback,
@@ -19,8 +23,6 @@ import { useAllCoachesQuery } from 'src/hexagon/application/queries/CoachQueries
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { DateRangeProvider } from './DateRangeProvider';
 import WeeksFilter from './Filter/WeeksFilter';
-import { NewAssignmentView } from './Table/AssignmentsCell';
-import { NewGroupSessionView } from './Table/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
 import useDateRange from './useDateRange';
 import '../coaching.scss';

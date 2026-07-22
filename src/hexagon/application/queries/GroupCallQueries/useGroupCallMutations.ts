@@ -7,6 +7,12 @@ import type {
 } from '@learncraft-spanish/shared';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useGroupCallsAdapter } from '@application/adapters/groupCallsAdapter';
+import {
+  insertIntoMatchingRecentRecordsOrInvalidate,
+  invalidateMembershipWeeks,
+  removeGroupCallFromRecentRecords,
+  replaceGroupCallInRecentRecords,
+} from '@application/queries/coachingRecordsCache';
 import { weekAttendsGroupSession } from '@domain/functions/weekAttendsGroupSession';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 const WEEKS_QUERY_KEY = ['weeklyRecords', 'weeksByStartDate'];
@@ -65,6 +71,15 @@ export function useGroupCallMutations(): UseGroupCallMutationsReturn {
           });
         },
       );
+      insertIntoMatchingRecentRecordsOrInvalidate(queryClient, {
+        coachId: newGroupCall.coach.coach_id,
+        callDate: newGroupCall.callDate,
+        insert: (old) => ({
+          ...old,
+          groupCalls: [...old.groupCalls, newGroupCall],
+        }),
+      });
+      invalidateMembershipWeeks(queryClient);
     },
   });
 
@@ -101,6 +116,8 @@ export function useGroupCallMutations(): UseGroupCallMutationsReturn {
           });
         },
       );
+      replaceGroupCallInRecentRecords(queryClient, updatedGroupCall);
+      invalidateMembershipWeeks(queryClient);
     },
   });
 
@@ -119,6 +136,8 @@ export function useGroupCallMutations(): UseGroupCallMutationsReturn {
           }));
         },
       );
+      removeGroupCallFromRecentRecords(queryClient, groupSessionId);
+      invalidateMembershipWeeks(queryClient);
     },
   });
 
