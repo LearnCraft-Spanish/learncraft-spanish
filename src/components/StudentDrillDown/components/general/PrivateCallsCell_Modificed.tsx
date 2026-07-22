@@ -105,7 +105,7 @@ function PrivateCallView({
 
       <Dropdown
         label="Call Type"
-        value={call.callType.callType}
+        value={call.callType?.callType ?? ''}
         onChange={() => {}}
         options={callTypeOptions}
         editMode={false}
