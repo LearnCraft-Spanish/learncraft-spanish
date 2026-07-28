@@ -1,6 +1,7 @@
 import type { AdminReportsPort } from '@application/ports/AdminReports/adminReportsPort';
 import type { AuthPort } from '@application/ports/authPort';
 import type {
+  ActiveMembershipsByCourse,
   AssignmentsCompletedByWeek,
   CoachSummary,
   CoachSummaryDrilldown,
@@ -10,6 +11,7 @@ import type {
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
+  getActiveMembershipsReportEndpoint,
   getAssignmentsCompletedByWeekReportEndpoint,
   getGroupCallsByCoachReportEndpoint,
   getLastWeekCoachSummaryReportEndpoint,
@@ -88,6 +90,11 @@ export function createAdminReportsInfrastructure(
       httpClient.get<GroupCallsByCoach[]>(
         getGroupCallsByCoachReportEndpoint.path,
         getGroupCallsByCoachReportEndpoint.requiredScopes,
+      ),
+    getActiveMembershipsReport: () =>
+      httpClient.get<ActiveMembershipsByCourse[]>(
+        getActiveMembershipsReportEndpoint.path,
+        getActiveMembershipsReportEndpoint.requiredScopes,
       ),
   };
 }

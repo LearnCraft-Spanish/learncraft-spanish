@@ -1,4 +1,5 @@
 import type {
+  ActiveMembershipsByCourse,
   AssignmentsCompletedByWeek,
   CoachSummary,
   CoachSummaryDrilldown,
@@ -30,4 +31,5 @@ export interface AdminReportsPort {
   ) => Promise<CoachSummaryDrilldown[]>;
   getPrivateCallsByCoachReport: () => Promise<PrivateCallsByCoach[]>;
   getGroupCallsByCoachReport: () => Promise<GroupCallsByCoach[]>;
+  getActiveMembershipsReport: () => Promise<ActiveMembershipsByCourse[]>;
 }
