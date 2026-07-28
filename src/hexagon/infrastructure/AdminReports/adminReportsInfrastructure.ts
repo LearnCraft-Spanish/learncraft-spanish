@@ -4,12 +4,14 @@ import type {
   AssignmentsCompletedByWeek,
   CoachSummary,
   CoachSummaryDrilldown,
+  GroupCallsByCoach,
   MembershipsByCoach,
   PrivateCallsByCoach,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
   getAssignmentsCompletedByWeekReportEndpoint,
+  getGroupCallsByCoachReportEndpoint,
   getLastWeekCoachSummaryReportEndpoint,
   getMembershipsByCoachCurrentReportEndpoint,
   getMembershipsByCoachTwoWeeksOutReportEndpoint,
@@ -81,6 +83,11 @@ export function createAdminReportsInfrastructure(
       httpClient.get<PrivateCallsByCoach[]>(
         getPrivateCallsByCoachReportEndpoint.path,
         getPrivateCallsByCoachReportEndpoint.requiredScopes,
+      ),
+    getGroupCallsByCoachReport: () =>
+      httpClient.get<GroupCallsByCoach[]>(
+        getGroupCallsByCoachReportEndpoint.path,
+        getGroupCallsByCoachReportEndpoint.requiredScopes,
       ),
   };
 }

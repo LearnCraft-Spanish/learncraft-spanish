@@ -2,6 +2,7 @@ import type {
   AssignmentsCompletedByWeek,
   CoachSummary,
   CoachSummaryDrilldown,
+  GroupCallsByCoach,
   MembershipsByCoach,
   PrivateCallsByCoach,
 } from '@learncraft-spanish/shared';
@@ -28,4 +29,5 @@ export interface AdminReportsPort {
     report: WeeksDrilldownReportName,
   ) => Promise<CoachSummaryDrilldown[]>;
   getPrivateCallsByCoachReport: () => Promise<PrivateCallsByCoach[]>;
+  getGroupCallsByCoachReport: () => Promise<GroupCallsByCoach[]>;
 }

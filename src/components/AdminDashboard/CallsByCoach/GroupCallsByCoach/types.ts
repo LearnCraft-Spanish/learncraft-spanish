@@ -1,6 +1,1 @@
-interface GroupCallData {
-  coach: string;
-  numberOfGroupSessions: number;
-}
-
-export type { GroupCallData };
+export type { GroupCallsByCoach as GroupCallData } from '@learncraft-spanish/shared';

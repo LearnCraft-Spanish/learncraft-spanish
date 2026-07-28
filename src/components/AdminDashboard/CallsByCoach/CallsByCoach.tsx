@@ -1,27 +1,41 @@
-import { useState } from 'react';
-import DeprecatedSectionHeader from '../DeprecatedSectionHeader';
-import PrivateCallsByCoach from './PrivateCallsByCoach';
-
-/* Deprecated — re-enable when group calls and calls drilldown are migrated.
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import GroupCallsByCoach from './GroupCallsByCoach';
 import GroupCallsDrilldownTable from './GroupCallsDrilldownTable';
-import PrivateCallsDrilldownTable from './PrivateCallsDrilldownTable';
-*/
+import PrivateCallsByCoach from './PrivateCallsByCoach';
 
 export default function CallsByCoach() {
   const [privateCallsByCoachOpen, setPrivateCallsByCoachOpen] = useState(false);
 
+  const [selectedReport, setSelectedReport] = useState<string | null>(null);
+  const [groupCallsByCoachOpen, setGroupCallsByCoachOpen] = useState(false);
+
+  const updateSelectedReport = (str: string) => {
+    setSelectedReport(str);
+  };
+
+  useEffect(() => {
+    if (!groupCallsByCoachOpen) {
+      setSelectedReport(null);
+    }
+  }, [groupCallsByCoachOpen]);
+
   return (
     <div className="section-with-interactive-table">
       <div className="admin-dashboard-grid">
-        <DeprecatedSectionHeader title="Group Calls by Coach" />
         <PrivateCallsByCoach
           setSelectedReport={() => undefined}
           isOpen={privateCallsByCoachOpen}
           setIsOpen={setPrivateCallsByCoachOpen}
         />
+        <GroupCallsByCoach
+          setSelectedReport={updateSelectedReport}
+          isOpen={groupCallsByCoachOpen}
+          setIsOpen={setGroupCallsByCoachOpen}
+        />
       </div>
+      {selectedReport?.includes('Group') && (
+        <GroupCallsDrilldownTable selectedReport={selectedReport} />
+      )}
     </div>
   );
 }
