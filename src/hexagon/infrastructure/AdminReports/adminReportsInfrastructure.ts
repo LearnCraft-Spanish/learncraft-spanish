@@ -2,15 +2,20 @@ import type { AdminReportsPort } from '@application/ports/AdminReports/adminRepo
 import type { AuthPort } from '@application/ports/authPort';
 import type {
   AssignmentsCompletedByWeek,
+  CoachSummary,
+  CoachSummaryDrilldown,
   MembershipsByCoach,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
   getAssignmentsCompletedByWeekReportEndpoint,
+  getLastWeekCoachSummaryReportEndpoint,
   getMembershipsByCoachCurrentReportEndpoint,
   getMembershipsByCoachTwoWeeksOutReportEndpoint,
   getMembershipsBySalariedCoachCurrentReportEndpoint,
   getMembershipsBySalariedCoachTwoWeeksOutReportEndpoint,
+  getWeeklyCoachSummaryReportEndpoint,
+  getWeeksDrilldownReportEndpoint,
 } from '@learncraft-spanish/shared';
 
 export function createAdminReportsInfrastructure(
@@ -47,6 +52,27 @@ export function createAdminReportsInfrastructure(
           params: {
             startDate: weekStarts,
           },
+        },
+      ),
+    getWeeklyCoachSummaryReport: () =>
+      httpClient.get<CoachSummary[]>(
+        getWeeklyCoachSummaryReportEndpoint.path,
+        getWeeklyCoachSummaryReportEndpoint.requiredScopes,
+      ),
+    getLastWeekCoachSummaryReport: () =>
+      httpClient.get<CoachSummary[]>(
+        getLastWeekCoachSummaryReportEndpoint.path,
+        getLastWeekCoachSummaryReportEndpoint.requiredScopes,
+      ),
+    getWeeksDrilldownReport: (
+      coachName: string,
+      report: 'Weekly Coach Summary' | 'Last Week Coach Summary',
+    ) =>
+      httpClient.get<CoachSummaryDrilldown[]>(
+        getWeeksDrilldownReportEndpoint.path,
+        getWeeksDrilldownReportEndpoint.requiredScopes,
+        {
+          params: { coachName, report },
         },
       ),
   };

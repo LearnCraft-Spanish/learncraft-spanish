@@ -54,7 +54,7 @@ export default function DrilldownTable({
               <tr key={week.recordId}>
                 <td>{week.student}</td>
                 <td>{week.level}</td>
-                <td>{week.primaryCoach.name}</td>
+                <td>{week.primaryCoach.fullName}</td>
                 <td>{toISODate(new Date(week.weekStarts))}</td>
                 <td>
                   {week.assignments.length > 0 && (
