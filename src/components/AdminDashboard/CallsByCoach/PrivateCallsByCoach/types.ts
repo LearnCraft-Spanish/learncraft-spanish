@@ -1,6 +1,3 @@
-interface PrivateCallData {
-  caller: string;
-  numberOfCalls: number;
-}
+import type { PrivateCallsByCoach } from '@learncraft-spanish/shared';
 
-export type { PrivateCallData };
+export type { PrivateCallsByCoach as PrivateCallData };
