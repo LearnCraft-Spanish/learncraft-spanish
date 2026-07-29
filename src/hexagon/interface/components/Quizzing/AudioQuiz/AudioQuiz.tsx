@@ -121,9 +121,9 @@ export default function AudioQuiz({
       } else if (event.key === ' ') {
         event.preventDefault();
         if (isPlaying) {
-          pause();
+          pause().catch(() => {});
         } else {
-          play();
+          play().catch(() => {});
         }
       }
       if (getHelpIsOpen) {
