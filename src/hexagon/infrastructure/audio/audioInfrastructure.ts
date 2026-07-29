@@ -71,7 +71,10 @@ export function useAudioInfrastructure(): AudioPort {
     (silenceUrl: string) => {
       if (!playingAudioRef.current) return;
       playingAudioRef.current.src = silenceUrl;
-      playingAudioRef.current.play().catch(() => {});
+      // safePlay still invokes play() synchronously (preserves the gesture token)
+      // and reports unexpected failures — especially NotAllowedError, which is the
+      // autoplay-policy case this unlock exists to prevent.
+      void safePlay(playingAudioRef.current);
     },
     [playingAudioRef],
   );
@@ -164,7 +167,12 @@ export function useAudioInfrastructure(): AudioPort {
         () => {
           el.currentTime = newAudio.currentTime;
           if (newAudio.playOnLoad) {
-            safePlay(el);
+            // Same post-play guard as play(): optimistic isPlaying(true) must be
+            // corrected if playback fails and no newer operation has superseded us.
+            safePlay(el).then(() => {
+              if (signal.aborted) return;
+              if (el.paused) setIsPlaying(false);
+            });
           }
         },
         { once: true, signal },

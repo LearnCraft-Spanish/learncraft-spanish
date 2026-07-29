@@ -124,6 +124,27 @@ describe('useAudioInfrastructure — play/pause race safety', () => {
 
       expect(result.current.isPlaying).toBe(true);
     });
+
+    it('primeAudioElement routes through safePlay (no unhandled rejection on AbortError)', async () => {
+      const { audio, wrapper } = makeAudioEngine();
+      const playSpy = vi
+        .spyOn(audio, 'play')
+        .mockRejectedValueOnce(makeAbortError());
+
+      const { result } = renderHook(() => useAudioInfrastructure(), {
+        wrapper,
+      });
+
+      await act(async () => {
+        result.current.primeAudioElement('https://example.com/silence.mp3');
+        await new Promise((r) => setTimeout(r, 0));
+      });
+
+      expect(audio.src).toContain('silence.mp3');
+      expect(playSpy).toHaveBeenCalledTimes(1);
+      // Priming must not flip quiz UI playing state
+      expect(result.current.isPlaying).toBe(false);
+    });
   });
 
   describe('abortController — stale listener cancellation', () => {
@@ -224,6 +245,82 @@ describe('useAudioInfrastructure — play/pause race safety', () => {
 
       expect(playSpy).not.toHaveBeenCalled();
       expect(result.current.isPlaying).toBe(false);
+    });
+
+    it('resets isPlaying when changeCurrentAudio playOnLoad fails and element stays paused', async () => {
+      const { audio, wrapper } = makeAudioEngine();
+      setReadyState(audio, 4);
+      vi.spyOn(audio, 'play').mockRejectedValueOnce(makeAbortError());
+      vi.spyOn(audio, 'pause').mockImplementation(() => {});
+
+      const { result } = renderHook(() => useAudioInfrastructure(), {
+        wrapper,
+      });
+
+      await act(async () => {
+        await result.current.changeCurrentAudio({
+          currentTime: 0,
+          src: 'https://example.com/next.mp3',
+          onEnded: vi.fn(),
+          playOnLoad: true,
+        });
+      });
+      expect(result.current.isPlaying).toBe(true);
+
+      await act(async () => {
+        audio.dispatchEvent(new Event('loadeddata'));
+        await new Promise((r) => setTimeout(r, 0));
+      });
+
+      expect(result.current.isPlaying).toBe(false);
+    });
+
+    it('keeps isPlaying true when a newer changeCurrentAudio supersedes a failed playOnLoad', async () => {
+      const { audio, wrapper } = makeAudioEngine();
+      setReadyState(audio, 4);
+
+      let resolveFirstPlay!: () => void;
+      vi.spyOn(audio, 'play').mockImplementationOnce(
+        () =>
+          new Promise<undefined>((res) => {
+            resolveFirstPlay = res as () => void;
+          }),
+      );
+      vi.spyOn(audio, 'pause').mockImplementation(() => {});
+
+      const { result } = renderHook(() => useAudioInfrastructure(), {
+        wrapper,
+      });
+
+      await act(async () => {
+        await result.current.changeCurrentAudio({
+          currentTime: 0,
+          src: 'https://example.com/first.mp3',
+          onEnded: vi.fn(),
+          playOnLoad: true,
+        });
+      });
+
+      await act(async () => {
+        audio.dispatchEvent(new Event('loadeddata'));
+      });
+
+      await act(async () => {
+        await result.current.changeCurrentAudio({
+          currentTime: 0,
+          src: 'https://example.com/second.mp3',
+          onEnded: vi.fn(),
+          playOnLoad: true,
+        });
+      });
+      expect(result.current.isPlaying).toBe(true);
+
+      await act(async () => {
+        resolveFirstPlay();
+        await new Promise((r) => setTimeout(r, 0));
+      });
+
+      expect(result.current.isPlaying).toBe(true);
     });
   });
 
