@@ -7,8 +7,8 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const incrementCurrentStep = vi.fn(() => {});
-const pausePlayback = vi.fn(() => {});
-const resumePlayback = vi.fn(() => {});
+const pausePlayback = vi.fn(() => Promise.resolve());
+const resumePlayback = vi.fn(() => Promise.resolve());
 
 const addFlashcard = vi.fn(() => {});
 const removeFlashcard = vi.fn(() => {});

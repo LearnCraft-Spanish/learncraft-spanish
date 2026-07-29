@@ -3,7 +3,35 @@ import type {
   AudioPort,
 } from '@application/ports/audioPort';
 import { AudioContext } from '@composition/context/AudioContext';
+import * as Sentry from '@sentry/react';
 import { use, useCallback, useEffect, useRef, useState } from 'react';
+
+/**
+ * Calls el.play() synchronously (preserving the browser user-gesture token),
+ * then catches expected interruption errors so they never become unhandled rejections.
+ *
+ * AbortError is an expected race (pause/load called before play resolves) — recorded
+ * as a breadcrumb only so the fix can be validated in Sentry without generating noise.
+ *
+ * Any other error is unexpected (e.g. NotSupportedError, NotAllowedError) and is
+ * captured as a warning-level Sentry event for investigation, but still not rethrown
+ * so it cannot break the UX.
+ */
+function safePlay(el: HTMLMediaElement): Promise<void> {
+  return el.play().catch((error: unknown) => {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      Sentry.addBreadcrumb({
+        category: 'audio',
+        message:
+          'play() interrupted (AbortError) — expected race with pause/load',
+        level: 'warning',
+        data: { src: el.src },
+      });
+      return;
+    }
+    Sentry.captureException(error, { level: 'warning' });
+  });
+}
 
 export function useAudioInfrastructure(): AudioPort {
   const context = use(AudioContext);
@@ -18,13 +46,35 @@ export function useAudioInfrastructure(): AudioPort {
   // State for the current time of the playing audio
   const [currentTime, setCurrentTime] = useState(0);
 
+  // One AbortController tracks the "current audio operation" (play / changeCurrentAudio /
+  // pause / cleanup). Every new operation aborts the previous one so that any
+  // addEventListener listener registered with its signal is automatically cancelled,
+  // preventing stale loadedmetadata / loadeddata callbacks from calling safePlay
+  // on a superseded audio element state.
+  const operationAbortControllerRef = useRef<AbortController | null>(null);
+  if (!operationAbortControllerRef.current) {
+    operationAbortControllerRef.current = new AbortController();
+  }
+
+  // Abort the current operation and return a fresh signal for the next one.
+  // Stable identity (empty deps): only reads/writes the ref, which is always the same object.
+  const startNewOperation = useCallback((): AbortSignal => {
+    operationAbortControllerRef.current!.abort();
+    const next = new AbortController();
+    operationAbortControllerRef.current = next;
+    return next.signal;
+  }, []);
+
   // Unlocks the audio element for programmatic playback.
   // Must be called synchronously from a user gesture (e.g. "Start Quiz" click).
   const primeAudioElement = useCallback(
     (silenceUrl: string) => {
       if (!playingAudioRef.current) return;
       playingAudioRef.current.src = silenceUrl;
-      playingAudioRef.current.play().catch(() => {});
+      // safePlay still invokes play() synchronously (preserves the gesture token)
+      // and reports unexpected failures — especially NotAllowedError, which is the
+      // autoplay-policy case this unlock exists to prevent.
+      void safePlay(playingAudioRef.current);
     },
     [playingAudioRef],
   );
@@ -33,32 +83,55 @@ export function useAudioInfrastructure(): AudioPort {
     // If the audio element is not mounted or is already playing, do nothing
     if (!playingAudioRef.current || isPlaying) {
       return;
-    } else if (playingAudioRef.current.readyState < 1) {
-      // If the audio is not ready to be played, play it when the metadata is loaded
+    }
+
+    const el = playingAudioRef.current;
+    // Abort any previous pending loadedmetadata listener from an earlier play() call
+    // that hasn't fired yet (e.g. double-click play before readyState advances).
+    const signal = startNewOperation();
+
+    if (el.readyState < 1) {
+      // Audio not yet loaded: optimistically mark as playing, then start when metadata arrives.
       setIsPlaying(true);
-      playingAudioRef.current.addEventListener(
+      el.addEventListener(
         'loadedmetadata',
         () => {
-          playingAudioRef.current?.play();
+          safePlay(el).then(() => {
+            // If a newer operation superseded this one while play() was in flight
+            // (e.g. changeCurrentAudio set isPlaying true and is waiting on loadeddata),
+            // do not stomp that optimistic state just because el is still paused.
+            if (signal.aborted) return;
+            // If playback was aborted or failed for a non-AbortError reason,
+            // reset the UI so it doesn't show "playing" when nothing is playing.
+            if (el.paused) setIsPlaying(false);
+          });
         },
-        { once: true },
+        { once: true, signal },
       );
       return;
     }
+
     setIsPlaying(true);
-    await playingAudioRef.current.play();
-  }, [playingAudioRef, isPlaying, setIsPlaying]);
+    await safePlay(el);
+    // Same supersession guard as the loadedmetadata path above.
+    if (signal.aborted) return;
+    // If playback failed for another reason, reset to avoid a stuck "playing" UI.
+    if (el.paused) setIsPlaying(false);
+  }, [playingAudioRef, isPlaying, startNewOperation]);
 
   const pause = useCallback(async () => {
     // If the audio is not playing, do nothing
     if (!playingAudioRef.current || !isPlaying) return;
+    // Cancel any pending loadedmetadata/loadeddata listener so audio cannot start
+    // playing again after this pause (e.g. if readyState was < 1 when play() was called).
+    startNewOperation();
     // Pause the audio
-    await playingAudioRef.current.pause();
+    playingAudioRef.current.pause();
     // Stop the UI update propagation
     if (tickRef.current) clearInterval(tickRef.current);
     // UI state update
     setIsPlaying(false);
-  }, [playingAudioRef, isPlaying, setIsPlaying]);
+  }, [playingAudioRef, isPlaying, startNewOperation]);
 
   // Updates the current time state of the playing audio
   const updateCurrentTime = useCallback(() => {
@@ -76,25 +149,33 @@ export function useAudioInfrastructure(): AudioPort {
 
       const el = playingAudioRef.current;
 
-      // Stop current playback and clear pending listeners on the SAME element
-      // (preserves the user-gesture permission chain — never clone/replace)
+      // Cancel any pending loadedmetadata/loadeddata listener from a previous play() or
+      // changeCurrentAudio() call, then stop current playback — all on the SAME element
+      // to preserve the user-gesture permission chain (never clone/replace the element).
+      const signal = startNewOperation();
       el.pause();
-      el.onloadedmetadata = null;
       el.onended = null;
 
       el.src = newAudio.src;
       el.onended = newAudio.onEnded;
 
-      // Use loadeddata (first frame available) to start playback as early as possible when switching sources
+      // Use loadeddata (first frame available) to start playback as early as possible
+      // when switching sources. The { signal } ensures this listener is cancelled if
+      // another changeCurrentAudio() call supersedes this one before loadeddata fires.
       el.addEventListener(
         'loadeddata',
         () => {
           el.currentTime = newAudio.currentTime;
           if (newAudio.playOnLoad) {
-            el.play();
+            // Same post-play guard as play(): optimistic isPlaying(true) must be
+            // corrected if playback fails and no newer operation has superseded us.
+            safePlay(el).then(() => {
+              if (signal.aborted) return;
+              if (el.paused) setIsPlaying(false);
+            });
           }
         },
-        { once: true },
+        { once: true, signal },
       );
 
       setIsPlaying(newAudio.playOnLoad);
@@ -102,13 +183,14 @@ export function useAudioInfrastructure(): AudioPort {
 
       updateCurrentTime();
     },
-    [playingAudioRef, updateCurrentTime],
+    [playingAudioRef, startNewOperation, updateCurrentTime],
   );
 
   const cleanupAudio = useCallback(() => {
+    // Cancel all pending listeners before touching the element.
+    startNewOperation();
     if (playingAudioRef.current) {
       playingAudioRef.current.pause();
-      playingAudioRef.current.onloadedmetadata = null;
       playingAudioRef.current.onended = null;
       playingAudioRef.current.currentTime = 0;
       playingAudioRef.current.src = '';
@@ -121,7 +203,7 @@ export function useAudioInfrastructure(): AudioPort {
 
     setIsPlaying(false);
     setCurrentTime(0);
-  }, [playingAudioRef]);
+  }, [playingAudioRef, startNewOperation]);
 
   // Ticks the current time of the playing audio, pushes to state
   useEffect(() => {
