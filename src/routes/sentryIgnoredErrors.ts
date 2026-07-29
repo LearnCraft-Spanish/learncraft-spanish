@@ -22,7 +22,7 @@ export const errorsToIgnore: IgnoredError[] = [
   // Deploy/CDN returned HTML (e.g. index/404) instead of the JS chunk.
   {
     name: 'TypeError',
-    message: "'text/html' is not a valid JavaScript MIME type.",
+    message: /is not a valid JavaScript MIME type/,
   },
 ];
 

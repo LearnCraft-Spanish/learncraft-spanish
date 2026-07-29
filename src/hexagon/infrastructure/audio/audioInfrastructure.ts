@@ -51,12 +51,15 @@ export function useAudioInfrastructure(): AudioPort {
   // addEventListener listener registered with its signal is automatically cancelled,
   // preventing stale loadedmetadata / loadeddata callbacks from calling safePlay
   // on a superseded audio element state.
-  const operationAbortControllerRef = useRef(new AbortController());
+  const operationAbortControllerRef = useRef<AbortController | null>(null);
+  if (!operationAbortControllerRef.current) {
+    operationAbortControllerRef.current = new AbortController();
+  }
 
   // Abort the current operation and return a fresh signal for the next one.
   // Stable identity (empty deps): only reads/writes the ref, which is always the same object.
   const startNewOperation = useCallback((): AbortSignal => {
-    operationAbortControllerRef.current.abort();
+    operationAbortControllerRef.current!.abort();
     const next = new AbortController();
     operationAbortControllerRef.current = next;
     return next.signal;
@@ -91,6 +94,10 @@ export function useAudioInfrastructure(): AudioPort {
         'loadedmetadata',
         () => {
           safePlay(el).then(() => {
+            // If a newer operation superseded this one while play() was in flight
+            // (e.g. changeCurrentAudio set isPlaying true and is waiting on loadeddata),
+            // do not stomp that optimistic state just because el is still paused.
+            if (signal.aborted) return;
             // If playback was aborted or failed for a non-AbortError reason,
             // reset the UI so it doesn't show "playing" when nothing is playing.
             if (el.paused) setIsPlaying(false);
@@ -103,8 +110,9 @@ export function useAudioInfrastructure(): AudioPort {
 
     setIsPlaying(true);
     await safePlay(el);
-    // If pause()/changeCurrentAudio() raced and already corrected isPlaying, this is a
-    // no-op. If playback failed for another reason, reset to avoid a stuck "playing" UI.
+    // Same supersession guard as the loadedmetadata path above.
+    if (signal.aborted) return;
+    // If playback failed for another reason, reset to avoid a stuck "playing" UI.
     if (el.paused) setIsPlaying(false);
   }, [playingAudioRef, isPlaying, startNewOperation]);
 

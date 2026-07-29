@@ -266,5 +266,93 @@ describe('useAudioInfrastructure — play/pause race safety', () => {
       // Final state must be paused regardless of the play() resolution order
       expect(result.current.isPlaying).toBe(false);
     });
+
+    it('does not stomp isPlaying when changeCurrentAudio supersedes an in-flight play()', async () => {
+      const { audio, wrapper } = makeAudioEngine();
+      setReadyState(audio, 4);
+
+      let resolvePlay!: () => void;
+      vi.spyOn(audio, 'play').mockImplementation(
+        () =>
+          new Promise<undefined>((res) => {
+            resolvePlay = res as () => void;
+          }),
+      );
+      vi.spyOn(audio, 'pause').mockImplementation(() => {});
+
+      const { result } = renderHook(() => useAudioInfrastructure(), {
+        wrapper,
+      });
+
+      // Start play — safePlay promise is pending after optimistic setIsPlaying(true)
+      act(() => {
+        result.current.play().catch(() => {});
+      });
+      expect(result.current.isPlaying).toBe(true);
+
+      // Superseding operation wants playback (playOnLoad) but new audio has not
+      // started yet, so el.paused remains true — the stale play() continuation
+      // must not reset isPlaying to false.
+      await act(async () => {
+        await result.current.changeCurrentAudio({
+          currentTime: 0,
+          src: 'https://example.com/next.mp3',
+          onEnded: vi.fn(),
+          playOnLoad: true,
+        });
+      });
+      expect(result.current.isPlaying).toBe(true);
+
+      await act(async () => {
+        resolvePlay();
+        await new Promise((r) => setTimeout(r, 0));
+      });
+
+      expect(result.current.isPlaying).toBe(true);
+    });
+
+    it('does not stomp isPlaying when changeCurrentAudio supersedes after loadedmetadata', async () => {
+      const { audio, wrapper } = makeAudioEngine();
+      setReadyState(audio, 0);
+
+      let resolvePlay!: () => void;
+      vi.spyOn(audio, 'play').mockImplementation(
+        () =>
+          new Promise<undefined>((res) => {
+            resolvePlay = res as () => void;
+          }),
+      );
+      vi.spyOn(audio, 'pause').mockImplementation(() => {});
+
+      const { result } = renderHook(() => useAudioInfrastructure(), {
+        wrapper,
+      });
+
+      await act(async () => {
+        await result.current.play();
+      });
+
+      // Fire loadedmetadata so safePlay starts; leave the promise pending.
+      await act(async () => {
+        audio.dispatchEvent(new Event('loadedmetadata'));
+      });
+
+      await act(async () => {
+        await result.current.changeCurrentAudio({
+          currentTime: 0,
+          src: 'https://example.com/next.mp3',
+          onEnded: vi.fn(),
+          playOnLoad: true,
+        });
+      });
+      expect(result.current.isPlaying).toBe(true);
+
+      await act(async () => {
+        resolvePlay();
+        await new Promise((r) => setTimeout(r, 0));
+      });
+
+      expect(result.current.isPlaying).toBe(true);
+    });
   });
 });

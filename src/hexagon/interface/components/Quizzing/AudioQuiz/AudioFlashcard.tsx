@@ -42,9 +42,9 @@ export default function AudioFlashcardComponent({
   ): void {
     e.stopPropagation();
     if (isPlaying) {
-      pause().catch(() => {});
+      pause();
     } else {
-      play().catch(() => {});
+      play();
     }
   }
 
