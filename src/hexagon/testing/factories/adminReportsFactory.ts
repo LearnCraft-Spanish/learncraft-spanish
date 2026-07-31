@@ -3,6 +3,7 @@ import {
   assignmentsCompletedByWeekSchema,
   coachSummaryDrilldownSchema,
   coachSummarySchema,
+  groupCallsByCoachSchema,
   membershipsByCoachSchema,
 } from '@learncraft-spanish/shared';
 import {
@@ -40,4 +41,11 @@ export const createMockCoachSummaryDrilldown = createZodFactory(
 );
 export const createMockCoachSummaryDrilldownList = createZodListFactory(
   coachSummaryDrilldownSchema,
+);
+
+export const createMockGroupCallsByCoach = createZodFactory(
+  groupCallsByCoachSchema,
+);
+export const createMockGroupCallsByCoachList = createZodListFactory(
+  groupCallsByCoachSchema,
 );
