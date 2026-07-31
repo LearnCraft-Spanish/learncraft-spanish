@@ -14,8 +14,8 @@ interface AudioFlashcardProps {
   nextStep: () => void;
   autoplay: boolean;
   progressStatus: number;
-  pause: () => void;
-  play: () => void;
+  pause: () => Promise<void>;
+  play: () => Promise<void>;
   isPlaying: boolean;
   getHelpIsOpen: boolean;
   setGetHelpIsOpen: (getHelpIsOpen: boolean) => void;

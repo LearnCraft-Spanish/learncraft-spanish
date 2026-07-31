@@ -2,11 +2,13 @@ import { overrideMockAssignmentsAdapter } from '@application/adapters/assignment
 import { overrideMockWeeklyRecordsAdapter } from '@application/adapters/weeklyRecordsAdapter.mock';
 import { useAssignmentsMutations } from '@application/queries/AssignmentsQueries/useAssignmentMutations';
 import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
+import { MEMBERSHIP_WEEKS_QUERY_KEY_ROOT } from '@application/queries/WeekQueries/useMembershipWeeksQuery';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { baseAssignmentFactory } from '@testing/factories/assignmentsFactory';
 import { createMockFurnishedWeekWithCoach } from '@testing/factories/weekFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
-import { describe, expect, it } from 'vitest';
+import { testQueryClient } from '@testing/utils/testQueryClient';
+import { describe, expect, it, vi } from 'vitest';
 
 const START_DATE = '2026-01-05';
 
@@ -238,5 +240,46 @@ describe('useAssignmentsMutations', () => {
       expect(updatedWeek?.assignments).toHaveLength(1);
       expect(updatedWeek?.assignments[0].assignmentId).toBe(20);
     });
+  });
+
+  it('should invalidate Student Drill Down membershipWeeks queries on create/update/delete', async () => {
+    const invalidateSpy = vi.spyOn(testQueryClient, 'invalidateQueries');
+    const assignment = baseAssignmentFactory({ weekId: 101, assignmentId: 1 });
+    overrideMockAssignmentsAdapter({
+      createAssignment: async () => assignment,
+      updateAssignment: async () => assignment,
+      deleteAssignment: async () => {},
+    });
+
+    const { result } = renderHook(() => useAssignmentsMutations(), {
+      wrapper: TestQueryClientProvider,
+    });
+
+    await act(() =>
+      result.current.createAssignmentMutation.mutateAsync(
+        makeCreateCmd(assignment),
+      ),
+    );
+    await act(() =>
+      result.current.updateAssignmentMutation.mutateAsync(
+        makeUpdateCmd(assignment),
+      ),
+    );
+    await act(() =>
+      result.current.deleteAssignmentMutation.mutateAsync({
+        assignmentId: 1,
+      }),
+    );
+
+    await waitFor(() =>
+      expect(result.current.deleteAssignmentMutation.isSuccess).toBe(true),
+    );
+
+    const membershipWeekInvalidations = invalidateSpy.mock.calls.filter(
+      ([args]) =>
+        Array.isArray(args?.queryKey) &&
+        args.queryKey[0] === MEMBERSHIP_WEEKS_QUERY_KEY_ROOT[0],
+    );
+    expect(membershipWeekInvalidations).toHaveLength(3);
   });
 });

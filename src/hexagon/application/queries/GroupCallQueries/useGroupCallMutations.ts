@@ -7,8 +7,10 @@ import type {
 } from '@learncraft-spanish/shared';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useGroupCallsAdapter } from '@application/adapters/groupCallsAdapter';
+import { MEMBERSHIP_WEEKS_QUERY_KEY_ROOT } from '@application/queries/WeekQueries/useMembershipWeeksQuery';
 import { weekAttendsGroupSession } from '@domain/functions/weekAttendsGroupSession';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 const WEEKS_QUERY_KEY = ['weeklyRecords', 'weeksByStartDate'];
 
 export interface UseGroupCallMutationsReturn {
@@ -65,6 +67,9 @@ export function useGroupCallMutations(): UseGroupCallMutationsReturn {
           });
         },
       );
+      void queryClient.invalidateQueries({
+        queryKey: MEMBERSHIP_WEEKS_QUERY_KEY_ROOT,
+      });
     },
   });
 
@@ -101,6 +106,9 @@ export function useGroupCallMutations(): UseGroupCallMutationsReturn {
           });
         },
       );
+      void queryClient.invalidateQueries({
+        queryKey: MEMBERSHIP_WEEKS_QUERY_KEY_ROOT,
+      });
     },
   });
 
@@ -119,6 +127,9 @@ export function useGroupCallMutations(): UseGroupCallMutationsReturn {
           }));
         },
       );
+      void queryClient.invalidateQueries({
+        queryKey: MEMBERSHIP_WEEKS_QUERY_KEY_ROOT,
+      });
     },
   });
 

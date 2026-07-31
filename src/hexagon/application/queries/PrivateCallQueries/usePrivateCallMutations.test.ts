@@ -2,11 +2,13 @@ import { overrideMockPrivateCallsAdapter } from '@application/adapters/privateCa
 import { overrideMockWeeklyRecordsAdapter } from '@application/adapters/weeklyRecordsAdapter.mock';
 import { usePrivateCallMutations } from '@application/queries/PrivateCallQueries/usePrivateCallMutations';
 import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
+import { MEMBERSHIP_WEEKS_QUERY_KEY_ROOT } from '@application/queries/WeekQueries/useMembershipWeeksQuery';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { basePrivateCallFactory } from '@testing/factories/privateCallsFactory';
 import { createMockFurnishedWeekWithCoach } from '@testing/factories/weekFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
-import { describe, expect, it } from 'vitest';
+import { testQueryClient } from '@testing/utils/testQueryClient';
+import { describe, expect, it, vi } from 'vitest';
 
 const START_DATE = '2026-01-05';
 
@@ -231,5 +233,40 @@ describe('usePrivateCallMutations', () => {
       expect(week?.privateCalls).toHaveLength(1);
       expect(week?.privateCalls[0].callId).toBe(20);
     });
+  });
+
+  it('should invalidate Student Drill Down membershipWeeks queries on create/update/delete', async () => {
+    const invalidateSpy = vi.spyOn(testQueryClient, 'invalidateQueries');
+    const call = basePrivateCallFactory({ weekId: 101, callId: 1 });
+    overrideMockPrivateCallsAdapter({
+      createPrivateCall: async () => call,
+      updatePrivateCall: async () => call,
+      deletePrivateCall: async () => {},
+    });
+
+    const { result } = renderHook(() => usePrivateCallMutations(), {
+      wrapper: TestQueryClientProvider,
+    });
+
+    await act(() =>
+      result.current.createPrivateCallMutation.mutateAsync(makeCreateCmd(call)),
+    );
+    await act(() =>
+      result.current.updatePrivateCallMutation.mutateAsync(makeUpdateCmd(call)),
+    );
+    await act(() =>
+      result.current.deletePrivateCallMutation.mutateAsync({ callId: 1 }),
+    );
+
+    await waitFor(() =>
+      expect(result.current.deletePrivateCallMutation.isSuccess).toBe(true),
+    );
+
+    const membershipWeekInvalidations = invalidateSpy.mock.calls.filter(
+      ([args]) =>
+        Array.isArray(args?.queryKey) &&
+        args.queryKey[0] === MEMBERSHIP_WEEKS_QUERY_KEY_ROOT[0],
+    );
+    expect(membershipWeekInvalidations).toHaveLength(3);
   });
 });
