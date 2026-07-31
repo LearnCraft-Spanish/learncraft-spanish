@@ -5,6 +5,7 @@ import type {
   CoachSummary,
   CoachSummaryDrilldown,
   MembershipsByCoach,
+  PrivateCallsByCoach,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
@@ -14,6 +15,7 @@ import {
   getMembershipsByCoachTwoWeeksOutReportEndpoint,
   getMembershipsBySalariedCoachCurrentReportEndpoint,
   getMembershipsBySalariedCoachTwoWeeksOutReportEndpoint,
+  getPrivateCallsByCoachReportEndpoint,
   getWeeklyCoachSummaryReportEndpoint,
   getWeeksDrilldownReportEndpoint,
 } from '@learncraft-spanish/shared';
@@ -74,6 +76,11 @@ export function createAdminReportsInfrastructure(
         {
           params: { coachName, report },
         },
+      ),
+    getPrivateCallsByCoachReport: () =>
+      httpClient.get<PrivateCallsByCoach[]>(
+        getPrivateCallsByCoachReportEndpoint.path,
+        getPrivateCallsByCoachReportEndpoint.requiredScopes,
       ),
   };
 }
