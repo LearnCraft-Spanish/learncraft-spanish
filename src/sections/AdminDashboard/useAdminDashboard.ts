@@ -18,7 +18,9 @@ export default function useAdminDashboard() {
     privateCallsByCoachQuery.isError;
 
   const isSuccess =
-    weeklyCoachSummaryQuery.isSuccess && lastWeekCoachSummaryQuery.isSuccess;
+    weeklyCoachSummaryQuery.isSuccess &&
+    lastWeekCoachSummaryQuery.isSuccess &&
+    privateCallsByCoachQuery.isSuccess;
 
   return {
     isLoading,
