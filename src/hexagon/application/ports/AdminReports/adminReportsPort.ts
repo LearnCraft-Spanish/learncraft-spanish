@@ -1,7 +1,12 @@
 import type {
   AssignmentsCompletedByWeek,
+  CoachSummary,
+  CoachSummaryDrilldown,
   MembershipsByCoach,
 } from '@learncraft-spanish/shared';
+
+export type WeeksDrilldownReportName =
+  'Weekly Coach Summary' | 'Last Week Coach Summary';
 
 export interface AdminReportsPort {
   getMembershipsByCoachCurrentReport: () => Promise<MembershipsByCoach[]>;
@@ -15,4 +20,10 @@ export interface AdminReportsPort {
   getAssignmentsCompletedByWeekReport: (
     weekStarts: string,
   ) => Promise<AssignmentsCompletedByWeek[]>;
+  getWeeklyCoachSummaryReport: () => Promise<CoachSummary[]>;
+  getLastWeekCoachSummaryReport: () => Promise<CoachSummary[]>;
+  getWeeksDrilldownReport: (
+    coachName: string,
+    report: WeeksDrilldownReportName,
+  ) => Promise<CoachSummaryDrilldown[]>;
 }
