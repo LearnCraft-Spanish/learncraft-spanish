@@ -1,4 +1,5 @@
 import {
+  activeMembershipsByCourseSchema,
   activeMembershipSummarySchema,
   assignmentsCompletedByWeekSchema,
   coachSummaryDrilldownSchema,
@@ -10,6 +11,13 @@ import {
   createZodFactory,
   createZodListFactory,
 } from '@testing/utils/factoryTools';
+
+export const createMockActiveMembershipsByCourse = createZodFactory(
+  activeMembershipsByCourseSchema,
+);
+export const createMockActiveMembershipsByCourseList = createZodListFactory(
+  activeMembershipsByCourseSchema,
+);
 
 export const createMockActiveMembershipSummary = createZodFactory(
   activeMembershipSummarySchema,
