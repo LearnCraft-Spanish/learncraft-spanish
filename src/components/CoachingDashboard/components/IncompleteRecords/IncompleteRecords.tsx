@@ -1,84 +1,65 @@
-// export function IncompleteRecords() {
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import WeeksTable from 'src/components/Coaching/WeeksRecords/Table/WeeksTable';
+import { useIncompleteWeeksForCoach } from 'src/hexagon/application/units/useIncompleteWeeksForCoach/useIncompleteWeeksForCoach';
+import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
+import { InlineLoading } from 'src/hexagon/interface/components/Loading';
+import SectionHeader from '../SectionHeader';
 
-//   const { contextual } = useContextualMenu();
+function IncompleteRecords({
+  coachId,
+}: {
+  coachId: number;
+}): React.JSX.Element {
+  const { weeks, startDate, loading } = useIncompleteWeeksForCoach(coachId);
+  const [isOpen, setIsOpen] = useState(true);
 
-//   const { coach } = useActiveCoach();
-//   const { myIncompleteWeeklyRecords, startDate } = useMyIncompleteWeeklyRecords(
-//     {
-//       coach,
-//     },
-//   );
-
-//   return (
-//     <div className="coachingDashbaord__recordsToComplete">
-//       {myIncompleteWeeklyRecords === undefined ? (
-//         <InlineLoading message="Loading records..." />
-//       ) : (
-//         <>
-//           <p style={{ padding: '0 1rem' }}>
-//             {`Incomplete records for the week of: `}
-//             <b>{toReadableMonthDay(startDate)}</b>
-//           </p>
-//           <DisplayOnlyTable
-//             headers={[
-//               'Student',
-//               'Assignments',
-//               'Group Calls',
-//               'Private Calls',
-//               'Notes',
-//               'Current Lesson',
-//               'Hold Week',
-//               'Records Complete',
-//             ]}
-//             data={myIncompleteWeeklyRecords ?? []}
-//             renderRow={(item) => {
-//               return (
-//                 <WeeksTableItem
-//                   key={item.id}
-//                   week={item}
-//                   updateActiveDataWeek={() => {}}
-//                   editMode={false}
-//                   failedToUpdate={false}
-//                   hiddenFields={[]}
-//                 />
-//               );
-//             }}
-//           />
-//           {contextual.startsWith('week') && (
-//             <ViewWeekRecord
-//               week={myIncompleteWeeklyRecords?.find(
-//                 (week) => week.recordId === Number(contextual.split('week')[1]),
-//               )}
-//             />
-//           )}{' '}
-//         </>
-//       )}
-//     </div>
-//   );
-// }
-
-export default function IncompleteRecordsWrapper() {
-  return null;
+  return (
+    <div className="coachingDashbaord__recordsToComplete">
+      <SectionHeader
+        title="My Incomplete Records"
+        isOpen={isOpen}
+        openFunction={() => setIsOpen((prev) => !prev)}
+        button={
+          <div className="button">
+            <Link className="linkButton" to="/weeklyrecords">
+              Weekly Records Interface
+            </Link>
+          </div>
+        }
+      />
+      {isOpen && (
+        <>
+          {loading ? (
+            <InlineLoading message="Loading records..." />
+          ) : (
+            <>
+              {weeks.length > 0 && (
+                <p style={{ padding: '0 1rem' }}>
+                  {`Incomplete records for the week of: `}
+                  <b>{toReadableMonthDay(startDate)}</b>
+                </p>
+              )}
+              <WeeksTable
+                weeks={weeks}
+                tableEditMode={false}
+                hiddenFields={['primaryCoach']}
+                sortByStudent={false}
+                handleUpdateSortByStudent={() => {}}
+                sortDirection="none"
+              />
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
 }
-//   const [isOpen, setIsOpen] = useState(true);
-//   const openFunctionWrapper = (_title: string) => {
-//     setIsOpen(!isOpen);
-//   };
-//   return (
-//     <div>
-//       <SectionHeader
-//         title="My Incomplete Records"
-//         isOpen={isOpen}
-//         openFunction={openFunctionWrapper}
-//         button={
-//           <div className="button">
-//             <Link className="linkButton" to="/weeklyrecords">
-//               Weekly Records Interface
-//             </Link>
-//           </div>
-//         }
-//       />
-//       {isOpen && <IncompleteRecords />}
-//     </div>
-//   );
-// }
+
+export default function IncompleteRecordsWrapper({
+  coachId,
+}: {
+  coachId: number;
+}): React.JSX.Element {
+  return <IncompleteRecords coachId={coachId} />;
+}

@@ -1,6 +1,6 @@
 import { Loading } from '@interface/components/Loading';
 // import { DateRangeProvider } from '../Coaching/WeeksRecords/DateRangeProvider';
-// import IncompleteRecords from './components/IncompleteRecords';
+import IncompleteRecords from './components/IncompleteRecords';
 // import MyStudents from './components/MyStudents/MyStudents';
 // import MyStudentsBeyond150 from './components/MyStudentsBeyond150';
 import RecentRecords from './components/RecentRecords';
@@ -31,8 +31,7 @@ function CoachingDashboard() {
             </h1>
           </div>
           <div className="coachingDashbaordBody">
-            {/* Legacy — not yet reimplemented */}
-            {/* <IncompleteRecords /> */}
+            <IncompleteRecords coachId={currentCoach.coach_id} />
             {/* <MyStudents /> */}
             <div className="coachingDashbaord__recentActivity">
               <RecentRecords coachId={currentCoach.coach_id} />
@@ -46,11 +45,5 @@ function CoachingDashboard() {
 }
 
 export default function CoachingDashboardWrapper() {
-  // DateRangeProvider only needed for incomplete weekly records (legacy)
-  // return (
-  //   <DateRangeProvider>
-  //     <CoachingDashboard />
-  //   </DateRangeProvider>
-  // );
   return <CoachingDashboard />;
 }
