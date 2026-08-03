@@ -1,21 +1,7 @@
-import type { MembershipReportData } from 'src/components/AdminDashboard/ActiveMemberships/types';
-import { useQuery } from '@tanstack/react-query';
-import { deprecatedAdminReportQueryOptions } from './deprecatedAdminReportQueryOptions';
-// import { useBackendHelpers } from '../useBackend';
+import { useDropoutsByLevelReportQuery } from '@application/queries/AdminReportQueries/useDropoutsByLevelReportQuery';
+
 export default function useDropoutsByLevelReport() {
-  // const { getFactory } = useBackendHelpers();
-
-  const getDropoutsByLevelReport = (): Promise<MembershipReportData[]> => {
-    throw new Error('This feature is not available at this time.');
-    // return getFactory<MembershipReportData[]>('admin/report/dropouts-by-level');
-  };
-
-  const dropoutsByLevelReportQuery = useQuery({
-    queryKey: ['dropouts-by-level-report'],
-    queryFn: getDropoutsByLevelReport,
-    // staleTime: Infinity,
-    ...deprecatedAdminReportQueryOptions,
-  });
+  const { dropoutsByLevelReportQuery } = useDropoutsByLevelReportQuery();
 
   return { dropoutsByLevelReportQuery };
 }

@@ -32,4 +32,5 @@ export interface AdminReportsPort {
   getPrivateCallsByCoachReport: () => Promise<PrivateCallsByCoach[]>;
   getGroupCallsByCoachReport: () => Promise<GroupCallsByCoach[]>;
   getActiveMembershipsReport: () => Promise<ActiveMembershipsByCourse[]>;
+  getDropoutsByLevelReport: () => Promise<ActiveMembershipsByCourse[]>;
 }
