@@ -1,23 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import GroupCallsByCoach from './GroupCallsByCoach';
-import GroupCallsDrilldownTable from './GroupCallsDrilldownTable';
+// import GroupCallsDrilldownTable from './GroupCallsDrilldownTable';
 import PrivateCallsByCoach from './PrivateCallsByCoach';
 
 export default function CallsByCoach() {
   const [privateCallsByCoachOpen, setPrivateCallsByCoachOpen] = useState(false);
 
-  const [selectedReport, setSelectedReport] = useState<string | null>(null);
+  // const [selectedReport, setSelectedReport] = useState<string | null>(null);
   const [groupCallsByCoachOpen, setGroupCallsByCoachOpen] = useState(false);
 
-  const updateSelectedReport = (str: string) => {
-    setSelectedReport(str);
-  };
+  // const updateSelectedReport = (str: string) => {
+  //   setSelectedReport(str);
+  // };
 
-  useEffect(() => {
-    if (!groupCallsByCoachOpen) {
-      setSelectedReport(null);
-    }
-  }, [groupCallsByCoachOpen]);
+  // useEffect(() => {
+  //   if (!groupCallsByCoachOpen) {
+  //     setSelectedReport(null);
+  //   }
+  // }, [groupCallsByCoachOpen]);
 
   return (
     <div className="section-with-interactive-table">
@@ -28,14 +28,15 @@ export default function CallsByCoach() {
           setIsOpen={setPrivateCallsByCoachOpen}
         />
         <GroupCallsByCoach
-          setSelectedReport={updateSelectedReport}
+          // setSelectedReport={updateSelectedReport}
+          setSelectedReport={() => undefined}
           isOpen={groupCallsByCoachOpen}
           setIsOpen={setGroupCallsByCoachOpen}
         />
       </div>
-      {selectedReport?.includes('Group') && (
+      {/* {selectedReport?.includes('Group') && (
         <GroupCallsDrilldownTable selectedReport={selectedReport} />
-      )}
+      )} */}
     </div>
   );
 }
