@@ -37,7 +37,7 @@ export function useAuthInfrastructure(): AuthPort {
   }, [authUser]);
 
   return {
-    getAccessToken: async (scopes: string[] | null) => {
+    getAccessToken: async (scopes: readonly string[] | null) => {
       try {
         if (!isAuthenticated) {
           return undefined;

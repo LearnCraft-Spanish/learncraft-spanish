@@ -1,29 +1,41 @@
-import type { GroupSession } from 'src/types/CoachingTypes';
+import type { RecentRecords } from '@learncraft-spanish/shared';
+import { useContextualMenu } from '@interface/hooks/useContextualMenu';
 import eye from 'src/assets/icons/eye.svg';
-import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+
+type RecentGroupCall = RecentRecords['groupCalls'][number];
+
+function formatDate(date: string | Date): string {
+  if (typeof date === 'string') {
+    return date.split('T')[0];
+  }
+  return date.toLocaleDateString();
+}
+
+function groupSessionContextualKey(groupCall: RecentGroupCall): string {
+  const weekId = groupCall.attendees[0]?.weekId ?? 0;
+  return `groupSession${groupCall.groupSessionId}week${weekId}`;
+}
 
 export default function GroupCallRecordRow({
   groupCall,
 }: {
-  groupCall: GroupSession;
-}) {
+  groupCall: RecentGroupCall;
+}): React.JSX.Element {
   const { openContextual } = useContextualMenu();
+
   return (
     <tr>
       <td className="viewRecordIconCell">
-        <img
-          src={eye}
-          alt="view record"
-          className="viewRecordIcon"
-          onClick={() => openContextual(`group-call-${groupCall.recordId}`)}
-        />
+        <button
+          type="button"
+          className="viewRecordIconButton"
+          onClick={() => openContextual(groupSessionContextualKey(groupCall))}
+        >
+          <img src={eye} alt="view group session" className="viewRecordIcon" />
+        </button>
       </td>
-      <td>
-        {typeof groupCall.date === 'string'
-          ? groupCall.date
-          : groupCall.date.toLocaleDateString()}
-      </td>
-      <td>{groupCall.coach.name}</td>
+      <td>{formatDate(groupCall.callDate)}</td>
+      <td>{groupCall.coach.fullName}</td>
       <td>
         {groupCall.zoomLink && (
           <a
@@ -36,10 +48,8 @@ export default function GroupCallRecordRow({
           </a>
         )}
       </td>
-
-      <td>{groupCall.topic}</td>
+      <td>{groupCall.groupSessionTopic?.groupSessionTopic ?? '—'}</td>
       <td>{groupCall.comments}</td>
-      {/* <td>currently unavalible, check back after the next update!</td> */}
     </tr>
   );
 }
