@@ -13,6 +13,7 @@ import { createHttpClient } from '@infrastructure/http/client';
 import {
   getActiveMembershipsReportEndpoint,
   getAssignmentsCompletedByWeekReportEndpoint,
+  getDropoutsByLevelReportEndpoint,
   getGroupCallsByCoachReportEndpoint,
   getLastWeekCoachSummaryReportEndpoint,
   getMembershipsByCoachCurrentReportEndpoint,
@@ -95,6 +96,11 @@ export function createAdminReportsInfrastructure(
       httpClient.get<ActiveMembershipsByCourse[]>(
         getActiveMembershipsReportEndpoint.path,
         getActiveMembershipsReportEndpoint.requiredScopes,
+      ),
+    getDropoutsByLevelReport: () =>
+      httpClient.get<ActiveMembershipsByCourse[]>(
+        getDropoutsByLevelReportEndpoint.path,
+        getDropoutsByLevelReportEndpoint.requiredScopes,
       ),
   };
 }
