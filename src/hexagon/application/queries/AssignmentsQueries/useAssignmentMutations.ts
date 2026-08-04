@@ -7,6 +7,13 @@ import type {
 } from '@learncraft-spanish/shared';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useAssignmentsAdapter } from '@application/adapters/assignmentAdapter';
+import {
+  invalidateAssignmentsCompletedByWeekReport,
+  invalidateMembershipWeeks,
+  invalidateRecentRecords,
+  removeAssignmentFromRecentRecords,
+  replaceAssignmentInRecentRecords,
+} from '@application/queries/coachingRecordsCache';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const WEEKS_QUERY_KEY = ['weeklyRecords', 'weeksByStartDate'];
@@ -50,6 +57,10 @@ export function useAssignmentsMutations(): UseAssignmentsMutationsReturn {
           });
         },
       );
+      // No date on BaseAssignment — always invalidate recent-records
+      invalidateRecentRecords(queryClient);
+      invalidateMembershipWeeks(queryClient);
+      invalidateAssignmentsCompletedByWeekReport(queryClient);
     },
   });
 
@@ -74,6 +85,9 @@ export function useAssignmentsMutations(): UseAssignmentsMutationsReturn {
           });
         },
       );
+      replaceAssignmentInRecentRecords(queryClient, updatedAssignment);
+      invalidateMembershipWeeks(queryClient);
+      invalidateAssignmentsCompletedByWeekReport(queryClient);
     },
   });
 
@@ -92,6 +106,9 @@ export function useAssignmentsMutations(): UseAssignmentsMutationsReturn {
           }));
         },
       );
+      removeAssignmentFromRecentRecords(queryClient, assignmentId);
+      invalidateMembershipWeeks(queryClient);
+      invalidateAssignmentsCompletedByWeekReport(queryClient);
     },
   });
 

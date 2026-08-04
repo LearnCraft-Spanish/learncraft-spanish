@@ -1,5 +1,6 @@
 import { overrideMockWeeklyRecordsAdapter } from '@application/adapters/weeklyRecordsAdapter.mock';
 import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
+import { MEMBERSHIP_WEEKS_QUERY_KEY_ROOT } from '@application/queries/WeekQueries/useMembershipWeeksQuery';
 import { useWeekMutations } from '@application/queries/WeekQueries/useWeekMutations';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import {
@@ -8,7 +9,8 @@ import {
   createMockUpdateWeekCommand,
 } from '@testing/factories/weekFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
-import { describe, expect, it } from 'vitest';
+import { testQueryClient } from '@testing/utils/testQueryClient';
+import { describe, expect, it, vi } from 'vitest';
 
 const START_DATE = '2026-01-05';
 
@@ -149,5 +151,30 @@ describe('useWeekMutations', () => {
     await waitFor(() =>
       expect(result.current.updateWeekMutation.isError).toBe(true),
     );
+  });
+
+  it('should invalidate Student Drill Down membershipWeeks queries on success', async () => {
+    const invalidateSpy = vi.spyOn(testQueryClient, 'invalidateQueries');
+    overrideMockWeeklyRecordsAdapter({
+      updateWeeks: async () => [createMockBaseWeek()],
+    });
+
+    const { result } = renderHook(() => useWeekMutations(), {
+      wrapper: TestQueryClientProvider,
+    });
+
+    await act(() =>
+      result.current.updateWeekMutation.mutateAsync([
+        createMockUpdateWeekCommand(),
+      ]),
+    );
+
+    await waitFor(() =>
+      expect(result.current.updateWeekMutation.isSuccess).toBe(true),
+    );
+
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: MEMBERSHIP_WEEKS_QUERY_KEY_ROOT,
+    });
   });
 });

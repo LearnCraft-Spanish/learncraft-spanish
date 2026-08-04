@@ -1,6 +1,3 @@
-import DeprecatedSectionHeader from '../DeprecatedSectionHeader';
-
-/* Deprecated — re-enable when admin reports are migrated to hexagon.
 import { useEffect, useState } from 'react';
 import LastWeekCoachSummary from './LastWeekCoachSummary';
 import WeekCoachSummary from './WeekCoachSummary';
@@ -39,18 +36,6 @@ export default function WeeklySummaries() {
       {selectedReport && (
         <WeeksDrilldownTable selectedReport={selectedReport} />
       )}
-    </div>
-  );
-}
-*/
-
-export default function WeeklySummaries() {
-  return (
-    <div className="section-with-interactive-table">
-      <div className="admin-dashboard-grid">
-        <DeprecatedSectionHeader title="Week Coach Summary" />
-        <DeprecatedSectionHeader title="Last Week Coach Summary" />
-      </div>
     </div>
   );
 }

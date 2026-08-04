@@ -1,4 +1,4 @@
-import type { GroupCallData } from './types';
+import type { GroupCallsByCoach as GroupCallData } from '@learncraft-spanish/shared';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useGroupCallsByCoach from 'src/hooks/AdminData/useGroupCallsByCoach';

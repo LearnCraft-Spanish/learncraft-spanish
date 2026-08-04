@@ -9,6 +9,7 @@ import {
   useLocation,
   useNavigationType,
 } from 'react-router-dom';
+import { shouldIgnoreError } from './sentryIgnoredErrors';
 
 const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
@@ -40,6 +41,13 @@ Sentry.init({
   ],
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
+  beforeSend: (event, hint) => {
+    if (shouldIgnoreError(event, hint.originalException)) {
+      return null;
+    }
+
+    return event;
+  },
 });
 
 export default SentryRoutes;

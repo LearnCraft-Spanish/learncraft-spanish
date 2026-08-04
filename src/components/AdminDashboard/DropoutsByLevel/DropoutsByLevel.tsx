@@ -1,7 +1,4 @@
-import DeprecatedSectionHeader from '../DeprecatedSectionHeader';
-
-/* Deprecated — re-enable when admin reports are migrated to hexagon.
-import type { MembershipReportData } from '../ActiveMemberships/types';
+import type { MembershipReportData } from './types';
 import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
@@ -38,9 +35,4 @@ export default function DropoutsByLevel() {
       )}
     </div>
   );
-}
-*/
-
-export default function DropoutsByLevel() {
-  return <DeprecatedSectionHeader title="Dropouts By Level" />;
 }

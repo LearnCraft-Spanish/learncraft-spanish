@@ -1,14 +1,35 @@
+import type { RecentRecordsCache } from '@application/queries/coachingRecordsCache';
+import { overrideMockCoachAdapter } from '@application/adapters/coachAdapter.mock';
 import { overrideMockGroupCallsAdapter } from '@application/adapters/groupCallsAdapter.mock';
 import { overrideMockWeeklyRecordsAdapter } from '@application/adapters/weeklyRecordsAdapter.mock';
+import {
+  RECENT_RECORDS_QUERY_KEY,
+  useRecentRecordsQuery,
+} from '@application/queries/CoachQueries/useRecentRecordsQuery';
 import { useGroupCallMutations } from '@application/queries/GroupCallQueries/useGroupCallMutations';
 import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
 import { act, renderHook, waitFor } from '@testing-library/react';
+import { createMockCoach } from '@testing/factories/coachFactory';
 import { baseGroupSessionFactory } from '@testing/factories/groupCallsFactory';
 import { createMockFurnishedWeekWithCoach } from '@testing/factories/weekFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
-import { describe, expect, it } from 'vitest';
+import { testQueryClient } from '@testing/utils/testQueryClient';
+import { describe, expect, it, vi } from 'vitest';
 
 const START_DATE = '2026-01-05';
+const COACH_ID = 42;
+const MONTH_YEAR = '2026-01';
+
+function emptyRecentRecords(
+  overrides: Partial<RecentRecordsCache> = {},
+): RecentRecordsCache {
+  return {
+    assignments: [],
+    privateCalls: [],
+    groupCalls: [],
+    ...overrides,
+  };
+}
 
 const makeAttendee = (weekId: number) => ({
   weekId,
@@ -326,6 +347,198 @@ describe('useGroupCallMutations', () => {
         updatedWeek1?.groupCalls.find((c) => c.groupSessionId === 888),
       ).toBeDefined();
       expect(updatedWeek2?.groupCalls).toHaveLength(0);
+    });
+  });
+
+  describe('recent-records cache', () => {
+    it('should insert into matching month/coach recent-records on create', async () => {
+      const coach = createMockCoach({ coach_id: COACH_ID });
+      const newSession = baseGroupSessionFactory({
+        groupSessionId: 999,
+        callDate: '2026-01-20',
+        coach,
+        attendees: [makeAttendee(101)],
+      });
+      overrideMockGroupCallsAdapter({
+        createGroupCall: async () => newSession,
+      });
+      overrideMockCoachAdapter({
+        getRecentRecords: async () => emptyRecentRecords({ groupCalls: [] }),
+      });
+
+      const { result } = renderHook(
+        () => ({
+          recent: useRecentRecordsQuery(String(COACH_ID), MONTH_YEAR),
+          mutations: useGroupCallMutations(),
+        }),
+        { wrapper: TestQueryClientProvider },
+      );
+
+      await waitFor(() => expect(result.current.recent.isLoading).toBe(false));
+
+      const invalidateSpy = vi.spyOn(testQueryClient, 'invalidateQueries');
+
+      await act(() =>
+        result.current.mutations.createGroupCallMutation.mutateAsync(
+          makeCreateCmd(newSession),
+        ),
+      );
+
+      await waitFor(() =>
+        expect(result.current.mutations.createGroupCallMutation.isSuccess).toBe(
+          true,
+        ),
+      );
+
+      expect(result.current.recent.recentRecords?.groupCalls).toContainEqual(
+        newSession,
+      );
+      expect(invalidateSpy).not.toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: RECENT_RECORDS_QUERY_KEY }),
+      );
+      expect(invalidateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['membershipWeeks'] }),
+      );
+    });
+
+    it('should invalidate recent-records when create month does not match', async () => {
+      const coach = createMockCoach({ coach_id: COACH_ID });
+      const newSession = baseGroupSessionFactory({
+        groupSessionId: 999,
+        callDate: '2026-04-20',
+        coach,
+        attendees: [],
+      });
+      overrideMockGroupCallsAdapter({
+        createGroupCall: async () => newSession,
+      });
+      overrideMockCoachAdapter({
+        getRecentRecords: async () => emptyRecentRecords({ groupCalls: [] }),
+      });
+
+      const { result } = renderHook(
+        () => ({
+          recent: useRecentRecordsQuery(String(COACH_ID), MONTH_YEAR),
+          mutations: useGroupCallMutations(),
+        }),
+        { wrapper: TestQueryClientProvider },
+      );
+
+      await waitFor(() => expect(result.current.recent.isLoading).toBe(false));
+
+      const invalidateSpy = vi.spyOn(testQueryClient, 'invalidateQueries');
+
+      await act(() =>
+        result.current.mutations.createGroupCallMutation.mutateAsync(
+          makeCreateCmd(newSession),
+        ),
+      );
+
+      await waitFor(() =>
+        expect(result.current.mutations.createGroupCallMutation.isSuccess).toBe(
+          true,
+        ),
+      );
+
+      expect(invalidateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: RECENT_RECORDS_QUERY_KEY }),
+      );
+    });
+
+    it('should replace the group session in recent-records on update', async () => {
+      const coach = createMockCoach({ coach_id: COACH_ID });
+      const existingSession = baseGroupSessionFactory({
+        groupSessionId: 999,
+        comments: 'old',
+        coach,
+        attendees: [makeAttendee(101)],
+      });
+      const updatedSession = baseGroupSessionFactory({
+        groupSessionId: 999,
+        comments: 'updated comments',
+        coach,
+        attendees: [makeAttendee(101)],
+      });
+      overrideMockGroupCallsAdapter({
+        updateGroupCall: async () => updatedSession,
+      });
+      overrideMockCoachAdapter({
+        getRecentRecords: async () =>
+          emptyRecentRecords({ groupCalls: [existingSession] }),
+      });
+
+      const { result } = renderHook(
+        () => ({
+          recent: useRecentRecordsQuery(String(COACH_ID), MONTH_YEAR),
+          mutations: useGroupCallMutations(),
+        }),
+        { wrapper: TestQueryClientProvider },
+      );
+
+      await waitFor(() => expect(result.current.recent.isLoading).toBe(false));
+
+      await act(() =>
+        result.current.mutations.updateGroupCallMutation.mutateAsync(
+          makeUpdateCmd(updatedSession),
+        ),
+      );
+
+      await waitFor(() =>
+        expect(result.current.mutations.updateGroupCallMutation.isSuccess).toBe(
+          true,
+        ),
+      );
+
+      expect(
+        result.current.recent.recentRecords?.groupCalls.find(
+          (c) => c.groupSessionId === 999,
+        )?.comments,
+      ).toBe('updated comments');
+    });
+
+    it('should remove the group session from recent-records on delete', async () => {
+      const sessionToDelete = baseGroupSessionFactory({
+        groupSessionId: 999,
+        attendees: [],
+      });
+      const otherSession = baseGroupSessionFactory({
+        groupSessionId: 888,
+        attendees: [],
+      });
+      overrideMockGroupCallsAdapter({ deleteGroupCall: async () => {} });
+      overrideMockCoachAdapter({
+        getRecentRecords: async () =>
+          emptyRecentRecords({
+            groupCalls: [sessionToDelete, otherSession],
+          }),
+      });
+
+      const { result } = renderHook(
+        () => ({
+          recent: useRecentRecordsQuery(String(COACH_ID), MONTH_YEAR),
+          mutations: useGroupCallMutations(),
+        }),
+        { wrapper: TestQueryClientProvider },
+      );
+
+      await waitFor(() => expect(result.current.recent.isLoading).toBe(false));
+
+      await act(() =>
+        result.current.mutations.deleteGroupCallMutation.mutateAsync({
+          groupSessionId: 999,
+        }),
+      );
+
+      await waitFor(() =>
+        expect(result.current.mutations.deleteGroupCallMutation.isSuccess).toBe(
+          true,
+        ),
+      );
+
+      expect(result.current.recent.recentRecords?.groupCalls).toHaveLength(1);
+      expect(
+        result.current.recent.recentRecords?.groupCalls[0].groupSessionId,
+      ).toBe(888);
     });
   });
 });

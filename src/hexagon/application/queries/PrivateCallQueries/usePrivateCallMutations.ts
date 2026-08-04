@@ -7,6 +7,12 @@ import type {
 } from '@learncraft-spanish/shared';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { usePrivateCallsAdapter } from '@application/adapters/privateCallsAdapter';
+import {
+  insertIntoMatchingRecentRecordsOrInvalidate,
+  invalidateMembershipWeeks,
+  removePrivateCallFromRecentRecords,
+  replacePrivateCallInRecentRecords,
+} from '@application/queries/coachingRecordsCache';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const WEEKS_QUERY_KEY = ['weeklyRecords', 'weeksByStartDate'];
@@ -50,6 +56,15 @@ export function usePrivateCallMutations(): UsePrivateCallMutationsReturn {
           });
         },
       );
+      insertIntoMatchingRecentRecordsOrInvalidate(queryClient, {
+        coachId: newPrivateCall.caller.coach_id,
+        callDate: newPrivateCall.callDate,
+        insert: (old) => ({
+          ...old,
+          privateCalls: [...old.privateCalls, newPrivateCall],
+        }),
+      });
+      invalidateMembershipWeeks(queryClient);
     },
   });
   const updatePrivateCallMutation = useMutation({
@@ -73,6 +88,8 @@ export function usePrivateCallMutations(): UsePrivateCallMutationsReturn {
           });
         },
       );
+      replacePrivateCallInRecentRecords(queryClient, updatedPrivateCall);
+      invalidateMembershipWeeks(queryClient);
     },
   });
   const deletePrivateCallMutation = useMutation({
@@ -90,6 +107,8 @@ export function usePrivateCallMutations(): UsePrivateCallMutationsReturn {
           }));
         },
       );
+      removePrivateCallFromRecentRecords(queryClient, callId);
+      invalidateMembershipWeeks(queryClient);
     },
   });
 

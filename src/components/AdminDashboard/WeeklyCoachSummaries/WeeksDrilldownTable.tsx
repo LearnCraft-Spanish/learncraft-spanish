@@ -1,3 +1,4 @@
+import type { WeeksDrilldownReportName } from '@application/ports/AdminReports/adminReportsPort';
 import { InlineLoading } from '@interface/components/Loading';
 import checkmark from 'src/assets/icons/checkmark_green.svg';
 import AssignmentsCell from 'src/components/StudentDrillDown/components/general/AssignmentsCell_Modificed';
@@ -6,6 +7,18 @@ import PrivateCallsCell from 'src/components/StudentDrillDown/components/general
 import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import useWeeksDrilldownTable from './useWeeksDrilldownTable';
 import 'src/components/Table/Table.scss';
+
+const VALID_REPORT_NAMES: ReadonlyArray<WeeksDrilldownReportName> = [
+  'Weekly Coach Summary',
+  'Last Week Coach Summary',
+];
+
+function parseReportName(raw: string): WeeksDrilldownReportName {
+  if ((VALID_REPORT_NAMES as readonly string[]).includes(raw)) {
+    return raw as WeeksDrilldownReportName;
+  }
+  throw new Error(`Unrecognized report name: "${raw}"`);
+}
 
 const headers = [
   'Student',
@@ -26,11 +39,13 @@ export default function DrilldownTable({
   selectedReport: string;
 }) {
   const coachId = selectedReport.split('_')[0];
-  const report = selectedReport.split('_')[1];
+  const rawReport = selectedReport.split('_')[1];
 
-  if (!coachId || !report) {
+  if (!coachId || !rawReport) {
     throw new Error('Coach ID or report not found');
   }
+
+  const report = parseReportName(rawReport);
 
   const { data, isLoading, isError, isSuccess } = useWeeksDrilldownTable(
     coachId,
@@ -54,7 +69,7 @@ export default function DrilldownTable({
               <tr key={week.recordId}>
                 <td>{week.student}</td>
                 <td>{week.level}</td>
-                <td>{week.primaryCoach.name}</td>
+                <td>{week.primaryCoach.fullName}</td>
                 <td>{toISODate(new Date(week.weekStarts))}</td>
                 <td>
                   {week.assignments.length > 0 && (

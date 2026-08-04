@@ -1,4 +1,4 @@
-import type { PrivateCallData } from './types';
+import type { PrivateCallsByCoach as PrivateCallData } from '@learncraft-spanish/shared';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import usePrivateCallsByCoach from 'src/hooks/AdminData/usePrivateCallsByCoach';

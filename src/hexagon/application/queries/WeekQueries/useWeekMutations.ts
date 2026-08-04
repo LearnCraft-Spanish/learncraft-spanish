@@ -5,6 +5,7 @@ import type {
 } from '@learncraft-spanish/shared';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useWeeklyRecordsAdapter } from '@application/adapters/weeklyRecordsAdapter';
+import { MEMBERSHIP_WEEKS_QUERY_KEY_ROOT } from '@application/queries/WeekQueries/useMembershipWeeksQuery';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const WEEKS_QUERY_KEY = ['weeklyRecords', 'weeksByStartDate'];
@@ -39,6 +40,9 @@ export function useWeekMutations(): UseWeekMutationsReturn {
           });
         },
       );
+      void queryClient.invalidateQueries({
+        queryKey: MEMBERSHIP_WEEKS_QUERY_KEY_ROOT,
+      });
     },
   });
 

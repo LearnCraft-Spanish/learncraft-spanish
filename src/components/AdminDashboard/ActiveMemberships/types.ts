@@ -1,4 +1,1 @@
-export interface MembershipReportData {
-  courseName: string;
-  numberOfMemberships: number;
-}
+export type { ActiveMembershipsByCourse as MembershipReportData } from '@learncraft-spanish/shared';

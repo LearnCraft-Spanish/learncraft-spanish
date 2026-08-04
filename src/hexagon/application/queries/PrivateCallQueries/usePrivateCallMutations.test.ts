@@ -1,14 +1,35 @@
+import type { RecentRecordsCache } from '@application/queries/coachingRecordsCache';
+import { overrideMockCoachAdapter } from '@application/adapters/coachAdapter.mock';
 import { overrideMockPrivateCallsAdapter } from '@application/adapters/privateCallsAdapter.mock';
 import { overrideMockWeeklyRecordsAdapter } from '@application/adapters/weeklyRecordsAdapter.mock';
+import {
+  RECENT_RECORDS_QUERY_KEY,
+  useRecentRecordsQuery,
+} from '@application/queries/CoachQueries/useRecentRecordsQuery';
 import { usePrivateCallMutations } from '@application/queries/PrivateCallQueries/usePrivateCallMutations';
 import { useWeeksByStartDate } from '@application/queries/useWeeksByStartDate/useWeeksByStartDate';
 import { act, renderHook, waitFor } from '@testing-library/react';
+import { createMockCoach } from '@testing/factories/coachFactory';
 import { basePrivateCallFactory } from '@testing/factories/privateCallsFactory';
 import { createMockFurnishedWeekWithCoach } from '@testing/factories/weekFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
-import { describe, expect, it } from 'vitest';
+import { testQueryClient } from '@testing/utils/testQueryClient';
+import { describe, expect, it, vi } from 'vitest';
 
 const START_DATE = '2026-01-05';
+const COACH_ID = 42;
+const MONTH_YEAR = '2026-01';
+
+function emptyRecentRecords(
+  overrides: Partial<RecentRecordsCache> = {},
+): RecentRecordsCache {
+  return {
+    assignments: [],
+    privateCalls: [],
+    groupCalls: [],
+    ...overrides,
+  };
+}
 
 function makeCreateCmd(call: ReturnType<typeof basePrivateCallFactory>) {
   return {
@@ -230,6 +251,243 @@ describe('usePrivateCallMutations', () => {
       expect(week?.privateCalls.find((c) => c.callId === 10)).toBeUndefined();
       expect(week?.privateCalls).toHaveLength(1);
       expect(week?.privateCalls[0].callId).toBe(20);
+    });
+  });
+
+  describe('recent-records cache', () => {
+    it('should insert into matching month/coach recent-records on create', async () => {
+      const caller = createMockCoach({ coach_id: COACH_ID });
+      const newCall = basePrivateCallFactory({
+        weekId: 101,
+        callDate: '2026-01-15',
+        caller,
+      });
+      overrideMockPrivateCallsAdapter({
+        createPrivateCall: async () => newCall,
+      });
+      overrideMockCoachAdapter({
+        getRecentRecords: async (_coachId, monthYear) => {
+          if (monthYear === MONTH_YEAR) {
+            return emptyRecentRecords({ privateCalls: [] });
+          }
+          return emptyRecentRecords({ privateCalls: [] });
+        },
+      });
+
+      const { result } = renderHook(
+        () => ({
+          january: useRecentRecordsQuery(String(COACH_ID), MONTH_YEAR),
+          february: useRecentRecordsQuery(String(COACH_ID), '2026-02'),
+          mutations: usePrivateCallMutations(),
+        }),
+        { wrapper: TestQueryClientProvider },
+      );
+
+      await waitFor(() => expect(result.current.january.isLoading).toBe(false));
+      await waitFor(() =>
+        expect(result.current.february.isLoading).toBe(false),
+      );
+
+      const invalidateSpy = vi.spyOn(testQueryClient, 'invalidateQueries');
+
+      await act(() =>
+        result.current.mutations.createPrivateCallMutation.mutateAsync(
+          makeCreateCmd(newCall),
+        ),
+      );
+
+      await waitFor(() =>
+        expect(
+          result.current.mutations.createPrivateCallMutation.isSuccess,
+        ).toBe(true),
+      );
+
+      expect(result.current.january.recentRecords?.privateCalls).toContainEqual(
+        newCall,
+      );
+      expect(result.current.february.recentRecords?.privateCalls).toHaveLength(
+        0,
+      );
+      expect(invalidateSpy).not.toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: RECENT_RECORDS_QUERY_KEY }),
+      );
+      expect(invalidateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['membershipWeeks'] }),
+      );
+    });
+
+    it('should invalidate recent-records when create month does not match', async () => {
+      const caller = createMockCoach({ coach_id: COACH_ID });
+      const newCall = basePrivateCallFactory({
+        weekId: 101,
+        callDate: '2026-03-15',
+        caller,
+      });
+      overrideMockPrivateCallsAdapter({
+        createPrivateCall: async () => newCall,
+      });
+      overrideMockCoachAdapter({
+        getRecentRecords: async () => emptyRecentRecords({ privateCalls: [] }),
+      });
+
+      const { result } = renderHook(
+        () => ({
+          recent: useRecentRecordsQuery(String(COACH_ID), MONTH_YEAR),
+          mutations: usePrivateCallMutations(),
+        }),
+        { wrapper: TestQueryClientProvider },
+      );
+
+      await waitFor(() => expect(result.current.recent.isLoading).toBe(false));
+
+      const invalidateSpy = vi.spyOn(testQueryClient, 'invalidateQueries');
+
+      await act(() =>
+        result.current.mutations.createPrivateCallMutation.mutateAsync(
+          makeCreateCmd(newCall),
+        ),
+      );
+
+      await waitFor(() =>
+        expect(
+          result.current.mutations.createPrivateCallMutation.isSuccess,
+        ).toBe(true),
+      );
+
+      expect(invalidateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: RECENT_RECORDS_QUERY_KEY }),
+      );
+    });
+
+    it('should invalidate recent-records when create coach does not match', async () => {
+      const caller = createMockCoach({ coach_id: 99 });
+      const newCall = basePrivateCallFactory({
+        weekId: 101,
+        callDate: '2026-01-15',
+        caller,
+      });
+      overrideMockPrivateCallsAdapter({
+        createPrivateCall: async () => newCall,
+      });
+      overrideMockCoachAdapter({
+        getRecentRecords: async () => emptyRecentRecords({ privateCalls: [] }),
+      });
+
+      const { result } = renderHook(
+        () => ({
+          recent: useRecentRecordsQuery(String(COACH_ID), MONTH_YEAR),
+          mutations: usePrivateCallMutations(),
+        }),
+        { wrapper: TestQueryClientProvider },
+      );
+
+      await waitFor(() => expect(result.current.recent.isLoading).toBe(false));
+
+      const invalidateSpy = vi.spyOn(testQueryClient, 'invalidateQueries');
+
+      await act(() =>
+        result.current.mutations.createPrivateCallMutation.mutateAsync(
+          makeCreateCmd(newCall),
+        ),
+      );
+
+      await waitFor(() =>
+        expect(
+          result.current.mutations.createPrivateCallMutation.isSuccess,
+        ).toBe(true),
+      );
+
+      expect(invalidateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: RECENT_RECORDS_QUERY_KEY }),
+      );
+    });
+
+    it('should replace the private call in recent-records on update', async () => {
+      const caller = createMockCoach({ coach_id: COACH_ID });
+      const existingCall = basePrivateCallFactory({
+        callId: 50,
+        weekId: 101,
+        notes: 'old',
+        caller,
+      });
+      const updatedCall = basePrivateCallFactory({
+        callId: 50,
+        weekId: 101,
+        notes: 'updated notes',
+        caller,
+      });
+      overrideMockPrivateCallsAdapter({
+        updatePrivateCall: async () => updatedCall,
+      });
+      overrideMockCoachAdapter({
+        getRecentRecords: async () =>
+          emptyRecentRecords({ privateCalls: [existingCall] }),
+      });
+
+      const { result } = renderHook(
+        () => ({
+          recent: useRecentRecordsQuery(String(COACH_ID), MONTH_YEAR),
+          mutations: usePrivateCallMutations(),
+        }),
+        { wrapper: TestQueryClientProvider },
+      );
+
+      await waitFor(() => expect(result.current.recent.isLoading).toBe(false));
+
+      await act(() =>
+        result.current.mutations.updatePrivateCallMutation.mutateAsync(
+          makeUpdateCmd(existingCall),
+        ),
+      );
+
+      await waitFor(() =>
+        expect(
+          result.current.mutations.updatePrivateCallMutation.isSuccess,
+        ).toBe(true),
+      );
+
+      expect(
+        result.current.recent.recentRecords?.privateCalls.find(
+          (c) => c.callId === 50,
+        )?.notes,
+      ).toBe('updated notes');
+    });
+
+    it('should remove the private call from recent-records on delete', async () => {
+      const callToDelete = basePrivateCallFactory({ callId: 10 });
+      const otherCall = basePrivateCallFactory({ callId: 20 });
+      overrideMockPrivateCallsAdapter({ deletePrivateCall: async () => {} });
+      overrideMockCoachAdapter({
+        getRecentRecords: async () =>
+          emptyRecentRecords({ privateCalls: [callToDelete, otherCall] }),
+      });
+
+      const { result } = renderHook(
+        () => ({
+          recent: useRecentRecordsQuery(String(COACH_ID), MONTH_YEAR),
+          mutations: usePrivateCallMutations(),
+        }),
+        { wrapper: TestQueryClientProvider },
+      );
+
+      await waitFor(() => expect(result.current.recent.isLoading).toBe(false));
+
+      await act(() =>
+        result.current.mutations.deletePrivateCallMutation.mutateAsync({
+          callId: 10,
+        }),
+      );
+
+      await waitFor(() =>
+        expect(
+          result.current.mutations.deletePrivateCallMutation.isSuccess,
+        ).toBe(true),
+      );
+
+      expect(result.current.recent.recentRecords?.privateCalls).toHaveLength(1);
+      expect(result.current.recent.recentRecords?.privateCalls[0].callId).toBe(
+        20,
+      );
     });
   });
 });
