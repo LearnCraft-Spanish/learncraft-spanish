@@ -2,7 +2,6 @@ import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { Loading } from '@interface/components/Loading';
 import { lazy, Suspense } from 'react';
 import { Route } from 'react-router-dom';
-import NotAvailablePage from '../NotAvailablePage';
 import NotFoundPage from '../NotFoundPage';
 import Menu from '../sections/Menu';
 import SentryRoutes from './SentryRoutes';
@@ -36,9 +35,9 @@ const WeeksRecordsSection = lazy(
 const StudentDrillDown = lazy(
   () => import('src/components/StudentDrillDown/StudentDrillDown'),
 );
-// const CoachingDashboard = lazy(
-//   () => import('src/components/CoachingDashboard'),
-// );
+const CoachingDashboard = lazy(
+  () => import('src/components/CoachingDashboard'),
+);
 
 // Admin-only pages
 const AdminDashboard = lazy(() => import('src/sections/AdminDashboard'));
@@ -88,14 +87,9 @@ export default function AppRoutes() {
           path="/student-drill-down"
           element={(isAdmin || isCoach) && <StudentDrillDown />}
         />
-        {/* Not available at this time */}
-        {/* <Route
-          path="/coaching-dashboard"
-          element={(isAdmin || isCoach) && <CoachingDashboard />}
-        /> */}
         <Route
           path="/coaching-dashboard"
-          element={(isAdmin || isCoach) && <NotAvailablePage />}
+          element={(isAdmin || isCoach) && <CoachingDashboard />}
         />
         <Route
           path="/database-tables/*"

@@ -1,4 +1,8 @@
-import { callCountSchema, CoachSchema } from '@learncraft-spanish/shared';
+import {
+  callCountSchema,
+  CoachSchema,
+  recentRecordsSchema,
+} from '@learncraft-spanish/shared';
 import {
   createZodFactory,
   createZodListFactory,
@@ -10,3 +14,5 @@ export const createMockCoachCallCountList =
 
 export const createMockCoach = createZodFactory(CoachSchema);
 export const createMockCoachList = createZodListFactory(CoachSchema);
+
+export const createMockRecentRecords = createZodFactory(recentRecordsSchema);

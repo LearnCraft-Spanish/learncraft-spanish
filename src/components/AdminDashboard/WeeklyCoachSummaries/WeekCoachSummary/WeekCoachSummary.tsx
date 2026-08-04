@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
-import type { CoachSummaryData } from '../types';
+import type { CoachSummary } from '../types';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useWeeklyCoachSummary from 'src/hooks/AdminData/useWeeklyCoachSummary';
 
 function renderRow(
-  row: CoachSummaryData,
+  row: CoachSummary,
   onClickFunc?: (str: string) => void,
 ): ReactNode {
   return (
