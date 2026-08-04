@@ -172,10 +172,7 @@ export function AssignmentView({
   }
 
   return (
-    <ContextualView
-      key={`assignment${assignment.assignmentId}`}
-      editFunction={tableEditMode ? undefined : toggleEditMode}
-    >
+    <ContextualView editFunction={tableEditMode ? undefined : toggleEditMode}>
       {editMode ? (
         <h4>Edit Assignment</h4>
       ) : (

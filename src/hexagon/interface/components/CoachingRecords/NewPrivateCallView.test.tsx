@@ -15,9 +15,14 @@ import {
   overrideMockUsePrivateCallMutations,
   resetMockUsePrivateCallMutations,
 } from '@application/queries/PrivateCallQueries/usePrivateCallMutations.mock';
+import mockUseWeeksByStartDate, {
+  overrideMockUseWeeksByStartDate,
+  resetMockUseWeeksByStartDate,
+} from '@application/queries/useWeeksByStartDate/useWeeksByStartDate.mock';
 import { NewPrivateCallView } from '@interface/components/CoachingRecords/NewPrivateCallView';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { basePrivateCallFactory } from '@testing/factories/privateCallsFactory';
+import { createMockFurnishedWeekWithCoach } from '@testing/factories/weekFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -40,13 +45,26 @@ vi.mock('@application/queries/CoachQueries/useAllCoachesQuery', () => ({
 }));
 
 vi.mock('@application/queries/useWeeksByStartDate/useWeeksByStartDate', () => ({
-  useWeeksByStartDate: () => ({
-    weeks: [],
-    loading: false,
-    error: null,
-    refetch: vi.fn(),
-    getWeekById: vi.fn(),
-  }),
+  useWeeksByStartDate: () => mockUseWeeksByStartDate,
+}));
+
+vi.mock('src/components/Coaching/general/CustomStudentSelector', () => ({
+  CustomStudentSelector: ({
+    weekStarts,
+    onChange,
+  }: {
+    weekStarts: string;
+    onChange: (weekId: number) => void;
+  }) => (
+    <button
+      type="button"
+      data-testid="select-student"
+      data-week-starts={weekStarts}
+      onClick={() => onChange(27)}
+    >
+      select student
+    </button>
+  ),
 }));
 
 const callRating = {
@@ -73,12 +91,15 @@ const createdCall = basePrivateCallFactory({
   callType,
 });
 
+const selectedWeek = createMockFurnishedWeekWithCoach({ weekId: 27 });
+
 describe('component NewPrivateCallView', () => {
   beforeEach(() => {
     resetMockAuthAdapter();
     resetMockUsePrivateCallMutations();
     resetMockUsePrivateCallLookupsQuery();
     resetMockUseAllCoachesQuery();
+    resetMockUseWeeksByStartDate();
     overrideMockUseAllCoachesQuery({ coaches: [caller] });
     overrideMockUsePrivateCallLookupsQuery({
       callRatings: [callRating],
@@ -130,6 +151,39 @@ describe('component NewPrivateCallView', () => {
         expect.any(Object),
       );
       expect(onSuccess).toHaveBeenCalled();
+    });
+  });
+
+  it('resolves the selected student week on the selector path', async () => {
+    overrideMockUseWeeksByStartDate({ weeks: [selectedWeek] });
+    render(
+      <MockAllProviders>
+        <NewPrivateCallView weekStartsDefaultValue="2026-07-05" />
+      </MockAllProviders>,
+    );
+
+    expect(screen.getByTestId('select-student')).toHaveAttribute(
+      'data-week-starts',
+      '2026-07-05',
+    );
+    fireEvent.click(screen.getByTestId('select-student'));
+    fireEvent.change(screen.getByLabelText(/Rating:/), {
+      target: { value: callRating.rating },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => {
+      expect(
+        mockUsePrivateCallMutations().createPrivateCallMutation.mutate,
+      ).toHaveBeenCalledWith(
+        expect.objectContaining({
+          weekId: 27,
+          caller: caller.coach_id,
+          callRating,
+          callType,
+        }),
+        expect.any(Object),
+      );
     });
   });
 });
