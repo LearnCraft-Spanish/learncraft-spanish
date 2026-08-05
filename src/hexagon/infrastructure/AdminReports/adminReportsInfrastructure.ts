@@ -8,6 +8,7 @@ import type {
   GroupCallsByCoach,
   MembershipsByCoach,
   PrivateCallsByCoach,
+  WeeklyTimeCommitmentByCoach,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
@@ -22,6 +23,7 @@ import {
   getMembershipsBySalariedCoachTwoWeeksOutReportEndpoint,
   getPrivateCallsByCoachReportEndpoint,
   getWeeklyCoachSummaryReportEndpoint,
+  getWeeklyTimeCommitmentByCoachReportEndpoint,
   getWeeksDrilldownReportEndpoint,
 } from '@learncraft-spanish/shared';
 
@@ -101,6 +103,11 @@ export function createAdminReportsInfrastructure(
       httpClient.get<ActiveMembershipsByCourse[]>(
         getDropoutsByLevelReportEndpoint.path,
         getDropoutsByLevelReportEndpoint.requiredScopes,
+      ),
+    getWeeklyTimeCommitmentByCoachReport: () =>
+      httpClient.get<WeeklyTimeCommitmentByCoach[]>(
+        getWeeklyTimeCommitmentByCoachReportEndpoint.path,
+        getWeeklyTimeCommitmentByCoachReportEndpoint.requiredScopes,
       ),
   };
 }
