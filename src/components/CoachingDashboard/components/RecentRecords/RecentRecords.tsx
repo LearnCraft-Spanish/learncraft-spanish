@@ -176,7 +176,7 @@ function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
               <DisplayOnlyTable
                 headers={[
                   'View',
-                  'Week',
+                  'Student',
                   'Type',
                   'Corrector',
                   'Link',
@@ -231,7 +231,7 @@ function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
               <DisplayOnlyTable
                 headers={[
                   'View',
-                  'Week',
+                  'Student',
                   'Rating',
                   'Areas of Difficulty',
                   'Notes',
@@ -300,6 +300,9 @@ function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
           {activeAssignment && (
             <AssignmentView
               assignment={activeAssignment}
+              displayContext={{
+                studentName: activeAssignment.studentName ?? undefined,
+              }}
               tableEditMode={false}
             />
           )}
@@ -310,7 +313,13 @@ function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
             />
           )}
           {activePrivateCall && (
-            <PrivateCallView call={activePrivateCall} tableEditMode={false} />
+            <PrivateCallView
+              call={activePrivateCall}
+              displayContext={{
+                studentName: activePrivateCall.studentName ?? undefined,
+              }}
+              tableEditMode={false}
+            />
           )}
 
           {contextual === 'newGroupSession' && (
