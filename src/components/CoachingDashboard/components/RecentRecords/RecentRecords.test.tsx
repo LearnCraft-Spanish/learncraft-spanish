@@ -3,7 +3,13 @@ import {
   overrideMockUseRecentRecordsQuery,
   resetMockUseRecentRecordsQuery,
 } from '@application/queries/CoachQueries/useRecentRecordsQuery.mock';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { baseAssignmentFactory } from '@testing/factories/assignmentsFactory';
 import { baseGroupSessionFactory } from '@testing/factories/groupCallsFactory';
 import { basePrivateCallFactory } from '@testing/factories/privateCallsFactory';
@@ -246,8 +252,12 @@ describe('component RecentRecords', () => {
     fireEvent.click(screen.getByAltText('view assignment'));
 
     await waitFor(() => {
-      expect(screen.getByText('AssignmentView:101')).toBeInTheDocument();
-      expect(screen.getAllByText('Jane Student').length).toBeGreaterThan(0);
+      const assignmentView = screen
+        .getByText('AssignmentView:101')
+        .closest('div')!;
+      expect(
+        within(assignmentView).getByText('Jane Student'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -257,8 +267,12 @@ describe('component RecentRecords', () => {
     fireEvent.click(screen.getByAltText('view private call'));
 
     await waitFor(() => {
-      expect(screen.getByText('PrivateCallView:202')).toBeInTheDocument();
-      expect(screen.getAllByText('Jane Student').length).toBeGreaterThan(0);
+      const privateCallView = screen
+        .getByText('PrivateCallView:202')
+        .closest('div')!;
+      expect(
+        within(privateCallView).getByText('Jane Student'),
+      ).toBeInTheDocument();
     });
   });
 });
