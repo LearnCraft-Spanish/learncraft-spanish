@@ -29,7 +29,7 @@ export default function PrivateCallRecordRow({
           <img src={eye} alt="view private call" className="viewRecordIcon" />
         </button>
       </td>
-      <td>{privateCall.weekId ?? '—'}</td>
+      <td>{privateCall.studentName ?? '—'}</td>
       <td>{privateCall.callRating.rating}</td>
       <td>{privateCall.areasOfDifficulty}</td>
       <td>{privateCall.notes}</td>

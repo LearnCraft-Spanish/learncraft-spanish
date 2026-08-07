@@ -3,7 +3,13 @@ import {
   overrideMockUseRecentRecordsQuery,
   resetMockUseRecentRecordsQuery,
 } from '@application/queries/CoachQueries/useRecentRecordsQuery.mock';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { baseAssignmentFactory } from '@testing/factories/assignmentsFactory';
 import { baseGroupSessionFactory } from '@testing/factories/groupCallsFactory';
 import { basePrivateCallFactory } from '@testing/factories/privateCallsFactory';
@@ -18,11 +24,31 @@ vi.mock('@application/queries/CoachQueries/useRecentRecordsQuery', () => ({
 vi.mock('@interface/components/CoachingRecords', () => ({
   AssignmentView: ({
     assignment,
+    displayContext,
   }: {
     assignment: { assignmentId: number };
-  }) => <div>{`AssignmentView:${assignment.assignmentId}`}</div>,
-  PrivateCallView: ({ call }: { call: { callId: number } }) => (
-    <div>{`PrivateCallView:${call.callId}`}</div>
+    displayContext?: { studentName?: string };
+  }) => (
+    <div>
+      {`AssignmentView:${assignment.assignmentId}`}
+      {displayContext?.studentName != null && (
+        <span>{displayContext.studentName}</span>
+      )}
+    </div>
+  ),
+  PrivateCallView: ({
+    call,
+    displayContext,
+  }: {
+    call: { callId: number };
+    displayContext?: { studentName?: string };
+  }) => (
+    <div>
+      {`PrivateCallView:${call.callId}`}
+      {displayContext?.studentName != null && (
+        <span>{displayContext.studentName}</span>
+      )}
+    </div>
   ),
   GroupSessionView: ({
     groupSession,
@@ -37,6 +63,7 @@ vi.mock('@interface/components/CoachingRecords', () => ({
 const assignment = baseAssignmentFactory({
   assignmentId: 101,
   weekId: 5,
+  studentName: 'Jane Student',
   assignmentType: {
     assignmentTypeId: 1,
     assignmentType: 'Writing',
@@ -55,6 +82,7 @@ const assignment = baseAssignmentFactory({
 const privateCall = basePrivateCallFactory({
   callId: 202,
   weekId: 5,
+  studentName: 'Jane Student',
   callDate: '2026-07-08',
   caller: {
     coach_id: 1,
@@ -175,6 +203,76 @@ describe('component RecentRecords', () => {
 
     await waitFor(() => {
       expect(screen.getByText('GroupSessionView:303')).toBeInTheDocument();
+    });
+  });
+
+  it('renders Student column header in the Assignments table', async () => {
+    await openRecentRecords();
+    fireEvent.click(screen.getByText('Assignments'));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('columnheader', { name: 'Student' }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('renders student name in an assignment row', async () => {
+    await openRecentRecords();
+    fireEvent.click(screen.getByText('Assignments'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Jane Student')).toBeInTheDocument();
+    });
+  });
+
+  it('renders Student column header in the Private Calls table', async () => {
+    await openRecentRecords();
+    fireEvent.click(screen.getByText('Private Calls'));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('columnheader', { name: 'Student' }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('renders student name in a private call row', async () => {
+    await openRecentRecords();
+    fireEvent.click(screen.getByText('Private Calls'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Jane Student')).toBeInTheDocument();
+    });
+  });
+
+  it('passes displayContext.studentName to AssignmentView when opening a record', async () => {
+    await openRecentRecords();
+    fireEvent.click(screen.getByText('Assignments'));
+    fireEvent.click(screen.getByAltText('view assignment'));
+
+    await waitFor(() => {
+      const assignmentView = screen
+        .getByText('AssignmentView:101')
+        .closest('div')!;
+      expect(
+        within(assignmentView).getByText('Jane Student'),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('passes displayContext.studentName to PrivateCallView when opening a record', async () => {
+    await openRecentRecords();
+    fireEvent.click(screen.getByText('Private Calls'));
+    fireEvent.click(screen.getByAltText('view private call'));
+
+    await waitFor(() => {
+      const privateCallView = screen
+        .getByText('PrivateCallView:202')
+        .closest('div')!;
+      expect(
+        within(privateCallView).getByText('Jane Student'),
+      ).toBeInTheDocument();
     });
   });
 });
