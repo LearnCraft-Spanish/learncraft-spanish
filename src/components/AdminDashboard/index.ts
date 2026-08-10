@@ -5,6 +5,7 @@ import DropoutsByLevel from './DropoutsByLevel';
 import MembershipsByCoachReports from './MembershipsByCoachReports/MembershipsByCoachReports';
 import StudentsBySalariedCoach from './StudentsBySalariedCoach/StudentsBySalariedCoach';
 import WeeklySummaries from './WeeklyCoachSummaries/WeeklySummaries';
+import WeeklyTimeCommitmentByCoach from './WeeklyTimeCommitmentByCoach';
 
 export {
   ActiveMemberships,
@@ -14,4 +15,5 @@ export {
   MembershipsByCoachReports,
   StudentsBySalariedCoach,
   WeeklySummaries,
+  WeeklyTimeCommitmentByCoach,
 };

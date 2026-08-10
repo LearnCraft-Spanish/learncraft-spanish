@@ -3,6 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@9.7.1",
   "description": "This project was bootstrapped with Create React App.",
   "author": "",
   "license": "ISC",
@@ -13,7 +14,6 @@
     "node": "24.x",
     "pnpm": ">=7"
   },
-  "packageManager": "pnpm@9.7.1",
   "scripts": {
     "install:local": "bash scripts/install-local-shared.sh",
     "install:published": "bash scripts/install-published-shared.sh",
