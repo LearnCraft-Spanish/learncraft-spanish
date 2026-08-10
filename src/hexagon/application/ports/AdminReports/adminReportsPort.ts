@@ -4,6 +4,7 @@ import type {
   CoachSummary,
   CoachSummaryDrilldown,
   GroupCallsByCoach,
+  LeadsToReEngage,
   MembershipsByCoach,
   PrivateCallsByCoach,
   WeeklyTimeCommitmentByCoach,
@@ -37,4 +38,5 @@ export interface AdminReportsPort {
   getWeeklyTimeCommitmentByCoachReport: () => Promise<
     WeeklyTimeCommitmentByCoach[]
   >;
+  getLeadsToReEngageReport: () => Promise<LeadsToReEngage[]>;
 }
