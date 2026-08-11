@@ -5,6 +5,7 @@ import {
   coachSummaryDrilldownSchema,
   coachSummarySchema,
   groupCallsByCoachSchema,
+  leadsToReEngageSchema,
   membershipsByCoachSchema,
   weeklyTimeCommitmentByCoachSchema,
 } from '@learncraft-spanish/shared';
@@ -64,4 +65,11 @@ export const createMockWeeklyTimeCommitmentByCoach = createZodFactory(
 );
 export const createMockWeeklyTimeCommitmentByCoachList = createZodListFactory(
   weeklyTimeCommitmentByCoachSchema,
+);
+
+export const createMockLeadsToReEngage = createZodFactory(
+  leadsToReEngageSchema,
+);
+export const createMockLeadsToReEngageList = createZodListFactory(
+  leadsToReEngageSchema,
 );

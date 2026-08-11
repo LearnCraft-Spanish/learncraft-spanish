@@ -4,6 +4,7 @@ import {
   AssignmentsCompletedByWeek,
   CallsByCoach,
   DropoutsByLevel,
+  LeadsToReEngage,
   MembershipsByCoachReports,
   StudentsBySalariedCoach,
   WeeklySummaries,
@@ -27,6 +28,7 @@ export default function AdminDashboard() {
           <StudentsBySalariedCoach />
           <MembershipsByCoachReports />
           <WeeklyTimeCommitmentByCoach />
+          <LeadsToReEngage />
           <div className="admin-dashboard-grid">
             <ActiveMemberships />
             <DropoutsByLevel />

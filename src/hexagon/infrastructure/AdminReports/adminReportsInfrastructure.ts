@@ -6,6 +6,7 @@ import type {
   CoachSummary,
   CoachSummaryDrilldown,
   GroupCallsByCoach,
+  LeadsToReEngage,
   MembershipsByCoach,
   PrivateCallsByCoach,
   WeeklyTimeCommitmentByCoach,
@@ -17,6 +18,7 @@ import {
   getDropoutsByLevelReportEndpoint,
   getGroupCallsByCoachReportEndpoint,
   getLastWeekCoachSummaryReportEndpoint,
+  getLeadsToReEngageReportEndpoint,
   getMembershipsByCoachCurrentReportEndpoint,
   getMembershipsByCoachTwoWeeksOutReportEndpoint,
   getMembershipsBySalariedCoachCurrentReportEndpoint,
@@ -108,6 +110,11 @@ export function createAdminReportsInfrastructure(
       httpClient.get<WeeklyTimeCommitmentByCoach[]>(
         getWeeklyTimeCommitmentByCoachReportEndpoint.path,
         getWeeklyTimeCommitmentByCoachReportEndpoint.requiredScopes,
+      ),
+    getLeadsToReEngageReport: () =>
+      httpClient.get<LeadsToReEngage[]>(
+        getLeadsToReEngageReportEndpoint.path,
+        getLeadsToReEngageReportEndpoint.requiredScopes,
       ),
   };
 }
