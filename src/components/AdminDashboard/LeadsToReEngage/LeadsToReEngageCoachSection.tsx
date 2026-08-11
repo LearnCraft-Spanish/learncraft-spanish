@@ -8,11 +8,24 @@ function studentCountString(studentCount: number): string {
   return `${studentCount} student${studentCount === 1 ? '' : 's'} to re-engage`;
 }
 
+function formatMembershipEndDate(
+  lastMembershipEndDate: Student['lastMembershipEndDate'],
+  onHold: boolean,
+): string {
+  if (onHold) {
+    return 'On Hold';
+  }
+  return new Date(lastMembershipEndDate).toLocaleDateString();
+}
+
 function renderStudentRow(student: Student) {
+  const { lastMembershipName, lastMembershipEndDate, onHold } = student;
   return (
     <tr key={student.student_id}>
       <td>{student.fullName}</td>
       <td>{student.email}</td>
+      <td>{lastMembershipName}</td>
+      <td>{formatMembershipEndDate(lastMembershipEndDate, onHold)}</td>
     </tr>
   );
 }
@@ -38,7 +51,7 @@ export default function LeadsToReEngageCoachSection({
       />
       {isOpen && (
         <DisplayOnlyTable
-          headers={['Name', 'Email']}
+          headers={['Name', 'Email', 'Last Membership', 'Membership Ended']}
           data={students}
           renderRow={renderStudentRow}
         />

@@ -37,6 +37,9 @@ const coachOne = createMockLeadsToReEngage({
       student_id: 1,
       fullName: 'Student One',
       email: 'student.one@example.test',
+      lastMembershipName: 'Coaching Program',
+      lastMembershipEndDate: '2026-01-01',
+      onHold: false,
     },
   ],
 });
@@ -52,6 +55,9 @@ const coachTwo = createMockLeadsToReEngage({
       student_id: 2,
       fullName: 'Student Two',
       email: 'student.two@example.test',
+      lastMembershipName: 'Coaching Program',
+      lastMembershipEndDate: '2026-02-01',
+      onHold: false,
     },
   ],
 });
