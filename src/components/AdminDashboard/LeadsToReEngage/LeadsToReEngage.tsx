@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useLeadsToReEngage from 'src/hooks/AdminData/useLeadsToReEngage';
 import LeadsToReEngageCoachSection from './LeadsToReEngageCoachSection';
@@ -58,26 +57,19 @@ export default function LeadsToReEngage() {
           </div>
         }
       />
-      {isOpen && (
-        <>
-          {coachReports.length > 0 ? (
-            coachReports.map((coachReport) => (
-              <LeadsToReEngageCoachSection
-                key={coachReport.coach.coach_id}
-                coachReport={coachReport}
-                isOpen={openCoachIds.has(coachReport.coach.coach_id)}
-                toggleOpen={() => toggleCoach(coachReport.coach.coach_id)}
-              />
-            ))
-          ) : (
-            <DisplayOnlyTable
-              headers={['Coach']}
-              data={[]}
-              renderRow={() => null}
+      {isOpen &&
+        (coachReports.length > 0 ? (
+          coachReports.map((coachReport) => (
+            <LeadsToReEngageCoachSection
+              key={coachReport.coach.coach_id}
+              coachReport={coachReport}
+              isOpen={openCoachIds.has(coachReport.coach.coach_id)}
+              toggleOpen={() => toggleCoach(coachReport.coach.coach_id)}
             />
-          )}
-        </>
-      )}
+          ))
+        ) : (
+          <p className="leadsToReEngage__emptyState">No records found</p>
+        ))}
     </div>
   );
 }

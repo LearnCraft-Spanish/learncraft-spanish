@@ -40,4 +40,10 @@
       opacity: 0.5;
     }
   }
+
+  &__emptyState {
+    margin: 0.75rem 0;
+    padding: 0.5rem 1rem;
+    background-color: white;
+  }
 }
