@@ -40,7 +40,7 @@ describe('weeklyTimeCommitmentByCoach', () => {
     expect(screen.queryByText('Coach')).not.toBeInTheDocument();
   });
 
-  it('renders each coach with their time commitment formatted in minutes and hours', () => {
+  it('renders each coach with their time commitment formatted in hours', () => {
     const coachReport = createMockWeeklyTimeCommitmentByCoach({
       coach: {
         coach_id: 501,
@@ -60,7 +60,7 @@ describe('weeklyTimeCommitmentByCoach', () => {
     fireEvent.click(screen.getByText('Weekly Time Commitment by Coach'));
 
     expect(screen.getByText('Coach Weekly')).toBeInTheDocument();
-    expect(screen.getByText('90 min / 1.5 hrs')).toBeInTheDocument();
+    expect(screen.getByText('1.5 hrs')).toBeInTheDocument();
   });
 
   it('shows no records when there are no coaches with a time commitment', () => {

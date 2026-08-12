@@ -4,8 +4,8 @@ import DisplayOnlyTable from 'src/components/CoachingDashboard/components/Recent
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useWeeklyTimeCommitmentByCoach from 'src/hooks/AdminData/useWeeklyTimeCommitmentByCoach';
 
-function formatMinutes(minutes: number): string {
-  return `${minutes} min / ${(minutes / 60).toFixed(1)} hrs`;
+function formatHours(minutes: number): string {
+  return `${(minutes / 60).toFixed(1)} hrs`;
 }
 
 function renderRow(data: WeeklyTimeCommitmentByCoachData) {
@@ -13,7 +13,7 @@ function renderRow(data: WeeklyTimeCommitmentByCoachData) {
   return (
     <tr key={coach.coach_id}>
       <td>{coach.fullName}</td>
-      <td>{formatMinutes(totalWeeklyTimeCommitmentMinutes)}</td>
+      <td>{formatHours(totalWeeklyTimeCommitmentMinutes)}</td>
     </tr>
   );
 }
