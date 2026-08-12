@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
+import { usePagination } from '@application/units/Pagination/usePagination';
+import { Pagination } from '@interface/components/general';
 import React, { useMemo } from 'react';
-import { Pagination } from 'src/components/Table/components';
-import usePaginatedTable from 'src/components/Table/hooks/usePaginatedTable';
 
 import 'src/components/Table/Table.scss';
 
@@ -18,15 +18,21 @@ export default function DisplayOnlyTable({
   onClickFunc?: (str: string) => void;
   itemsPerPage?: number;
 }) {
-  const { page, maxPage, getDisplayData, nextPage, previousPage } =
-    usePaginatedTable({
-      data,
-      itemsPerPage,
-    });
+  const {
+    pageNumber: page,
+    maxPageNumber: maxPage,
+    nextPage,
+    previousPage,
+    startIndex,
+    endIndex,
+  } = usePagination({
+    itemsPerPage,
+    totalItems: data.length,
+  });
 
   const displayData = useMemo(
-    () => getDisplayData(data),
-    [data, getDisplayData],
+    () => data.slice(startIndex, endIndex),
+    [data, startIndex, endIndex],
   );
 
   return (
