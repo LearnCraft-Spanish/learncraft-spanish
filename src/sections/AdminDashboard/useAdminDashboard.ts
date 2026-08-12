@@ -2,8 +2,10 @@ import useActiveMembershipsReport from 'src/hooks/AdminData/useActiveMemberships
 import useDropoutsByLevelReport from 'src/hooks/AdminData/useDropoutsByLevelReport';
 import useGroupCallsByCoach from 'src/hooks/AdminData/useGroupCallsByCoach';
 import useLastWeekCoachSummary from 'src/hooks/AdminData/useLastWeekCoachSummary';
+import useLeadsToReEngage from 'src/hooks/AdminData/useLeadsToReEngage';
 import usePrivateCallsByCoach from 'src/hooks/AdminData/usePrivateCallsByCoach';
 import useWeeklyCoachSummary from 'src/hooks/AdminData/useWeeklyCoachSummary';
+import useWeeklyTimeCommitmentByCoach from 'src/hooks/AdminData/useWeeklyTimeCommitmentByCoach';
 
 export default function useAdminDashboard() {
   const { weeklyCoachSummaryQuery } = useWeeklyCoachSummary();
@@ -12,6 +14,9 @@ export default function useAdminDashboard() {
   const { groupCallsByCoachQuery } = useGroupCallsByCoach();
   const { activeMembershipsReportQuery } = useActiveMembershipsReport();
   const { dropoutsByLevelReportQuery } = useDropoutsByLevelReport();
+  const { weeklyTimeCommitmentByCoachReportQuery } =
+    useWeeklyTimeCommitmentByCoach();
+  const { leadsToReEngageReportQuery } = useLeadsToReEngage();
 
   const isLoading =
     weeklyCoachSummaryQuery.isLoading ||
@@ -19,7 +24,9 @@ export default function useAdminDashboard() {
     privateCallsByCoachQuery.isLoading ||
     groupCallsByCoachQuery.isLoading ||
     activeMembershipsReportQuery.isLoading ||
-    dropoutsByLevelReportQuery.isLoading;
+    dropoutsByLevelReportQuery.isLoading ||
+    weeklyTimeCommitmentByCoachReportQuery.isLoading ||
+    leadsToReEngageReportQuery.isLoading;
 
   const isError =
     weeklyCoachSummaryQuery.isError ||
@@ -27,7 +34,9 @@ export default function useAdminDashboard() {
     privateCallsByCoachQuery.isError ||
     groupCallsByCoachQuery.isError ||
     activeMembershipsReportQuery.isError ||
-    dropoutsByLevelReportQuery.isError;
+    dropoutsByLevelReportQuery.isError ||
+    weeklyTimeCommitmentByCoachReportQuery.isError ||
+    leadsToReEngageReportQuery.isError;
 
   const isSuccess =
     weeklyCoachSummaryQuery.isSuccess &&
@@ -35,7 +44,9 @@ export default function useAdminDashboard() {
     privateCallsByCoachQuery.isSuccess &&
     groupCallsByCoachQuery.isSuccess &&
     activeMembershipsReportQuery.isSuccess &&
-    dropoutsByLevelReportQuery.isSuccess;
+    dropoutsByLevelReportQuery.isSuccess &&
+    weeklyTimeCommitmentByCoachReportQuery.isSuccess &&
+    leadsToReEngageReportQuery.isSuccess;
 
   return {
     isLoading,

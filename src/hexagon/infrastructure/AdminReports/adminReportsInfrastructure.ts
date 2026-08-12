@@ -6,8 +6,10 @@ import type {
   CoachSummary,
   CoachSummaryDrilldown,
   GroupCallsByCoach,
+  LeadsToReEngage,
   MembershipsByCoach,
   PrivateCallsByCoach,
+  WeeklyTimeCommitmentByCoach,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
@@ -16,12 +18,14 @@ import {
   getDropoutsByLevelReportEndpoint,
   getGroupCallsByCoachReportEndpoint,
   getLastWeekCoachSummaryReportEndpoint,
+  getLeadsToReEngageReportEndpoint,
   getMembershipsByCoachCurrentReportEndpoint,
   getMembershipsByCoachTwoWeeksOutReportEndpoint,
   getMembershipsBySalariedCoachCurrentReportEndpoint,
   getMembershipsBySalariedCoachTwoWeeksOutReportEndpoint,
   getPrivateCallsByCoachReportEndpoint,
   getWeeklyCoachSummaryReportEndpoint,
+  getWeeklyTimeCommitmentByCoachReportEndpoint,
   getWeeksDrilldownReportEndpoint,
 } from '@learncraft-spanish/shared';
 
@@ -101,6 +105,16 @@ export function createAdminReportsInfrastructure(
       httpClient.get<ActiveMembershipsByCourse[]>(
         getDropoutsByLevelReportEndpoint.path,
         getDropoutsByLevelReportEndpoint.requiredScopes,
+      ),
+    getWeeklyTimeCommitmentByCoachReport: () =>
+      httpClient.get<WeeklyTimeCommitmentByCoach[]>(
+        getWeeklyTimeCommitmentByCoachReportEndpoint.path,
+        getWeeklyTimeCommitmentByCoachReportEndpoint.requiredScopes,
+      ),
+    getLeadsToReEngageReport: () =>
+      httpClient.get<LeadsToReEngage[]>(
+        getLeadsToReEngageReportEndpoint.path,
+        getLeadsToReEngageReportEndpoint.requiredScopes,
       ),
   };
 }

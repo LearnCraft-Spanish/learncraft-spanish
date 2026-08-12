@@ -1,0 +1,49 @@
+/* Extends (does not override) the shared .sectionHeader / .table-wrapper
+   styles from CoachingDashboard.scss and Table.scss. Overrides below are
+   scoped under .leadsToReEngage so they only apply to this report. */
+
+.leadsToReEngage {
+  // Keep the top-level toggle-all button right next to the report title
+  // instead of the default space-between layout pushing it to the far edge.
+  > .sectionHeader {
+    justify-content: flex-start;
+    gap: 1rem;
+  }
+
+  &__coachSection {
+    margin-left: 1rem;
+
+    .sectionHeader {
+      background-color: var(--accent);
+
+      .titleWrapper:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  &__toggleAllButton {
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+    border-radius: 0.25rem;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background-color: white;
+      color: black;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  &__emptyState {
+    margin: 0.75rem 0;
+    padding: 0.5rem 1rem;
+    background-color: white;
+  }
+}

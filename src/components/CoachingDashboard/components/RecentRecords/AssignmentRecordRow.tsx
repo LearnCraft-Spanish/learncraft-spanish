@@ -22,7 +22,7 @@ export default function AssignmentRecordRow({
           <img src={eye} alt="view assignment" className="viewRecordIcon" />
         </button>
       </td>
-      <td>{assignment.weekId}</td>
+      <td>{assignment.studentName ?? '—'}</td>
       <td>{assignment.assignmentType.assignmentType}</td>
       <td>{assignment.homeworkCorrector.fullName}</td>
       <td>

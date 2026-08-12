@@ -61,8 +61,8 @@ function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
   const [privateCallsSorting, setPrivateCallsSorting] = useState<
     'Caller Name' | 'Date'
   >('Caller Name');
-  const [assignmentsSorting, setAssignmentsSorting] = useState<'Type' | 'Week'>(
-    'Week',
+  const [assignmentsSorting, setAssignmentsSorting] = useState<'Type' | 'Name'>(
+    'Name',
   );
 
   const weekStartsDefaultValue = useMemo(
@@ -93,7 +93,9 @@ function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
         ),
       );
     }
-    return [...recentRecords.assignments].sort((a, b) => b.weekId - a.weekId);
+    return [...recentRecords.assignments].sort((a, b) =>
+      (a.studentName ?? '').localeCompare(b.studentName ?? ''),
+    );
   }, [recentRecords, assignmentsSorting]);
 
   const privateCalls = useMemo(() => {
@@ -153,10 +155,10 @@ function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
                 <Dropdown
                   label="Sort by"
                   editMode
-                  options={['Week', 'Type']}
+                  options={['Name', 'Type']}
                   value={assignmentsSorting}
                   onChange={(value) =>
-                    setAssignmentsSorting(value as 'Type' | 'Week')
+                    setAssignmentsSorting(value as 'Type' | 'Name')
                   }
                 />
               </div>
@@ -176,7 +178,7 @@ function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
               <DisplayOnlyTable
                 headers={[
                   'View',
-                  'Week',
+                  'Student',
                   'Type',
                   'Corrector',
                   'Link',
@@ -231,7 +233,7 @@ function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
               <DisplayOnlyTable
                 headers={[
                   'View',
-                  'Week',
+                  'Student',
                   'Rating',
                   'Areas of Difficulty',
                   'Notes',
@@ -300,6 +302,9 @@ function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
           {activeAssignment && (
             <AssignmentView
               assignment={activeAssignment}
+              displayContext={{
+                studentName: activeAssignment.studentName ?? undefined,
+              }}
               tableEditMode={false}
             />
           )}
@@ -310,7 +315,13 @@ function RecentRecords({ coachId }: { coachId: number }): React.JSX.Element {
             />
           )}
           {activePrivateCall && (
-            <PrivateCallView call={activePrivateCall} tableEditMode={false} />
+            <PrivateCallView
+              call={activePrivateCall}
+              displayContext={{
+                studentName: activePrivateCall.studentName ?? undefined,
+              }}
+              tableEditMode={false}
+            />
           )}
 
           {contextual === 'newGroupSession' && (
