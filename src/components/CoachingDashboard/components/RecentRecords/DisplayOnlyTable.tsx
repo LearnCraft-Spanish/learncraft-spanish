@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { usePagination } from '@application/units/Pagination/usePagination';
+import { Pagination } from '@interface/components/general';
 import React, { useMemo } from 'react';
-import { Pagination } from 'src/hexagon/interface/components/general';
 
 import 'src/components/Table/Table.scss';
 

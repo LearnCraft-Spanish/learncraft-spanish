@@ -1,8 +1,8 @@
 // coaching interface
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import type { FilterConfig, HeaderObject, SortConfig } from './types';
+import { Pagination } from '@interface/components/general';
 import React from 'react';
-import { Pagination } from 'src/hexagon/interface/components/general';
 import { QuantifiedRecords } from './components';
 import HeaderCell from './components/HeaderCell';
 import useTable from './hooks/useTable';
