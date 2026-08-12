@@ -1,7 +1,7 @@
 import type { FilterConfig, SortConfig } from '../types';
+import { usePagination } from '@application/units/Pagination/usePagination';
 // src/components/Table/hooks/useTable.ts
 import { useMemo } from 'react';
-import { usePaginatedTable } from './';
 import useFilter from './useFilter';
 import useSort from './useSort';
 
@@ -28,15 +28,21 @@ export default function useTable<T>({
     sortFunction,
   );
 
-  const { page, maxPage, getDisplayData, nextPage, previousPage } =
-    usePaginatedTable({
-      data: sortedData,
-      itemsPerPage,
-    });
+  const {
+    pageNumber: page,
+    maxPageNumber: maxPage,
+    nextPage,
+    previousPage,
+    startIndex,
+    endIndex,
+  } = usePagination({
+    itemsPerPage,
+    totalItems: sortedData.length,
+  });
 
   const displayData = useMemo(() => {
-    return getDisplayData(sortedData);
-  }, [sortedData, getDisplayData]);
+    return sortedData.slice(startIndex, endIndex);
+  }, [sortedData, startIndex, endIndex]);
 
   return {
     filterConfig,
