@@ -1,7 +1,17 @@
 import type { SkillTag } from '@learncraft-spanish/shared';
 import { useSkillTags } from '@application/queries/useSkillTags';
+import { filterSkillTagsByKnownVocabulary } from '@domain/functions/skillTagLessonRange';
 import { SkillType } from '@learncraft-spanish/shared';
 import { useMemo, useState } from 'react';
+
+export interface UseSkillTagSearchProps {
+  /**
+   * Vocabulary ids the student can encounter. When provided, tags pointing at
+   * vocabulary outside this list are withheld from suggestions. Leave undefined
+   * to search the full tag catalog.
+   */
+  allowedVocabularyIds?: number[];
+}
 
 export interface UseSkillTagSearchReturnType {
   tagSearchTerm: string;
@@ -13,7 +23,9 @@ export interface UseSkillTagSearchReturnType {
   error: Error | null;
 }
 
-export function useSkillTagSearch(): UseSkillTagSearchReturnType {
+export function useSkillTagSearch({
+  allowedVocabularyIds,
+}: UseSkillTagSearchProps = {}): UseSkillTagSearchReturnType {
   const { skillTags, isLoading, error } = useSkillTags();
   const [tagSearchTerm, setTagSearchTerm] = useState('');
   const [removedTagIds, setRemovedTagIds] = useState<Set<string>>(
@@ -40,9 +52,21 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
     });
   };
 
+  // An undefined list means the lesson range is unknown or still loading, which
+  // is different from a range that teaches no vocabulary.
+  const availableTags: SkillTag[] | undefined = useMemo(() => {
+    if (!skillTags || !allowedVocabularyIds) {
+      return skillTags;
+    }
+    return filterSkillTagsByKnownVocabulary(
+      skillTags,
+      new Set(allowedVocabularyIds),
+    );
+  }, [skillTags, allowedVocabularyIds]);
+
   const tagSuggestions: SkillTag[] = useMemo(() => {
     // Early return for empty search terms or no skill tags
-    if (!skillTags?.length || !tagSearchTerm.trim()) return [];
+    if (!availableTags?.length || !tagSearchTerm.trim()) return [];
 
     const searchTerm = tagSearchTerm.toLowerCase().trim();
     const exactNameMatches: SkillTag[] = [];
@@ -51,7 +75,7 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
     const partialTraitMatches: SkillTag[] = [];
 
     // Process tags in a single pass
-    for (const tag of skillTags) {
+    for (const tag of availableTags) {
       // Skip if removed
       if (removedTagIds.has(tag.key)) {
         continue;
@@ -120,7 +144,7 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
       ...partialTraitMatches,
     ];
     return result.slice(0, 10);
-  }, [skillTags, tagSearchTerm, removedTagIds]);
+  }, [availableTags, tagSearchTerm, removedTagIds]);
 
   return {
     tagSearchTerm,

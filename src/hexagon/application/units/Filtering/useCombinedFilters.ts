@@ -6,28 +6,44 @@ import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleFilterCoordinator } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import {
+  useCoursePrerequisiteVocab,
+  useLessonVocabKnown,
+} from '@application/queries/useLessonWithVocab';
+import {
   PreSetQuizPreset,
   preSetQuizzes,
 } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { usePresetFilters } from '@application/units/Filtering/FilterPresets/usePresetFilters';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
-import { transformToLessonRanges } from '@domain/coursePrerequisites';
+import {
+  courseHasPrerequisites,
+  transformToLessonRanges,
+} from '@domain/coursePrerequisites';
+import { isSkillTagInKnownVocabulary } from '@domain/functions/skillTagLessonRange';
 import { useEffect, useMemo, useRef } from 'react';
 export type UseCombinedFiltersReturnType =
   UseExampleFilterCoordinatorReturnType &
     UseSelectedCourseAndLessonsReturnType & {
       filterState: LocalExampleFilters; // Always uses lesson ranges
       skillTagSearch: UseSkillTagSearchReturnType;
+      /** Keys of selected tags that cannot appear in the selected lesson range. */
+      outOfRangeSkillTagKeys: string[];
       filterPreset: PreSetQuizPreset;
       setFilterPreset: (preset: PreSetQuizPreset) => void;
     } & { isAdmin?: boolean };
 
 export interface UseCombinedFiltersProps {
   onFilterChange?: () => void;
+  /**
+   * Limits tag search to tags the student can encounter in the selected lesson
+   * range. Disable for admin tooling that searches the whole catalog.
+   */
+  restrictTagsToLessonRange?: boolean;
 }
 
 export function useCombinedFilters({
   onFilterChange = () => {},
+  restrictTagsToLessonRange = true,
 }: UseCombinedFiltersProps): UseCombinedFiltersReturnType {
   // Destructure the filter properties from the coordinator
   const {
@@ -63,7 +79,49 @@ export function useCombinedFilters({
     error: errorCourseAndLessons,
   } = useSelectedCourseAndLessons();
 
-  const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
+  // Shares a react-query cache entry with useCombinedFiltersWithVocabulary.
+  const { lessonVocabKnown } = useLessonVocabKnown(
+    courseId ?? null,
+    toLessonNumber ?? null,
+  );
+
+  // Courses like Post-Podcast Lessons assume an earlier course was completed,
+  // so everything it taught stays available to study.
+  const { prerequisiteVocab } = useCoursePrerequisiteVocab(courseId ?? null);
+
+  const allowedVocabularyIds: number[] | undefined = useMemo(() => {
+    if (!restrictTagsToLessonRange || !courseId || !lessonVocabKnown) {
+      return undefined;
+    }
+    if (!courseHasPrerequisites(courseId)) {
+      return lessonVocabKnown;
+    }
+    // Restricting before the prerequisite vocabulary arrives would briefly hide
+    // tags the student can study.
+    if (!prerequisiteVocab) {
+      return undefined;
+    }
+    return [...lessonVocabKnown, ...prerequisiteVocab];
+  }, [
+    restrictTagsToLessonRange,
+    courseId,
+    lessonVocabKnown,
+    prerequisiteVocab,
+  ]);
+
+  const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch({
+    allowedVocabularyIds,
+  });
+
+  const outOfRangeSkillTagKeys: string[] = useMemo(() => {
+    if (!allowedVocabularyIds) {
+      return [];
+    }
+    const knownVocabularyIds = new Set(allowedVocabularyIds);
+    return selectedSkillTags
+      .filter((tag) => !isSkillTagInKnownVocabulary(tag, knownVocabularyIds))
+      .map((tag) => tag.key);
+  }, [selectedSkillTags, allowedVocabularyIds]);
 
   // Filter state that always uses lesson ranges
   const filterState: LocalExampleFilters = useMemo(() => {
@@ -191,6 +249,7 @@ export function useCombinedFilters({
     removeSkillTagFromFilters,
     bulkUpdateSkillTagKeys,
     skillTagSearch,
+    outOfRangeSkillTagKeys,
     // Destructure the course and lesson properties from the coordinator
     course,
     courseId,

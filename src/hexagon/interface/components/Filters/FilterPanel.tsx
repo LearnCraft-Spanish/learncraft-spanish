@@ -30,6 +30,7 @@ export function FilterPanel({
     updateAudioOnly,
     updateIncludeUnpublished,
     selectedSkillTags,
+    outOfRangeSkillTagKeys,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
     skillTagSearch,
@@ -127,6 +128,7 @@ export function FilterPanel({
                   addTagBackToSuggestions(tagId);
                 }}
                 skillTags={selectedSkillTags}
+                outOfRangeTagKeys={outOfRangeSkillTagKeys}
               />
             </>
           )}

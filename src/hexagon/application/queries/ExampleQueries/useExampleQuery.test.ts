@@ -39,6 +39,7 @@ describe('useExampleQuery', () => {
     includeUnpublished: false,
     updateIncludeUnpublished: vi.fn(),
     selectedSkillTags: [],
+    outOfRangeSkillTagKeys: [],
     addSkillTagToFilters: vi.fn(),
     removeSkillTagFromFilters: vi.fn(),
     bulkUpdateSkillTagKeys: vi.fn(),

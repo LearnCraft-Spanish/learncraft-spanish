@@ -90,6 +90,32 @@ export function courseHasPrerequisites(courseId: number): boolean {
 }
 
 /**
+ * Lesson ranges covering every prerequisite course a student must have
+ * completed before starting the given course. Empty for courses without
+ * prerequisites.
+ */
+export function getPrerequisiteLessonRanges(
+  courseId: number | null | undefined,
+): Array<{
+  courseId: number;
+  fromLessonNumber: number;
+  toLessonNumber: number;
+}> {
+  if (!courseId) {
+    return [];
+  }
+  const courseConfig = getPrerequisitesForCourse(courseId);
+  if (!courseConfig) {
+    return [];
+  }
+  return courseConfig.prerequisites.map((prerequisite) => ({
+    courseId: prerequisite.courseId,
+    fromLessonNumber: prerequisite.fromLessonNumber,
+    toLessonNumber: prerequisite.toLessonNumber,
+  }));
+}
+
+/**
  * Generate virtual lesson ID for a prerequisite
  * Uses negative numbers to avoid conflicts with real lesson IDs
  */
