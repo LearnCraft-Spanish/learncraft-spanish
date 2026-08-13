@@ -2,7 +2,9 @@ import type { AudioQuizProps } from '@application/units/AudioQuiz/useAudioQuiz';
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import { useAudioAdapter } from '@application/adapters/audioAdapter';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
+import { useLastStudiedLessonQuery } from '@application/queries/useLastStudiedLessonQuery';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
@@ -46,6 +48,8 @@ export function useCombinedCustomQuiz(): UseCombinedCustomQuizReturn {
   const QUERY_PAGE_SIZE = 150;
   const { primeAudioElement } = useAudioAdapter();
   const { isCoach, isAdmin } = useAuthAdapter();
+  const { course, toLesson } = useSelectedCourseAndLessons();
+  const { recordLastStudiedLesson } = useLastStudiedLessonQuery();
   // Local state
   const [quizType, setQuizType] = useState<CombinedCustomQuizType>(
     CombinedCustomQuizType.Text,
@@ -119,6 +123,12 @@ export function useCombinedCustomQuiz(): UseCombinedCustomQuizReturn {
 
   // Function to ready the quiz
   const readyQuiz = () => {
+    if (course && toLesson) {
+      void recordLastStudiedLesson({
+        courseId: course.id,
+        lessonNumber: toLesson.lessonNumber,
+      });
+    }
     if (quizType === CombinedCustomQuizType.Text) {
       // Take snapshot of text examples
       const shuffledExamples = fisherYatesShuffle(textQuizSetup.examplesToQuiz);

@@ -42,6 +42,10 @@ import {
   resetMockGroupCallsAdapter,
 } from '@application/adapters/groupCallsAdapter.mock';
 import {
+  mockLastStudiedLessonAdapter,
+  resetMockLastStudiedLessonAdapter,
+} from '@application/adapters/lastStudiedLessonAdapter.mock';
+import {
   mockLocalStorageAdapter,
   resetMockLocalStorageAdapter,
 } from '@application/adapters/localStorageAdapter.mock';
@@ -153,6 +157,10 @@ vi.mock('@application/adapters/localStorageAdapter', () => ({
   LocalStorageAdapter: () => mockLocalStorageAdapter,
 }));
 
+vi.mock('@application/adapters/lastStudiedLessonAdapter', () => ({
+  useLastStudiedLessonAdapter: vi.fn(() => mockLastStudiedLessonAdapter),
+}));
+
 vi.mock('@application/adapters/pmfSurveyFrequencyAdapter', () => ({
   usePMFSurveyFrequencyAdapter: vi.fn(() => mockPMFSurveyFrequencyAdapter),
 }));
@@ -226,6 +234,7 @@ const resetGlobalMocks = () => {
   resetMockCourseAdapter();
   resetMockFlashcardAdapter();
   resetMockLocalStorageAdapter();
+  resetMockLastStudiedLessonAdapter();
   resetMockOfficialQuizAdapter();
   resetMockSkillTagsAdapter();
   resetMockPMFSurveyFrequencyAdapter();

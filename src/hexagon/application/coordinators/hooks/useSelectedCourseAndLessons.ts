@@ -4,7 +4,9 @@ import { ExampleFilterContext } from '@application/coordinators/contexts/Example
 import SelectedCourseAndLessonsContext from '@application/coordinators/contexts/SelectedCourseAndLessonsContext';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
+import { useLastStudiedLessonQuery } from '@application/queries/useLastStudiedLessonQuery';
 import { getPrerequisiteFromVirtualId } from '@domain/coursePrerequisites';
+import { resolveLastStudiedLessonNumber } from '@domain/lastStudiedLesson/lastStudiedLesson';
 import { use, useMemo } from 'react';
 
 export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturnType {
@@ -32,6 +34,8 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     error,
   } = useCoursesWithLessons(includeUnpublished);
   const { appUser } = useActiveStudent();
+  const { lastStudiedLesson, isLoading: lastStudiedLessonLoading } =
+    useLastStudiedLessonQuery();
 
   const course: CourseWithLessons | null = useMemo(() => {
     let newCourseId: number | null;
@@ -91,8 +95,17 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
 
     let newToLessonNumber: number | undefined;
 
+    const lastStudiedLessonNumber = resolveLastStudiedLessonNumber(
+      lastStudiedLesson,
+      course.id,
+    );
+
     if (toLessonNumber) {
       newToLessonNumber = toLessonNumber;
+    } else if (lastStudiedLessonNumber) {
+      // Where the student left off last session takes precedence over their
+      // recorded course progress
+      newToLessonNumber = lastStudiedLessonNumber;
     } else if (
       appUser &&
       appUser.studentRole === 'student' &&
@@ -116,7 +129,7 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
       course?.lessons.find((item) => item.lessonNumber === newToLessonNumber) ||
       null
     );
-  }, [course, toLessonNumber, appUser]);
+  }, [course, toLessonNumber, appUser, lastStudiedLesson]);
 
   // ------------------ Return ------------------ //
   return {
@@ -130,7 +143,7 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     updateFromLessonNumber,
     updateToLessonNumber,
     includeUnpublished,
-    isLoading,
+    isLoading: isLoading || lastStudiedLessonLoading,
     error,
   };
 }
