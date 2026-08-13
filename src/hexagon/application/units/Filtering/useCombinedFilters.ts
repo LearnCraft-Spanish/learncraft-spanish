@@ -5,21 +5,18 @@ import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTag
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleFilterCoordinator } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
-import {
-  useCoursePrerequisiteVocab,
-  useLessonVocabKnown,
-} from '@application/queries/useLessonWithVocab';
+import { useReachableSkills } from '@application/queries/useReachableSkills';
 import {
   PreSetQuizPreset,
   preSetQuizzes,
 } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { usePresetFilters } from '@application/units/Filtering/FilterPresets/usePresetFilters';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
+import { transformToLessonRanges } from '@domain/coursePrerequisites';
 import {
-  courseHasPrerequisites,
-  transformToLessonRanges,
-} from '@domain/coursePrerequisites';
-import { isSkillTagInKnownVocabulary } from '@domain/functions/skillTagLessonRange';
+  isSkillTagReachable,
+  toReachableSkillSets,
+} from '@domain/functions/skillTagLessonRange';
 import { useEffect, useMemo, useRef } from 'react';
 export type UseCombinedFiltersReturnType =
   UseExampleFilterCoordinatorReturnType &
@@ -79,49 +76,28 @@ export function useCombinedFilters({
     error: errorCourseAndLessons,
   } = useSelectedCourseAndLessons();
 
-  // Shares a react-query cache entry with useCombinedFiltersWithVocabulary.
-  const { lessonVocabKnown } = useLessonVocabKnown(
+  // The backend resolves the range against the vocabulary table, including any
+  // prerequisite courses the selected course assumes.
+  const { reachableSkills } = useReachableSkills(
     courseId ?? null,
+    fromLessonNumber ?? null,
     toLessonNumber ?? null,
+    restrictTagsToLessonRange,
   );
 
-  // Courses like Post-Podcast Lessons assume an earlier course was completed,
-  // so everything it taught stays available to study.
-  const { prerequisiteVocab } = useCoursePrerequisiteVocab(courseId ?? null);
-
-  const allowedVocabularyIds: number[] | undefined = useMemo(() => {
-    if (!restrictTagsToLessonRange || !courseId || !lessonVocabKnown) {
-      return undefined;
-    }
-    if (!courseHasPrerequisites(courseId)) {
-      return lessonVocabKnown;
-    }
-    // Restricting before the prerequisite vocabulary arrives would briefly hide
-    // tags the student can study.
-    if (!prerequisiteVocab) {
-      return undefined;
-    }
-    return [...lessonVocabKnown, ...prerequisiteVocab];
-  }, [
-    restrictTagsToLessonRange,
-    courseId,
-    lessonVocabKnown,
-    prerequisiteVocab,
-  ]);
-
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch({
-    allowedVocabularyIds,
+    reachableSkills: restrictTagsToLessonRange ? reachableSkills : undefined,
   });
 
   const outOfRangeSkillTagKeys: string[] = useMemo(() => {
-    if (!allowedVocabularyIds) {
+    if (!restrictTagsToLessonRange || !reachableSkills) {
       return [];
     }
-    const knownVocabularyIds = new Set(allowedVocabularyIds);
+    const reachableSkillSets = toReachableSkillSets(reachableSkills);
     return selectedSkillTags
-      .filter((tag) => !isSkillTagInKnownVocabulary(tag, knownVocabularyIds))
+      .filter((tag) => !isSkillTagReachable(tag, reachableSkillSets))
       .map((tag) => tag.key);
-  }, [selectedSkillTags, allowedVocabularyIds]);
+  }, [selectedSkillTags, reachableSkills, restrictTagsToLessonRange]);
 
   // Filter state that always uses lesson ranges
   const filterState: LocalExampleFilters = useMemo(() => {

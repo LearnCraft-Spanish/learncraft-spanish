@@ -1,7 +1,8 @@
-import type { SkillTag } from '@learncraft-spanish/shared';
+import type { ReachableSkills, SkillTag } from '@learncraft-spanish/shared';
 import {
-  filterSkillTagsByKnownVocabulary,
-  isSkillTagInKnownVocabulary,
+  filterSkillTagsByReachability,
+  isSkillTagReachable,
+  toReachableSkillSets,
 } from '@domain/functions/skillTagLessonRange';
 import { PartOfSpeech, SkillType } from '@learncraft-spanish/shared';
 import { describe, expect, it } from 'vitest';
@@ -46,37 +47,98 @@ const conjugationTag: SkillTag = {
   name: 'Subjunctive present',
 };
 
-describe('isSkillTagInKnownVocabulary', () => {
-  it('keeps a vocabulary tag whose vocabularyId is known', () => {
-    expect(isSkillTagInKnownVocabulary(vocabularyTag, new Set([1, 2]))).toBe(
+const nothingReachable: ReachableSkills = {
+  vocabularyIds: [],
+  subcategoryIds: [],
+  verbIds: [],
+  conjugationTags: [],
+};
+
+function reachable(overrides: Partial<ReachableSkills>) {
+  return toReachableSkillSets({ ...nothingReachable, ...overrides });
+}
+
+describe('isSkillTagReachable', () => {
+  it('keeps a vocabulary tag whose vocabularyId is reachable', () => {
+    expect(
+      isSkillTagReachable(vocabularyTag, reachable({ vocabularyIds: [1, 2] })),
+    ).toBe(true);
+  });
+
+  it('rejects a vocabulary tag whose vocabularyId is out of range', () => {
+    expect(
+      isSkillTagReachable(vocabularyTag, reachable({ vocabularyIds: [2, 3] })),
+    ).toBe(false);
+  });
+
+  it('keeps an idiom tag whose vocabularyId is reachable', () => {
+    expect(
+      isSkillTagReachable(idiomTag, reachable({ vocabularyIds: [57] })),
+    ).toBe(true);
+  });
+
+  it('rejects an idiom tag whose vocabularyId is out of range', () => {
+    expect(
+      isSkillTagReachable(idiomTag, reachable({ vocabularyIds: [1] })),
+    ).toBe(false);
+  });
+
+  it('keeps a subcategory tag when the range teaches something beneath it', () => {
+    expect(
+      isSkillTagReachable(subcategoryTag, reachable({ subcategoryIds: [49] })),
+    ).toBe(true);
+  });
+
+  it('rejects a subcategory tag the range teaches nothing beneath', () => {
+    expect(
+      isSkillTagReachable(subcategoryTag, reachable({ subcategoryIds: [50] })),
+    ).toBe(false);
+  });
+
+  it('keeps a verb tag whose verb the range teaches', () => {
+    expect(isSkillTagReachable(verbTag, reachable({ verbIds: [1] }))).toBe(
       true,
     );
   });
 
-  it('rejects a vocabulary tag whose vocabularyId is not known', () => {
-    expect(isSkillTagInKnownVocabulary(vocabularyTag, new Set([2, 3]))).toBe(
+  it('rejects a verb tag whose verb the range does not teach', () => {
+    expect(isSkillTagReachable(verbTag, reachable({ verbIds: [2] }))).toBe(
       false,
     );
   });
 
-  it('keeps an idiom tag whose vocabularyId is known', () => {
-    expect(isSkillTagInKnownVocabulary(idiomTag, new Set([57]))).toBe(true);
+  it('matches a conjugation tag by name', () => {
+    expect(
+      isSkillTagReachable(
+        conjugationTag,
+        reachable({ conjugationTags: ['Subjunctive present'] }),
+      ),
+    ).toBe(true);
   });
 
-  it('rejects an idiom tag whose vocabularyId is not known', () => {
-    expect(isSkillTagInKnownVocabulary(idiomTag, new Set([1]))).toBe(false);
+  it('rejects a conjugation tag the range never conjugates', () => {
+    expect(
+      isSkillTagReachable(
+        conjugationTag,
+        reachable({ conjugationTags: ['Preterite'] }),
+      ),
+    ).toBe(false);
   });
 
   it.each([
+    ['vocabulary', vocabularyTag],
+    ['idiom', idiomTag],
     ['subcategory', subcategoryTag],
     ['verb', verbTag],
     ['conjugation', conjugationTag],
-  ])('always keeps a %s tag, which carries no vocabularyId', (_label, tag) => {
-    expect(isSkillTagInKnownVocabulary(tag, new Set())).toBe(true);
+  ])('rejects a %s tag when nothing is reachable', (_label, tag) => {
+    expect(
+      isSkillTagReachable(tag, toReachableSkillSets(nothingReachable)),
+    ).toBe(false);
   });
 });
 
-describe('filterSkillTagsByKnownVocabulary', () => {
+describe('filterSkillTagsByReachability', () => {
   const allTags: SkillTag[] = [
     vocabularyTag,
     idiomTag,
@@ -85,34 +147,61 @@ describe('filterSkillTagsByKnownVocabulary', () => {
     conjugationTag,
   ];
 
-  it('keeps only the vocabulary and idiom tags within the known set', () => {
-    const result = filterSkillTagsByKnownVocabulary(allTags, new Set([1]));
+  it('keeps only the tags the range can reach, across every tag type', () => {
+    const result = filterSkillTagsByReachability(
+      allTags,
+      reachable({
+        vocabularyIds: [1],
+        verbIds: [1],
+      }),
+    );
 
-    expect(result.map((tag) => tag.key)).toEqual([
-      'Vocabulary-1',
-      'Subcategory-49',
-      'Verb-1',
-      'Conjugation-Subjunctive present',
-    ]);
+    expect(result.map((tag) => tag.key)).toEqual(['Vocabulary-1', 'Verb-1']);
   });
 
-  it('drops every vocabulary and idiom tag when the known set is empty', () => {
-    const result = filterSkillTagsByKnownVocabulary(allTags, new Set());
+  it('drops every tag when the range reaches nothing', () => {
+    const result = filterSkillTagsByReachability(
+      allTags,
+      toReachableSkillSets(nothingReachable),
+    );
 
-    expect(result.map((tag) => tag.key)).toEqual([
-      'Subcategory-49',
-      'Verb-1',
-      'Conjugation-Subjunctive present',
-    ]);
+    expect(result).toEqual([]);
   });
 
-  it('keeps every tag when the known set covers all vocabulary ids', () => {
-    const result = filterSkillTagsByKnownVocabulary(allTags, new Set([1, 57]));
+  it('keeps every tag when the range reaches all four dimensions', () => {
+    const result = filterSkillTagsByReachability(
+      allTags,
+      reachable({
+        vocabularyIds: [1, 57],
+        subcategoryIds: [49],
+        verbIds: [1],
+        conjugationTags: ['Subjunctive present'],
+      }),
+    );
 
     expect(result).toHaveLength(allTags.length);
   });
 
   it('returns an empty list for an empty input', () => {
-    expect(filterSkillTagsByKnownVocabulary([], new Set([1]))).toEqual([]);
+    expect(
+      filterSkillTagsByReachability([], reachable({ vocabularyIds: [1] })),
+    ).toEqual([]);
+  });
+});
+
+describe('toReachableSkillSets', () => {
+  it('turns each dimension into a lookup set', () => {
+    const sets = toReachableSkillSets({
+      vocabularyIds: [1, 2],
+      subcategoryIds: [10],
+      verbIds: [200],
+      conjugationTags: ['Infinitive'],
+    });
+
+    expect(sets.vocabularyIds.has(2)).toBe(true);
+    expect(sets.subcategoryIds.has(10)).toBe(true);
+    expect(sets.verbIds.has(200)).toBe(true);
+    expect(sets.conjugationTags.has('Infinitive')).toBe(true);
+    expect(sets.vocabularyIds.has(3)).toBe(false);
   });
 });

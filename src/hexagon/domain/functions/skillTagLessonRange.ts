@@ -1,37 +1,63 @@
-import type { SkillTag } from '@learncraft-spanish/shared';
+import type { ReachableSkills, SkillTag } from '@learncraft-spanish/shared';
 import { SkillType } from '@learncraft-spanish/shared';
 
 /**
- * Determines whether a skill tag can appear in examples limited to a set of
- * known vocabulary.
+ * The reachable skill dimensions in lookup form, so a long tag list can be
+ * filtered without rescanning arrays.
+ */
+export interface ReachableSkillSets {
+  vocabularyIds: ReadonlySet<number>;
+  subcategoryIds: ReadonlySet<number>;
+  verbIds: ReadonlySet<number>;
+  conjugationTags: ReadonlySet<string>;
+}
+
+export function toReachableSkillSets(
+  reachableSkills: ReachableSkills,
+): ReachableSkillSets {
+  return {
+    vocabularyIds: new Set(reachableSkills.vocabularyIds),
+    subcategoryIds: new Set(reachableSkills.subcategoryIds),
+    verbIds: new Set(reachableSkills.verbIds),
+    conjugationTags: new Set(reachableSkills.conjugationTags),
+  };
+}
+
+/**
+ * Determines whether a skill tag can appear in examples limited to a lesson
+ * range.
  *
  * The example query filters by lesson range before applying skill tags, and the
  * lesson range filter rejects any example containing vocabulary the student has
- * not reached. A vocabulary or idiom tag outside that set can therefore never
- * return results.
- *
- * Subcategory, Verb, and Conjugation tags carry no vocabulary id, so they
- * cannot be resolved against the known set and are always treated as available.
+ * not reached. A tag whose vocabulary lies entirely outside that range can
+ * therefore never return results.
  */
-export function isSkillTagInKnownVocabulary(
+export function isSkillTagReachable(
   tag: SkillTag,
-  knownVocabularyIds: ReadonlySet<number>,
+  reachableSkills: ReachableSkillSets,
 ): boolean {
-  if (tag.type === SkillType.Vocabulary || tag.type === SkillType.Idiom) {
-    return knownVocabularyIds.has(tag.vocabularyId);
+  switch (tag.type) {
+    case SkillType.Vocabulary:
+    case SkillType.Idiom:
+      return reachableSkills.vocabularyIds.has(tag.vocabularyId);
+    case SkillType.Subcategory:
+      return reachableSkills.subcategoryIds.has(tag.subcategoryId);
+    case SkillType.Verb:
+      return reachableSkills.verbIds.has(tag.verbId);
+    case SkillType.Conjugation:
+      return reachableSkills.conjugationTags.has(tag.name);
+    default:
+      return false;
   }
-  return true;
 }
 
 /**
  * Narrows a list of skill tags to those that can appear in examples limited to
- * the given known vocabulary.
+ * a lesson range.
  */
-export function filterSkillTagsByKnownVocabulary(
+export function filterSkillTagsByReachability(
   tags: SkillTag[],
-  knownVocabularyIds: ReadonlySet<number>,
+  reachableSkills: ReachableSkillSets,
 ): SkillTag[] {
-  return tags.filter((tag) =>
-    isSkillTagInKnownVocabulary(tag, knownVocabularyIds),
-  );
+  return tags.filter((tag) => isSkillTagReachable(tag, reachableSkills));
 }

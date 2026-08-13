@@ -1,4 +1,4 @@
-import type { SkillTag } from '@learncraft-spanish/shared';
+import type { ReachableSkills, SkillTag } from '@learncraft-spanish/shared';
 import { overrideMockSkillTagsAdapter } from '@application/adapters/skillTagsAdapter.mock';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { SkillType } from '@learncraft-spanish/shared';
@@ -34,10 +34,25 @@ const ponerTag: SkillTag = {
 
 const allTags: SkillTag[] = [porTag, porqueTag, ponerTag];
 
-function renderSearch(allowedVocabularyIds?: number[]) {
-  return renderHook(() => useSkillTagSearch({ allowedVocabularyIds }), {
-    wrapper: createQueryClientWrapper(),
-  });
+const nothingReachable: ReachableSkills = {
+  vocabularyIds: [],
+  subcategoryIds: [],
+  verbIds: [],
+  conjugationTags: [],
+};
+
+function renderSearch(reachableSkills?: Partial<ReachableSkills>) {
+  return renderHook(
+    () =>
+      useSkillTagSearch({
+        reachableSkills: reachableSkills
+          ? { ...nothingReachable, ...reachableSkills }
+          : undefined,
+      }),
+    {
+      wrapper: createQueryClientWrapper(),
+    },
+  );
 }
 
 async function search(
@@ -58,7 +73,7 @@ describe('useSkillTagSearch', () => {
     });
   });
 
-  it('suggests every matching tag when no allowed vocabulary is given', async () => {
+  it('suggests every matching tag when no reachable skills are given', async () => {
     const { result } = renderSearch();
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -73,8 +88,8 @@ describe('useSkillTagSearch', () => {
     );
   });
 
-  it('withholds vocabulary tags outside the allowed vocabulary', async () => {
-    const { result } = renderSearch([1]);
+  it('withholds vocabulary tags the lesson range cannot reach', async () => {
+    const { result } = renderSearch({ vocabularyIds: [1], verbIds: [7] });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     await search(result, 'po');
@@ -87,21 +102,31 @@ describe('useSkillTagSearch', () => {
     );
   });
 
-  it('withholds every vocabulary tag when the allowed vocabulary is empty', async () => {
-    const { result } = renderSearch([]);
+  it('withholds verb tags the lesson range cannot reach', async () => {
+    const { result } = renderSearch({ vocabularyIds: [1, 99] });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     await search(result, 'po');
 
     await waitFor(() =>
       expect(result.current.tagSuggestions.map((tag) => tag.key)).toEqual([
-        'Verb-7',
+        'Vocabulary-1',
+        'Vocabulary-99',
       ]),
     );
   });
 
+  it('withholds every tag when the lesson range reaches nothing', async () => {
+    const { result } = renderSearch(nothingReachable);
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await search(result, 'po');
+
+    await waitFor(() => expect(result.current.tagSuggestions).toEqual([]));
+  });
+
   it('returns no suggestions for an empty search term', async () => {
-    const { result } = renderSearch([1]);
+    const { result } = renderSearch({ vocabularyIds: [1] });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 

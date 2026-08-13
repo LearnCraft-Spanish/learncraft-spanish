@@ -1,16 +1,19 @@
-import type { SkillTag } from '@learncraft-spanish/shared';
+import type { ReachableSkills, SkillTag } from '@learncraft-spanish/shared';
 import { useSkillTags } from '@application/queries/useSkillTags';
-import { filterSkillTagsByKnownVocabulary } from '@domain/functions/skillTagLessonRange';
+import {
+  filterSkillTagsByReachability,
+  toReachableSkillSets,
+} from '@domain/functions/skillTagLessonRange';
 import { SkillType } from '@learncraft-spanish/shared';
 import { useMemo, useState } from 'react';
 
 export interface UseSkillTagSearchProps {
   /**
-   * Vocabulary ids the student can encounter. When provided, tags pointing at
-   * vocabulary outside this list are withheld from suggestions. Leave undefined
-   * to search the full tag catalog.
+   * The skills the student can encounter in their lesson range. When provided,
+   * tags outside it are withheld from suggestions. Leave undefined to search
+   * the full tag catalog.
    */
-  allowedVocabularyIds?: number[];
+  reachableSkills?: ReachableSkills;
 }
 
 export interface UseSkillTagSearchReturnType {
@@ -24,7 +27,7 @@ export interface UseSkillTagSearchReturnType {
 }
 
 export function useSkillTagSearch({
-  allowedVocabularyIds,
+  reachableSkills,
 }: UseSkillTagSearchProps = {}): UseSkillTagSearchReturnType {
   const { skillTags, isLoading, error } = useSkillTags();
   const [tagSearchTerm, setTagSearchTerm] = useState('');
@@ -52,17 +55,17 @@ export function useSkillTagSearch({
     });
   };
 
-  // An undefined list means the lesson range is unknown or still loading, which
-  // is different from a range that teaches no vocabulary.
+  // Undefined means the lesson range is unknown or still loading, which is
+  // different from a range that teaches nothing.
   const availableTags: SkillTag[] | undefined = useMemo(() => {
-    if (!skillTags || !allowedVocabularyIds) {
+    if (!skillTags || !reachableSkills) {
       return skillTags;
     }
-    return filterSkillTagsByKnownVocabulary(
+    return filterSkillTagsByReachability(
       skillTags,
-      new Set(allowedVocabularyIds),
+      toReachableSkillSets(reachableSkills),
     );
-  }, [skillTags, allowedVocabularyIds]);
+  }, [skillTags, reachableSkills]);
 
   const tagSuggestions: SkillTag[] = useMemo(() => {
     // Early return for empty search terms or no skill tags
