@@ -6,13 +6,17 @@ import { createLocalStorageInfrastructure } from '@infrastructure/localStorageIn
 
 export const LAST_STUDIED_LESSON_STORAGE_KEY = 'lcs-last-studied-lesson';
 
+export function lastStudiedLessonStorageKey(emailHash: string): string {
+  return `${LAST_STUDIED_LESSON_STORAGE_KEY}:${emailHash}`;
+}
+
 export function createLastStudiedLessonInfrastructure(): LastStudiedLessonPort {
   const storage = createLocalStorageInfrastructure();
 
-  const readRecord = (): LastStudiedLessonRecord | null => {
+  const readRecord = (emailHash: string): LastStudiedLessonRecord | null => {
     try {
       const parsed = LastStudiedLessonRecordSchema.safeParse(
-        storage.getItem(LAST_STUDIED_LESSON_STORAGE_KEY),
+        storage.getItem(lastStudiedLessonStorageKey(emailHash)),
       );
       return parsed.success ? parsed.data : null;
     } catch {
@@ -23,27 +27,29 @@ export function createLastStudiedLessonInfrastructure(): LastStudiedLessonPort {
 
   return {
     getLastStudiedLesson: async (email: string) => {
-      const record = readRecord();
-      if (!record || record.emailHash !== (await hashEmail(email))) {
+      const emailHash = await hashEmail(email);
+      const record = readRecord(emailHash);
+      if (!record || record.emailHash !== emailHash) {
         return null;
       }
       return record;
     },
 
     setLastStudiedLesson: async ({ email, courseId, lessonNumber }) => {
+      const emailHash = await hashEmail(email);
       const record: LastStudiedLessonRecord = {
-        emailHash: await hashEmail(email),
+        emailHash,
         courseId,
         lessonNumber,
         updatedAt: new Date().toISOString(),
       };
-      // A single key means each write replaces the previous entry
-      storage.setItem(LAST_STUDIED_LESSON_STORAGE_KEY, record);
+      storage.setItem(lastStudiedLessonStorageKey(emailHash), record);
       return record;
     },
 
-    clearLastStudiedLesson: async () => {
-      storage.removeItem(LAST_STUDIED_LESSON_STORAGE_KEY);
+    clearLastStudiedLesson: async (email: string) => {
+      const emailHash = await hashEmail(email);
+      storage.removeItem(lastStudiedLessonStorageKey(emailHash));
     },
   };
 }

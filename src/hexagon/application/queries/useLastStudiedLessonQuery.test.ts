@@ -113,6 +113,33 @@ describe('useLastStudiedLessonQuery', () => {
         expect(result.current.lastStudiedLesson?.lessonNumber).toBe(8),
       );
     });
+
+    it('keeps independent records when two users store lessons', async () => {
+      loginAsStudent();
+      await seedMockLastStudiedLesson({
+        email: studentEmail,
+        courseId: 2,
+        lessonNumber: 42,
+        updatedAt: '2026-08-13T00:00:00.000Z',
+      });
+      await seedMockLastStudiedLesson({
+        email: limitedAuth.email,
+        courseId: 2,
+        lessonNumber: 8,
+        updatedAt: '2026-08-13T00:00:00.000Z',
+      });
+
+      const { result } = renderQuery();
+
+      await waitFor(() =>
+        expect(result.current.lastStudiedLesson?.lessonNumber).toBe(42),
+      );
+      const otherUserRecord =
+        await mockLastStudiedLessonAdapter.getLastStudiedLesson(
+          limitedAuth.email,
+        );
+      expect(otherUserRecord?.lessonNumber).toBe(8);
+    });
   });
 
   describe('recording', () => {

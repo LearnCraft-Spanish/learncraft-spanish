@@ -102,6 +102,9 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
 
     if (toLessonNumber) {
       newToLessonNumber = toLessonNumber;
+    } else if (toLessonNumber === 0) {
+      // Explicit "–Choose Lesson–" clears the To-lesson for this session
+      return null;
     } else if (lastStudiedLessonNumber) {
       // Where the student left off last session takes precedence over their
       // recorded course progress
@@ -114,8 +117,6 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     ) {
       // If the appUser is a student, use their lessonNumber
       newToLessonNumber = appUser.lessonNumber;
-    } else if (toLessonNumber === 0) {
-      return null;
     } else {
       // If they are not a student, check if course is "LearnCraft Spanish"
       if (course?.name === 'LearnCraft Spanish') {

@@ -9,6 +9,12 @@ import type { CourseWithLessons } from '@learncraft-spanish/shared';
  * SHA-256 hex digest of an email, used as the localStorage owner key so the
  * address itself is never persisted. Normalized to lowercase/trimmed so
  * equivalent addresses produce the same hash.
+ *
+ * Allowed domain exception: `crypto.subtle.digest` is Web Crypto's SHA-256
+ * algorithm, not the network/persistence "API calls" BOUNDARIES.md forbids.
+ * It is deterministic and in-memory (same input → same hex digest), with no
+ * network, no persistence, and no React. The call is async only because that
+ * is how the platform exposes SHA-256.
  */
 export async function hashEmail(email: string): Promise<string> {
   const normalized = email.trim().toLowerCase();

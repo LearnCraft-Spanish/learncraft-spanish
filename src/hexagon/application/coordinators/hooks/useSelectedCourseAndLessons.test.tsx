@@ -112,6 +112,25 @@ describe('useSelectedCourseAndLessons toLesson precedence', () => {
     await waitFor(() => expect(result.current.toLesson?.lessonNumber).toBe(9));
   });
 
+  it('lets an explicit reset to Choose Lesson clear the to-lesson', async () => {
+    loginAsStudent();
+    await seedMockLastStudiedLesson({
+      email: student.emailAddress,
+      courseId: LCSP_COURSE_ID,
+      lessonNumber: 5,
+      updatedAt: '2026-08-13T00:00:00.000Z',
+    });
+
+    const { result } = renderCoordinator();
+    await waitFor(() => expect(result.current.toLesson?.lessonNumber).toBe(5));
+
+    act(() => {
+      result.current.updateToLessonNumber(0);
+    });
+
+    await waitFor(() => expect(result.current.toLesson).toBe(null));
+  });
+
   it('uses the stored lesson for a free user with no app data', async () => {
     const limitedAuth = getAuthUserFromEmail('limited@fake.not')!;
     overrideAuthAndAppUser(

@@ -3,27 +3,29 @@ import type { LastStudiedLessonRecord } from '@domain/lastStudiedLesson/types';
 import { hashEmail } from '@domain/lastStudiedLesson/lastStudiedLesson';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
-// In-memory stand-in for the single localStorage entry
-let storedRecord: LastStudiedLessonRecord | null = null;
+// In-memory stand-in for one localStorage item per hashed email
+const storedRecords = new Map<string, LastStudiedLessonRecord>();
 
 export const defaultMockLastStudiedLessonAdapter: LastStudiedLessonPort = {
-  getLastStudiedLesson: async (email: string) =>
-    storedRecord && storedRecord.emailHash === (await hashEmail(email))
-      ? storedRecord
-      : null,
+  getLastStudiedLesson: async (email: string) => {
+    const emailHash = await hashEmail(email);
+    return storedRecords.get(emailHash) ?? null;
+  },
 
   setLastStudiedLesson: async ({ email, courseId, lessonNumber }) => {
-    storedRecord = {
-      emailHash: await hashEmail(email),
+    const emailHash = await hashEmail(email);
+    const record: LastStudiedLessonRecord = {
+      emailHash,
       courseId,
       lessonNumber,
       updatedAt: new Date().toISOString(),
     };
-    return storedRecord;
+    storedRecords.set(emailHash, record);
+    return record;
   },
 
-  clearLastStudiedLesson: async () => {
-    storedRecord = null;
+  clearLastStudiedLesson: async (email: string) => {
+    storedRecords.delete(await hashEmail(email));
   },
 };
 
@@ -42,25 +44,26 @@ export interface SeedLastStudiedLessonInput {
   updatedAt: string;
 }
 
-/** Seeds the in-memory record, as if a previous session had saved it. */
+/** Seeds one in-memory record without wiping other emails. */
 export const seedMockLastStudiedLesson = async (
   record: SeedLastStudiedLessonInput | null,
 ): Promise<void> => {
   if (!record) {
-    storedRecord = null;
+    storedRecords.clear();
     return;
   }
   const { email, courseId, lessonNumber, updatedAt } = record;
-  storedRecord = {
-    emailHash: await hashEmail(email),
+  const emailHash = await hashEmail(email);
+  storedRecords.set(emailHash, {
+    emailHash,
     courseId,
     lessonNumber,
     updatedAt,
-  };
+  });
 };
 
 export const resetMockLastStudiedLessonAdapter = (): void => {
-  storedRecord = null;
+  storedRecords.clear();
   baseResetMockLastStudiedLessonAdapter();
 };
 
