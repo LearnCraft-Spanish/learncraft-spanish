@@ -35,7 +35,8 @@ Thin wrappers around external services:
 
 - ✅ External dependencies (HTTP clients, auth libraries, etc.)
 - ✅ Application ports (to implement them)
+- ✅ Domain types, schemas, and pure functions (to map and validate external data)
 - ✅ Shared endpoint definitions
-- ❌ Cannot import from `domain/` or `application/` (except ports)
+- ❌ Cannot import from `application/` (except ports)
 - ❌ Cannot be imported by `domain/`
 - ✅ Can be imported by `application/adapters/` (wrapped)

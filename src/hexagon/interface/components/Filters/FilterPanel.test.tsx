@@ -6,10 +6,18 @@ import { FilterPanel } from '@interface/components/Filters/FilterPanel';
 import { SkillType } from '@learncraft-spanish/shared';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-function renderFilterPanel() {
+function renderFilterPanel({
+  restrictTagsToLessonRange,
+}: {
+  restrictTagsToLessonRange?: boolean;
+} = {}) {
   return render(
     <ContextualMenuProvider>
-      <FilterPanel requireAudioOnly={false} requireNoSpanglish={false} />
+      <FilterPanel
+        requireAudioOnly={false}
+        requireNoSpanglish={false}
+        restrictTagsToLessonRange={restrictTagsToLessonRange}
+      />
     </ContextualMenuProvider>,
   );
 }
@@ -96,6 +104,7 @@ const defaultCombinedFilters: UseCombinedFiltersReturnType = {
 
 describe('filterPanel', () => {
   beforeEach(() => {
+    mockUseCombinedFilters.mockReset();
     mockUseCombinedFilters.mockReturnValue(defaultCombinedFilters);
   });
 
@@ -159,7 +168,16 @@ describe('filterPanel', () => {
     expect(screen.queryByText('Outside lesson range')).not.toBeInTheDocument();
   });
 
-  it('explains why a search returned no tags', () => {
+  it('restricts tag search to the lesson range by default', () => {
+    renderFilterPanel();
+
+    expect(mockUseCombinedFilters).toHaveBeenCalledWith({
+      onFilterChange: undefined,
+      restrictTagsToLessonRange: true,
+    });
+  });
+
+  it('explains why a search returned no tags when lesson-range restriction is on', () => {
     mockUseCombinedFilters.mockReturnValue({
       ...defaultCombinedFilters,
       skillTagSearch: {
@@ -175,5 +193,28 @@ describe('filterPanel', () => {
     expect(
       screen.getByText(/No matching tags are taught in your selected lessons/i),
     ).toBeInTheDocument();
+  });
+
+  it('does not mention lesson range when an unrestricted search returns no tags', () => {
+    mockUseCombinedFilters.mockReturnValue({
+      ...defaultCombinedFilters,
+      skillTagSearch: {
+        ...defaultCombinedFilters.skillTagSearch,
+        tagSearchTerm: 'por',
+        tagSuggestions: [],
+      },
+    });
+
+    renderFilterPanel({ restrictTagsToLessonRange: false });
+    fireEvent.click(screen.getByPlaceholderText('Search tags'));
+
+    expect(mockUseCombinedFilters).toHaveBeenCalledWith({
+      onFilterChange: undefined,
+      restrictTagsToLessonRange: false,
+    });
+    expect(screen.getByText('No matching tags.')).toBeInTheDocument();
+    expect(
+      screen.queryByText(/taught in your selected lessons/i),
+    ).not.toBeInTheDocument();
   });
 });

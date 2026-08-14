@@ -9,12 +9,14 @@ export default function TagFilter({
   searchResults,
   addTag,
   removeTagFromSuggestions,
+  restrictTagsToLessonRange = true,
 }: {
   searchTerm: string;
   updateSearchTerm: (e?: EventTarget & HTMLInputElement) => void;
   searchResults: SkillTag[];
   addTag: (tagId: string) => void;
   removeTagFromSuggestions: (tagId: string) => void;
+  restrictTagsToLessonRange?: boolean;
 }) {
   const { contextual, setContextualRef, openContextual } = useContextualMenu();
 
@@ -44,8 +46,9 @@ export default function TagFilter({
         <div className="tagSuggestionBox" ref={setContextualRef}>
           {!searchResults.length && (
             <p className="noTagSuggestions">
-              No matching tags are taught in your selected lessons. Try widening
-              your lesson range.
+              {restrictTagsToLessonRange
+                ? 'No matching tags are taught in your selected lessons. Try widening your lesson range.'
+                : 'No matching tags.'}
             </p>
           )}
           {searchResults.map((item) => (

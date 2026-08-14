@@ -14,11 +14,13 @@ export function FilterPanel({
   requireAudioOnly,
   requireNoSpanglish,
   mobileActiveSection,
+  restrictTagsToLessonRange = true,
 }: {
   onFilterChange?: () => void;
   requireAudioOnly: boolean;
   requireNoSpanglish: boolean;
   mobileActiveSection?: 'courseLesson' | 'tags' | 'togglesOnly';
+  restrictTagsToLessonRange?: boolean;
 }) {
   const [filterMode, setFilterMode] = useState<'preset' | 'search'>('search');
 
@@ -37,7 +39,7 @@ export function FilterPanel({
     filterPreset,
     setFilterPreset,
     isAdmin,
-  } = useCombinedFilters({ onFilterChange });
+  } = useCombinedFilters({ onFilterChange, restrictTagsToLessonRange });
 
   const {
     tagSearchTerm,
@@ -121,6 +123,7 @@ export function FilterPanel({
                 searchResults={tagSuggestions}
                 addTag={addSkillTagToFilters}
                 removeTagFromSuggestions={removeTagFromSuggestions}
+                restrictTagsToLessonRange={restrictTagsToLessonRange}
               />
               <SelectedTags
                 removeTag={(tagId) => {
