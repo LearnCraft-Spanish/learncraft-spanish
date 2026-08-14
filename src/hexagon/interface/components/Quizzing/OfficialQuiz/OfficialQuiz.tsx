@@ -1,4 +1,4 @@
-import { useOfficialQuiz } from '@application/units/OfficialQuiz/useOfficialQuiz';
+import { useOfficialQuizPage } from '@application/useCases/useOfficialQuizPage/useOfficialQuizPage';
 import { Loading } from '@interface/components/Loading';
 import { RegularTextQuiz } from '@interface/components/Quizzing/TextQuiz';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -16,7 +16,7 @@ export function OfficialQuiz() {
   const quizNumber = Number(relativePath[3]);
 
   // get the examples for the quiz
-  const { quizExamples, isLoading, error, quizTitle } = useOfficialQuiz({
+  const { quizExamples, isLoading, error, quizTitle } = useOfficialQuizPage({
     courseCode,
     quizNumber,
   });

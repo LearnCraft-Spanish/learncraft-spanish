@@ -39,6 +39,7 @@ const createDefaultCombinedFilters = (): UseCombinedFiltersReturnType => ({
   includeUnpublished: false,
   updateIncludeUnpublished: vi.fn(),
   selectedSkillTags: [],
+  outOfRangeSkillTagKeys: [],
   addSkillTagToFilters: vi.fn(),
   removeSkillTagFromFilters: vi.fn(),
   bulkUpdateSkillTagKeys: vi.fn(),
@@ -80,6 +81,7 @@ describe('useExampleSearch', () => {
 
     expect(mockUseCombinedFilters).toHaveBeenCalledWith({
       onFilterChange: expect.any(Function),
+      restrictTagsToLessonRange: false,
     });
     expect(result.current.mode).toBe('ids');
     expect(result.current.searchIsTriggered).toBe(false);

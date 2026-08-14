@@ -30,6 +30,16 @@
   z-index: 999;
 }
 
+.tagSuggestionBox .noTagSuggestions {
+  background-color: var(--light);
+  border: 4px solid var(--brand);
+  color: var(--dark);
+  font-size: 14px;
+  margin: 0;
+  padding: 12px;
+  text-align: left;
+}
+
 .confirmSubmissionBox form {
   background-color: var(--light);
   padding: 20px;
@@ -117,6 +127,21 @@
 
   .tagCard {
     margin: 2px 4px;
+  }
+
+  .tagCard.outOfRange {
+    opacity: 0.65;
+
+    div {
+      border-color: var(--error-bg);
+    }
+  }
+
+  .outOfRangeNotice {
+    color: var(--error-bg);
+    font-size: 10px;
+    font-style: italic;
+    margin: 0;
   }
 
   @media screen and (max-width: 768px) {

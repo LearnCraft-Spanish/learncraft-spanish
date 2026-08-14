@@ -1,6 +1,8 @@
 import type { AudioQuizProps } from '@application/units/AudioQuiz/useAudioQuiz';
 import { useAudioAdapter } from '@application/adapters/audioAdapter';
+import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
+import { useLastStudiedLessonQuery } from '@application/queries/useLastStudiedLessonQuery';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useMemo, useRef, useState } from 'react';
@@ -29,6 +31,8 @@ export interface UseLimitedCustomQuizReturn {
 export function useLimitedCustomQuiz(): UseLimitedCustomQuizReturn {
   const QUERY_PAGE_SIZE = 150;
   const { primeAudioElement } = useAudioAdapter();
+  const { course, toLesson } = useSelectedCourseAndLessons();
+  const { recordLastStudiedLesson } = useLastStudiedLessonQuery();
 
   // Local state
   const [quizReady, setQuizReady] = useState(false);
@@ -71,6 +75,12 @@ export function useLimitedCustomQuiz(): UseLimitedCustomQuizReturn {
 
   // Function to ready the quiz
   const readyQuiz = () => {
+    if (course && toLesson) {
+      void recordLastStudiedLesson({
+        courseId: course.id,
+        lessonNumber: toLesson.lessonNumber,
+      });
+    }
     primeAudioElement(silence1s);
     const shuffledAudioExamples = fisherYatesShuffle(filteredExamples ?? []);
     staticAudioExamples.current = shuffledAudioExamples.slice(

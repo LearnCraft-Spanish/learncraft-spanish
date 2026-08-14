@@ -24,6 +24,7 @@ Pure business logic and data transformations:
 - Write pure functions only (same input = same output)
 - Import and use types/schemas from `@learncraft-spanish/shared`
 - Use external pure utility libraries (uuid, zod, etc.)
+- Web Crypto `subtle.digest` for deterministic hashing is allowed; it is not the “API calls” side-effect the **DON’T** bullet forbids
 
 ### ❌ DON'T
 

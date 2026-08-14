@@ -35,6 +35,7 @@ export function Filters({
           onFilterChange={onFilterChange}
           requireAudioOnly={false}
           requireNoSpanglish={false}
+          restrictTagsToLessonRange={false}
         />
       </div>
     );
