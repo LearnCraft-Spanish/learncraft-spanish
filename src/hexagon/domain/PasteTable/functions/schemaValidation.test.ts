@@ -95,7 +95,7 @@ describe('schemaValidation', () => {
             parse() {
               throw new Error('boom');
             },
-          } as any,
+          } as unknown as z.ZodType<unknown>,
         },
       ];
       const row: TableRow = {
@@ -117,7 +117,7 @@ describe('schemaValidation', () => {
             parse() {
               throw new z.ZodError([]);
             },
-          } as any,
+          } as unknown as z.ZodType<unknown>,
         },
       ];
       const row: TableRow = {
@@ -281,7 +281,7 @@ describe('schemaValidation', () => {
           parse() {
             throw new Error('boom');
           },
-        } as any,
+        } as unknown as z.ZodType<Record<string, unknown>>,
         columns,
       )(row);
 
