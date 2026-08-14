@@ -14,6 +14,7 @@ const vocabularyTag: SkillTag = {
   descriptor: 'for',
   vocabularyId: 1,
   subcategoryName: 'Prepositions',
+  frequency: null,
 };
 
 const idiomTag: SkillTag = {
@@ -22,6 +23,7 @@ const idiomTag: SkillTag = {
   name: 'por favor',
   vocabularyId: 57,
   subcategoryName: 'Idioms',
+  frequency: null,
 };
 
 const subcategoryTag: SkillTag = {

@@ -13,6 +13,7 @@ const porTag: SkillTag = {
   descriptor: 'for',
   vocabularyId: 1,
   subcategoryName: 'Prepositions',
+  frequency: 10,
 };
 
 const porqueTag: SkillTag = {
@@ -22,6 +23,7 @@ const porqueTag: SkillTag = {
   descriptor: 'because',
   vocabularyId: 99,
   subcategoryName: 'Conjunctions',
+  frequency: 20,
 };
 
 const ponerTag: SkillTag = {
@@ -81,9 +83,9 @@ describe('useSkillTagSearch', () => {
 
     await waitFor(() =>
       expect(result.current.tagSuggestions.map((tag) => tag.key)).toEqual([
+        'Verb-7',
         'Vocabulary-1',
         'Vocabulary-99',
-        'Verb-7',
       ]),
     );
   });
@@ -96,8 +98,8 @@ describe('useSkillTagSearch', () => {
 
     await waitFor(() =>
       expect(result.current.tagSuggestions.map((tag) => tag.key)).toEqual([
-        'Vocabulary-1',
         'Verb-7',
+        'Vocabulary-1',
       ]),
     );
   });
@@ -130,6 +132,47 @@ describe('useSkillTagSearch', () => {
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
+    expect(result.current.tagSuggestions).toEqual([]);
+  });
+
+  it('withholds a removed tag until it is added back', async () => {
+    const { result } = renderSearch();
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await search(result, 'po');
+
+    await waitFor(() => expect(result.current.tagSuggestions).toHaveLength(3));
+
+    act(() => result.current.removeTagFromSuggestions('Vocabulary-1'));
+
+    await waitFor(() =>
+      expect(result.current.tagSuggestions.map((tag) => tag.key)).toEqual([
+        'Verb-7',
+        'Vocabulary-99',
+      ]),
+    );
+
+    act(() => result.current.addTagBackToSuggestions('Vocabulary-1'));
+
+    await waitFor(() =>
+      expect(result.current.tagSuggestions.map((tag) => tag.key)).toEqual([
+        'Verb-7',
+        'Vocabulary-1',
+        'Vocabulary-99',
+      ]),
+    );
+  });
+
+  it('surfaces a tag catalog failure', async () => {
+    overrideMockSkillTagsAdapter({
+      getSkillTags: async () => {
+        throw new Error('catalog unavailable');
+      },
+    });
+
+    const { result } = renderSearch();
+
+    await waitFor(() => expect(result.current.error).not.toBeNull());
     expect(result.current.tagSuggestions).toEqual([]);
   });
 });

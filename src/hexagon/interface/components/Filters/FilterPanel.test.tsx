@@ -40,6 +40,7 @@ const porTag: SkillTag = {
   descriptor: 'for',
   vocabularyId: 1,
   subcategoryName: 'Prepositions',
+  frequency: null,
 };
 
 const defaultCombinedFilters: UseCombinedFiltersReturnType = {
