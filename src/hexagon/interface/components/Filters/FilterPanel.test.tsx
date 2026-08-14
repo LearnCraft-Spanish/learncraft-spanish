@@ -1,7 +1,9 @@
 import type { UseCombinedFiltersReturnType } from '@application/units/Filtering/useCombinedFilters';
+import type { SkillTag } from '@learncraft-spanish/shared';
 import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
 import { FilterPanel } from '@interface/components/Filters/FilterPanel';
+import { SkillType } from '@learncraft-spanish/shared';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 function renderFilterPanel() {
@@ -31,6 +33,16 @@ vi.mock('@interface/components/Filters/PresetSelector', () => ({
   default: () => <div data-testid="preset-selector" />,
 }));
 
+const porTag: SkillTag = {
+  type: SkillType.Vocabulary,
+  key: 'Vocabulary-1',
+  name: 'por',
+  descriptor: 'for',
+  vocabularyId: 1,
+  subcategoryName: 'Prepositions',
+  frequency: null,
+};
+
 const defaultCombinedFilters: UseCombinedFiltersReturnType = {
   isAdmin: false,
   filterState: {
@@ -56,6 +68,7 @@ const defaultCombinedFilters: UseCombinedFiltersReturnType = {
   includeUnpublished: false,
   updateIncludeUnpublished: vi.fn(),
   selectedSkillTags: [],
+  outOfRangeSkillTagKeys: [],
   addSkillTagToFilters: vi.fn(),
   removeSkillTagFromFilters: vi.fn(),
   bulkUpdateSkillTagKeys: vi.fn(),
@@ -120,5 +133,47 @@ describe('filterPanel', () => {
     fireEvent.click(checkbox);
 
     expect(updateIncludeUnpublished).toHaveBeenCalledWith(true);
+  });
+
+  it('marks a selected tag that is outside the lesson range', () => {
+    mockUseCombinedFilters.mockReturnValue({
+      ...defaultCombinedFilters,
+      selectedSkillTags: [porTag],
+      outOfRangeSkillTagKeys: [porTag.key],
+    });
+
+    renderFilterPanel();
+
+    expect(screen.getByText('Outside lesson range')).toBeInTheDocument();
+  });
+
+  it('does not mark a selected tag that is inside the lesson range', () => {
+    mockUseCombinedFilters.mockReturnValue({
+      ...defaultCombinedFilters,
+      selectedSkillTags: [porTag],
+      outOfRangeSkillTagKeys: [],
+    });
+
+    renderFilterPanel();
+
+    expect(screen.queryByText('Outside lesson range')).not.toBeInTheDocument();
+  });
+
+  it('explains why a search returned no tags', () => {
+    mockUseCombinedFilters.mockReturnValue({
+      ...defaultCombinedFilters,
+      skillTagSearch: {
+        ...defaultCombinedFilters.skillTagSearch,
+        tagSearchTerm: 'por',
+        tagSuggestions: [],
+      },
+    });
+
+    renderFilterPanel();
+    fireEvent.click(screen.getByPlaceholderText('Search tags'));
+
+    expect(
+      screen.getByText(/No matching tags are taught in your selected lessons/i),
+    ).toBeInTheDocument();
   });
 });

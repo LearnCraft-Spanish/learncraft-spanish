@@ -4,6 +4,12 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 const defaultMockAdapter: SkillTagsPort = {
   getSkillTags: async () => createMockSkillTagList(3),
+  getReachableSkills: async () => ({
+    vocabularyIds: [],
+    subcategoryIds: [],
+    verbIds: [],
+    conjugationTags: [],
+  }),
 };
 
 export const {

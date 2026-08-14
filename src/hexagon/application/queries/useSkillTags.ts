@@ -1,9 +1,16 @@
+import type { SkillTag } from '@learncraft-spanish/shared';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useSkillTagsAdapter } from '@application/adapters/skillTagsAdapter';
 import { queryDefaults } from '@application/utils/queryUtils';
 import { useQuery } from '@tanstack/react-query';
 
-export function useSkillTags() {
+export interface UseSkillTagsReturnType {
+  skillTags: SkillTag[] | undefined;
+  isLoading: boolean;
+  error: Error | null;
+}
+
+export function useSkillTags(): UseSkillTagsReturnType {
   const skillTagsAdapter = useSkillTagsAdapter();
   const { isStudent, isAdmin, isCoach } = useAuthAdapter();
   const {

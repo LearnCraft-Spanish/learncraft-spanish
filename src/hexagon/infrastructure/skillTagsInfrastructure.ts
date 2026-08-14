@@ -1,8 +1,15 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { SkillTagsPort } from '@application/ports/skillTagsPort';
-import type { SkillTag } from '@learncraft-spanish/shared';
+import type {
+  LessonRange,
+  ReachableSkills,
+  SkillTag,
+} from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
-import { getSkillsEndpoint } from '@learncraft-spanish/shared';
+import {
+  getReachableSkillsEndpoint,
+  getSkillsEndpoint,
+} from '@learncraft-spanish/shared';
 
 export function createSkillTagsInfrastructure(
   apiUrl: string,
@@ -17,7 +24,23 @@ export function createSkillTagsInfrastructure(
     return response;
   };
 
+  const getReachableSkills = async ({
+    lessonRanges,
+  }: {
+    lessonRanges: LessonRange[];
+  }): Promise<ReachableSkills> => {
+    const response = await httpClient.post<ReachableSkills>(
+      getReachableSkillsEndpoint.path,
+      getReachableSkillsEndpoint.requiredScopes,
+      {
+        lessonRanges,
+      },
+    );
+    return response;
+  };
+
   return {
     getSkillTags,
+    getReachableSkills,
   };
 }
