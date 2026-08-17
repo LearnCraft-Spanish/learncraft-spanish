@@ -5,6 +5,7 @@ import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTag
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleFilterCoordinator } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
+import { useReachableSkills } from '@application/queries/useReachableSkills';
 import {
   PreSetQuizPreset,
   preSetQuizzes,
@@ -12,22 +13,34 @@ import {
 import { usePresetFilters } from '@application/units/Filtering/FilterPresets/usePresetFilters';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { transformToLessonRanges } from '@domain/coursePrerequisites';
+import {
+  isSkillTagReachable,
+  toReachableSkillSets,
+} from '@domain/functions/skillTagLessonRange';
 import { useEffect, useMemo, useRef } from 'react';
 export type UseCombinedFiltersReturnType =
   UseExampleFilterCoordinatorReturnType &
     UseSelectedCourseAndLessonsReturnType & {
       filterState: LocalExampleFilters; // Always uses lesson ranges
       skillTagSearch: UseSkillTagSearchReturnType;
+      /** Keys of selected tags that cannot appear in the selected lesson range. */
+      outOfRangeSkillTagKeys: string[];
       filterPreset: PreSetQuizPreset;
       setFilterPreset: (preset: PreSetQuizPreset) => void;
     } & { isAdmin?: boolean };
 
 export interface UseCombinedFiltersProps {
   onFilterChange?: () => void;
+  /**
+   * Limits tag search to tags the student can encounter in the selected lesson
+   * range. Disable for admin tooling that searches the whole catalog.
+   */
+  restrictTagsToLessonRange?: boolean;
 }
 
 export function useCombinedFilters({
   onFilterChange = () => {},
+  restrictTagsToLessonRange = true,
 }: UseCombinedFiltersProps): UseCombinedFiltersReturnType {
   // Destructure the filter properties from the coordinator
   const {
@@ -63,7 +76,28 @@ export function useCombinedFilters({
     error: errorCourseAndLessons,
   } = useSelectedCourseAndLessons();
 
-  const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
+  // The backend resolves the range against the vocabulary table, including any
+  // prerequisite courses the selected course assumes.
+  const { reachableSkills } = useReachableSkills(
+    courseId ?? null,
+    fromLessonNumber ?? null,
+    toLessonNumber ?? null,
+    restrictTagsToLessonRange,
+  );
+
+  const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch({
+    reachableSkills: restrictTagsToLessonRange ? reachableSkills : undefined,
+  });
+
+  const outOfRangeSkillTagKeys: string[] = useMemo(() => {
+    if (!restrictTagsToLessonRange || !reachableSkills) {
+      return [];
+    }
+    const reachableSkillSets = toReachableSkillSets(reachableSkills);
+    return selectedSkillTags
+      .filter((tag) => !isSkillTagReachable(tag, reachableSkillSets))
+      .map((tag) => tag.key);
+  }, [selectedSkillTags, reachableSkills, restrictTagsToLessonRange]);
 
   // Filter state that always uses lesson ranges
   const filterState: LocalExampleFilters = useMemo(() => {
@@ -191,6 +225,7 @@ export function useCombinedFilters({
     removeSkillTagFromFilters,
     bulkUpdateSkillTagKeys,
     skillTagSearch,
+    outOfRangeSkillTagKeys,
     // Destructure the course and lesson properties from the coordinator
     course,
     courseId,

@@ -78,6 +78,7 @@ export function useExampleSearch(): UseExampleSearchReturnType {
   // Combined filters for filter panel
   const filtersForUI = useCombinedFilters({
     onFilterChange: () => setSearchIsTriggered(false),
+    restrictTagsToLessonRange: false,
   });
 
   // Get course data for lesson calculations

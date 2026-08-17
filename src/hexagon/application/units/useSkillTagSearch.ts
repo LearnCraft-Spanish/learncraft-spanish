@@ -1,7 +1,22 @@
-import type { SkillTag } from '@learncraft-spanish/shared';
+import type { ReachableSkills, SkillTag } from '@learncraft-spanish/shared';
 import { useSkillTags } from '@application/queries/useSkillTags';
-import { SkillType } from '@learncraft-spanish/shared';
+import {
+  filterSkillTagsByReachability,
+  toReachableSkillSets,
+} from '@domain/functions/skillTagLessonRange';
+import { searchSkillTags } from '@domain/functions/skillTagSearch';
 import { useMemo, useState } from 'react';
+
+const SUGGESTION_LIMIT = 20;
+
+export interface UseSkillTagSearchProps {
+  /**
+   * The skills the student can encounter in their lesson range. When provided,
+   * tags outside it are withheld from suggestions. Leave undefined to search
+   * the full tag catalog.
+   */
+  reachableSkills?: ReachableSkills;
+}
 
 export interface UseSkillTagSearchReturnType {
   tagSearchTerm: string;
@@ -13,7 +28,9 @@ export interface UseSkillTagSearchReturnType {
   error: Error | null;
 }
 
-export function useSkillTagSearch(): UseSkillTagSearchReturnType {
+export function useSkillTagSearch({
+  reachableSkills,
+}: UseSkillTagSearchProps = {}): UseSkillTagSearchReturnType {
   const { skillTags, isLoading, error } = useSkillTags();
   const [tagSearchTerm, setTagSearchTerm] = useState('');
   const [removedTagIds, setRemovedTagIds] = useState<Set<string>>(
@@ -40,87 +57,29 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
     });
   };
 
-  const tagSuggestions: SkillTag[] = useMemo(() => {
-    // Early return for empty search terms or no skill tags
-    if (!skillTags?.length || !tagSearchTerm.trim()) return [];
-
-    const searchTerm = tagSearchTerm.toLowerCase().trim();
-    const exactNameMatches: SkillTag[] = [];
-    const exactTraitMatches: SkillTag[] = [];
-    const partialNameMatches: SkillTag[] = [];
-    const partialTraitMatches: SkillTag[] = [];
-
-    // Process tags in a single pass
-    for (const tag of skillTags) {
-      // Skip if removed
-      if (removedTagIds.has(tag.key)) {
-        continue;
-      }
-
-      const nameLower = tag.name.toLowerCase();
-      const isExactNameMatch = nameLower === searchTerm;
-      let isExactTraitMatch = false;
-      let isPartialNameMatch = false;
-      let isPartialTraitMatch = false;
-
-      if (!isExactNameMatch) {
-        const verbTraitMatch =
-          tag.type === SkillType.Verb &&
-          tag.verbTags?.some((verbTag) => verbTag.toLowerCase() === searchTerm);
-        const vocabularyTraitMatch =
-          tag.type === SkillType.Vocabulary &&
-          tag.descriptor?.toLowerCase() === searchTerm;
-        const subcategoryTraitMatch =
-          tag.type === SkillType.Subcategory &&
-          tag.partOfSpeech?.toLowerCase() === searchTerm;
-        isExactTraitMatch =
-          verbTraitMatch || vocabularyTraitMatch || subcategoryTraitMatch;
-      }
-
-      if (!isExactTraitMatch) {
-        isPartialNameMatch = nameLower.includes(searchTerm);
-      }
-
-      if (!isPartialNameMatch) {
-        const verbPartialTraitMatch =
-          tag.type === SkillType.Verb &&
-          tag.verbTags.some((verbTag) =>
-            verbTag.toLowerCase().includes(searchTerm),
-          );
-        const vocabularyPartialTraitMatch =
-          tag.type === SkillType.Vocabulary &&
-          tag.descriptor?.toLowerCase().includes(searchTerm);
-        const subcategoryPartialTraitMatch =
-          tag.type === SkillType.Subcategory &&
-          tag.partOfSpeech.toLowerCase().includes(searchTerm);
-
-        isPartialTraitMatch =
-          verbPartialTraitMatch ||
-          vocabularyPartialTraitMatch ||
-          subcategoryPartialTraitMatch;
-      }
-
-      // Categorize by match type for efficient sorting
-      if (isExactNameMatch) {
-        exactNameMatches.push(tag);
-      } else if (isExactTraitMatch) {
-        exactTraitMatches.push(tag);
-      } else if (isPartialNameMatch) {
-        partialNameMatches.push(tag);
-      } else if (isPartialTraitMatch) {
-        partialTraitMatches.push(tag);
-      }
+  // Undefined means the lesson range is unknown or still loading, which is
+  // different from a range that teaches nothing.
+  const availableTags: SkillTag[] | undefined = useMemo(() => {
+    if (!skillTags || !reachableSkills) {
+      return skillTags;
     }
+    return filterSkillTagsByReachability(
+      skillTags,
+      toReachableSkillSets(reachableSkills),
+    );
+  }, [skillTags, reachableSkills]);
 
-    // Combine exact matches first, then partial matches, and limit to 10
-    const result = [
-      ...exactNameMatches,
-      ...exactTraitMatches,
-      ...partialNameMatches,
-      ...partialTraitMatches,
-    ];
-    return result.slice(0, 10);
-  }, [skillTags, tagSearchTerm, removedTagIds]);
+  const tagSuggestions: SkillTag[] = useMemo(() => {
+    if (!availableTags?.length) return [];
+
+    const searchableTags = removedTagIds.size
+      ? availableTags.filter((tag) => !removedTagIds.has(tag.key))
+      : availableTags;
+
+    return searchSkillTags(searchableTags, tagSearchTerm, {
+      limit: SUGGESTION_LIMIT,
+    });
+  }, [availableTags, tagSearchTerm, removedTagIds]);
 
   return {
     tagSearchTerm,

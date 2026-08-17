@@ -9,12 +9,14 @@ export default function TagFilter({
   searchResults,
   addTag,
   removeTagFromSuggestions,
+  restrictTagsToLessonRange = true,
 }: {
   searchTerm: string;
   updateSearchTerm: (e?: EventTarget & HTMLInputElement) => void;
   searchResults: SkillTag[];
   addTag: (tagId: string) => void;
   removeTagFromSuggestions: (tagId: string) => void;
+  restrictTagsToLessonRange?: boolean;
 }) {
   const { contextual, setContextualRef, openContextual } = useContextualMenu();
 
@@ -40,42 +42,47 @@ export default function TagFilter({
           Clear
         </button>
       </div>
-      {!!searchTerm.length &&
-        contextual === 'tagSuggestionBox' &&
-        !!searchResults.length && (
-          <div className="tagSuggestionBox" ref={setContextualRef}>
-            {searchResults.map((item) => (
-              <div
-                key={item.key}
-                className="tagCard"
-                onClick={() => {
-                  addTag(item.key);
-                  removeTagFromSuggestions(item.key);
-                }}
-              >
-                <div className={`${item.type}Card`}>
-                  <h4 className="vocabName">
-                    {item.type === SkillType.Subcategory
-                      ? item.subcategory
-                      : item.name}
-                  </h4>
-                  {item.type === SkillType.Vocabulary && (
-                    <h5 className="vocabDescriptor">{item.descriptor}</h5>
-                  )}
-                  {item.type === SkillType.Idiom && (
-                    <h5 className="vocabDescriptor">{item.subcategoryName}</h5>
-                  )}
-                  {item.type === SkillType.Verb && (
-                    <h5 className="vocabDescriptor">
-                      {item.verbTags.join(' - ')}
-                    </h5>
-                  )}
-                  <p className="vocabUse">{item.type}</p>
-                </div>
+      {!!searchTerm.length && contextual === 'tagSuggestionBox' && (
+        <div className="tagSuggestionBox" ref={setContextualRef}>
+          {!searchResults.length && (
+            <p className="noTagSuggestions">
+              {restrictTagsToLessonRange
+                ? 'No matching tags are taught in your selected lessons. Try widening your lesson range.'
+                : 'No matching tags.'}
+            </p>
+          )}
+          {searchResults.map((item) => (
+            <div
+              key={item.key}
+              className="tagCard"
+              onClick={() => {
+                addTag(item.key);
+                removeTagFromSuggestions(item.key);
+              }}
+            >
+              <div className={`${item.type}Card`}>
+                <h4 className="vocabName">
+                  {item.type === SkillType.Subcategory
+                    ? item.subcategory
+                    : item.name}
+                </h4>
+                {item.type === SkillType.Vocabulary && (
+                  <h5 className="vocabDescriptor">{item.descriptor}</h5>
+                )}
+                {item.type === SkillType.Idiom && (
+                  <h5 className="vocabDescriptor">{item.subcategoryName}</h5>
+                )}
+                {item.type === SkillType.Verb && (
+                  <h5 className="vocabDescriptor">
+                    {item.verbTags.join(' - ')}
+                  </h5>
+                )}
+                <p className="vocabUse">{item.type}</p>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -4,8 +4,10 @@ import type {
   CoachSummary,
   CoachSummaryDrilldown,
   GroupCallsByCoach,
+  LeadsToReEngage,
   MembershipsByCoach,
   PrivateCallsByCoach,
+  WeeklyTimeCommitmentByCoach,
 } from '@learncraft-spanish/shared';
 
 export type WeeksDrilldownReportName =
@@ -33,4 +35,8 @@ export interface AdminReportsPort {
   getGroupCallsByCoachReport: () => Promise<GroupCallsByCoach[]>;
   getActiveMembershipsReport: () => Promise<ActiveMembershipsByCourse[]>;
   getDropoutsByLevelReport: () => Promise<ActiveMembershipsByCourse[]>;
+  getWeeklyTimeCommitmentByCoachReport: () => Promise<
+    WeeklyTimeCommitmentByCoach[]
+  >;
+  getLeadsToReEngageReport: () => Promise<LeadsToReEngage[]>;
 }
