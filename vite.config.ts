@@ -44,6 +44,9 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       cssCodeSplit: false,
+      // esbuild's CSS minifier concatenates adjacent @layer blocks into
+      // invalid `@layer legacy @layer legacy {` rules.
+      cssMinify: false,
       manifest: true,
       outDir: 'build',
       sourcemap: true,

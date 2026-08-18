@@ -1,0 +1,27 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--space-2) var(--space-5);
+  border: none;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-action);
+  color: var(--color-on-action);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.root:hover:not(:disabled) {
+  background-color: var(--color-action-hover);
+  color: var(--color-on-action);
+}
+
+.root:disabled {
+  background-color: var(--color-disabled);
+  color: var(--color-on-action);
+  cursor: not-allowed;
+}

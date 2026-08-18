@@ -1,15 +1,6 @@
 /* Used by App.js, ExampleRetriever.js, Menu.js */
 
-/*General Theming Styles*/
-:root {
-  --brand: #449ac2;
-  --theme: #6f6259;
-  --accent: #b0a96f;
-  --light: #ffffff;
-  --dark: #3c3c3c;
-  --error-bg: darkred;
-  --error-text: red;
-}
+/* Palette tokens live in src/hexagon/interface/styles/tokens.css */
 
 * {
   box-sizing: border-box;

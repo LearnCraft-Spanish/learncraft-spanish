@@ -29,7 +29,6 @@
     "predeploy": "pnpm run build",
     "preview": "vite preview",
     "refresh-mockdata": "tsx .github/workflows/update-cache.ts",
-    "scss": "sass --watch src/components/Coaching/styles:src/components/Coaching/styles",
     "start": "vite",
     "test": "vitest run --coverage",
     "test:hexagon": "vitest --config vitest.config-hexagon.ts --coverage",
