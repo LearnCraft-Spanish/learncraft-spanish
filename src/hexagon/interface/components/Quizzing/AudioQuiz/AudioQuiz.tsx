@@ -7,9 +7,6 @@ import AudioQuizEnd from '@interface/components/Quizzing/general/AudioQuizEnd';
 import { QuizProgress } from '@interface/components/Quizzing/general/QuizProgress';
 import React, { useCallback, useEffect } from 'react';
 
-// TO DO: Remove duplicate styles.
-import 'src/App.css';
-
 import './AudioBasedReview.css';
 
 /**

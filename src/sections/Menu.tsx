@@ -5,8 +5,6 @@ import { Loading } from '@interface/components/Loading';
 import { Link } from 'react-router-dom';
 import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
 
-import 'src/App.css';
-
 export default function Menu() {
   const { isAuthenticated, isLoading, isAdmin, isCoach } = useAuthAdapter();
   const { appUser, isLoading: appUserLoading } = useActiveStudent();

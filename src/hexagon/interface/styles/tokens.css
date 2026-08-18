@@ -1,0 +1,33 @@
+@layer tokens {
+  :root {
+    /* Primitive palette — identical to the former App.css :root values */
+    --brand: #449ac2;
+    --theme: #6f6259;
+    --accent: #b0a96f;
+    --light: #ffffff;
+    --dark: #3c3c3c;
+    --error-bg: darkred;
+    --error-text: red;
+
+    /* Semantic aliases for new student UI */
+    --color-action: var(--brand);
+    --color-action-hover: var(--accent);
+    --color-on-action: var(--light);
+    --color-surface: var(--light);
+    --color-text: var(--dark);
+    --color-disabled: var(--dark);
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --z-base: 1;
+    --z-header: 10;
+    --z-overlay: 100;
+    --z-toast: 999;
+    --font-sans: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+  }
+}
