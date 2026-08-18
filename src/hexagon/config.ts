@@ -1,6 +1,6 @@
 const viteConsts = import.meta.env;
 
-function parseUiFlags(raw: string | undefined): string[] {
+export function parseUiFlags(raw: string | undefined): string[] {
   if (!raw) {
     return [];
   }

@@ -515,30 +515,6 @@ pnpm update-shared
 
 ---
 
-### `pnpm scss`
-
-**What it does:** Watches and compiles SCSS files for legacy coaching styles.
-
-**When to use:**
-
-- Working on legacy coaching components
-- Modifying SCSS styles
-
-**Details:**
-
-- Watches `src/components/Coaching/styles/`
-- Auto-compiles on changes
-- **Note:** New code should use CSS-in-JS or Tailwind
-
-**Example:**
-
-```bash
-pnpm scss
-# Watching for SCSS changes...
-```
-
----
-
 ### `pnpm refresh-mockdata`
 
 **What it does:** Updates cached mock data from API.
