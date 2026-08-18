@@ -37,3 +37,5 @@ New UI must use the semantic names. Do not put breakpoints in CSS variables — 
 4. Author v2 styles as a `*.module.scss` file. Target `[data-ui='v2']` only when a v1/v2 split exists in the same tree.
 
 Do not wrap student routes until that surface is being redesigned.
+
+The first major student surface is Flashcard Manager + Flashcard Finder (one flag, both routes). Architecture, isolation rules, and the start sequence live in [`pages/STUDENT_FLASHCARDS.md`](../pages/STUDENT_FLASHCARDS.md). `ui.student.help.v2` is the documented example flag only — Get Help is not wrapped and is not that phase.
