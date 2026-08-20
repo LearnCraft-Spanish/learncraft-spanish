@@ -21,12 +21,29 @@
   margin: 0 auto;
 }
 
+.flushHorizontal {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.flushHorizontal .column {
+  max-width: none;
+}
+
 @media (max-width: 768px) {
   .root {
     padding: var(--lcs-space-7) var(--lcs-page-pad-narrow);
   }
 
   .reserveBottomBar {
+    padding-bottom: var(--lcs-page-pad-bottom);
+  }
+
+  .flushHorizontal {
+    padding: var(--lcs-space-9) 0 0;
+  }
+
+  .flushHorizontal.reserveBottomBar {
     padding-bottom: var(--lcs-page-pad-bottom);
   }
 }

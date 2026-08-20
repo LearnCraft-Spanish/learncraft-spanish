@@ -2,6 +2,7 @@ import { Chip } from '@interface/components/general/Chip/Chip';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import styles from './Chip.module.scss';
 
 describe('chip', () => {
   afterEach(() => {
@@ -44,6 +45,20 @@ describe('chip', () => {
     expect(
       screen.getByRole('button', { name: 'Beginner verbs' }),
     ).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Beginner verbs' })).toHaveClass(
+      styles.selected,
+    );
+  });
+
+  it('can select with a navy skin instead of the action fill', () => {
+    render(
+      <Chip label="eso" onSelect={vi.fn()} selected selectedSkin="navy" />,
+    );
+
+    const chip = screen.getByRole('button', { name: 'eso' });
+
+    expect(chip).toHaveClass(styles.selectedNavy);
+    expect(chip).not.toHaveClass(styles.selected);
   });
 
   it('offers a named remove control', async () => {

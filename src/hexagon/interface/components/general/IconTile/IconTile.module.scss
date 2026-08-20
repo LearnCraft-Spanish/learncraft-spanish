@@ -19,3 +19,9 @@
 .warning {
   background-color: var(--lcs-tint-warning);
 }
+
+/* One-off: prototype list-density glyph is 17px; Icon sm stays 16. */
+.menuGlyph svg {
+  width: 17px;
+  height: 17px;
+}

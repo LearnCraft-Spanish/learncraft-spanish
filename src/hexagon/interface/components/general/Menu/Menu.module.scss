@@ -25,6 +25,11 @@
   background-color: var(--lcs-tint-hover);
 }
 
+/* Paper list, not a selected table row — parchment, not action-blue tint. */
+.listFlush .item:hover {
+  background-color: var(--lcs-color-page);
+}
+
 .item:focus-visible {
   outline: var(--lcs-focus-ring);
   outline-offset: calc(var(--lcs-focus-offset) * -1);
@@ -52,6 +57,25 @@
 .hint {
   color: var(--lcs-color-muted);
   font-size: var(--lcs-text-caption);
+}
+
+/* Flush actions list — 13×16 rows, hairline dividers, labels at 400. */
+.listFlush {
+  overflow: hidden;
+  padding: 0;
+}
+
+.listFlush .item {
+  padding: 13px var(--lcs-space-7);
+  border-radius: 0;
+}
+
+.listFlush li + li .item {
+  border-top: var(--lcs-border-hairline) solid var(--lcs-divider);
+}
+
+.listFlush .label {
+  font-weight: var(--lcs-weight-regular);
 }
 
 @media (prefers-reduced-motion: reduce) {

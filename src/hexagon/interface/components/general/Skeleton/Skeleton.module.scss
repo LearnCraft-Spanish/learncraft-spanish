@@ -4,11 +4,35 @@
   gap: var(--lcs-space-4);
 }
 
+.rows {
+  align-items: flex-start;
+}
+
 .bar {
   height: 14px;
   border-radius: var(--lcs-radius-sm);
   background-color: var(--lcs-divider);
   animation: pulse 1.2s var(--lcs-ease-standard) infinite;
+}
+
+.rows .bar:nth-child(5n + 1) {
+  width: 88%;
+}
+
+.rows .bar:nth-child(5n + 2) {
+  width: 62%;
+}
+
+.rows .bar:nth-child(5n + 3) {
+  width: 76%;
+}
+
+.rows .bar:nth-child(5n + 4) {
+  width: 54%;
+}
+
+.rows .bar:nth-child(5n + 5) {
+  width: 70%;
 }
 
 @keyframes pulse {

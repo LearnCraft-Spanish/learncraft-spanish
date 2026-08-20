@@ -8,8 +8,8 @@
 .headerRow {
   display: grid;
   align-items: center;
-  padding: var(--lcs-space-5) var(--lcs-space-8);
-  gap: var(--lcs-space-6);
+  padding: var(--dt-header-pad, var(--lcs-space-5) var(--lcs-space-8));
+  gap: var(--dt-column-gap, var(--lcs-space-6));
   background-color: var(--lcs-color-surface-dark);
   grid-template-columns: var(--dt-columns);
 }
@@ -23,13 +23,16 @@
   text-transform: uppercase;
 }
 
-/* No zebra striping and no vertical rules — one hairline between rows. */
+/* No zebra striping and no vertical rules — one hairline between rows.
+ * 56px is the gallery floor. Finder sets --dt-row-min-height to the in-row
+ * Add (40px) plus the 14px row pad on each side. */
 .row {
   display: grid;
-  min-height: 56px;
+  box-sizing: border-box;
+  min-height: var(--dt-row-min-height, 56px);
   align-items: center;
-  padding: var(--lcs-space-5) var(--lcs-space-8);
-  gap: var(--lcs-space-6);
+  padding: var(--dt-row-pad, var(--lcs-space-5) var(--lcs-space-8));
+  gap: var(--dt-column-gap, var(--lcs-space-6));
   grid-template-columns: var(--dt-columns);
   transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
 }
@@ -66,15 +69,49 @@
   background-color: var(--lcs-color-page);
 }
 
+.expandFlush {
+  padding: 0;
+  border-top: none;
+  background-color: transparent;
+}
+
+.record {
+  position: relative;
+  border-top: var(--lcs-border-hairline) solid var(--lcs-divider);
+}
+
+.selectedRecord::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--lcs-tint-row-selected);
+  pointer-events: none;
+}
+
+.noRowHover .row:hover {
+  background-color: transparent;
+}
+
+.noRowHover .selected,
+.noRowHover .selected:hover {
+  background-color: var(--lcs-tint-row-selected);
+}
+
 .empty {
   padding: var(--lcs-space-8);
 }
 
 @media (max-width: 768px) {
-  .headerRow,
-  .row {
-    padding: var(--lcs-space-5) var(--lcs-space-7);
+  .headerRow {
+    padding: var(--dt-header-pad, var(--lcs-space-5) var(--lcs-space-7));
     /* Falls back to the desktop grid when the caller gave no mobile layout. */
+    grid-template-areas: var(--dt-mobile-areas, none);
+    grid-template-columns: var(--dt-mobile-columns, var(--dt-columns));
+    row-gap: var(--lcs-space-1);
+  }
+
+  .row {
+    padding: var(--dt-row-pad, var(--lcs-space-5) var(--lcs-space-7));
     grid-template-areas: var(--dt-mobile-areas, none);
     grid-template-columns: var(--dt-mobile-columns, var(--dt-columns));
     row-gap: var(--lcs-space-1);

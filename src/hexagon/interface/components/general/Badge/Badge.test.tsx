@@ -12,4 +12,14 @@ describe('badge', () => {
 
     expect(screen.getByText('Admin only')).toBeInTheDocument();
   });
+
+  it('renders a compact sm pill', () => {
+    render(
+      <Badge size="sm" compact>
+        Admin only
+      </Badge>,
+    );
+
+    expect(screen.getByText('Admin only')).toBeInTheDocument();
+  });
 });

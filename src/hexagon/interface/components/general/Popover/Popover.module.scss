@@ -31,6 +31,19 @@
   color: var(--lcs-color-on-surface-dark);
 }
 
+.shadowPopover {
+  box-shadow: var(--lcs-shadow-popover);
+}
+
+.shadowMenu {
+  overflow: hidden;
+  box-shadow: var(--lcs-shadow-menu);
+}
+
+.offsetMenu {
+  top: calc(100% + var(--lcs-space-4));
+}
+
 @keyframes rise {
   from {
     opacity: 0;

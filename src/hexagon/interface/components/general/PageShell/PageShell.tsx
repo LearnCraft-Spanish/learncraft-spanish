@@ -5,6 +5,11 @@ interface PageShellProps {
   children: ReactNode;
   /** Reserve space at the bottom for a FixedBottomStack. */
   reserveBottomBar?: boolean;
+  /**
+   * Skip the shell's horizontal gutters and 1240 column. The child owns
+   * padding and measure. Defaults to the outer-pad + max-width column.
+   */
+  flushHorizontal?: boolean;
 }
 
 /**
@@ -15,10 +20,15 @@ interface PageShellProps {
 export function PageShell({
   children,
   reserveBottomBar = false,
+  flushHorizontal = false,
 }: PageShellProps): JSX.Element {
-  const className = reserveBottomBar
-    ? `${styles.root} ${styles.reserveBottomBar}`
-    : styles.root;
+  const className = [
+    styles.root,
+    reserveBottomBar ? styles.reserveBottomBar : undefined,
+    flushHorizontal ? styles.flushHorizontal : undefined,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={className}>

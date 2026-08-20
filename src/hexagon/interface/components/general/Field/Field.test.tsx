@@ -2,6 +2,7 @@ import { Field } from '@interface/components/general/Field/Field';
 import { TextInput } from '@interface/components/general/TextInput/TextInput';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import styles from './Field.module.scss';
 
 describe('field', () => {
   afterEach(() => {
@@ -16,6 +17,7 @@ describe('field', () => {
     );
 
     expect(screen.getByLabelText('Course')).toBeInTheDocument();
+    expect(screen.getByText('Course')).toHaveClass(styles.label);
   });
 
   it('points the control at its hint', () => {

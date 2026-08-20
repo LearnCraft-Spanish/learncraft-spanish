@@ -6,7 +6,7 @@ import type { JSX } from 'react';
 import { Icon } from '@interface/components/general/Icon/Icon';
 import styles from './IconButton.module.scss';
 
-type IconButtonTone = 'muted' | 'action' | 'onDark';
+type IconButtonTone = 'muted' | 'action' | 'onDark' | 'steel';
 
 interface IconButtonProps {
   icon: IconName;
@@ -16,7 +16,8 @@ interface IconButtonProps {
   disabled?: boolean;
   /** `bare` for in-row controls, `outlined` for standalone controls. */
   variant?: 'bare' | 'outlined';
-  size?: 'sm' | 'md';
+  /** `fit` sizes to the glyph; `sm`/`md` are 32 and 40 squares. */
+  size?: 'sm' | 'md' | 'fit';
   tone?: IconButtonTone;
   /**
    * Marks the button as a toggle and reports its state. Pressed renders in the

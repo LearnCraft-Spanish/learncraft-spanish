@@ -32,6 +32,11 @@
   height: var(--lcs-control-height-sm);
 }
 
+.fit {
+  width: auto;
+  height: auto;
+}
+
 .bare {
   border-radius: var(--lcs-radius-sm);
 }
@@ -57,6 +62,10 @@
 .onDark.outlined {
   border-color: var(--lcs-on-dark-45);
   background: none;
+}
+
+.steel {
+  color: var(--lcs-color-steel);
 }
 
 @media (prefers-reduced-motion: reduce) {

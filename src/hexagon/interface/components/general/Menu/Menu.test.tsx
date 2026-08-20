@@ -121,6 +121,48 @@ describe('menu', () => {
     expect(onDismiss).toHaveBeenCalledOnce();
   });
 
+  it('lists every item at list density', () => {
+    render(
+      <Menu
+        open
+        density="list"
+        onDismiss={vi.fn()}
+        trigger={<button>Do more with these</button>}
+        items={buildItems(vi.fn())}
+        label="Do more with these"
+      />,
+    );
+
+    expect(screen.getByRole('list')).toHaveAccessibleName('Do more with these');
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+    expect(screen.getByText('Admin only')).toBeInTheDocument();
+  });
+
+  it('runs a list-density row and closes', async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn<() => void>();
+    const onDismiss = vi.fn<() => void>();
+    render(
+      <Menu
+        open
+        density="list"
+        onDismiss={onDismiss}
+        trigger={<button>Do more with these</button>}
+        items={buildItems(onSelect)}
+        label="Do more with these"
+      />,
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /Apply these filters to my flashcards/,
+      }),
+    );
+
+    expect(onSelect).toHaveBeenCalledOnce();
+    expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
   it('shows hints and badges where the item has them', () => {
     render(
       <Menu

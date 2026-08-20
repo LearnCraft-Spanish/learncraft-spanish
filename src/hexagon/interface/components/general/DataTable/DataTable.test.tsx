@@ -47,6 +47,9 @@ describe('data table', () => {
     );
 
     expect(screen.getAllByRole('columnheader')).toHaveLength(3);
+    expect(screen.getByRole('columnheader', { name: 'Spanish' })).toHaveClass(
+      styles.headerCell,
+    );
   });
 
   it('renders a row per record, plus the header row', () => {
@@ -76,6 +79,22 @@ describe('data table', () => {
     for (const row of screen.getAllByRole('row')) {
       expect(row.style.getPropertyValue('--dt-columns')).toBe('1fr 1fr 80px');
     }
+  });
+
+  it('leaves gallery rows on the 56px floor instead of a finder min-height', () => {
+    render(
+      <DataTable
+        columns={COLUMNS}
+        rows={ROWS}
+        columnTemplate="1fr 1fr 80px"
+        caption="Search results"
+      />,
+    );
+
+    const row = screen.getAllByRole('row')[1];
+
+    expect(row).toHaveClass(styles.row);
+    expect(row.style.getPropertyValue('--dt-row-min-height')).toBe('');
   });
 
   it('keeps the desktop grid at every width without a mobile layout', () => {
@@ -165,6 +184,68 @@ describe('data table', () => {
     );
 
     expect(screen.getAllByRole('row')).toHaveLength(1);
+  });
+});
+
+describe('data table finder grouping', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('keeps parchment expand and row-level selected by default', () => {
+    render(
+      <DataTable
+        columns={COLUMNS}
+        rows={[
+          {
+            ...ROWS[0],
+            selected: true,
+            expanded: true,
+            expandPanel: <span>detail</span>,
+          },
+        ]}
+        columnTemplate="1fr 1fr 80px"
+        caption="Search results"
+      />,
+    );
+
+    const sentence = screen.getByRole('row', { selected: true });
+    const expand = screen.getByText('detail').closest('[role="row"]');
+
+    expect(sentence).toHaveClass(styles.selected);
+    expect(sentence.parentElement).not.toHaveClass(styles.selectedRecord);
+    expect(expand).toHaveClass(styles.expandRow);
+    expect(expand).not.toHaveClass(styles.expandFlush);
+  });
+
+  it('paints selected across the sentence and flush expand as one record', () => {
+    render(
+      <DataTable
+        columns={COLUMNS}
+        rows={[
+          {
+            ...ROWS[0],
+            selected: true,
+            expanded: true,
+            expandPanel: <span>detail</span>,
+          },
+        ]}
+        columnTemplate="1fr 1fr 80px"
+        caption="Search results"
+        expandTone="flush"
+        groupSelection
+        disableRowHover
+      />,
+    );
+
+    const sentence = screen.getByRole('row', { selected: true });
+    const expand = screen.getByText('detail').closest('[role="row"]');
+
+    expect(sentence).not.toHaveClass(styles.selected);
+    expect(sentence.parentElement).toHaveClass(styles.selectedRecord);
+    expect(sentence.parentElement).toContainElement(screen.getByText('detail'));
+    expect(expand).toHaveClass(styles.expandFlush);
+    expect(screen.getByRole('table')).toHaveClass(styles.noRowHover);
   });
 });
 

@@ -24,4 +24,22 @@ describe('eyebrow', () => {
 
     expect(screen.getByRole('heading', { name: 'Tags' })).toBeInTheDocument();
   });
+
+  it('keeps medium weight and tight leading unless asked otherwise', () => {
+    render(<Eyebrow>Flashcards</Eyebrow>);
+
+    expect(screen.getByText('Flashcards').className).not.toMatch(/regular/);
+    expect(screen.getByText('Flashcards').className).not.toMatch(/leadingBody/);
+  });
+
+  it('accepts regular weight and body leading', () => {
+    render(
+      <Eyebrow weight="regular" leading="body">
+        Flashcards
+      </Eyebrow>,
+    );
+
+    expect(screen.getByText('Flashcards').className).toMatch(/regular/);
+    expect(screen.getByText('Flashcards').className).toMatch(/leadingBody/);
+  });
 });

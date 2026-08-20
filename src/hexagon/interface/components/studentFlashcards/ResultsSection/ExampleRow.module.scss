@@ -1,0 +1,119 @@
+.sentenceCell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--lcs-space-4);
+}
+
+.sentenceCell button:hover,
+.expandToggle button:hover {
+  background-color: transparent;
+}
+
+.sentence {
+  min-width: 0;
+  color: var(--lcs-color-ink);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-body);
+  line-height: var(--lcs-line-body);
+}
+
+.targetWord {
+  font-weight: var(--lcs-weight-bold);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--lcs-space-1);
+}
+
+.expandToggle button {
+  padding: var(--lcs-space-2);
+}
+
+.addAction button,
+.inSetAction button {
+  min-width: 78px;
+}
+
+.inSetAction button {
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+}
+
+.expandPanel {
+  display: grid;
+  padding: var(--lcs-space-1) var(--lcs-space-7) var(--lcs-space-8) 60px;
+  gap: var(--lcs-space-8) calc(var(--lcs-space-9) + var(--lcs-space-3));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.columnEyebrow {
+  margin-bottom: var(--lcs-space-3);
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-2);
+}
+
+.hint {
+  margin: var(--lcs-space-3) 0 0;
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-chip);
+}
+
+.emptySpecial {
+  margin: 0;
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+}
+
+.vocabChip button,
+.specialChip > * {
+  padding: 5px var(--lcs-space-5);
+  border-radius: var(--lcs-radius-sm);
+  font-weight: var(--lcs-weight-medium);
+}
+
+.vocabChip button {
+  background-color: var(--lcs-tint-label);
+  color: var(--lcs-color-on-label);
+}
+
+.vocabChip button[aria-pressed='true'],
+.vocabChip button[aria-pressed='true']:hover {
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+.smokeChip > * {
+  background-color: var(--lcs-tint-label);
+}
+
+.vocabDetail {
+  max-width: 300px;
+  margin-top: var(--lcs-space-4);
+  padding: var(--lcs-space-5) var(--lcs-space-6);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+.vocabLesson {
+  margin: 0;
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.vocabUnit {
+  margin: 0;
+  color: var(--lcs-on-dark-60);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+}

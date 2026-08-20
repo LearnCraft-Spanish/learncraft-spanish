@@ -8,7 +8,7 @@
 
 .pages {
   display: flex;
-  gap: var(--lcs-space-3);
+  gap: var(--pg-gap, var(--lcs-space-3));
   align-items: center;
 }
 
@@ -24,7 +24,7 @@
   cursor: pointer;
   font-family: var(--lcs-font-sans);
   font-size: var(--lcs-text-action);
-  font-weight: var(--lcs-weight-bold);
+  font-weight: var(--pg-idle-weight, var(--lcs-weight-bold));
   transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
 }
 
@@ -42,6 +42,14 @@
   border-color: var(--lcs-color-action);
   background-color: var(--lcs-color-action);
   color: var(--lcs-color-on-action);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.parchmentEnd button:disabled {
+  opacity: 1;
+  border-color: var(--lcs-border-card);
+  background-color: var(--lcs-color-page);
+  color: var(--lcs-color-steel);
 }
 
 /* Ends fade rather than disappear, so the control never reflows. */

@@ -6,6 +6,11 @@
   color: var(--lcs-color-ink);
 }
 
+/* Own background still follows the radius; descendants may paint outside. */
+.card.unclipped {
+  overflow: visible;
+}
+
 /* No shadow at rest; interactive cards lift on hover. */
 .interactive {
   transition: box-shadow var(--lcs-motion-micro) var(--lcs-ease-standard);
