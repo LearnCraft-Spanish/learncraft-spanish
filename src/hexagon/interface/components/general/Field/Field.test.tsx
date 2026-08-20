@@ -1,6 +1,7 @@
 import { Field } from '@interface/components/general/Field/Field';
+import { TextInput } from '@interface/components/general/TextInput/TextInput';
 import { cleanup, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 describe('field', () => {
   afterEach(() => {
@@ -17,16 +18,15 @@ describe('field', () => {
     expect(screen.getByLabelText('Course')).toBeInTheDocument();
   });
 
-  it('names the hint so a caller can point the control at it', () => {
+  it('points the control at its hint', () => {
     render(
       <Field htmlFor="course" label="Course" hint="Pick a course first">
         <select id="course" />
       </Field>,
     );
 
-    expect(screen.getByText('Pick a course first')).toHaveAttribute(
-      'id',
-      'course-hint',
+    expect(screen.getByLabelText('Course')).toHaveAccessibleDescription(
+      'Pick a course first',
     );
   });
 
@@ -44,6 +44,28 @@ describe('field', () => {
 
     expect(screen.queryByText('Pick a course first')).not.toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent('Course is required');
-    expect(screen.getByRole('alert')).toHaveAttribute('id', 'course-error');
+    expect(screen.getByLabelText('Course')).toHaveAccessibleDescription(
+      'Course is required',
+    );
+    expect(screen.getByLabelText('Course')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+  });
+
+  it('wires hint and error onto a primitive control', () => {
+    render(
+      <Field htmlFor="tags" label="Tags" error="Enter at least one tag">
+        <TextInput id="tags" value="" onChange={vi.fn()} />
+      </Field>,
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Tags' })).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+    expect(
+      screen.getByRole('textbox', { name: 'Tags' }),
+    ).toHaveAccessibleDescription('Enter at least one tag');
   });
 });
