@@ -54,6 +54,22 @@ describe('text input', () => {
     expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
   });
 
+  it('points assistive technology at a describing message', () => {
+    render(
+      <TextInput
+        id="tags"
+        value=""
+        onChange={vi.fn()}
+        describedBy="tags-hint"
+      />,
+    );
+
+    expect(screen.getByRole('textbox')).toHaveAttribute(
+      'aria-describedby',
+      'tags-hint',
+    );
+  });
+
   it('does not report changes while disabled', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn<(value: string) => void>();

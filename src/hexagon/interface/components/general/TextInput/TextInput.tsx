@@ -10,6 +10,8 @@ interface TextInputProps {
   placeholder?: string;
   leadingIcon?: IconName;
   invalid?: boolean;
+  /** Id of the hint or error that describes this input. */
+  describedBy?: string;
   disabled?: boolean;
   type?: 'text' | 'search';
 }
@@ -21,6 +23,7 @@ export function TextInput({
   placeholder,
   leadingIcon,
   invalid = false,
+  describedBy,
   disabled = false,
   type = 'text',
 }: TextInputProps): JSX.Element {
@@ -47,6 +50,7 @@ export function TextInput({
         placeholder={placeholder}
         disabled={disabled}
         aria-invalid={invalid || undefined}
+        aria-describedby={describedBy}
         onChange={(event) => onChange(event.target.value)}
       />
     </span>

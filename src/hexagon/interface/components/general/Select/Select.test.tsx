@@ -50,6 +50,23 @@ describe('select', () => {
     );
   });
 
+  it('points assistive technology at a describing message', () => {
+    render(
+      <Select
+        id="lesson"
+        value="1"
+        options={OPTIONS}
+        onChange={vi.fn()}
+        describedBy="lesson-hint"
+      />,
+    );
+
+    expect(screen.getByRole('combobox')).toHaveAttribute(
+      'aria-describedby',
+      'lesson-hint',
+    );
+  });
+
   it('shows a readout instead of a disabled dropdown', () => {
     render(
       <Select

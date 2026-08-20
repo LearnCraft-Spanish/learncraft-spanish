@@ -14,6 +14,8 @@ interface SelectProps {
   /** Marks a required scope control with the action border. */
   emphasis?: boolean;
   invalid?: boolean;
+  /** Id of the hint or error that describes this control. */
+  describedBy?: string;
   disabled?: boolean;
   /**
    * Show the current value as a fixed readout instead of a control. Use when
@@ -29,6 +31,7 @@ export function Select({
   onChange,
   emphasis = false,
   invalid = false,
+  describedBy,
   disabled = false,
   readout = false,
 }: SelectProps): JSX.Element {
@@ -41,6 +44,7 @@ export function Select({
         className={styles.readout}
         value={selected?.label ?? ''}
         readOnly
+        aria-describedby={describedBy}
       />
     );
   }
@@ -60,6 +64,7 @@ export function Select({
       value={value}
       disabled={disabled}
       aria-invalid={invalid || undefined}
+      aria-describedby={describedBy}
       onChange={(event) => onChange(event.target.value)}
     >
       {options.map((option) => (
