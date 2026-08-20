@@ -12,6 +12,16 @@ interface PopoverProps {
   skin?: 'light' | 'dark';
   /** Anchor the panel to the trigger's right edge. */
   align?: 'start' | 'end';
+  /**
+   * Light skin defaults to `--lcs-shadow-popover`. Pass `menu` for the
+   * heavier actions-menu shadow. Dark skin already uses the menu shadow.
+   */
+  shadow?: 'popover' | 'menu';
+  /**
+   * Gap below the trigger. Default is 6px (`--lcs-space-2`). `menu` is
+   * 10px (`--lcs-space-4`) for the flush actions list.
+   */
+  offset?: 'default' | 'menu';
 }
 
 export function Popover({
@@ -21,6 +31,8 @@ export function Popover({
   children,
   skin = 'light',
   align = 'start',
+  shadow,
+  offset = 'default',
 }: PopoverProps): JSX.Element {
   const { containerRef } = useDismissable(open, onDismiss);
 
@@ -28,6 +40,9 @@ export function Popover({
     styles.panel,
     styles[skin],
     align === 'end' ? styles.alignEnd : undefined,
+    shadow === 'menu' ? styles.shadowMenu : undefined,
+    shadow === 'popover' ? styles.shadowPopover : undefined,
+    offset === 'menu' ? styles.offsetMenu : undefined,
   ]
     .filter(Boolean)
     .join(' ');

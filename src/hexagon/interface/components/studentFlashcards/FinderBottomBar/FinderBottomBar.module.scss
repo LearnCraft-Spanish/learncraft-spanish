@@ -1,0 +1,88 @@
+/* One Deep Navy slab docked to the viewport. Layers stack with a hairline;
+ * inner rows stay on the 1240px measure. */
+
+.slab {
+  position: fixed;
+  z-index: var(--lcs-z-bottom-bar);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+  animation: rise var(--lcs-motion-panel) var(--lcs-ease-standard);
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+.row {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--lcs-max-width);
+  flex-wrap: wrap;
+  gap: var(--lcs-space-7);
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 auto;
+  padding: var(--lcs-space-6) var(--lcs-space-9);
+}
+
+.selection {
+  border-top: var(--lcs-border-hairline) solid var(--lcs-on-dark-12);
+}
+
+.message,
+.label {
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-control);
+}
+
+.actions {
+  display: flex;
+  gap: var(--lcs-space-4);
+  align-items: center;
+}
+
+/* On-dark ghosts toward 36/40px. Button.inline stays padding 0 in the gallery. */
+.dismiss button {
+  min-height: calc(var(--lcs-control-height-sm) - var(--lcs-space-1));
+  padding: var(--lcs-space-3) var(--lcs-space-1);
+}
+
+.clear button {
+  min-height: var(--lcs-control-height-sm);
+  padding: var(--lcs-space-4) var(--lcs-space-3);
+}
+
+/* Prototype primary: 13px 22px / 15px / 900, ~46px tall. Button md is 12×16. */
+.add button {
+  min-height: 0;
+  padding: 13px 22px;
+  line-height: 20px;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slab {
+    animation: none;
+  }
+}
+
+/* Stay edge-to-edge at the narrow breakpoint — no page-pad inset. */
+@media (max-width: 768px) {
+  .slab {
+    padding: 0;
+  }
+}

@@ -6,13 +6,23 @@ interface CardProps {
   children: ReactNode;
   /** Adds the hover lift. Only for cards that are themselves clickable. */
   interactive?: boolean;
+  /**
+   * Clip descendants to the card radius. Gallery cards stay clipped.
+   * Pass `false` when a child overlay must paint outside the card.
+   */
+  clip?: boolean;
 }
 
 export function Card({
   children,
   interactive = false,
+  clip = true,
 }: CardProps): JSX.Element {
-  const className = [styles.card, interactive ? styles.interactive : undefined]
+  const className = [
+    styles.card,
+    interactive ? styles.interactive : undefined,
+    clip ? undefined : styles.unclipped,
+  ]
     .filter(Boolean)
     .join(' ');
 

@@ -16,6 +16,11 @@ interface ChipProps {
    */
   onSelect?: () => void;
   selected?: boolean;
+  /**
+   * `action` (default) is Celestial when selected. `navy` is Deep Navy, used
+   * when an open vocabulary chip must not look like a filter chip.
+   */
+  selectedSkin?: 'action' | 'navy';
   /** Adds a trailing remove control, as on an applied filter chip. */
   onRemove?: () => void;
 }
@@ -26,6 +31,7 @@ export function Chip({
   icon,
   onSelect,
   selected = false,
+  selectedSkin = 'action',
   onRemove,
 }: ChipProps): JSX.Element {
   const selectable = onSelect !== undefined && onRemove === undefined;
@@ -34,7 +40,8 @@ export function Chip({
     styles.root,
     tone === 'label' ? undefined : styles[tone],
     selectable ? styles.selectable : undefined,
-    selected ? styles.selected : undefined,
+    selected && selectedSkin === 'action' ? styles.selected : undefined,
+    selected && selectedSkin === 'navy' ? styles.selectedNavy : undefined,
   ]
     .filter(Boolean)
     .join(' ');

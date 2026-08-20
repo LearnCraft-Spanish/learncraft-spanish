@@ -46,6 +46,18 @@ interface DataTableProps {
   emptyState?: ReactNode;
   /** Reflow below 768px. Without it the desktop grid is kept at every width. */
   mobileLayout?: DataTableMobileLayout;
+  /**
+   * `parchment` (default) is a separate inset card below the row. `flush`
+   * keeps the panel on the same surface with no hairline between them.
+   */
+  expandTone?: 'parchment' | 'flush';
+  /**
+   * Paint the selected tint across the row and its expand panel as one
+   * overlay, matching an inset highlight on a grouped record.
+   */
+  groupSelection?: boolean;
+  /** Skip the row hover wash. */
+  disableRowHover?: boolean;
 }
 
 /**
@@ -53,6 +65,7 @@ interface DataTableProps {
  * detail panel without colspan gymnastics. The caller owns the column widths
  * at both widths — the grid is passed in as custom properties so the mobile
  * reflow can live in a media query, which inline styles cannot express.
+ * `--dt-row-min-height` defaults to 56px (gallery); Finder overrides it.
  */
 export function DataTable({
   columns,
@@ -61,6 +74,9 @@ export function DataTable({
   caption,
   emptyState,
   mobileLayout,
+  expandTone = 'parchment',
+  groupSelection = false,
+  disableRowHover = false,
 }: DataTableProps): JSX.Element {
   const gridStyle = {
     '--dt-columns': columnTemplate,
@@ -69,6 +85,13 @@ export function DataTable({
       '--dt-mobile-areas': mobileLayout.templateAreas,
     }),
   } as CSSProperties;
+
+  const rootClassName = [
+    styles.root,
+    disableRowHover ? styles.noRowHover : undefined,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const cellClassName = (
     column: DataTableColumn | undefined,
@@ -94,7 +117,7 @@ export function DataTable({
       : ({ '--dt-mobile-area': column.mobileArea } as CSSProperties);
 
   return (
-    <div className={styles.root} role="table" aria-label={caption}>
+    <div className={rootClassName} role="table" aria-label={caption}>
       <div role="rowgroup">
         <div className={styles.headerRow} role="row" style={gridStyle}>
           {columns.map((column) => (
@@ -114,37 +137,65 @@ export function DataTable({
         {rows.length === 0 && emptyState !== undefined && (
           <div className={styles.empty}>{emptyState}</div>
         )}
-        {rows.map((row) => (
-          <Fragment key={row.id}>
+        {rows.map((row) => {
+          const record = (
+            <>
+              <div
+                className={[
+                  styles.row,
+                  !groupSelection && row.selected ? styles.selected : undefined,
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                role="row"
+                aria-selected={row.selected}
+                style={gridStyle}
+              >
+                {row.cells.map((cell, index) => (
+                  <div
+                    className={cellClassName(columns[index], styles.cell)}
+                    role="cell"
+                    key={columns[index]?.id ?? index}
+                    style={cellStyle(columns[index])}
+                  >
+                    {cell}
+                  </div>
+                ))}
+              </div>
+              {row.expanded === true && row.expandPanel !== undefined && (
+                <div
+                  className={[
+                    styles.expandRow,
+                    expandTone === 'flush' ? styles.expandFlush : undefined,
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  role="row"
+                >
+                  <div role="cell">{row.expandPanel}</div>
+                </div>
+              )}
+            </>
+          );
+
+          if (!groupSelection) {
+            return <Fragment key={row.id}>{record}</Fragment>;
+          }
+
+          return (
             <div
               className={[
-                styles.row,
-                row.selected ? styles.selected : undefined,
+                styles.record,
+                row.selected ? styles.selectedRecord : undefined,
               ]
                 .filter(Boolean)
                 .join(' ')}
-              role="row"
-              aria-selected={row.selected}
-              style={gridStyle}
+              key={row.id}
             >
-              {row.cells.map((cell, index) => (
-                <div
-                  className={cellClassName(columns[index], styles.cell)}
-                  role="cell"
-                  key={columns[index]?.id ?? index}
-                  style={cellStyle(columns[index])}
-                >
-                  {cell}
-                </div>
-              ))}
+              {record}
             </div>
-            {row.expanded === true && row.expandPanel !== undefined && (
-              <div className={styles.expandRow} role="row">
-                <div role="cell">{row.expandPanel}</div>
-              </div>
-            )}
-          </Fragment>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

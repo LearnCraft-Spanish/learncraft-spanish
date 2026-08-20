@@ -2,6 +2,7 @@ import { IconButton } from '@interface/components/general/IconButton/IconButton'
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import styles from './IconButton.module.scss';
 
 describe('icon button', () => {
   afterEach(() => {
@@ -65,5 +66,23 @@ describe('icon button', () => {
     expect(
       screen.getByRole('button', { name: 'Play Spanish' }),
     ).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('can size to the glyph instead of a 32px square', () => {
+    render(
+      <IconButton
+        icon="volume"
+        label="Play Spanish"
+        size="fit"
+        iconSize="md"
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Play Spanish' })).toHaveClass(
+      styles.fit,
+    );
+    expect(
+      screen.getByRole('button', { name: 'Play Spanish' }),
+    ).not.toHaveClass(styles.sm);
   });
 });

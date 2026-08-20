@@ -2,6 +2,7 @@ import { PaginationV2 } from '@interface/components/general/PaginationV2/Paginat
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import styles from './PaginationV2.module.scss';
 
 describe('pagination v2', () => {
   afterEach(() => {
@@ -97,5 +98,32 @@ describe('pagination v2', () => {
     );
 
     expect(screen.getByText('1–25 of 342')).toBeInTheDocument();
+  });
+
+  it('wraps unavailable ends in parchment rather than fading them', () => {
+    render(
+      <PaginationV2
+        page={1}
+        pageCount={10}
+        onPageChange={vi.fn()}
+        unavailableTreatment="parchment"
+      />,
+    );
+
+    const previous = screen.getByRole('button', { name: 'Previous page' });
+    const next = screen.getByRole('button', { name: 'Next page' });
+
+    expect(previous).toBeDisabled();
+    expect(previous.parentElement).toHaveClass(styles.parchmentEnd);
+    expect(next).not.toBeDisabled();
+    expect(next.parentElement).not.toHaveClass(styles.parchmentEnd);
+  });
+
+  it('fades unavailable ends by default', () => {
+    render(<PaginationV2 page={1} pageCount={10} onPageChange={vi.fn()} />);
+
+    expect(
+      screen.getByRole('button', { name: 'Previous page' }).parentElement,
+    ).not.toHaveClass(styles.parchmentEnd);
   });
 });

@@ -38,6 +38,12 @@
   background-color: var(--lcs-color-action-hover);
 }
 
+.selectedNavy,
+.selectedNavy:hover {
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+}
+
 .action {
   background-color: var(--lcs-tint-action);
   color: var(--lcs-color-action-hover);

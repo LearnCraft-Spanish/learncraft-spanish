@@ -16,6 +16,11 @@
   font-size: var(--lcs-text-badge);
 }
 
+.compact {
+  padding: 2px var(--lcs-space-3);
+  font-weight: var(--lcs-weight-medium);
+}
+
 .label {
   background-color: var(--lcs-tint-label-strong);
   color: var(--lcs-color-on-label);

@@ -11,6 +11,42 @@ interface PaginationV2Props {
   onPageChange: (page: number) => void;
   /** Plain-language position, e.g. "1–25 of 342". */
   rangeLabel?: string;
+  /**
+   * `fade` (default) drops unavailable prev/next to 35% opacity. `parchment`
+   * paints them as a non-interactive parchment fill with a steel glyph.
+   */
+  unavailableTreatment?: 'fade' | 'parchment';
+}
+
+function EndButton({
+  icon,
+  label,
+  disabled,
+  parchment,
+  onClick,
+}: {
+  icon: 'chevronLeft' | 'chevronRight';
+  label: string;
+  disabled: boolean;
+  parchment: boolean;
+  onClick: () => void;
+}): JSX.Element {
+  const button = (
+    <IconButton
+      icon={icon}
+      label={label}
+      variant="outlined"
+      tone={parchment && disabled ? 'steel' : 'muted'}
+      disabled={disabled}
+      onClick={onClick}
+    />
+  );
+
+  if (!parchment || !disabled) {
+    return button;
+  }
+
+  return <span className={styles.parchmentEnd}>{button}</span>;
 }
 
 /**
@@ -22,15 +58,18 @@ export function PaginationV2({
   pageCount,
   onPageChange,
   rangeLabel,
+  unavailableTreatment = 'fade',
 }: PaginationV2Props): JSX.Element {
+  const parchment = unavailableTreatment === 'parchment';
+
   return (
     <nav className={styles.root} aria-label="Pagination">
       <div className={styles.pages}>
-        <IconButton
+        <EndButton
           icon="chevronLeft"
           label="Previous page"
-          variant="outlined"
           disabled={page <= 1}
+          parchment={parchment}
           onClick={() => onPageChange(page - 1)}
         />
         {buildPages(page, pageCount).map((entry, index) =>
@@ -60,11 +99,11 @@ export function PaginationV2({
             </button>
           ),
         )}
-        <IconButton
+        <EndButton
           icon="chevronRight"
           label="Next page"
-          variant="outlined"
           disabled={page >= pageCount}
+          parchment={parchment}
           onClick={() => onPageChange(page + 1)}
         />
       </div>

@@ -29,6 +29,51 @@ describe('popover', () => {
     expect(screen.getByText('panel')).toBeInTheDocument();
   });
 
+  it('shows the panel with the menu shadow', () => {
+    render(
+      <Popover
+        open
+        shadow="menu"
+        onDismiss={vi.fn()}
+        trigger={<button>Open</button>}
+      >
+        <span>panel</span>
+      </Popover>,
+    );
+
+    expect(screen.getByText('panel')).toBeInTheDocument();
+  });
+
+  it('shows the panel with the menu offset', () => {
+    render(
+      <Popover
+        open
+        offset="menu"
+        onDismiss={vi.fn()}
+        trigger={<button>Open</button>}
+      >
+        <span>panel</span>
+      </Popover>,
+    );
+
+    expect(screen.getByText('panel')).toBeInTheDocument();
+  });
+
+  it('shows the panel with an explicit popover shadow', () => {
+    render(
+      <Popover
+        open
+        shadow="popover"
+        onDismiss={vi.fn()}
+        trigger={<button>Open</button>}
+      >
+        <span>panel</span>
+      </Popover>,
+    );
+
+    expect(screen.getByText('panel')).toBeInTheDocument();
+  });
+
   it('dismisses on a click outside', async () => {
     const user = userEvent.setup();
     const onDismiss = vi.fn<() => void>();

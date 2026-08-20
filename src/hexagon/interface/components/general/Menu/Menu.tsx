@@ -23,6 +23,11 @@ interface MenuProps {
   /** Accessible name for the menu itself. */
   label: string;
   align?: 'start' | 'end';
+  /**
+   * `list` is the flush 330px actions menu: no list gutter, hairline rows,
+   * regular-weight labels, menu shadow. Default keeps the padded gallery look.
+   */
+  density?: 'default' | 'list';
 }
 
 /**
@@ -37,10 +42,21 @@ export function Menu({
   items,
   label,
   align = 'end',
+  density = 'default',
 }: MenuProps): JSX.Element {
+  const listClassName =
+    density === 'list' ? `${styles.list} ${styles.listFlush}` : styles.list;
+
   return (
-    <Popover open={open} onDismiss={onDismiss} trigger={trigger} align={align}>
-      <ul className={styles.list} aria-label={label}>
+    <Popover
+      open={open}
+      onDismiss={onDismiss}
+      trigger={trigger}
+      align={align}
+      shadow={density === 'list' ? 'menu' : undefined}
+      offset={density === 'list' ? 'menu' : undefined}
+    >
+      <ul className={listClassName} aria-label={label}>
         {items.map((item) => (
           <li key={item.id}>
             <button
@@ -51,12 +67,17 @@ export function Menu({
                 onDismiss();
               }}
             >
-              <IconTile icon={item.icon} />
+              <IconTile
+                icon={item.icon}
+                glyphSize={density === 'list' ? 'menu' : undefined}
+              />
               <span className={styles.body}>
                 <span className={styles.labelRow}>
                   <span className={styles.label}>{item.label}</span>
                   {item.badge !== undefined && (
-                    <Badge size="sm">{item.badge}</Badge>
+                    <Badge size="sm" compact={density === 'list'}>
+                      {item.badge}
+                    </Badge>
                   )}
                 </span>
                 {item.hint !== undefined && (

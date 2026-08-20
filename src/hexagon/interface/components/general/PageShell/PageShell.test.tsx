@@ -16,4 +16,14 @@ describe('page shell', () => {
 
     expect(screen.getByText('content')).toBeInTheDocument();
   });
+
+  it('still renders children when flushHorizontal skips the default gutters', () => {
+    render(
+      <PageShell flushHorizontal>
+        <span>flush content</span>
+      </PageShell>,
+    );
+
+    expect(screen.getByText('flush content')).toBeInTheDocument();
+  });
 });

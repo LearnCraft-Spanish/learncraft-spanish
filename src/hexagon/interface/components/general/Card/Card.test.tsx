@@ -6,6 +6,7 @@ import {
 } from '@interface/components/general/Card/Card';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
+import styles from './Card.module.scss';
 
 describe('card', () => {
   afterEach(() => {
@@ -20,6 +21,27 @@ describe('card', () => {
     );
 
     expect(screen.getByText('body')).toBeInTheDocument();
+  });
+
+  it('clips overflowing descendants by default', () => {
+    const { container } = render(
+      <Card>
+        <span>body</span>
+      </Card>,
+    );
+
+    expect(container.firstElementChild).toHaveClass(styles.card);
+    expect(container.firstElementChild).not.toHaveClass(styles.unclipped);
+  });
+
+  it('lets descendants paint outside when clip is false', () => {
+    const { container } = render(
+      <Card clip={false}>
+        <span>body</span>
+      </Card>,
+    );
+
+    expect(container.firstElementChild).toHaveClass(styles.unclipped);
   });
 });
 

@@ -1,0 +1,62 @@
+.bar {
+  box-sizing: border-box;
+  padding-top: var(--lcs-space-5);
+  padding-bottom: var(--lcs-space-5);
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+  font-family: var(--lcs-font-sans);
+  text-align: left;
+}
+
+/* Same box as Finder `.measure`: border-box 1240 with 24px pad inside. */
+.inner {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lcs-space-7);
+  max-width: var(--lcs-max-width);
+  margin: 0 auto;
+  padding-right: var(--lcs-page-pad);
+  padding-left: var(--lcs-page-pad);
+}
+
+.student {
+  display: flex;
+  flex: 1 1 12rem;
+  align-items: center;
+  gap: var(--lcs-space-5);
+  min-width: 12rem;
+}
+
+.meta,
+.workingSetMeta {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta {
+  flex: 1 1 auto;
+  min-width: 12rem;
+}
+
+.workingSetMeta {
+  text-align: right;
+}
+
+.value {
+  margin: 0;
+  min-height: calc(var(--lcs-text-body) * var(--lcs-line-tight));
+  font-size: var(--lcs-text-body);
+  font-weight: var(--lcs-weight-regular);
+  line-height: var(--lcs-line-tight);
+}
+
+.workingSet {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: var(--lcs-space-8);
+  margin-left: auto;
+}

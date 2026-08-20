@@ -1,6 +1,7 @@
 import { Skeleton } from '@interface/components/general/Skeleton/Skeleton';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
+import styles from './Skeleton.module.scss';
 
 describe('skeleton', () => {
   afterEach(() => {
@@ -29,5 +30,21 @@ describe('skeleton', () => {
     expect(
       screen.getByRole('status', { name: 'Loading examples' }).children,
     ).toHaveLength(6);
+  });
+
+  it('keeps default bars full width', () => {
+    render(<Skeleton label="Loading examples" />);
+
+    expect(
+      screen.getByRole('status', { name: 'Loading examples' }),
+    ).not.toHaveClass(styles.rows);
+  });
+
+  it('renders row placeholders instead of a full-width grate', () => {
+    render(<Skeleton label="Loading examples" variant="rows" />);
+
+    expect(
+      screen.getByRole('status', { name: 'Loading examples' }),
+    ).toHaveClass(styles.rows);
   });
 });

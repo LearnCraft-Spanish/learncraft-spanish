@@ -15,4 +15,13 @@ describe('icon tile', () => {
       'true',
     );
   });
+
+  it('renders a menu-sized glyph', () => {
+    const { container } = render(<IconTile icon="filter" glyphSize="menu" />);
+
+    expect(container.querySelector('svg')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+  });
 });

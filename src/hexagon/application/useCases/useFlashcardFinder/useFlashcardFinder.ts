@@ -6,12 +6,18 @@ import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTag
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
+import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import { useQueryPagination } from '@application/units/Pagination/useQueryPagination';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
+import {
+  generateVirtualLessonId,
+  getPrerequisitesForCourse,
+} from '@domain/coursePrerequisites';
 import { useEffect, useMemo, useRef } from 'react';
 
 export interface UseFlashcardFinderReturnType {
@@ -23,6 +29,9 @@ export interface UseFlashcardFinderReturnType {
   totalPages: number | null;
   lessonPopup: LessonPopup;
   skillTagSearch: UseSkillTagSearchReturnType;
+  resetFilters: () => void;
+  /** Active student's name, passed through from auth / app user. */
+  studentDisplayName: string | null;
 
   // Loading states similar to FlashcardManager
   filteredExamplesLoading: boolean;
@@ -33,6 +42,7 @@ export interface UseFlashcardFinderReturnType {
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   // isCoach or isAdmin
   const { isCoach, isAdmin } = useAuthAdapter();
+  const { appUser } = useActiveStudent();
   const { lessonPopup } = useLessonPopup();
 
   const QUERY_PAGE_SIZE = 150;
@@ -118,6 +128,33 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
 
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
 
+  const resetFilters = (): void => {
+    exampleFilter.bulkUpdateSkillTagKeys([]);
+    exampleFilter.updateExcludeSpanglish(false);
+    exampleFilter.updateAudioOnly(false);
+    exampleFilter.updateIncludeUnpublished(false);
+    exampleFilter.setFilterPreset(PreSetQuizPreset.None);
+    exampleFilter.skillTagSearch.updateTagSearchTerm();
+
+    const selectedCourse = exampleFilter.course;
+    if (!selectedCourse) {
+      return;
+    }
+
+    const prerequisites = getPrerequisitesForCourse(selectedCourse.id);
+    if (prerequisites && prerequisites.prerequisites.length > 0) {
+      exampleFilter.updateFromLessonNumber(
+        generateVirtualLessonId(selectedCourse.id, 0),
+      );
+      return;
+    }
+
+    const firstLesson = selectedCourse.lessons[0];
+    if (firstLesson) {
+      exampleFilter.updateFromLessonNumber(firstLesson.lessonNumber);
+    }
+  };
+
   return {
     pagination,
     exampleFilter,
@@ -127,6 +164,8 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     totalPages,
     lessonPopup,
     skillTagSearch,
+    resetFilters,
+    studentDisplayName: appUser?.name ?? null,
 
     // Loading states similar to FlashcardManager
     initialLoading:

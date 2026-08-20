@@ -1,4 +1,5 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { UiScope } from '@interface/components/general/UiScope/UiScope';
 import { Loading } from '@interface/components/Loading';
 import { lazy, Suspense } from 'react';
 import { Route } from 'react-router-dom';
@@ -72,7 +73,13 @@ export default function AppRoutes() {
         />
         <Route
           path="/flashcardfinder"
-          element={(isStudent || isAdmin || isCoach) && <FlashcardFinderPage />}
+          element={
+            (isStudent || isAdmin || isCoach) && (
+              <UiScope flag="ui.student.flashcards.finder.v2">
+                <FlashcardFinderPage />
+              </UiScope>
+            )
+          }
         />
         <Route
           path="/frequensay"
