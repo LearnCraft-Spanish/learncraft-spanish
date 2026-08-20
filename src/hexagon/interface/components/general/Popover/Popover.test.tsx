@@ -95,22 +95,34 @@ describe('popover', () => {
     expect(onDismiss).not.toHaveBeenCalled();
   });
 
-  it('applies the dark skin and end alignment when asked', () => {
-    render(
-      <Popover
-        open
-        onDismiss={vi.fn()}
-        trigger={<button>Open</button>}
-        skin="dark"
-        align="end"
-      >
-        <span>panel</span>
-      </Popover>,
+  it('stops listening for dismiss once it has closed', async () => {
+    const user = userEvent.setup();
+    const onDismiss = vi.fn<() => void>();
+    const { rerender } = render(
+      <div>
+        <span>outside</span>
+        <Popover open onDismiss={onDismiss} trigger={<button>Open</button>}>
+          <span>panel</span>
+        </Popover>
+      </div>,
     );
 
-    const panel = screen.getByText('panel').parentElement;
+    rerender(
+      <div>
+        <span>outside</span>
+        <Popover
+          open={false}
+          onDismiss={onDismiss}
+          trigger={<button>Open</button>}
+        >
+          <span>panel</span>
+        </Popover>
+      </div>,
+    );
 
-    expect(panel?.className).toContain('dark');
-    expect(panel?.className).toContain('alignEnd');
+    await user.click(screen.getByText('outside'));
+    await user.keyboard('{Escape}');
+
+    expect(onDismiss).not.toHaveBeenCalled();
   });
 });

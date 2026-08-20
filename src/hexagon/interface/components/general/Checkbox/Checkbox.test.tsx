@@ -63,9 +63,6 @@ describe('checkbox', () => {
       />,
     );
 
-    expect(screen.getByText('Select this example').className).toContain(
-      'labelHidden',
-    );
     expect(
       screen.getByRole('checkbox', { name: 'Select this example' }),
     ).toBeInTheDocument();

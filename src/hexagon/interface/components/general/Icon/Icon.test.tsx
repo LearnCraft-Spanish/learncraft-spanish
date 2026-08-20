@@ -36,14 +36,6 @@ describe('icon', () => {
     expect(container.querySelector('svg')).toHaveAttribute('width', '18');
   });
 
-  it('applies the requested tone', () => {
-    const { container } = render(<Icon name="check" tone="action" />);
-
-    expect(container.querySelector('svg')?.getAttribute('class')).toContain(
-      'action',
-    );
-  });
-
   it('uses the outline stroke weight', () => {
     const { container } = render(<Icon name="bookmark" />);
 

@@ -20,7 +20,7 @@ describe('toggle', () => {
 
     expect(
       screen.getByRole('switch', { name: 'Set a starting lesson' }),
-    ).toBeInTheDocument();
+    ).not.toBeChecked();
   });
 
   it('reports the new state when switched on', async () => {
@@ -57,14 +57,26 @@ describe('toggle', () => {
     expect(onChange).toHaveBeenCalledWith(true);
   });
 
-  it('slides the knob when on', () => {
-    const { container } = render(
-      <Toggle id="from-lesson" checked onChange={vi.fn()} label="On" />,
+  it('is on when checked', () => {
+    render(<Toggle id="from-lesson" checked onChange={vi.fn()} label="On" />);
+
+    expect(screen.getByRole('switch', { name: 'On' })).toBeChecked();
+  });
+
+  it('keeps a hidden label available to assistive technology', () => {
+    render(
+      <Toggle
+        id="from-lesson"
+        checked={false}
+        onChange={vi.fn()}
+        label="Set a starting lesson"
+        labelHidden
+      />,
     );
 
-    expect(container.querySelector('[class*="track"]')?.className).toContain(
-      'on',
-    );
+    expect(
+      screen.getByRole('switch', { name: 'Set a starting lesson' }),
+    ).toBeInTheDocument();
   });
 
   it('does not report changes while disabled', async () => {

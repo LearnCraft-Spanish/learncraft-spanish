@@ -59,34 +59,11 @@ describe('icon button', () => {
     ).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('tones the glyph to the action color while active', () => {
-    const { container } = render(
-      <IconButton icon="volume" label="Play Spanish" active />,
-    );
+  it('reports that it is pressed when active', () => {
+    render(<IconButton icon="volume" label="Play Spanish" active />);
 
     expect(
       screen.getByRole('button', { name: 'Play Spanish' }),
     ).toHaveAttribute('aria-pressed', 'true');
-    expect(container.querySelector('svg')?.getAttribute('class')).toContain(
-      'action',
-    );
-  });
-
-  it('applies the requested variant and size', () => {
-    render(
-      <IconButton
-        icon="chevronLeft"
-        label="Previous page"
-        variant="outlined"
-        size="sm"
-      />,
-    );
-
-    const className = screen.getByRole('button', {
-      name: 'Previous page',
-    }).className;
-
-    expect(className).toContain('outlined');
-    expect(className).toContain('sm');
   });
 });

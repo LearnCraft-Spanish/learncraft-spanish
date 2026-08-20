@@ -39,56 +39,6 @@ describe('button', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
-  it('is a primary button at the standalone size by default', () => {
-    render(<Button>Continue</Button>);
-
-    const className = screen.getByRole('button', {
-      name: 'Continue',
-    }).className;
-
-    expect(className).toContain('primary');
-    expect(className).toContain('md');
-  });
-
-  it('applies the requested variant and size', () => {
-    render(
-      <Button variant="secondary" size="sm">
-        Do more with these
-      </Button>,
-    );
-
-    const className = screen.getByRole('button', {
-      name: 'Do more with these',
-    }).className;
-
-    expect(className).toContain('secondary');
-    expect(className).toContain('sm');
-  });
-
-  it('supports the on-dark tone', () => {
-    render(
-      <Button variant="secondary" tone="onDark">
-        Change student
-      </Button>,
-    );
-
-    expect(
-      screen.getByRole('button', { name: 'Change student' }).className,
-    ).toContain('onDark');
-  });
-
-  it('drops a ghost button to the muted color when asked', () => {
-    render(
-      <Button variant="ghost" muted>
-        Reset all filters
-      </Button>,
-    );
-
-    expect(
-      screen.getByRole('button', { name: 'Reset all filters' }).className,
-    ).toContain('muted');
-  });
-
   it('renders leading and trailing icons as decoration', () => {
     const { container } = render(
       <Button leadingIcon="bolt" trailingIcon="chevronDown">

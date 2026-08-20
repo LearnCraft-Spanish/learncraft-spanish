@@ -16,16 +16,18 @@ describe('skeleton', () => {
   });
 
   it('renders three bars by default', () => {
-    const { container } = render(<Skeleton label="Loading examples" />);
+    render(<Skeleton label="Loading examples" />);
 
-    expect(container.querySelectorAll('[class*="bar"]')).toHaveLength(3);
+    expect(
+      screen.getByRole('status', { name: 'Loading examples' }).children,
+    ).toHaveLength(3);
   });
 
   it('renders the requested number of bars', () => {
-    const { container } = render(
-      <Skeleton label="Loading examples" count={6} />,
-    );
+    render(<Skeleton label="Loading examples" count={6} />);
 
-    expect(container.querySelectorAll('[class*="bar"]')).toHaveLength(6);
+    expect(
+      screen.getByRole('status', { name: 'Loading examples' }).children,
+    ).toHaveLength(6);
   });
 });

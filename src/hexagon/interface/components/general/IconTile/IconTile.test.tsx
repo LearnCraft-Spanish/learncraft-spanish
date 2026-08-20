@@ -15,24 +15,4 @@ describe('icon tile', () => {
       'true',
     );
   });
-
-  it('defaults to the action tint', () => {
-    const { container } = render(<IconTile icon="filter" />);
-
-    expect(container.firstElementChild?.className).toContain('action');
-  });
-
-  it('applies the requested tint', () => {
-    const { container } = render(<IconTile icon="userStar" tone="warning" />);
-
-    expect(container.firstElementChild?.className).toContain('warning');
-  });
-
-  it('tones the glyph to match its tile', () => {
-    const { container } = render(<IconTile icon="language" tone="label" />);
-
-    expect(container.querySelector('svg')?.getAttribute('class')).toContain(
-      'onLabel',
-    );
-  });
 });

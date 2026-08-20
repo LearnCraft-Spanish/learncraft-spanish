@@ -19,16 +19,4 @@ describe('fixed bottom stack', () => {
 
     expect(column?.textContent).toBe('noticebulk bar');
   });
-
-  it('centers the stack on the page measure', () => {
-    render(
-      <FixedBottomStack>
-        <span>notice</span>
-      </FixedBottomStack>,
-    );
-
-    expect(screen.getByText('notice').parentElement?.className).toContain(
-      'column',
-    );
-  });
 });

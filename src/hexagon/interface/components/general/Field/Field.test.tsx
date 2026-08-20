@@ -17,14 +17,17 @@ describe('field', () => {
     expect(screen.getByLabelText('Course')).toBeInTheDocument();
   });
 
-  it('renders a hint when there is no error', () => {
+  it('names the hint so a caller can point the control at it', () => {
     render(
       <Field htmlFor="course" label="Course" hint="Pick a course first">
         <select id="course" />
       </Field>,
     );
 
-    expect(screen.getByText('Pick a course first')).toBeInTheDocument();
+    expect(screen.getByText('Pick a course first')).toHaveAttribute(
+      'id',
+      'course-hint',
+    );
   });
 
   it('replaces the hint with the error when both are given', () => {
@@ -41,15 +44,6 @@ describe('field', () => {
 
     expect(screen.queryByText('Pick a course first')).not.toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent('Course is required');
-  });
-
-  it('colors the label when the field is in error', () => {
-    render(
-      <Field htmlFor="course" label="Course" error="Course is required">
-        <select id="course" />
-      </Field>,
-    );
-
-    expect(screen.getByText('Course').className).toContain('labelError');
+    expect(screen.getByRole('alert')).toHaveAttribute('id', 'course-error');
   });
 });

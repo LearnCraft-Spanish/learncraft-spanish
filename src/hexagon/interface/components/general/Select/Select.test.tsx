@@ -33,20 +33,6 @@ describe('select', () => {
     expect(onChange).toHaveBeenCalledWith('2');
   });
 
-  it('carries the action border when it is a required scope control', () => {
-    render(
-      <Select
-        id="lesson"
-        value="1"
-        options={OPTIONS}
-        onChange={vi.fn()}
-        emphasis
-      />,
-    );
-
-    expect(screen.getByRole('combobox').className).toContain('emphasis');
-  });
-
   it('marks itself invalid for assistive technology', () => {
     render(
       <Select

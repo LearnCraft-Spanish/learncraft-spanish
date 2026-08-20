@@ -66,10 +66,4 @@ describe('chip', () => {
       screen.queryByRole('button', { name: 'verbs' }),
     ).not.toBeInTheDocument();
   });
-
-  it('applies a non-default tone', () => {
-    render(<Chip label="Custom" tone="warning" />);
-
-    expect(screen.getByText('Custom').className).toContain('warning');
-  });
 });

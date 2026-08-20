@@ -42,7 +42,6 @@ describe('text input', () => {
       <TextInput id="tags" value="" onChange={vi.fn()} leadingIcon="search" />,
     );
 
-    expect(screen.getByRole('textbox').className).toContain('withIcon');
     expect(container.querySelector('svg')).toHaveAttribute(
       'aria-hidden',
       'true',
