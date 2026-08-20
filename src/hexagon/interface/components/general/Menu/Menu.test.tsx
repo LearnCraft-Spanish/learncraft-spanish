@@ -81,6 +81,28 @@ describe('menu', () => {
     expect(onSelect).toHaveBeenCalledOnce();
   });
 
+  it('closes after a row is chosen', async () => {
+    const user = userEvent.setup();
+    const onDismiss = vi.fn<() => void>();
+    render(
+      <Menu
+        open
+        onDismiss={onDismiss}
+        trigger={<button>Do more with these</button>}
+        items={buildItems(vi.fn())}
+        label="Do more with these"
+      />,
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /Apply these filters to my flashcards/,
+      }),
+    );
+
+    expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
   it('dismisses on Escape', async () => {
     const user = userEvent.setup();
     const onDismiss = vi.fn<() => void>();
