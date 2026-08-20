@@ -26,8 +26,9 @@ interface MenuProps {
 }
 
 /**
- * Icon-tile action list in a popover. Callers filter `items` by permission —
- * a row a user may not use is left out rather than disabled.
+ * Icon-tile action list in a popover. Choosing a row runs that item's handler
+ * and closes the menu. Callers filter `items` by permission — a row a user
+ * may not use is left out rather than disabled.
  */
 export function Menu({
   open,
@@ -45,7 +46,10 @@ export function Menu({
             <button
               type="button"
               className={styles.item}
-              onClick={item.onSelect}
+              onClick={() => {
+                item.onSelect();
+                onDismiss();
+              }}
             >
               <IconTile icon={item.icon} />
               <span className={styles.body}>
