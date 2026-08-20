@@ -27,6 +27,9 @@ const FlashcardFinderPage = lazy(
 );
 const GetHelpPage = lazy(() => import('@interface/pages/GetHelpPage'));
 
+// Development-only, gated inside the page by the `ui.dev.gallery` flag
+const UiGallery = lazy(() => import('@interface/pages/UiGallery'));
+
 // Coach / Admin pages
 const FrequensayPage = lazy(() => import('@interface/pages/FrequensayPage'));
 const WeeksRecordsSection = lazy(
@@ -96,6 +99,7 @@ export default function AppRoutes() {
           element={isAdmin && <DatabaseTables />}
         />
         <Route path="/example-manager/*" element={<ExampleManagerRouter />} />
+        <Route path="/ui-gallery" element={<UiGallery />} />
         <Route path="/*" element={<NotFoundPage />} />
         <Route
           path="/admin-dashboard"

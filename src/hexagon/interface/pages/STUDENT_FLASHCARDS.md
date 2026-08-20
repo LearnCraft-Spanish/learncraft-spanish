@@ -65,7 +65,11 @@ flowchart TB
 
 **Treat Manager and Finder as one redesign surface.** Students move between them (`Find More Matching Flashcards`, `Use these filters on my flashcards` via `?enableFiltering=true`). They share filter chrome and list-item chrome.
 
-When implementation starts, use **one** flag: `ui.student.flashcards.v2`. Do not wrap Custom Quiz or Review My Flashcards.
+**Superseded, 2026-08: the two routes ship behind separate flags.** The design handoff covers the Finder only, so `ui.student.flashcards.finder.v2` gates `/flashcardfinder` and the Manager gets its own flag when its design lands. A shared flag would have put a half-redesigned Manager in front of anyone who turned the Finder on. Everything else on this page still holds — the two pages remain one redesign _surface_, they share the same primitives and the same filter coordinator, and the Manager's rewrite should reuse whatever the Finder builds.
+
+Do not wrap Custom Quiz or Review My Flashcards under either flag.
+
+The shared primitives those pages will compose are built ahead of the page work; see [`components/general/README.md`](../components/general/README.md) for the primitive contract and `/ui-gallery` (`VITE_UI_FLAGS=ui.dev.gallery`) to view them.
 
 ---
 

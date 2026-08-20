@@ -1,5 +1,5 @@
 import type { FeatureFlagPort } from '@application/ports/featureFlagPort';
-import type { StudentUiFlag } from '@domain/uiFlags';
+import type { UiFlag } from '@domain/uiFlags';
 
 export function createFeatureFlagInfrastructure(
   enabledFlags: readonly string[],
@@ -7,6 +7,6 @@ export function createFeatureFlagInfrastructure(
   const enabled = new Set(enabledFlags);
 
   return {
-    isEnabled: (flagId: StudentUiFlag): boolean => enabled.has(flagId),
+    isEnabled: (flagId: UiFlag): boolean => enabled.has(flagId),
   };
 }

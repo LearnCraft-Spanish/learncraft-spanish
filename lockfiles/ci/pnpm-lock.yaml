@@ -29,6 +29,9 @@ importers:
       '@sentry/vite-plugin':
         specifier: ^3.2.1
         version: 3.6.1
+      '@tabler/icons-react':
+        specifier: ^3.46.0
+        version: 3.46.0(react@19.2.8)
       '@tanstack/react-query':
         specifier: ^5.66.9
         version: 5.101.4(react@19.2.8)
@@ -1711,6 +1714,14 @@ packages:
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: '>=9.0.0'
+
+  '@tabler/icons-react@3.46.0':
+    resolution: {integrity: sha512-CCm7xJWhDT2PH4ZIFkP6AgYKtVhq0gpYkjUN+GVh1AzmIQaa77OW0bQPBPQiTE0PsXMR9oSxFqA3qBglzPyrVQ==}
+    peerDependencies:
+      react: '>= 16'
+
+  '@tabler/icons@3.46.0':
+    resolution: {integrity: sha512-f2RYFl3fzPwj5WO82x6en0dmkjefxEfOm16D1ByM6cj/McNiwOkL4VaPUoP9VVIrXAD9WnTSVFr70px703b//A==}
 
   '@tanstack/eslint-plugin-query@5.101.4':
     resolution: {integrity: sha512-jqAZJWXGd5PthJYH9wmC2O5Ry5xAN2/7zxi9qcANQ+Xix8V5JkqNRjZ8Fh+rYzqzVYGiHqbrHekt+uh38OZVpw==}
@@ -7435,6 +7446,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
       - typescript
+
+  '@tabler/icons-react@3.46.0(react@19.2.8)':
+    dependencies:
+      '@tabler/icons': 3.46.0
+      react: 19.2.8
+
+  '@tabler/icons@3.46.0': {}
 
   '@tanstack/eslint-plugin-query@5.101.4(eslint@9.39.5)(typescript@5.9.3)':
     dependencies:
