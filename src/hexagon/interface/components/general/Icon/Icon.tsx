@@ -80,7 +80,8 @@ const SIZES: Record<IconSize, number> = {
   xl: 28,
 };
 
-// Tabler's outline weight. Filled variants are never used.
+// Tabler outline at its native weight, settled against the handoff's competing
+// suggestion of Lucide at 1.5. Filled variants are never used.
 const STROKE_WIDTH = 2;
 
 interface IconProps {

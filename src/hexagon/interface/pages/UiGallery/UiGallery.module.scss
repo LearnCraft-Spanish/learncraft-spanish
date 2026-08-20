@@ -117,6 +117,12 @@
   background-color: var(--lcs-color-surface-dark);
 }
 
+.note {
+  margin: 0 0 var(--lcs-space-7);
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+}
+
 .popoverBody {
   width: 260px;
   padding: var(--lcs-space-7);

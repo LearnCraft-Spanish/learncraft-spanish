@@ -71,6 +71,12 @@ Do not wrap Custom Quiz or Review My Flashcards under either flag.
 
 The shared primitives those pages will compose are built ahead of the page work; see [`components/general/README.md`](../components/general/README.md) for the primitive contract and `/ui-gallery` (`VITE_UI_FLAGS=ui.dev.gallery`) to view them.
 
+### Two constraints on the results table
+
+**No lesson column on either table.** Neither the Finder nor the Manager shows a lesson per row. The value either is not stored against the record or is too expensive to derive for every row on the page. Both tables omit the column rather than showing a blank or paying for the lookup. A row is therefore: select, Spanish, English, expand.
+
+**Below 768px the row reflows** rather than scrolling sideways: Spanish stacks over English while the checkbox and chevron stay in place, spanning both lines. `DataTable` takes this as a `mobileLayout` prop; the areas are named by the caller.
+
 ---
 
 ## Data: keep the two pipelines

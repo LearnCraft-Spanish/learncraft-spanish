@@ -128,8 +128,11 @@
     --lcs-control-border: 1.5px;
 
     /* Typography */
+    /* Nunito Sans only. Avenir was dropped: it is a system font on macOS and
+     * iOS but absent elsewhere, so listing it first served two different
+     * typefaces depending on the platform. */
     --lcs-font-sans:
-      'Avenir', 'Avenir Next', 'Nunito Sans', 'Gill Sans', sans-serif;
+      'Nunito Sans', 'Helvetica Neue', helvetica, arial, sans-serif;
     --lcs-text-display: 40px;
     --lcs-text-h1: 28px;
     --lcs-text-h2: 24px;

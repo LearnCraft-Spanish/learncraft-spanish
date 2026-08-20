@@ -1,4 +1,4 @@
-import type { JSX, ReactNode } from 'react';
+import type { CSSProperties, JSX, ReactNode } from 'react';
 import { Fragment } from 'react';
 import styles from './DataTable.module.scss';
 
@@ -7,6 +7,11 @@ export interface DataTableColumn {
   header: ReactNode;
   /** Right-align counts and other numerics. */
   align?: 'start' | 'end';
+  /**
+   * Named area this column takes below 768px, matching `mobileLayout`. When a
+   * mobile layout is given, a column without an area is hidden on mobile.
+   */
+  mobileArea?: string;
 }
 
 export interface DataTableRow {
@@ -19,6 +24,17 @@ export interface DataTableRow {
   expandPanel?: ReactNode;
 }
 
+export interface DataTableMobileLayout {
+  /** `grid-template-columns` below 768px. */
+  columnTemplate: string;
+  /**
+   * `grid-template-areas` below 768px. Repeat an area name down the rows to
+   * span it, e.g. `'"select spanish chevron" "select english chevron"'`
+   * stacks two columns while the outer two stay full height.
+   */
+  templateAreas: string;
+}
+
 interface DataTableProps {
   columns: DataTableColumn[];
   rows: DataTableRow[];
@@ -28,11 +44,15 @@ interface DataTableProps {
   caption: string;
   /** Shown in place of the body when there are no rows. */
   emptyState?: ReactNode;
+  /** Reflow below 768px. Without it the desktop grid is kept at every width. */
+  mobileLayout?: DataTableMobileLayout;
 }
 
 /**
  * CSS Grid rather than a `table`, so a row can hold controls and an expanding
- * detail panel without colspan gymnastics. The caller owns the column widths.
+ * detail panel without colspan gymnastics. The caller owns the column widths
+ * at both widths — the grid is passed in as custom properties so the mobile
+ * reflow can live in a media query, which inline styles cannot express.
  */
 export function DataTable({
   columns,
@@ -40,8 +60,38 @@ export function DataTable({
   columnTemplate,
   caption,
   emptyState,
+  mobileLayout,
 }: DataTableProps): JSX.Element {
-  const gridStyle = { gridTemplateColumns: columnTemplate };
+  const gridStyle = {
+    '--dt-columns': columnTemplate,
+    ...(mobileLayout !== undefined && {
+      '--dt-mobile-columns': mobileLayout.columnTemplate,
+      '--dt-mobile-areas': mobileLayout.templateAreas,
+    }),
+  } as CSSProperties;
+
+  const cellClassName = (
+    column: DataTableColumn | undefined,
+    base: string,
+  ): string =>
+    [
+      base,
+      column?.align === 'end' ? styles.alignEnd : undefined,
+      mobileLayout === undefined
+        ? undefined
+        : column?.mobileArea === undefined
+          ? styles.hiddenOnMobile
+          : styles.placed,
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+  const cellStyle = (
+    column: DataTableColumn | undefined,
+  ): CSSProperties | undefined =>
+    column?.mobileArea === undefined
+      ? undefined
+      : ({ '--dt-mobile-area': column.mobileArea } as CSSProperties);
 
   return (
     <div className={styles.root} role="table" aria-label={caption}>
@@ -49,14 +99,10 @@ export function DataTable({
         <div className={styles.headerRow} role="row" style={gridStyle}>
           {columns.map((column) => (
             <div
-              className={[
-                styles.headerCell,
-                column.align === 'end' ? styles.alignEnd : undefined,
-              ]
-                .filter(Boolean)
-                .join(' ')}
+              className={cellClassName(column, styles.headerCell)}
               role="columnheader"
               key={column.id}
+              style={cellStyle(column)}
             >
               {column.header}
             </div>
@@ -83,16 +129,10 @@ export function DataTable({
             >
               {row.cells.map((cell, index) => (
                 <div
-                  className={[
-                    styles.cell,
-                    columns[index]?.align === 'end'
-                      ? styles.alignEnd
-                      : undefined,
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
+                  className={cellClassName(columns[index], styles.cell)}
                   role="cell"
                   key={columns[index]?.id ?? index}
+                  style={cellStyle(columns[index])}
                 >
                   {cell}
                 </div>
