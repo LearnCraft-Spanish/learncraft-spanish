@@ -11,6 +11,7 @@
   padding: var(--lcs-space-5) var(--lcs-space-8);
   gap: var(--lcs-space-6);
   background-color: var(--lcs-color-surface-dark);
+  grid-template-columns: var(--dt-columns);
 }
 
 .headerCell {
@@ -29,6 +30,7 @@
   align-items: center;
   padding: var(--lcs-space-5) var(--lcs-space-8);
   gap: var(--lcs-space-6);
+  grid-template-columns: var(--dt-columns);
   transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
 }
 
@@ -72,6 +74,18 @@
   .headerRow,
   .row {
     padding: var(--lcs-space-5) var(--lcs-space-7);
+    /* Falls back to the desktop grid when the caller gave no mobile layout. */
+    grid-template-areas: var(--dt-mobile-areas, none);
+    grid-template-columns: var(--dt-mobile-columns, var(--dt-columns));
+    row-gap: var(--lcs-space-1);
+  }
+
+  .placed {
+    grid-area: var(--dt-mobile-area);
+  }
+
+  .hiddenOnMobile {
+    display: none;
   }
 }
 

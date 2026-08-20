@@ -12,8 +12,25 @@ import {
   GallerySpecimens,
 } from '@interface/pages/UiGallery/GallerySection';
 import { useState } from 'react';
+import styles from './UiGallery.module.scss';
 
-const COLUMN_TEMPLATE = '44px 1fr 1fr 90px 44px';
+const COLUMN_TEMPLATE = '44px 1fr 1fr 44px';
+
+/**
+ * Below 768px the two text columns stack while the checkbox and chevron stay
+ * put, spanning both lines.
+ */
+const MOBILE_LAYOUT = {
+  columnTemplate: '44px 1fr 44px',
+  templateAreas: '"select spanish expand" "select english expand"',
+};
+
+const COLUMNS = [
+  { id: 'select', header: '', mobileArea: 'select' },
+  { id: 'spanish', header: 'Spanish', mobileArea: 'spanish' },
+  { id: 'english', header: 'English', mobileArea: 'english' },
+  { id: 'expand', header: '', mobileArea: 'expand' },
+];
 
 export function DataSection(): JSX.Element {
   const [selectedChip, setSelectedChip] = useState(false);
@@ -51,16 +68,15 @@ export function DataSection(): JSX.Element {
       </GallerySection>
 
       <GallerySection title="Data table">
+        <p className={styles.note}>
+          Narrow the window past 768px to see the reflow: Spanish and English
+          stack, the checkbox and chevron stay.
+        </p>
         <DataTable
           caption="Example search results"
           columnTemplate={COLUMN_TEMPLATE}
-          columns={[
-            { id: 'select', header: '' },
-            { id: 'spanish', header: 'Spanish' },
-            { id: 'english', header: 'English' },
-            { id: 'lesson', header: 'Lesson', align: 'end' },
-            { id: 'expand', header: '' },
-          ]}
+          mobileLayout={MOBILE_LAYOUT}
+          columns={COLUMNS}
           rows={[
             {
               id: 'a',
@@ -76,7 +92,6 @@ export function DataSection(): JSX.Element {
                 />,
                 'Como tacos todos los días',
                 'I eat tacos every day',
-                '12',
                 <IconButton
                   key="e"
                   icon={expanded ? 'chevronUp' : 'chevronDown'}
@@ -100,7 +115,6 @@ export function DataSection(): JSX.Element {
                 />,
                 'Bebo agua fría',
                 'I drink cold water',
-                '14',
                 <IconButton key="e" icon="chevronDown" label="Expand row" />,
               ],
             },
@@ -112,13 +126,8 @@ export function DataSection(): JSX.Element {
         <DataTable
           caption="Example search results, empty"
           columnTemplate={COLUMN_TEMPLATE}
-          columns={[
-            { id: 'select', header: '' },
-            { id: 'spanish', header: 'Spanish' },
-            { id: 'english', header: 'English' },
-            { id: 'lesson', header: 'Lesson', align: 'end' },
-            { id: 'expand', header: '' },
-          ]}
+          mobileLayout={MOBILE_LAYOUT}
+          columns={COLUMNS}
           rows={[]}
           emptyState={
             <EmptyState

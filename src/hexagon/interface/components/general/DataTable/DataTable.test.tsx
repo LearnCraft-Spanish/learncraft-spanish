@@ -73,8 +73,24 @@ describe('data table', () => {
     );
 
     for (const row of screen.getAllByRole('row')) {
-      expect(row).toHaveStyle({ gridTemplateColumns: '1fr 1fr 80px' });
+      expect(row.style.getPropertyValue('--dt-columns')).toBe('1fr 1fr 80px');
     }
+  });
+
+  it('keeps the desktop grid at every width without a mobile layout', () => {
+    render(
+      <DataTable
+        columns={COLUMNS}
+        rows={ROWS}
+        columnTemplate="1fr 1fr 80px"
+        caption="Search results"
+      />,
+    );
+
+    const row = screen.getAllByRole('row')[1];
+
+    expect(row.style.getPropertyValue('--dt-mobile-columns')).toBe('');
+    expect(screen.getByText('12').className).not.toContain('hiddenOnMobile');
   });
 
   it('marks a selected row', () => {
@@ -145,5 +161,77 @@ describe('data table', () => {
     );
 
     expect(screen.getAllByRole('row')).toHaveLength(1);
+  });
+});
+
+describe('data table mobile reflow', () => {
+  const MOBILE_COLUMNS: DataTableColumn[] = [
+    { id: 'spanish', header: 'Spanish', mobileArea: 'spanish' },
+    { id: 'english', header: 'English', mobileArea: 'english' },
+    { id: 'lesson', header: 'Lesson', align: 'end' },
+  ];
+
+  const MOBILE_LAYOUT = {
+    columnTemplate: '1fr',
+    templateAreas: '"spanish" "english"',
+  };
+
+  function renderReflowed(): void {
+    render(
+      <DataTable
+        columns={MOBILE_COLUMNS}
+        rows={ROWS}
+        columnTemplate="1fr 1fr 80px"
+        caption="Search results"
+        mobileLayout={MOBILE_LAYOUT}
+      />,
+    );
+  }
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('passes both grids to every row', () => {
+    renderReflowed();
+
+    const row = screen.getAllByRole('row')[1];
+
+    expect(row.style.getPropertyValue('--dt-columns')).toBe('1fr 1fr 80px');
+    expect(row.style.getPropertyValue('--dt-mobile-columns')).toBe('1fr');
+    expect(row.style.getPropertyValue('--dt-mobile-areas')).toBe(
+      '"spanish" "english"',
+    );
+  });
+
+  it('places each mapped cell in its named area', () => {
+    renderReflowed();
+
+    expect(
+      screen.getByText('Como tacos').style.getPropertyValue('--dt-mobile-area'),
+    ).toBe('spanish');
+    expect(
+      screen
+        .getByText('I eat tacos')
+        .style.getPropertyValue('--dt-mobile-area'),
+    ).toBe('english');
+  });
+
+  it('hides a column that has no mobile area, header included', () => {
+    renderReflowed();
+
+    expect(screen.getByText('12').className).toContain('hiddenOnMobile');
+    expect(
+      screen.getByRole('columnheader', { name: 'Lesson' }).className,
+    ).toContain('hiddenOnMobile');
+  });
+
+  it('keeps the mapped columns visible', () => {
+    renderReflowed();
+
+    expect(screen.getByText('Como tacos').className).not.toContain(
+      'hiddenOnMobile',
+    );
+    expect(screen.getByText('Como tacos').className).toContain('placed');
   });
 });

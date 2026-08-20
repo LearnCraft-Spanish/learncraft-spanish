@@ -33,6 +33,17 @@ A file in this folder is a v2 primitive only if all of the following hold.
 
 `Select` has a `readout` variant that renders a read-only input rather than a disabled `select` — a greyed-out dropdown reads as broken rather than inactive.
 
+`DataTable` takes the grid as custom properties rather than an inline `grid-template-columns`, so an optional `mobileLayout` can reflow the row below 768px — inline styles cannot carry a media query. A column names the area it occupies on mobile; a column with no area is hidden there, header included. The Finder's results row stacks Spanish over English and keeps the checkbox and chevron spanning both lines:
+
+```tsx
+mobileLayout={{
+  columnTemplate: '44px 1fr 44px',
+  templateAreas: '"select spanish expand" "select english expand"',
+}}
+```
+
+There is no `density` prop. The prototype had `comfortable | compact`; production does not need it, so rows are a fixed ≥56px.
+
 ## Promotion rule
 
 Build in the feature tree first. A component earns a place here once a second surface needs it, or once it is obviously generic (a button, a checkbox). Feature-specific composition — preset chips, vocabulary tag popovers, a page's particular table columns — stays with its feature in `@layer features`.
