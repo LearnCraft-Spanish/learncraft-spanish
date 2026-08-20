@@ -1,0 +1,50 @@
+.root {
+  position: relative;
+  display: inline-block;
+}
+
+.panel {
+  position: absolute;
+  z-index: var(--lcs-z-popover);
+  top: calc(100% + var(--lcs-space-2));
+  left: 0;
+  border-radius: var(--lcs-radius-xl);
+  animation: rise var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+.alignEnd {
+  right: 0;
+  left: auto;
+}
+
+.light {
+  border: var(--lcs-border-hairline) solid var(--lcs-border-card);
+  background-color: var(--lcs-color-surface);
+  box-shadow: var(--lcs-shadow-popover);
+  color: var(--lcs-color-ink);
+}
+
+.dark {
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-surface-dark);
+  box-shadow: var(--lcs-shadow-menu);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation: none;
+  }
+}

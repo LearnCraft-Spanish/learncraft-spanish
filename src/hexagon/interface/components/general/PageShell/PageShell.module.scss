@@ -1,0 +1,32 @@
+.root {
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: var(--lcs-space-9) var(--lcs-page-pad);
+  background-color: var(--lcs-color-page);
+  color: var(--lcs-color-ink);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-body);
+  font-weight: var(--lcs-weight-regular);
+  line-height: var(--lcs-line-body);
+  text-align: left;
+}
+
+/* Room for a FixedBottomStack so the last row is never covered. */
+.reserveBottomBar {
+  padding-bottom: var(--lcs-page-pad-bottom);
+}
+
+.column {
+  max-width: var(--lcs-max-width);
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .root {
+    padding: var(--lcs-space-7) var(--lcs-page-pad-narrow);
+  }
+
+  .reserveBottomBar {
+    padding-bottom: var(--lcs-page-pad-bottom);
+  }
+}

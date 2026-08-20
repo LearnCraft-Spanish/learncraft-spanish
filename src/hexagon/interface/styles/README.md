@@ -27,7 +27,28 @@ Empty stylesheets are left unwrapped so concatenation cannot produce `@layer leg
 
 `tokens.css` keeps the original `--brand`, `--theme`, `--accent`, `--light`, `--dark`, `--error-*` names and adds semantic aliases (`--color-action`, `--space-*`, `--radius-*`, `--z-*`, `--font-sans`).
 
-New UI must use the semantic names. Do not put breakpoints in CSS variables — `@media (max-width: var(--x))` is invalid. Student-v2 breakpoints are **480px** and **768px**.
+Do not put breakpoints in CSS variables — `@media (max-width: var(--x))` is invalid. Student-v2 breakpoints are **480px** and **768px**.
+
+### `--lcs-*` — the v2 design system
+
+The LearnCraft Design System v2.1 values live in the same file under the `--lcs-` prefix: color, tints, lines, on-dark alphas, space, radius, elevation, motion, layout, typography, focus, and stacking. **New v2 primitives use `--lcs-*` exclusively.**
+
+The prefix is load-bearing, not decorative. `VocabularyCreator.scss` and `PaginatedVocabularyTable.scss` reference generic names that are _not defined_ (`--color-primary`, `--color-border`, `--color-danger`, `--color-text-muted`, `--color-gray-lighter`, `--color-secondary`, `--color-primary-dark`, `--color-danger-light`, `--color-gray-lightest`) and resolve to their inline `var(name, fallback)` values. Defining any of those names would silently restyle those components.
+
+Two rules follow:
+
+- **Add tokens; never change existing ones.** `--space-1..6`, `--radius-sm/md`, `--brand`, and `--color-action-hover` keep their current values. The v2 spacing steps (6/10/14/20/28px) and radii (6/10/14px) are additions, not a renumbering.
+- **Prefix every new token.** `--lcs-*` cannot collide with a legacy `var()` call site.
+
+The two scales are independent and intentionally different:
+
+|        | Legacy                           | v2                                                  |
+| ------ | -------------------------------- | --------------------------------------------------- |
+| Space  | `--space-1..6` = 4/8/12/16/24/32 | `--lcs-space-1..11` = 4/6/8/10/12/14/16/20/24/28/48 |
+| Radius | `--radius-sm/md` = 4/8           | `--lcs-radius-sm/md/lg/xl/pill` = 6/8/10/14/999     |
+| Font   | `--font-sans` (Poppins)          | `--lcs-font-sans` (Avenir → Nunito Sans)            |
+
+`--lcs-font-sans` is applied by `PageShell` and inherited. Form-control primitives must set `font-family: inherit` themselves, since browsers do not inherit into `input` / `select` / `button`.
 
 ## Adding a flagged student surface
 
@@ -38,4 +59,10 @@ New UI must use the semantic names. Do not put breakpoints in CSS variables — 
 
 Do not wrap student routes until that surface is being redesigned.
 
-The first major student surface is Flashcard Manager + Flashcard Finder (one flag, both routes). Architecture, isolation rules, and the start sequence live in [`pages/STUDENT_FLASHCARDS.md`](../pages/STUDENT_FLASHCARDS.md). `ui.student.help.v2` is the documented example flag only — Get Help is not wrapped and is not that phase.
+The first major student surface is Flashcard Finder (`ui.student.flashcards.finder.v2`). Architecture, isolation rules, and the start sequence live in [`pages/STUDENT_FLASHCARDS.md`](../pages/STUDENT_FLASHCARDS.md). `ui.student.help.v2` is the documented example flag only — Get Help is not wrapped and is not that phase.
+
+## Flags that gate a whole surface
+
+`UiScope` + `useStudentUiVersion` handle a v1/v2 split on a route that already exists. For a route that is entirely new or development-only, use `useUiFlag` inside the page instead — it returns `{ enabled }`, the page returns `null` when the flag is off, and the route needs no extra hook.
+
+`ui.dev.gallery` works this way. It serves `/ui-gallery`, a specimen page for every v2 primitive and token. Enable it with `VITE_UI_FLAGS=ui.dev.gallery`. The page is lazy-loaded, so it never enters the main bundle.

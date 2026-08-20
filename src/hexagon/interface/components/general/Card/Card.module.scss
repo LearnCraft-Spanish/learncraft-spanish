@@ -1,0 +1,61 @@
+.card {
+  overflow: hidden;
+  border: var(--lcs-border-hairline) solid var(--lcs-border-card);
+  border-radius: var(--lcs-radius-xl);
+  background-color: var(--lcs-color-surface);
+  color: var(--lcs-color-ink);
+}
+
+/* No shadow at rest; interactive cards lift on hover. */
+.interactive {
+  transition: box-shadow var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.interactive:hover {
+  box-shadow: var(--lcs-shadow-lift);
+}
+
+.section {
+  padding: var(--lcs-space-8);
+}
+
+.divided {
+  border-top: var(--lcs-border-hairline) solid var(--lcs-divider);
+}
+
+.sectionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-5);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--lcs-space-6) var(--lcs-space-8);
+  border-bottom: var(--lcs-border-hairline) solid var(--lcs-divider);
+}
+
+.footerStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-10);
+  align-items: center;
+  padding: var(--lcs-space-6) var(--lcs-space-8);
+  border-top: var(--lcs-border-hairline) solid var(--lcs-divider);
+  background-color: var(--lcs-color-page);
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: var(--lcs-space-7);
+  }
+
+  .sectionHeader,
+  .footerStrip {
+    padding: var(--lcs-space-5) var(--lcs-space-7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive {
+    transition: none;
+  }
+}

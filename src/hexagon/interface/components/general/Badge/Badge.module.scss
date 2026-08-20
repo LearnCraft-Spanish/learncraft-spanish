@@ -1,0 +1,42 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--lcs-space-1) var(--lcs-space-2);
+  border-radius: var(--lcs-radius-sm);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-eyebrow);
+  font-weight: var(--lcs-weight-bold);
+  letter-spacing: var(--lcs-tracking-eyebrow);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sm {
+  font-size: var(--lcs-text-badge);
+}
+
+.label {
+  background-color: var(--lcs-tint-label-strong);
+  color: var(--lcs-color-on-label);
+}
+
+.action {
+  background-color: var(--lcs-tint-action);
+  color: var(--lcs-color-action-hover);
+}
+
+.error {
+  background-color: var(--lcs-tint-error);
+  color: var(--lcs-color-error);
+}
+
+.success {
+  background-color: var(--lcs-tint-success);
+  color: var(--lcs-color-success);
+}
+
+.warning {
+  background-color: var(--lcs-tint-warning);
+  color: var(--lcs-color-warning-ink);
+}

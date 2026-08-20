@@ -1,0 +1,69 @@
+.root {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-6);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pages {
+  display: flex;
+  gap: var(--lcs-space-3);
+  align-items: center;
+}
+
+.page {
+  box-sizing: border-box;
+  width: var(--lcs-control-height-sm);
+  height: var(--lcs-control-height-sm);
+  padding: 0;
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-surface);
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-action);
+  font-weight: var(--lcs-weight-bold);
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.page:hover:not(:disabled) {
+  background-color: var(--lcs-tint-hover);
+}
+
+.page:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.current,
+.current:hover {
+  border-color: var(--lcs-color-action);
+  background-color: var(--lcs-color-action);
+  color: var(--lcs-color-on-action);
+}
+
+/* Ends fade rather than disappear, so the control never reflows. */
+.page:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.gap {
+  width: var(--lcs-space-8);
+  color: var(--lcs-color-muted);
+  text-align: center;
+}
+
+.range {
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page {
+    transition: none;
+  }
+}
