@@ -5,6 +5,7 @@ import type {
 import { DataTable } from '@interface/components/general/DataTable/DataTable';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
+import styles from './DataTable.module.scss';
 
 const COLUMNS: DataTableColumn[] = [
   { id: 'spanish', header: 'Spanish' },
@@ -90,7 +91,10 @@ describe('data table', () => {
     const row = screen.getAllByRole('row')[1];
 
     expect(row.style.getPropertyValue('--dt-mobile-columns')).toBe('');
-    expect(screen.getByText('12').className).not.toContain('hiddenOnMobile');
+    expect(screen.getByText('12')).not.toHaveClass(styles.hiddenOnMobile);
+    expect(
+      screen.getByRole('columnheader', { name: 'Lesson' }),
+    ).not.toHaveClass(styles.hiddenOnMobile);
   });
 
   it('marks a selected row', () => {
@@ -220,18 +224,24 @@ describe('data table mobile reflow', () => {
   it('hides a column that has no mobile area, header included', () => {
     renderReflowed();
 
-    expect(screen.getByText('12').className).toContain('hiddenOnMobile');
-    expect(
-      screen.getByRole('columnheader', { name: 'Lesson' }).className,
-    ).toContain('hiddenOnMobile');
+    expect(screen.getByText('12')).toHaveClass(styles.hiddenOnMobile);
+    expect(screen.getByRole('columnheader', { name: 'Lesson' })).toHaveClass(
+      styles.hiddenOnMobile,
+    );
   });
 
-  it('keeps the mapped columns visible', () => {
+  it('keeps the mapped columns visible, headers included', () => {
     renderReflowed();
 
-    expect(screen.getByText('Como tacos').className).not.toContain(
-      'hiddenOnMobile',
+    expect(screen.getByText('Como tacos')).toHaveClass(styles.placed);
+    expect(screen.getByText('Como tacos')).not.toHaveClass(
+      styles.hiddenOnMobile,
     );
-    expect(screen.getByText('Como tacos').className).toContain('placed');
+    expect(screen.getByRole('columnheader', { name: 'Spanish' })).toHaveClass(
+      styles.placed,
+    );
+    expect(
+      screen.getByRole('columnheader', { name: 'Spanish' }),
+    ).not.toHaveClass(styles.hiddenOnMobile);
   });
 });

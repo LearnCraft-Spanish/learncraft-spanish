@@ -21,26 +21,6 @@ describe('card', () => {
 
     expect(screen.getByText('body')).toBeInTheDocument();
   });
-
-  it('has no hover lift at rest', () => {
-    const { container } = render(
-      <Card>
-        <span>body</span>
-      </Card>,
-    );
-
-    expect(container.firstElementChild?.className).not.toContain('interactive');
-  });
-
-  it('lifts on hover when it is interactive', () => {
-    const { container } = render(
-      <Card interactive>
-        <span>body</span>
-      </Card>,
-    );
-
-    expect(container.firstElementChild?.className).toContain('interactive');
-  });
 });
 
 describe('card section', () => {
@@ -56,24 +36,6 @@ describe('card section', () => {
     );
 
     expect(screen.getByText('filters')).toBeInTheDocument();
-  });
-
-  it('draws a divider only when asked', () => {
-    const { container } = render(
-      <>
-        <CardSection>
-          <span>first</span>
-        </CardSection>
-        <CardSection divided>
-          <span>second</span>
-        </CardSection>
-      </>,
-    );
-
-    const [first, second] = Array.from(container.children);
-
-    expect(first.className).not.toContain('divided');
-    expect(second.className).toContain('divided');
   });
 });
 

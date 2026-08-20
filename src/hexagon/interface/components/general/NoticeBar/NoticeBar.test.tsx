@@ -9,7 +9,13 @@ describe('notice bar', () => {
   });
 
   it('shows its message', () => {
-    render(<NoticeBar message="12 flashcards added" onDismiss={vi.fn()} />);
+    render(
+      <NoticeBar
+        message="12 flashcards added"
+        onDismiss={vi.fn()}
+        autoDismissMs={0}
+      />,
+    );
 
     expect(screen.getByRole('status')).toHaveTextContent('12 flashcards added');
   });
@@ -17,7 +23,13 @@ describe('notice bar', () => {
   it('dismisses by hand', async () => {
     const user = userEvent.setup();
     const onDismiss = vi.fn<() => void>();
-    render(<NoticeBar message="12 flashcards added" onDismiss={onDismiss} />);
+    render(
+      <NoticeBar
+        message="12 flashcards added"
+        onDismiss={onDismiss}
+        autoDismissMs={0}
+      />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Dismiss' }));
 
@@ -33,6 +45,7 @@ describe('notice bar', () => {
         onDismiss={vi.fn()}
         actionLabel="Undo"
         onAction={onAction}
+        autoDismissMs={0}
       />,
     );
 
@@ -42,7 +55,13 @@ describe('notice bar', () => {
   });
 
   it('has no recovery action by default', () => {
-    render(<NoticeBar message="12 flashcards added" onDismiss={vi.fn()} />);
+    render(
+      <NoticeBar
+        message="12 flashcards added"
+        onDismiss={vi.fn()}
+        autoDismissMs={0}
+      />,
+    );
 
     expect(screen.getAllByRole('button')).toHaveLength(1);
   });
@@ -54,8 +73,9 @@ describe('notice bar auto-dismissal', () => {
   });
 
   afterEach(() => {
-    vi.useRealTimers();
     cleanup();
+    vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   it('dismisses itself after six seconds', () => {

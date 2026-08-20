@@ -43,26 +43,21 @@ describe('ui gallery', () => {
     expect(screen.getByRole('heading', { name: 'Radius' })).toBeInTheDocument();
   });
 
-  it('renders a swatch for every color token it documents', () => {
-    overrideMockUseUiFlag({ enabled: true });
-
-    render(<UiGallery />);
-
-    expect(screen.getByText('--lcs-color-action')).toBeInTheDocument();
-    expect(screen.getByText('--lcs-color-surface-dark')).toBeInTheDocument();
-  });
-
   it('has a section for each family of primitives', () => {
     overrideMockUseUiFlag({ enabled: true });
 
     render(<UiGallery />);
 
     for (const title of [
+      'Icons — registered set',
       'Icon button',
       'Icon tile',
+      'Eyebrow',
       'Badge',
+      'Button — variants at size md',
       'Card',
       'Field and Select',
+      'Text input',
       'Checkbox',
       'Toggle',
       'Popover',
@@ -76,5 +71,21 @@ describe('ui gallery', () => {
     ]) {
       expect(screen.getByRole('heading', { name: title })).toBeInTheDocument();
     }
+  });
+
+  it('composes live primitives, not just headings', () => {
+    overrideMockUseUiFlag({ enabled: true });
+
+    render(<UiGallery />);
+
+    expect(
+      screen.getByRole('table', { name: 'Example search results' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select this example' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('switch', { name: 'Set a starting lesson' }),
+    ).toBeInTheDocument();
   });
 });

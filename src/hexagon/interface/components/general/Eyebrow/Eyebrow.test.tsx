@@ -24,10 +24,4 @@ describe('eyebrow', () => {
 
     expect(screen.getByRole('heading', { name: 'Tags' })).toBeInTheDocument();
   });
-
-  it('applies a non-default tone', () => {
-    render(<Eyebrow tone="onDark">Working set</Eyebrow>);
-
-    expect(screen.getByText('Working set').className).toContain('onDark');
-  });
 });

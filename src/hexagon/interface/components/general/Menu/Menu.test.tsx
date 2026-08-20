@@ -81,6 +81,24 @@ describe('menu', () => {
     expect(onSelect).toHaveBeenCalledOnce();
   });
 
+  it('dismisses on Escape', async () => {
+    const user = userEvent.setup();
+    const onDismiss = vi.fn<() => void>();
+    render(
+      <Menu
+        open
+        onDismiss={onDismiss}
+        trigger={<button>Do more with these</button>}
+        items={buildItems(vi.fn())}
+        label="Do more with these"
+      />,
+    );
+
+    await user.keyboard('{Escape}');
+
+    expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
   it('shows hints and badges where the item has them', () => {
     render(
       <Menu
