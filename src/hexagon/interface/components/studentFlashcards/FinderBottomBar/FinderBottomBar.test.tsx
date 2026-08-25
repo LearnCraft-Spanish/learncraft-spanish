@@ -19,14 +19,14 @@ describe('finder bottom bar', () => {
         onDismissNotice={vi.fn()}
         selectedCount={0}
         onClearSelection={vi.fn()}
-        onAddToSet={vi.fn()}
+        onCollect={vi.fn()}
       />,
     );
 
     expect(container).toBeEmptyDOMElement();
     expect(screen.queryByRole('status', hidden)).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Add to working set', ...hidden }),
+      screen.queryByRole('button', { name: 'Collect flashcards', ...hidden }),
     ).not.toBeInTheDocument();
   });
 
@@ -37,7 +37,7 @@ describe('finder bottom bar', () => {
         onDismissNotice={vi.fn()}
         selectedCount={0}
         onClearSelection={vi.fn()}
-        onAddToSet={vi.fn()}
+        onCollect={vi.fn()}
       />,
     );
 
@@ -51,7 +51,7 @@ describe('finder bottom bar', () => {
         onDismissNotice={vi.fn()}
         selectedCount={0}
         onClearSelection={vi.fn()}
-        onAddToSet={vi.fn()}
+        onCollect={vi.fn()}
       />,
     );
 
@@ -62,7 +62,7 @@ describe('finder bottom bar', () => {
       screen.getByRole('button', { name: 'Dismiss', ...hidden }).parentElement,
     ).toHaveClass(styles.dismiss);
     expect(
-      screen.queryByRole('button', { name: 'Add to working set', ...hidden }),
+      screen.queryByRole('button', { name: 'Collect flashcards', ...hidden }),
     ).not.toBeInTheDocument();
   });
 
@@ -75,7 +75,7 @@ describe('finder bottom bar', () => {
         onDismissNotice={onDismissNotice}
         selectedCount={0}
         onClearSelection={vi.fn()}
-        onAddToSet={vi.fn()}
+        onCollect={vi.fn()}
       />,
     );
 
@@ -93,7 +93,7 @@ describe('finder bottom bar', () => {
         onDismissNotice={vi.fn()}
         selectedCount={3}
         onClearSelection={vi.fn()}
-        onAddToSet={vi.fn()}
+        onCollect={vi.fn()}
       />,
     );
 
@@ -112,7 +112,7 @@ describe('finder bottom bar', () => {
         onDismissNotice={vi.fn()}
         selectedCount={1}
         onClearSelection={vi.fn()}
-        onAddToSet={vi.fn()}
+        onCollect={vi.fn()}
       />,
     );
 
@@ -128,7 +128,7 @@ describe('finder bottom bar', () => {
         onDismissNotice={vi.fn()}
         selectedCount={2}
         onClearSelection={onClearSelection}
-        onAddToSet={vi.fn()}
+        onCollect={vi.fn()}
       />,
     );
 
@@ -139,24 +139,24 @@ describe('finder bottom bar', () => {
     expect(onClearSelection).toHaveBeenCalledOnce();
   });
 
-  it('adds the selection to the working set', async () => {
+  it('collects the selected flashcards', async () => {
     const user = userEvent.setup();
-    const onAddToSet = vi.fn<() => void>();
+    const onCollect = vi.fn<() => void>();
     render(
       <FinderBottomBar
         notice={null}
         onDismissNotice={vi.fn()}
         selectedCount={2}
         onClearSelection={vi.fn()}
-        onAddToSet={onAddToSet}
+        onCollect={onCollect}
       />,
     );
 
     await user.click(
-      screen.getByRole('button', { name: 'Add to working set', ...hidden }),
+      screen.getByRole('button', { name: 'Collect flashcards', ...hidden }),
     );
 
-    expect(onAddToSet).toHaveBeenCalledOnce();
+    expect(onCollect).toHaveBeenCalledOnce();
   });
 
   it('stacks the notice above the selection layer', () => {
@@ -166,13 +166,13 @@ describe('finder bottom bar', () => {
         onDismissNotice={vi.fn()}
         selectedCount={2}
         onClearSelection={vi.fn()}
-        onAddToSet={vi.fn()}
+        onCollect={vi.fn()}
       />,
     );
 
     const notice = screen.getByRole('status', hidden);
     const add = screen.getByRole('button', {
-      name: 'Add to working set',
+      name: 'Collect flashcards',
       ...hidden,
     });
 
@@ -189,7 +189,7 @@ describe('finder bottom bar', () => {
         onDismissNotice={vi.fn()}
         selectedCount={2}
         onClearSelection={vi.fn()}
-        onAddToSet={vi.fn()}
+        onCollect={vi.fn()}
       />,
     );
 
@@ -200,7 +200,7 @@ describe('finder bottom bar', () => {
     expect(slab?.childElementCount).toBe(2);
     expect(slab?.firstElementChild).toBe(notice);
     expect(slab).toContainElement(
-      screen.getByRole('button', { name: 'Add to working set', ...hidden }),
+      screen.getByRole('button', { name: 'Collect flashcards', ...hidden }),
     );
     expect(selection).not.toBe(notice);
   });
@@ -212,7 +212,7 @@ describe('finder bottom bar', () => {
         onDismissNotice={vi.fn()}
         selectedCount={4}
         onClearSelection={vi.fn()}
-        onAddToSet={vi.fn()}
+        onCollect={vi.fn()}
       />,
     );
 

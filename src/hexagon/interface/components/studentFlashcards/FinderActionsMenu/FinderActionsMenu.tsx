@@ -46,7 +46,7 @@ export function FinderActionsMenu({
       id: 'apply-filters',
       icon: 'filter',
       label: 'Apply these filters to my flashcards',
-      hint: 'Filter your own set the same way.',
+      hint: 'Filter your owned flashcards the same way.',
       onSelect: () => {
         run(onApplyFilters, 'Filters applied to your flashcards.');
       },

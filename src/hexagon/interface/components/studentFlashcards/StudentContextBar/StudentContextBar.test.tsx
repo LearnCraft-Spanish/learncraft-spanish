@@ -22,7 +22,7 @@ describe('student context bar', () => {
     cleanup();
   });
 
-  it('renders the building-for and working-set labels', () => {
+  it('renders the building-for and owned-flashcards labels', () => {
     render(
       <StudentContextBar
         flashcardsQuery={flashcardsQueryWithCount(3)}
@@ -32,14 +32,14 @@ describe('student context bar', () => {
     );
 
     expect(screen.getByText('Building for')).toBeInTheDocument();
-    expect(screen.getByText('Working set')).toBeInTheDocument();
+    expect(screen.getByText('Owned flashcards')).toBeInTheDocument();
     expect(screen.getByText('Alex Rivera')).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Change student' }),
     ).toBeInTheDocument();
   });
 
-  it('shows a plural working-set count from flashcardsQuery', () => {
+  it('shows a plural owned-flashcards count from flashcardsQuery', () => {
     render(
       <StudentContextBar
         flashcardsQuery={flashcardsQueryWithCount(24)}
@@ -51,7 +51,7 @@ describe('student context bar', () => {
     expect(screen.getByText('24 flashcards')).toBeInTheDocument();
   });
 
-  it('shows a singular working-set count', () => {
+  it('shows a singular owned-flashcards count', () => {
     render(
       <StudentContextBar
         flashcardsQuery={flashcardsQueryWithCount(1)}

@@ -15,7 +15,6 @@ import userEvent from '@testing-library/user-event';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import styles from './FlashcardFinder.module.scss';
 
 const mockNavigate = vi.fn<(to: string) => void>();
 const mockCopyTableToClipboard = vi.fn();
@@ -156,13 +155,13 @@ vi.mock('@interface/components/studentFlashcards/FinderBottomBar', () => ({
     notice,
     selectedCount,
     onClearSelection,
-    onAddToSet,
+    onCollect,
     onDismissNotice,
   }: {
     notice?: string | null;
     selectedCount?: number;
     onClearSelection?: () => void;
-    onAddToSet?: () => void;
+    onCollect?: () => void;
     onDismissNotice?: () => void;
   }) => (
     <div data-testid="finder-bottom-bar">
@@ -171,8 +170,8 @@ vi.mock('@interface/components/studentFlashcards/FinderBottomBar', () => ({
       <button type="button" onClick={onClearSelection}>
         mock-clear
       </button>
-      <button type="button" onClick={onAddToSet}>
-        mock-add
+      <button type="button" onClick={onCollect}>
+        mock-collect
       </button>
       <button type="button" onClick={onDismissNotice}>
         mock-dismiss
@@ -277,12 +276,6 @@ describe('flashcard finder page', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Flashcard Finder' }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'View working set →' }),
-    ).toHaveAttribute('href', '/manage-flashcards');
-    expect(
-      screen.getByRole('link', { name: 'View working set →' }),
-    ).toHaveClass(styles.workingSetLink);
     expect(screen.getByTestId('filter-section')).toBeInTheDocument();
     expect(screen.getByTestId('results-section')).toBeInTheDocument();
     expect(screen.getByTestId('finder-bottom-bar')).toBeInTheDocument();
@@ -431,7 +424,7 @@ describe('flashcard finder v2 interactions', () => {
     expect(mockCopyAllExamplesToClipboard).toHaveBeenCalledOnce();
   });
 
-  it('lifts selection into the bottom bar and adds to the working set', async () => {
+  it('lifts selection into the bottom bar and collects the flashcards', async () => {
     const user = userEvent.setup();
     const examples = [
       { ...createMockExampleWithVocabularyList(1)[0], id: 11 },
@@ -452,13 +445,13 @@ describe('flashcard finder v2 interactions', () => {
 
     expect(screen.getByTestId('selected-count')).toHaveTextContent('2');
 
-    await user.click(screen.getByRole('button', { name: 'mock-add' }));
+    await user.click(screen.getByRole('button', { name: 'mock-collect' }));
 
     expect(createFlashcards).toHaveBeenCalledWith(examples);
     expect(screen.getByTestId('selected-count')).toHaveTextContent('0');
   });
 
-  it('skips examples already in the working set', async () => {
+  it('skips examples that are already owned', async () => {
     const user = userEvent.setup();
     const examples = [
       { ...createMockExampleWithVocabularyList(1)[0], id: 11 },
@@ -478,7 +471,7 @@ describe('flashcard finder v2 interactions', () => {
     renderV2();
 
     await user.click(screen.getByRole('button', { name: 'mock-select' }));
-    await user.click(screen.getByRole('button', { name: 'mock-add' }));
+    await user.click(screen.getByRole('button', { name: 'mock-collect' }));
 
     expect(createFlashcards).toHaveBeenCalledWith([examples[1]]);
   });

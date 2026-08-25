@@ -8,8 +8,8 @@ import {
   buildExampleRow,
   ExampleExpandPanel,
   SpanishSentence,
-  splitOnTargetWord,
 } from '@interface/components/studentFlashcards/ResultsSection/ExampleRow';
+import { PartOfSpeech } from '@learncraft-spanish/shared';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
@@ -51,6 +51,14 @@ function makeExample(
   const vocab = createMockVocabulary({
     word: 'eso',
     spellings: ['eso', 'esa'],
+    type: 'nonverb',
+    descriptor: 'that (demonstrative)',
+    subcategory: {
+      id: 1,
+      name: 'Demonstratives',
+      category: 'Pronouns',
+      partOfSpeech: PartOfSpeech.Pronoun,
+    },
   });
   return {
     ...createMockExampleWithVocabularyList(1, {
@@ -71,97 +79,50 @@ const emptyLessonPopup: LessonPopup = {
   lessonsLoading: false,
 };
 
-describe('splitOnTargetWord', () => {
-  afterEach(() => {
-    cleanup();
-  });
-
-  it('emphasizes the vocabulary word that appears in the sentence', () => {
-    const vocab = createMockVocabulary({
-      word: 'eso',
-      spellings: ['eso'],
-    });
-
-    expect(splitOnTargetWord('No quiero eso aquí.', [vocab])).toEqual({
-      pre: 'No quiero ',
-      word: 'eso',
-      post: ' aquí.',
-    });
-  });
-
-  it('matches a spelling and prefers the longest candidate', () => {
-    const short = createMockVocabulary({
-      word: 'es',
-      spellings: ['es'],
-    });
-    const long = createMockVocabulary({
-      word: 'eso',
-      spellings: ['eso'],
-    });
-
-    expect(splitOnTargetWord('¿Encontraron eso?', [short, long])).toEqual({
-      pre: '¿Encontraron ',
-      word: 'eso',
-      post: '?',
-    });
-  });
-
-  it('returns null when no vocabulary word is in the sentence', () => {
-    const vocab = createMockVocabulary({
-      word: 'contigo',
-      spellings: ['contigo'],
-    });
-
-    expect(splitOnTargetWord('No quiero eso aquí.', [vocab])).toBeNull();
-  });
-
-  it('ignores empty candidate strings', () => {
-    const vocab = createMockVocabulary({
-      word: '',
-      spellings: [''],
-    });
-
-    expect(splitOnTargetWord('No quiero eso aquí.', [vocab])).toBeNull();
-  });
-});
-
 describe('spanish sentence', () => {
   afterEach(() => {
     cleanup();
   });
 
-  it('wraps the target word at weight 900', () => {
-    const vocab = createMockVocabulary({
-      word: 'eso',
-      spellings: ['eso'],
-    });
-    const { container } = render(
-      <SpanishSentence spanish="No quiero eso aquí." vocabulary={[vocab]} />,
-    );
+  it('bolds Spanish and leaves asterisk-wrapped English at regular weight', () => {
+    const { container } = render(<SpanishSentence spanish="Son de *wood.*" />);
 
-    expect(container.querySelector('strong')).toHaveTextContent('eso');
-    expect(container.querySelector('strong')?.parentElement).toHaveClass(
-      rowStyles.sentence,
+    const runs = container.querySelectorAll(`.${rowStyles.sentence} > span`);
+    expect(runs).toHaveLength(2);
+    expect(runs[0]).toHaveClass(rowStyles.spanishRun);
+    expect(runs[0]).toHaveTextContent('Son de');
+    expect(runs[1]).toHaveClass(rowStyles.embeddedEnglish);
+    expect(runs[1]).toHaveTextContent('wood.');
+    expect(container.querySelector(`.${rowStyles.sentence}`)).toHaveTextContent(
+      'Son de wood.',
     );
+    expect(container.textContent).not.toContain('*');
   });
 
-  it('renders the full sentence when nothing can be emphasized', () => {
-    const vocab = createMockVocabulary({
-      word: 'contigo',
-      spellings: ['contigo'],
-    });
+  it('bolds the full sentence when there is no embedded English', () => {
     const { container } = render(
-      <SpanishSentence spanish="No quiero eso aquí." vocabulary={[vocab]} />,
+      <SpanishSentence spanish="No quiero eso aquí." />,
     );
 
-    expect(screen.getByText('No quiero eso aquí.')).toBeInTheDocument();
-    expect(container.querySelector('strong')).not.toBeInTheDocument();
+    const run = container.querySelector(`.${rowStyles.spanishRun}`);
+    expect(run).toHaveTextContent('No quiero eso aquí.');
+    expect(
+      container.querySelector(`.${rowStyles.embeddedEnglish}`),
+    ).not.toBeInTheDocument();
   });
 
-  it('renders the full sentence when there is no vocabulary', () => {
-    render(<SpanishSentence spanish="Hola." vocabulary={[]} />);
+  it('renders multiple English stretches and keeps surrounding Spanish bold', () => {
+    const { container } = render(
+      <SpanishSentence spanish="El *wood* es *hard*" />,
+    );
 
-    expect(screen.getByText('Hola.')).toBeInTheDocument();
+    const runs = container.querySelectorAll(`.${rowStyles.sentence} > span`);
+    expect(runs[0]).toHaveClass(rowStyles.spanishRun);
+    expect(runs[1]).toHaveClass(rowStyles.embeddedEnglish);
+    expect(runs[1]).toHaveTextContent('wood');
+    expect(runs[2]).toHaveClass(rowStyles.spanishRun);
+    expect(runs[3]).toHaveClass(rowStyles.embeddedEnglish);
+    expect(runs[3]).toHaveTextContent('hard');
   });
 });
 
@@ -204,7 +165,7 @@ describe('example expand panel', () => {
     expect(screen.getByText('No lessons found')).toBeInTheDocument();
   });
 
-  it('sorts lessons so the earliest number is first taught', () => {
+  it('lists every lesson the word is taught in', () => {
     const example = makeExample();
     render(
       <ContextualMenuProvider>
@@ -213,9 +174,10 @@ describe('example expand panel', () => {
           openVocabId={example.vocabulary[0].id}
           lessonPopup={{
             lessonsLoading: false,
+            currentCourseName: 'Unit 1 · Demonstratives',
             lessonsByVocabulary: [
-              { id: 9, courseName: 'Later course', lessonNumber: 14 },
               { id: 2, courseName: 'Unit 1 · Demonstratives', lessonNumber: 2 },
+              { id: 9, courseName: 'Later course', lessonNumber: 14 },
             ],
           }}
           studentFlashcards={makeFlashcards()}
@@ -224,8 +186,99 @@ describe('example expand panel', () => {
       </ContextualMenuProvider>,
     );
 
+    expect(screen.getByText('that (demonstrative)')).toBeInTheDocument();
+    expect(screen.getByText('Part of Speech: Pronoun')).toBeInTheDocument();
+    expect(screen.getByText('Category: Pronouns')).toBeInTheDocument();
+    expect(screen.getByText('Taught in')).toBeInTheDocument();
     expect(screen.getByText('Lesson 2')).toBeInTheDocument();
-    expect(screen.queryByText('Lesson 14')).not.toBeInTheDocument();
+    expect(screen.getByText('Unit 1 · Demonstratives')).toBeInTheDocument();
+    expect(screen.getByText('Lesson 14')).toBeInTheDocument();
+    expect(screen.getByText('Later course')).toBeInTheDocument();
+  });
+
+  it('marks lessons from the current course', () => {
+    const example = makeExample();
+    const { container } = render(
+      <ContextualMenuProvider>
+        <ExampleExpandPanel
+          example={example}
+          openVocabId={example.vocabulary[0].id}
+          lessonPopup={{
+            lessonsLoading: false,
+            currentCourseName: 'Unit 1 · Demonstratives',
+            lessonsByVocabulary: [
+              { id: 2, courseName: 'Unit 1 · Demonstratives', lessonNumber: 2 },
+              { id: 9, courseName: 'Later course', lessonNumber: 14 },
+            ],
+          }}
+          studentFlashcards={makeFlashcards()}
+          onToggleVocab={vi.fn()}
+        />
+      </ContextualMenuProvider>,
+    );
+
+    const items = container.querySelectorAll('li');
+    expect(items[0]).toHaveClass(rowStyles.vocabLessonItemCurrent);
+    expect(items[1]).not.toHaveClass(rowStyles.vocabLessonItemCurrent);
+  });
+
+  it('shows verb infinitive and conjugation notes for a verb tag', () => {
+    const verb = createMockVocabulary({
+      word: 'ser',
+      spellings: ['ser'],
+      type: 'verb',
+      descriptor: 'to be (permanent)',
+      conjugationTags: ['present'],
+      verb: { id: 1, infinitive: 'ser' },
+      subcategory: {
+        id: 2,
+        name: 'Ser and Estar',
+        category: 'Verbs',
+        partOfSpeech: PartOfSpeech.Verb,
+      },
+    });
+    const example = makeExample({ vocabulary: [verb] });
+    render(
+      <ContextualMenuProvider>
+        <ExampleExpandPanel
+          example={example}
+          openVocabId={verb.id}
+          lessonPopup={emptyLessonPopup}
+          studentFlashcards={makeFlashcards()}
+          onToggleVocab={vi.fn()}
+        />
+      </ContextualMenuProvider>,
+    );
+
+    expect(screen.getByText('to be (permanent)')).toBeInTheDocument();
+    expect(screen.getByText('Part of Speech: Verb')).toBeInTheDocument();
+    expect(screen.getByText('Verb Infinitive: ser')).toBeInTheDocument();
+    expect(screen.getByText('Conjugation Notes: present')).toBeInTheDocument();
+    expect(screen.queryByText(/Category:/)).not.toBeInTheDocument();
+  });
+
+  it('dismisses the vocab popover on a click outside', async () => {
+    const user = userEvent.setup();
+    const onToggleVocab = vi.fn();
+    const example = makeExample();
+    render(
+      <div>
+        <span>outside</span>
+        <ContextualMenuProvider>
+          <ExampleExpandPanel
+            example={example}
+            openVocabId={example.vocabulary[0].id}
+            lessonPopup={emptyLessonPopup}
+            studentFlashcards={makeFlashcards()}
+            onToggleVocab={onToggleVocab}
+          />
+        </ContextualMenuProvider>
+      </div>,
+    );
+
+    await user.click(screen.getByText('outside'));
+
+    expect(onToggleVocab).toHaveBeenCalledWith(example.vocabulary[0].id);
   });
 
   it('omits the tag hint when the flashcard has no vocabulary', () => {
@@ -252,7 +305,7 @@ describe('buildExampleRow', () => {
     cleanup();
   });
 
-  it('disables add while a flashcard is pending', async () => {
+  it('disables collect while a flashcard is pending', async () => {
     const user = userEvent.setup();
     const studentFlashcards = makeFlashcards({
       isAddingFlashcard: vi.fn(() => true),
@@ -285,12 +338,12 @@ describe('buildExampleRow', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled();
-    await user.click(screen.getByRole('button', { name: 'Add' }));
+    expect(screen.getByRole('button', { name: 'Collect' })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Collect' }));
     expect(studentFlashcards.createFlashcards).not.toHaveBeenCalled();
   });
 
-  it('disables in-set while a flashcard is being removed', () => {
+  it('disables owned while a flashcard is being removed', () => {
     const studentFlashcards = makeFlashcards({
       isExampleCollected: vi.fn(() => true),
       isRemovingFlashcard: vi.fn(() => true),
@@ -323,14 +376,12 @@ describe('buildExampleRow', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'In set' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Owned' })).toBeDisabled();
   });
 
-  it('plays a clip with an empty url as visual-only state', async () => {
-    const user = userEvent.setup();
-    const onTogglePlay = vi.fn();
+  it('hides play controls when the example has no audio links', () => {
     const row = buildExampleRow({
-      example: makeExample({ englishAudio: '' }),
+      example: makeExample({ spanishAudio: '', englishAudio: '' }),
       selected: false,
       expanded: false,
       playing: null,
@@ -339,7 +390,7 @@ describe('buildExampleRow', () => {
       lessonPopup: emptyLessonPopup,
       onToggleSelected: vi.fn(),
       onToggleExpanded: vi.fn(),
-      onTogglePlay,
+      onTogglePlay: vi.fn(),
       onToggleVocab: vi.fn(),
     });
 
@@ -357,14 +408,62 @@ describe('buildExampleRow', () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Play English' }));
+    expect(
+      screen.queryByRole('button', { name: 'Play Spanish' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Play English' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Expand row' }),
+    ).toBeInTheDocument();
+  });
 
-    expect(onTogglePlay).toHaveBeenCalledWith('11:en', '');
+  it('shows only the Spanish play control when only Spanish audio exists', () => {
+    const row = buildExampleRow({
+      example: makeExample({
+        spanishAudio: 'https://cdn.example.com/es.mp3',
+        englishAudio: '',
+      }),
+      selected: false,
+      expanded: false,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards: makeFlashcards(),
+      lessonPopup: emptyLessonPopup,
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    render(
+      <DataTable
+        columns={[
+          { id: 'select', header: '' },
+          { id: 'spanish', header: 'Spanish' },
+          { id: 'english', header: 'English' },
+          { id: 'actions', header: '' },
+        ]}
+        rows={[row]}
+        columnTemplate="44px 1fr 1fr 132px"
+        caption="Row"
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Play Spanish' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Play English' }),
+    ).not.toBeInTheDocument();
   });
 
   it('uses glyph-sized audio and expand controls, not 32px squares', () => {
     const row = buildExampleRow({
-      example: makeExample(),
+      example: makeExample({
+        englishAudio: 'https://cdn.example.com/en.mp3',
+      }),
       selected: false,
       expanded: false,
       playing: null,

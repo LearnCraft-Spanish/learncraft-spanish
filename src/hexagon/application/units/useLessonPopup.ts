@@ -6,6 +6,8 @@ import { useMemo } from 'react';
 export interface LessonPopup {
   lessonsByVocabulary: Lesson[];
   lessonsLoading: boolean;
+  /** Selected Finder course; used to pin that course at the top of the list. */
+  currentCourseName?: string | null;
 }
 
 export interface UseLessonPopupReturnType {

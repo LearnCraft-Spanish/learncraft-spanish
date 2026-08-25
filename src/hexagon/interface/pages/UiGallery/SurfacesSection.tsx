@@ -28,7 +28,7 @@ export function SurfacesSection(): JSX.Element {
           </GallerySpecimen>
           <GallerySpecimen label="onDark">
             <div className={styles.darkSwatch}>
-              <Eyebrow tone="onDark">Working set</Eyebrow>
+              <Eyebrow tone="onDark">Owned flashcards</Eyebrow>
             </div>
           </GallerySpecimen>
         </GallerySpecimens>
@@ -60,7 +60,7 @@ export function SurfacesSection(): JSX.Element {
       <GallerySection title="Button — variants at size md">
         <GallerySpecimens>
           <GallerySpecimen label="primary">
-            <Button>Add to working set</Button>
+            <Button>Collect flashcards</Button>
           </GallerySpecimen>
           <GallerySpecimen label="secondary">
             <Button variant="secondary" leadingIcon="bolt">
@@ -79,7 +79,7 @@ export function SurfacesSection(): JSX.Element {
             <Button variant="destructive">Delete all Spanglish</Button>
           </GallerySpecimen>
           <GallerySpecimen label="primary, disabled">
-            <Button disabled>Add to working set</Button>
+            <Button disabled>Collect flashcards</Button>
           </GallerySpecimen>
         </GallerySpecimens>
       </GallerySection>
@@ -87,14 +87,14 @@ export function SurfacesSection(): JSX.Element {
       <GallerySection title="Button — sizes">
         <GallerySpecimens>
           <GallerySpecimen label="md (44px)">
-            <Button size="md">Add</Button>
+            <Button size="md">Collect</Button>
           </GallerySpecimen>
           <GallerySpecimen label="sm (40px, in-row)">
-            <Button size="sm">Add</Button>
+            <Button size="sm">Collect</Button>
           </GallerySpecimen>
           <GallerySpecimen label="inline (text)">
             <Button size="inline" variant="ghost">
-              View working set
+              View owned flashcards
             </Button>
           </GallerySpecimen>
           <GallerySpecimen label="with trailing icon">
@@ -107,7 +107,7 @@ export function SurfacesSection(): JSX.Element {
 
       <GallerySection title="Button — on a dark surface">
         <div className={styles.darkPanel}>
-          <Button tone="onDark">Add to working set</Button>
+          <Button tone="onDark">Collect flashcards</Button>
           <Button tone="onDark" variant="secondary">
             Change student
           </Button>

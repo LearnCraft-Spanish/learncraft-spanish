@@ -113,7 +113,7 @@ describe('finder actions menu', () => {
     await openMenu();
 
     expect(
-      screen.getByText('Filter your own set the same way.'),
+      screen.getByText('Filter your owned flashcards the same way.'),
     ).toBeInTheDocument();
     expect(screen.getByText('12 examples in total.')).toBeInTheDocument();
     expect(

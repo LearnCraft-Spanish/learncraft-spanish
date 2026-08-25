@@ -164,7 +164,7 @@ describe('results section', () => {
     ).not.toBeNull();
   });
 
-  it('sizes Select all as the 40px working-set ghost, not gallery inline', () => {
+  it('sizes Select all as the 40px owned-flashcards ghost, not gallery inline', () => {
     renderSection({
       examples: [makeExample({ id: 11 }), makeExample({ id: 12 })],
     });
@@ -269,26 +269,26 @@ describe('results section', () => {
     expect(previous.parentElement).toHaveClass(paginationStyles.parchmentEnd);
   });
 
-  it('adds an example that is not in the set', async () => {
+  it('collects an example that is not owned', async () => {
     const user = userEvent.setup();
     const studentFlashcards = makeFlashcards();
     renderSection({ studentFlashcards });
 
-    await user.click(screen.getByRole('button', { name: 'Add' }));
+    await user.click(screen.getByRole('button', { name: 'Collect' }));
 
     expect(studentFlashcards.createFlashcards).toHaveBeenCalledWith([
       expect.objectContaining({ id: 11 }),
     ]);
   });
 
-  it('removes an example that is already in the set', async () => {
+  it('removes an example that is already owned', async () => {
     const user = userEvent.setup();
     const studentFlashcards = makeFlashcards({
       isExampleCollected: vi.fn(() => true),
     });
     renderSection({ studentFlashcards });
 
-    await user.click(screen.getByRole('button', { name: 'In set' }));
+    await user.click(screen.getByRole('button', { name: 'Owned' }));
 
     expect(studentFlashcards.deleteFlashcards).toHaveBeenCalledWith([11]);
   });
@@ -315,7 +315,7 @@ describe('results section', () => {
     expect(screen.queryByText('Vocabulary tags')).not.toBeInTheDocument();
   });
 
-  it('opens an inline navy vocabulary detail, not a floating popover', async () => {
+  it('opens vocabulary detail in a popover', async () => {
     const user = userEvent.setup();
     const vocab = createMockVocabulary({
       id: 88,
@@ -340,7 +340,7 @@ describe('results section', () => {
     await user.click(screen.getByRole('button', { name: 'Expand row' }));
     await user.click(screen.getByRole('button', { name: 'eso' }));
 
-    expect(screen.getByText(/first taught in/i)).toBeInTheDocument();
+    expect(screen.getByText('Taught in')).toBeInTheDocument();
     expect(screen.getByText('Lesson 2')).toBeInTheDocument();
     expect(screen.getByText('Unit 1 · Demonstratives')).toBeInTheDocument();
     expect(
@@ -584,11 +584,7 @@ describe('results section', () => {
     expect(pagination.resetPagination).not.toHaveBeenCalled();
   });
 
-  it('keeps a playing visual when the clip has no audio url', async () => {
-    const user = userEvent.setup();
-    const pause = vi
-      .spyOn(HTMLMediaElement.prototype, 'pause')
-      .mockImplementation(() => undefined);
+  it('does not show play buttons when the example has no audio links', () => {
     renderSection({
       examples: [
         makeExample({
@@ -598,13 +594,12 @@ describe('results section', () => {
       ],
     });
 
-    await user.click(screen.getByRole('button', { name: 'Play Spanish' }));
-
     expect(
-      screen.getByRole('button', { name: 'Play Spanish' }),
-    ).toHaveAttribute('aria-pressed', 'true');
-    expect(pause).toHaveBeenCalled();
-    pause.mockRestore();
+      screen.queryByRole('button', { name: 'Play Spanish' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Play English' }),
+    ).not.toBeInTheDocument();
   });
 
   it('clears playing state when audio ends', async () => {

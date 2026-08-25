@@ -12,7 +12,7 @@ export interface StudentContextBarProps {
   studentDisplayName?: string | null;
 }
 
-function workingSetLabel(count: number): string {
+function ownedFlashcardsLabel(count: number): string {
   return count === 1 ? '1 flashcard' : `${count} flashcards`;
 }
 
@@ -61,12 +61,12 @@ export function StudentContextBar({
             <p className={styles.value}>{nameLine}</p>
           </div>
         </div>
-        <div className={styles.workingSet}>
-          <div className={styles.workingSetMeta}>
+        <div className={styles.owned}>
+          <div className={styles.ownedMeta}>
             <Eyebrow weight="regular" leading="body">
-              Working set
+              Owned flashcards
             </Eyebrow>
-            <p className={styles.value}>{workingSetLabel(count)}</p>
+            <p className={styles.value}>{ownedFlashcardsLabel(count)}</p>
           </div>
           <Button variant="secondary" tone="onDark" size="sm">
             Change student

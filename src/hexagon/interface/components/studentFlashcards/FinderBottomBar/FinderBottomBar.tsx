@@ -9,7 +9,7 @@ export interface FinderBottomBarProps {
   /** Checked rows. Zero hides the selection layer. */
   selectedCount?: number;
   onClearSelection?: () => void;
-  onAddToSet?: () => void;
+  onCollect?: () => void;
   /**
    * Accepted so the current page slot compiles. Unused — pass notice and
    * selection instead of the flashcards query.
@@ -24,16 +24,16 @@ function selectionLabel(count: number): string {
 function dismissNoop(): void {}
 
 /**
- * Finder notices + bulk-add bar. One full-bleed Deep Navy slab: notice on
- * top, hairline, selection under it. The page owns the notice slot, the
- * selection count, and the add/clear work.
+ * Finder notices + bulk-collect bar. One full-bleed Deep Navy slab: notice
+ * on top, hairline, selection under it. The page owns the notice slot, the
+ * selection count, and the collect/clear work.
  */
 export function FinderBottomBar({
   notice = null,
   onDismissNotice = dismissNoop,
   selectedCount = 0,
   onClearSelection,
-  onAddToSet,
+  onCollect,
 }: FinderBottomBarProps): JSX.Element | null {
   const showNotice = Boolean(notice);
   const showSelection = selectedCount > 0;
@@ -78,9 +78,9 @@ export function FinderBottomBar({
                   Clear selection
                 </Button>
               </span>
-              <span className={styles.add}>
-                <Button variant="primary" tone="onDark" onClick={onAddToSet}>
-                  Add to working set
+              <span className={styles.collect}>
+                <Button variant="primary" tone="onDark" onClick={onCollect}>
+                  Collect flashcards
                 </Button>
               </span>
             </span>
