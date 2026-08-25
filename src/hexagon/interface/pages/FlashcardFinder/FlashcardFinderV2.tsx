@@ -7,16 +7,14 @@ import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
 import useFlashcardFinder from '@application/useCases/useFlashcardFinder';
-import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { FilterSection } from '@interface/components/studentFlashcards/FilterSection';
 import { FinderBottomBar } from '@interface/components/studentFlashcards/FinderBottomBar';
 import { ResultsSection } from '@interface/components/studentFlashcards/ResultsSection';
-import { StudentContextBar } from '@interface/components/studentFlashcards/StudentContextBar';
 import { copyAllExamplesToClipboard } from '@interface/components/Tables/units/CopyAllExamplesToClipboard';
 import { copyTableToClipboard } from '@interface/components/Tables/units/functions';
 import { useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './FlashcardFinder.module.scss';
 
 interface FlashcardFinderV2LoadedProps {
@@ -30,7 +28,6 @@ interface FlashcardFinderV2LoadedProps {
   initialLoading: boolean;
   exampleFilter: UseCombinedFiltersReturnType;
   resetFilters: () => void;
-  studentDisplayName: string | null;
 }
 
 function copyPageExamples(examples: ExampleWithVocabulary[]): void {
@@ -52,7 +49,6 @@ function FlashcardFinderV2Loaded({
   initialLoading,
   exampleFilter,
   resetFilters,
-  studentDisplayName,
 }: FlashcardFinderV2LoadedProps): JSX.Element {
   const navigate = useNavigate();
   const exampleAdapter = useExampleAdapter();
@@ -84,8 +80,8 @@ function FlashcardFinderV2Loaded({
     setSelectedIds(new Set());
   };
 
-  const handleAddToSet = (): void => {
-    const toAdd = [...selectedIds]
+  const handleCollect = (): void => {
+    const toCollect = [...selectedIds]
       .map((id) => selectedExamplesRef.current.get(id))
       .filter(
         (example): example is ExampleWithVocabulary => example !== undefined,
@@ -97,8 +93,8 @@ function FlashcardFinderV2Loaded({
 
     handleClearSelection();
 
-    if (toAdd.length > 0) {
-      void flashcardsQuery.createFlashcards(toAdd);
+    if (toCollect.length > 0) {
+      void flashcardsQuery.createFlashcards(toCollect);
     }
   };
 
@@ -126,64 +122,51 @@ function FlashcardFinderV2Loaded({
   };
 
   return (
-    <>
-      <StudentContextBar
-        flashcardsQuery={flashcardsQuery}
-        exampleFilter={exampleFilter}
-        studentDisplayName={studentDisplayName}
-      />
-      <PageShell reserveBottomBar flushHorizontal>
-        <div className={styles.measure}>
-          <div className={styles.titleRow}>
-            <div className={styles.titleGroup}>
-              <Eyebrow weight="regular" leading="body">
-                Flashcards
-              </Eyebrow>
-              <h1 className={styles.title}>Flashcard Finder</h1>
-            </div>
-            <Link to="/manage-flashcards" className={styles.workingSetLink}>
-              View working set →
-            </Link>
+    <PageShell reserveBottomBar flushHorizontal>
+      <div className={styles.measure}>
+        <div className={styles.titleRow}>
+          <div className={styles.titleGroup}>
+            <h1 className={styles.title}>Flashcard Finder</h1>
           </div>
-          <FilterSection
-            exampleFilter={exampleFilter}
-            onResetAll={handleResetAll}
-          />
-          <ResultsSection
-            examples={displayExamples}
-            totalCount={exampleQuery.totalCount ?? 0}
-            studentFlashcards={flashcardsQuery}
-            pagination={pagination}
-            totalPages={totalPages}
-            lessonPopup={lessonPopup}
-            filteredExamplesLoading={filteredExamplesLoading}
-            firstPageLoading={
-              initialLoading ||
-              (exampleQuery.isLoading && exampleQuery.page === 1)
-            }
-            newPageLoading={exampleQuery.isLoading && exampleQuery.page > 1}
-            isAdmin={exampleFilter.isAdmin === true}
-            selectedIds={selectedIds}
-            onSelectionChange={handleSelectionChange}
-            onNotice={setNotice}
-            onApplyFilters={handleApplyFilters}
-            onCreateQuiz={handleCreateQuiz}
-            onCopyPage={handleCopyPage}
-            onCopyAll={handleCopyAll}
-            resetEpoch={resetEpoch}
-          />
-          <FinderBottomBar
-            notice={notice}
-            onDismissNotice={() => {
-              setNotice(null);
-            }}
-            selectedCount={selectedIds.size}
-            onClearSelection={handleClearSelection}
-            onAddToSet={handleAddToSet}
-          />
         </div>
-      </PageShell>
-    </>
+        <FilterSection
+          exampleFilter={exampleFilter}
+          onResetAll={handleResetAll}
+        />
+        <ResultsSection
+          examples={displayExamples}
+          totalCount={exampleQuery.totalCount ?? 0}
+          studentFlashcards={flashcardsQuery}
+          pagination={pagination}
+          totalPages={totalPages}
+          lessonPopup={lessonPopup}
+          filteredExamplesLoading={filteredExamplesLoading}
+          firstPageLoading={
+            initialLoading ||
+            (exampleQuery.isLoading && exampleQuery.page === 1)
+          }
+          newPageLoading={exampleQuery.isLoading && exampleQuery.page > 1}
+          isAdmin={exampleFilter.isAdmin === true}
+          selectedIds={selectedIds}
+          onSelectionChange={handleSelectionChange}
+          onNotice={setNotice}
+          onApplyFilters={handleApplyFilters}
+          onCreateQuiz={handleCreateQuiz}
+          onCopyPage={handleCopyPage}
+          onCopyAll={handleCopyAll}
+          resetEpoch={resetEpoch}
+        />
+        <FinderBottomBar
+          notice={notice}
+          onDismissNotice={() => {
+            setNotice(null);
+          }}
+          selectedCount={selectedIds.size}
+          onClearSelection={handleClearSelection}
+          onCollect={handleCollect}
+        />
+      </div>
+    </PageShell>
   );
 }
 
@@ -200,7 +183,6 @@ export function FlashcardFinderV2(): JSX.Element {
     error,
     exampleFilter,
     resetFilters,
-    studentDisplayName,
   } = useFlashcardFinder();
 
   if (error) {
@@ -219,7 +201,6 @@ export function FlashcardFinderV2(): JSX.Element {
       initialLoading={initialLoading}
       exampleFilter={exampleFilter}
       resetFilters={resetFilters}
-      studentDisplayName={studentDisplayName}
     />
   );
 }

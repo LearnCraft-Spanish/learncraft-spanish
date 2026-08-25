@@ -108,7 +108,6 @@ export const defaultMockUseFlashcardFinder: UseFlashcardFinderReturnType = {
   lessonPopup: defaultLessonPopup,
   skillTagSearch: defaultSkillTagSearch,
   resetFilters: vi.fn<() => void>(),
-  studentDisplayName: 'Alex Rivera',
   filteredExamplesLoading: false,
   initialLoading: false,
   error: null,

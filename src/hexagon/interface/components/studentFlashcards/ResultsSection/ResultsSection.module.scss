@@ -35,8 +35,8 @@
   gap: var(--lcs-space-3);
 }
 
-/* Prototype Select all is the same 40px / 10×4 / 15/900 ghost as
- * .workingSetLink. Button.inline stays padding 0 in the gallery. */
+/* Prototype Select all is a 40px / 10×4 / 15/900 ghost.
+ * Button.inline stays padding 0 in the gallery. */
 .selectAll button {
   min-height: var(--lcs-control-height-sm);
   padding: var(--lcs-space-4) var(--lcs-space-1);
@@ -49,7 +49,7 @@
 }
 
 .tableCard {
-  overflow: hidden;
+  overflow: visible;
   border: var(--lcs-border-hairline) solid var(--lcs-border-card);
   border-radius: var(--lcs-radius-xl);
   background-color: var(--lcs-color-surface);
@@ -67,10 +67,17 @@
   font-weight: var(--lcs-weight-regular);
 }
 
-/* DataTable already draws a card. Sit pagination in the same card. */
+/* DataTable already draws a card. Sit pagination in the same card.
+ * overflow stays visible so the vocab popover can sit above later rows. */
 .tableCard [role='table'] {
+  overflow: visible;
   border: none;
   border-radius: 0;
+}
+
+.tableCard [role='rowgroup']:first-child {
+  overflow: hidden;
+  border-radius: var(--lcs-radius-xl) var(--lcs-radius-xl) 0 0;
 }
 
 .footer {

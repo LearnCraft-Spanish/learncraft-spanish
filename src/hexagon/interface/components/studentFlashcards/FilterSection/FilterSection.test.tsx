@@ -213,23 +213,24 @@ describe('filter section', () => {
     expect(
       screen.getByRole('heading', { name: 'Scope · required' }).className,
     ).toMatch(/leadingBody/);
-    expect(screen.getByRole('heading', { name: 'Tags' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Tags' }).className).toMatch(
-      /regular/,
-    );
-    expect(screen.getByRole('heading', { name: 'Tags' }).className).toMatch(
-      /leadingBody/,
-    );
-    expect(screen.getByText('Presets').className).toMatch(/regular/);
-    expect(screen.getByText('Presets').className).toMatch(/leadingBody/);
+    const searchTab = screen.getByRole('tab', { name: 'Search tags' });
+    const presetsTab = screen.getByRole('tab', { name: 'Presets' });
+    expect(searchTab).toHaveAttribute('aria-selected', 'true');
+    expect(presetsTab).toHaveAttribute('aria-selected', 'false');
+    expect(searchTab).toHaveClass(styles.modeTabOn);
+    expect(presetsTab).not.toHaveClass(styles.modeTabOn);
+    expect(searchTab.closest(`.${styles.modeTabs}`)).not.toBeNull();
+    expect(
+      screen.queryByRole('button', { name: /Ser\/Estar/ }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByText(
         'No tags applied. Results cover every flashcard in the lesson range.',
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByText('One click applies a saved group of tags.'),
-    ).toBeInTheDocument();
+      screen.queryByText('One click applies a saved group of tags.'),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole('switch', { name: 'Exclude Spanglish' }),
     ).toBeInTheDocument();
@@ -341,6 +342,10 @@ describe('filter section', () => {
     expect(onResetAll).toHaveBeenCalledOnce();
     expect(fromLessonPlate()).toHaveTextContent('Lesson 1 — from the start');
     expect(screen.queryByLabelText('From lesson')).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Search tags' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
   });
 
   it('does not throw when Reset is clicked without onResetAll', async () => {
@@ -546,7 +551,7 @@ describe('filter section', () => {
     ).toHaveBeenCalledWith();
   });
 
-  it('overlays a six-row tag sheet without stretching the clipped card', () => {
+  it('paints the tag sheet outside the unclipped card without stretching it', () => {
     const extras: SkillTag[] = Array.from({ length: 6 }, (_, index) => ({
       type: SkillType.Conjugation,
       key: `Conjugation-open-${index}`,
@@ -585,7 +590,7 @@ describe('filter section', () => {
     const footer = card?.querySelector(`.${cardStyles.footerStrip}`);
     expect(options).toHaveLength(6);
     expect(card).not.toBeNull();
-    expect(card).not.toHaveClass(cardStyles.unclipped);
+    expect(card).toHaveClass(cardStyles.unclipped);
     expect(search).toHaveClass(styles.tagSearchOpen);
     expect(card?.contains(search)).toBe(true);
     expect(tagsSection).not.toBeNull();
@@ -731,6 +736,119 @@ describe('filter section', () => {
     expect(
       exampleFilter.skillTagSearch.addTagBackToSuggestions,
     ).toHaveBeenCalledWith(subcategoryTag.key);
+  });
+
+  it('switches between search tags and presets tabs', async () => {
+    const user = userEvent.setup();
+    const exampleFilter = createFilter({
+      skillTagSearch: {
+        tagSearchTerm: 'por',
+        tagSuggestions: [vocabularyTag],
+        updateTagSearchTerm: vi.fn(),
+        removeTagFromSuggestions: vi.fn(),
+        addTagBackToSuggestions: vi.fn(),
+        isLoading: false,
+        error: null,
+      },
+    });
+    renderSection(exampleFilter);
+
+    expect(
+      screen.getByPlaceholderText(
+        'Search tags — grammar, vocabulary, verb form…',
+      ),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('tab', { name: 'Presets' }));
+
+    expect(screen.getByRole('tab', { name: 'Presets' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(screen.getByRole('tab', { name: 'Presets' })).toHaveClass(
+      styles.modeTabOn,
+    );
+    expect(screen.getByRole('tab', { name: 'Search tags' })).toHaveAttribute(
+      'aria-selected',
+      'false',
+    );
+    expect(
+      screen.queryByPlaceholderText(
+        'Search tags — grammar, vocabulary, verb form…',
+      ),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText('One click applies a saved group of tags.'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Ser\/Estar/ }),
+    ).toBeInTheDocument();
+    expect(
+      exampleFilter.skillTagSearch.updateTagSearchTerm,
+    ).toHaveBeenCalledWith();
+
+    await user.click(screen.getByRole('tab', { name: 'Search tags' }));
+
+    expect(screen.getByRole('tab', { name: 'Search tags' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(
+      screen.getByPlaceholderText(
+        'Search tags — grammar, vocabulary, verb form…',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Ser\/Estar/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('opens on the presets tab when a preset is already applied', () => {
+    renderSection(
+      createFilter({
+        filterPreset: PreSetQuizPreset.SerEstar,
+      }),
+    );
+
+    expect(screen.getByRole('tab', { name: 'Presets' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(screen.getByRole('tab', { name: 'Presets' })).toHaveClass(
+      styles.modeTabOn,
+    );
+    expect(
+      screen.getByRole('button', { name: /Ser\/Estar/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText(
+        'Search tags — grammar, vocabulary, verb form…',
+      ),
+    ).not.toBeInTheDocument();
+  });
+
+  it('returns to the search tags tab when all filters are reset', async () => {
+    const user = userEvent.setup();
+    const onResetAll = vi.fn<() => void>();
+    renderSection(
+      createFilter({
+        filterPreset: PreSetQuizPreset.SerEstar,
+      }),
+      onResetAll,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Reset all filters' }));
+
+    expect(onResetAll).toHaveBeenCalledOnce();
+    expect(screen.getByRole('tab', { name: 'Search tags' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(
+      screen.getByPlaceholderText(
+        'Search tags — grammar, vocabulary, verb form…',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('applies a preset and clears it when it is already on', async () => {

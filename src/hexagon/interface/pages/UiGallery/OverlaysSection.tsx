@@ -86,7 +86,7 @@ export function OverlaysSection(): JSX.Element {
               id: 'apply',
               icon: 'filter',
               label: 'Use these filters on my flashcards',
-              hint: 'Switches to your own set',
+              hint: 'Switches to your owned flashcards',
               onSelect: () => setMenuOpen(false),
             },
             {
@@ -123,7 +123,7 @@ export function OverlaysSection(): JSX.Element {
       <GallerySection title="Notice bar">
         {noticeShown ? (
           <NoticeBar
-            message="12 flashcards added to your working set"
+            message="12 flashcards collected"
             actionLabel="Undo"
             onAction={() => setNoticeShown(false)}
             onDismiss={() => setNoticeShown(false)}

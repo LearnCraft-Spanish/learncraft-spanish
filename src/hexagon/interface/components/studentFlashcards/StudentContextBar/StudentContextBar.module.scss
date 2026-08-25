@@ -31,7 +31,7 @@
 }
 
 .meta,
-.workingSetMeta {
+.ownedMeta {
   display: flex;
   flex-direction: column;
 }
@@ -41,7 +41,7 @@
   min-width: 12rem;
 }
 
-.workingSetMeta {
+.ownedMeta {
   text-align: right;
 }
 
@@ -53,7 +53,7 @@
   line-height: var(--lcs-line-tight);
 }
 
-.workingSet {
+.owned {
   display: flex;
   flex: 0 1 auto;
   align-items: center;

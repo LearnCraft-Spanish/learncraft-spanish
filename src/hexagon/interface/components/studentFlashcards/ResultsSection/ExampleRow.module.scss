@@ -18,8 +18,12 @@
   line-height: var(--lcs-line-body);
 }
 
-.targetWord {
+.spanishRun {
   font-weight: var(--lcs-weight-bold);
+}
+
+.embeddedEnglish {
+  font-weight: var(--lcs-weight-regular);
 }
 
 .actions {
@@ -33,16 +37,18 @@
   padding: var(--lcs-space-2);
 }
 
-.addAction button,
-.inSetAction button {
-  min-width: 78px;
+.collectAction button,
+.ownedAction button {
+  min-width: 88px;
 }
 
-.inSetAction button {
+.ownedAction button {
   border: var(--lcs-control-border) solid var(--lcs-border-control);
 }
 
 .expandPanel {
+  position: relative;
+  z-index: 1;
   display: grid;
   padding: var(--lcs-space-1) var(--lcs-space-7) var(--lcs-space-8) 60px;
   gap: var(--lcs-space-8) calc(var(--lcs-space-9) + var(--lcs-space-3));
@@ -96,12 +102,52 @@
 }
 
 .vocabDetail {
-  max-width: 300px;
-  margin-top: var(--lcs-space-4);
+  width: 280px;
+  max-width: min(280px, calc(100vw - 40px));
   padding: var(--lcs-space-5) var(--lcs-space-6);
-  border-radius: var(--lcs-radius-lg);
-  background-color: var(--lcs-color-surface-dark);
-  color: var(--lcs-color-on-surface-dark);
+}
+
+.vocabWord {
+  margin: 0;
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.vocabDescriptor {
+  margin: var(--lcs-space-1) 0 0;
+  color: var(--lcs-on-dark-60);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+  font-style: italic;
+}
+
+.vocabMeta {
+  display: flex;
+  margin-top: var(--lcs-space-4);
+  flex-direction: column;
+  gap: var(--lcs-space-1);
+}
+
+.vocabMeta p {
+  margin: 0;
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-chip);
+}
+
+.taughtIn {
+  margin-top: var(--lcs-space-5);
+}
+
+.vocabLessonList {
+  display: flex;
+  max-height: 220px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex-direction: column;
+  gap: var(--lcs-space-4);
+  list-style: none;
 }
 
 .vocabLesson {
@@ -116,4 +162,8 @@
   color: var(--lcs-on-dark-60);
   font-family: var(--lcs-font-sans);
   font-size: var(--lcs-text-caption);
+}
+
+.vocabLessonItemCurrent .vocabUnit {
+  color: var(--lcs-color-on-surface-dark);
 }

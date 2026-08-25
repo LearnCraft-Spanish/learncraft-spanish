@@ -40,6 +40,8 @@ const SUGGESTION_CAP = 6;
 const EMPTY_TAGS_COPY =
   'No tags applied. Results cover every flashcard in the lesson range.';
 
+type TagFilterMode = 'search' | 'preset';
+
 export interface FilterSectionProps {
   exampleFilter: UseCombinedFiltersReturnType;
   onResetAll?: () => void;
@@ -214,6 +216,9 @@ export function FilterSection({
       start !== null &&
       fromLessonNumber !== start.lessonNumber,
   );
+  const [tagFilterMode, setTagFilterMode] = useState<TagFilterMode>(() =>
+    filterPreset !== PreSetQuizPreset.None ? 'preset' : 'search',
+  );
 
   const appliedKeys = new Set(selectedSkillTags.map((tag) => tag.key));
   const suggestions = skillTagSearch.tagSuggestions
@@ -237,9 +242,16 @@ export function FilterSection({
     updateUserSelectedCourseId(Number.parseInt(value, 10));
   }
 
+  function changeTagFilterMode(mode: TagFilterMode): void {
+    setTagFilterMode(mode);
+    if (mode !== 'search') {
+      setTagQuery(skillTagSearch.updateTagSearchTerm, '');
+    }
+  }
+
   return (
     <div className={styles.root}>
-      <Card>
+      <Card clip={false}>
         <div className={styles.sectionHeader}>
           <Eyebrow as="h2" weight="regular" leading="body">
             Scope · required
@@ -251,6 +263,7 @@ export function FilterSection({
               muted
               onClick={() => {
                 setUseStartingLesson(false);
+                setTagFilterMode('search');
                 onResetAll?.();
               }}
             >
@@ -261,6 +274,17 @@ export function FilterSection({
 
         <CardSection>
           <div className={styles.scopeGrid}>
+            {isAdmin === true && (
+              <div className={styles.adminStrip}>
+                <Badge>Admin only</Badge>
+                <Toggle
+                  id="finder-unpublished"
+                  checked={includeUnpublished}
+                  onChange={updateIncludeUnpublished}
+                  label="Include unpublished courses and lessons"
+                />
+              </div>
+            )}
             <Field htmlFor="finder-course" label="Course">
               <Select
                 id="finder-course"
@@ -318,154 +342,191 @@ export function FilterSection({
           </div>
         </CardSection>
 
-        {isAdmin === true && (
-          <div className={styles.adminStrip}>
-            <Badge>Admin only</Badge>
-            <Toggle
-              id="finder-unpublished"
-              checked={includeUnpublished}
-              onChange={updateIncludeUnpublished}
-              label="Include unpublished courses and lessons"
-            />
-          </div>
-        )}
-
         <CardSection divided>
           <div className={styles.tagsHeader}>
-            <Eyebrow as="h3" weight="regular" leading="body">
-              Tags
-            </Eyebrow>
-            {hasTags && (
-              <span className={styles.inlineAction}>
-                <Button
-                  variant="ghost"
-                  size="inline"
-                  muted
-                  onClick={() => {
-                    selectedSkillTags.forEach((tag) => {
-                      skillTagSearch.addTagBackToSuggestions(tag.key);
-                    });
-                    bulkUpdateSkillTagKeys([]);
-                  }}
-                >
-                  {`Clear ${tagCountLabel(selectedSkillTags.length)}`}
-                </Button>
-              </span>
-            )}
-          </div>
-
-          <div
-            className={
-              searchOpen
-                ? `${styles.tagSearch} ${styles.tagSearchOpen}`
-                : styles.tagSearch
-            }
-          >
-            <Popover
-              open={searchOpen}
-              onDismiss={() =>
-                setTagQuery(skillTagSearch.updateTagSearchTerm, '')
-              }
-              trigger={
-                <TextInput
-                  id="finder-tag-search"
-                  value={skillTagSearch.tagSearchTerm}
-                  onChange={(value) =>
-                    setTagQuery(skillTagSearch.updateTagSearchTerm, value)
-                  }
-                  placeholder={TAG_PLACEHOLDER}
-                  leadingIcon="search"
-                />
-              }
+            <div
+              className={styles.modeTabs}
+              role="tablist"
+              aria-label="Tag filters"
             >
-              {suggestions.length === 0 ? (
-                <div className={styles.noSuggestions}>No tags match that.</div>
-              ) : (
-                <ul className={styles.suggestions} role="listbox">
-                  {suggestions.map((tag) => (
-                    <li key={tag.key}>
-                      <button
-                        type="button"
-                        className={styles.suggestion}
-                        role="option"
-                        onClick={() => {
-                          addSkillTagToFilters(tag.key);
-                          skillTagSearch.removeTagFromSuggestions(tag.key);
-                          setTagQuery(skillTagSearch.updateTagSearchTerm, '');
-                        }}
-                      >
-                        <span>{tagLabel(tag)}</span>
-                        <span className={styles.suggestionMeta}>
-                          {tagCategory(tag)}
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Popover>
+              <button
+                type="button"
+                className={
+                  tagFilterMode === 'search'
+                    ? `${styles.modeTab} ${styles.modeTabOn}`
+                    : styles.modeTab
+                }
+                id="finder-tab-search"
+                role="tab"
+                aria-selected={tagFilterMode === 'search'}
+                aria-controls="finder-tabpanel-search"
+                onClick={() => changeTagFilterMode('search')}
+              >
+                Search tags
+              </button>
+              <button
+                type="button"
+                className={
+                  tagFilterMode === 'preset'
+                    ? `${styles.modeTab} ${styles.modeTabOn}`
+                    : styles.modeTab
+                }
+                id="finder-tab-presets"
+                role="tab"
+                aria-selected={tagFilterMode === 'preset'}
+                aria-controls="finder-tabpanel-presets"
+                onClick={() => changeTagFilterMode('preset')}
+              >
+                Presets
+              </button>
+            </div>
           </div>
 
-          {hasTags ? (
-            <div className={styles.appliedTags}>
-              {selectedSkillTags.map((tag) => (
-                <Chip
-                  key={tag.key}
-                  label={tagLabel(tag)}
-                  tone="action"
-                  onRemove={() => {
-                    removeSkillTagFromFilters(tag.key);
-                    skillTagSearch.addTagBackToSuggestions(tag.key);
-                  }}
-                />
-              ))}
+          {tagFilterMode === 'search' ? (
+            <div
+              id="finder-tabpanel-search"
+              role="tabpanel"
+              aria-labelledby="finder-tab-search"
+            >
+              <div className={styles.tagSearchRow}>
+                <div
+                  className={
+                    searchOpen
+                      ? `${styles.tagSearch} ${styles.tagSearchOpen}`
+                      : styles.tagSearch
+                  }
+                >
+                  <Popover
+                    open={searchOpen}
+                    onDismiss={() =>
+                      setTagQuery(skillTagSearch.updateTagSearchTerm, '')
+                    }
+                    trigger={
+                      <TextInput
+                        id="finder-tag-search"
+                        value={skillTagSearch.tagSearchTerm}
+                        onChange={(value) =>
+                          setTagQuery(skillTagSearch.updateTagSearchTerm, value)
+                        }
+                        placeholder={TAG_PLACEHOLDER}
+                        leadingIcon="search"
+                      />
+                    }
+                  >
+                    {suggestions.length === 0 ? (
+                      <div className={styles.noSuggestions}>
+                        No tags match that.
+                      </div>
+                    ) : (
+                      <ul className={styles.suggestions} role="listbox">
+                        {suggestions.map((tag) => (
+                          <li key={tag.key}>
+                            <button
+                              type="button"
+                              className={styles.suggestion}
+                              role="option"
+                              onClick={() => {
+                                addSkillTagToFilters(tag.key);
+                                skillTagSearch.removeTagFromSuggestions(
+                                  tag.key,
+                                );
+                                setTagQuery(
+                                  skillTagSearch.updateTagSearchTerm,
+                                  '',
+                                );
+                              }}
+                            >
+                              <span>{tagLabel(tag)}</span>
+                              <span className={styles.suggestionMeta}>
+                                {tagCategory(tag)}
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </Popover>
+                </div>
+                {hasTags && (
+                  <span className={styles.inlineAction}>
+                    <Button
+                      variant="ghost"
+                      size="inline"
+                      muted
+                      onClick={() => {
+                        selectedSkillTags.forEach((tag) => {
+                          skillTagSearch.addTagBackToSuggestions(tag.key);
+                        });
+                        bulkUpdateSkillTagKeys([]);
+                      }}
+                    >
+                      {`Clear ${tagCountLabel(selectedSkillTags.length)}`}
+                    </Button>
+                  </span>
+                )}
+              </div>
+
+              {hasTags ? (
+                <div className={styles.appliedTags}>
+                  {selectedSkillTags.map((tag) => (
+                    <Chip
+                      key={tag.key}
+                      label={tagLabel(tag)}
+                      tone="action"
+                      onRemove={() => {
+                        removeSkillTagFromFilters(tag.key);
+                        skillTagSearch.addTagBackToSuggestions(tag.key);
+                      }}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.emptyTags}>{EMPTY_TAGS_COPY}</p>
+              )}
             </div>
           ) : (
-            <p className={styles.emptyTags}>{EMPTY_TAGS_COPY}</p>
-          )}
-
-          <div className={styles.presets}>
-            <div className={styles.presetsHeader}>
-              <Eyebrow weight="regular" leading="body">
-                Presets
-              </Eyebrow>
+            <div
+              id="finder-tabpanel-presets"
+              role="tabpanel"
+              aria-labelledby="finder-tab-presets"
+            >
               <p className={styles.presetsHint}>
                 One click applies a saved group of tags.
               </p>
+              <div className={styles.presetList}>
+                {visiblePresets().map((quiz) => {
+                  const selected = filterPreset === quiz.preset;
+                  return (
+                    <button
+                      key={quiz.preset}
+                      type="button"
+                      className={
+                        selected
+                          ? `${styles.preset} ${styles.presetOn}`
+                          : styles.preset
+                      }
+                      aria-pressed={selected}
+                      onClick={() =>
+                        setFilterPreset(
+                          selected ? PreSetQuizPreset.None : quiz.preset,
+                        )
+                      }
+                    >
+                      <Icon
+                        name="bookmark"
+                        size="inline"
+                        tone={selected ? 'onAction' : 'muted'}
+                      />
+                      {quiz.preset}
+                      <span className={styles.presetCount}>
+                        {tagCountLabel(quiz.SkillTagKeys.length)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className={styles.presetList}>
-              {visiblePresets().map((quiz) => {
-                const selected = filterPreset === quiz.preset;
-                return (
-                  <button
-                    key={quiz.preset}
-                    type="button"
-                    className={
-                      selected
-                        ? `${styles.preset} ${styles.presetOn}`
-                        : styles.preset
-                    }
-                    aria-pressed={selected}
-                    onClick={() =>
-                      setFilterPreset(
-                        selected ? PreSetQuizPreset.None : quiz.preset,
-                      )
-                    }
-                  >
-                    <Icon
-                      name="bookmark"
-                      size="inline"
-                      tone={selected ? 'onAction' : 'muted'}
-                    />
-                    {quiz.preset}
-                    <span className={styles.presetCount}>
-                      {tagCountLabel(quiz.SkillTagKeys.length)}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          )}
         </CardSection>
 
         <CardFooterStrip>

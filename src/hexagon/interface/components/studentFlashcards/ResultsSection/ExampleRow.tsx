@@ -6,11 +6,13 @@ import type {
   Vocabulary,
 } from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
+import { splitSpanishTextRuns } from '@domain/functions/splitSpanishTextRuns';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
 import { Checkbox } from '@interface/components/general/Checkbox/Checkbox';
 import { Chip } from '@interface/components/general/Chip/Chip';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { IconButton } from '@interface/components/general/IconButton/IconButton';
+import { Popover } from '@interface/components/general/Popover/Popover';
 import { useContextualMenu } from '@interface/hooks/useContextualMenu';
 import { useEffect } from 'react';
 import styles from './ExampleRow.module.scss';
@@ -31,61 +33,25 @@ export interface ExampleRowModel {
   onToggleVocab: (vocabId: number) => void;
 }
 
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-/** Split a Spanish sentence around the first vocabulary word that appears in it. */
-export function splitOnTargetWord(
-  spanish: string,
-  vocabulary: Vocabulary[],
-): { pre: string; word: string; post: string } | null {
-  const candidates = vocabulary
-    .flatMap((item) => [item.word, ...item.spellings])
-    .filter((item) => item.length > 0)
-    .sort((a, b) => b.length - a.length);
-
-  for (const candidate of candidates) {
-    const pattern = new RegExp(
-      `(^|[^\\p{L}])(${escapeRegExp(candidate)})(?=[^\\p{L}]|$)`,
-      'iu',
-    );
-    const match = pattern.exec(spanish);
-    if (match === null) {
-      continue;
-    }
-    const capturedWord = match[2] as string;
-    const wordStart = match.index + (match[1] as string).length;
-    return {
-      pre: spanish.slice(0, wordStart),
-      word: spanish.slice(wordStart, wordStart + capturedWord.length),
-      post: spanish.slice(wordStart + capturedWord.length),
-    };
-  }
-
-  return null;
-}
-
-export function SpanishSentence({
-  spanish,
-  vocabulary,
-}: {
-  spanish: string;
-  vocabulary: Vocabulary[];
-}): JSX.Element {
-  const parts = splitOnTargetWord(spanish, vocabulary);
-
-  if (parts === null) {
-    return <span className={styles.sentence}>{spanish}</span>;
-  }
+export function SpanishSentence({ spanish }: { spanish: string }): JSX.Element {
+  const runs = splitSpanishTextRuns(spanish);
 
   return (
     <span className={styles.sentence}>
-      {parts.pre}
-      <strong className={styles.targetWord}>{parts.word}</strong>
-      {parts.post}
+      {runs.map((run, index) => (
+        <span
+          key={`${index}-${run.text}`}
+          className={run.english ? styles.embeddedEnglish : styles.spanishRun}
+        >
+          {run.text}
+        </span>
+      ))}
     </span>
   );
+}
+
+function hasAudioLink(url: string): boolean {
+  return url.length > 0;
 }
 
 function SpanishCell({
@@ -101,22 +67,21 @@ function SpanishCell({
 
   return (
     <div className={styles.sentenceCell}>
-      <IconButton
-        icon="volume"
-        label="Play Spanish"
-        variant="bare"
-        size="fit"
-        iconSize="md"
-        tone="muted"
-        active={playing === clip}
-        onClick={() => {
-          onTogglePlay(clip, example.spanishAudio);
-        }}
-      />
-      <SpanishSentence
-        spanish={example.spanish}
-        vocabulary={example.vocabulary}
-      />
+      {hasAudioLink(example.spanishAudio) && (
+        <IconButton
+          icon="volume"
+          label="Play Spanish"
+          variant="bare"
+          size="fit"
+          iconSize="md"
+          tone="muted"
+          active={playing === clip}
+          onClick={() => {
+            onTogglePlay(clip, example.spanishAudio);
+          }}
+        />
+      )}
+      <SpanishSentence spanish={example.spanish} />
     </div>
   );
 }
@@ -134,18 +99,20 @@ function EnglishCell({
 
   return (
     <div className={styles.sentenceCell}>
-      <IconButton
-        icon="volume"
-        label="Play English"
-        variant="bare"
-        size="fit"
-        iconSize="md"
-        tone="muted"
-        active={playing === clip}
-        onClick={() => {
-          onTogglePlay(clip, example.englishAudio);
-        }}
-      />
+      {hasAudioLink(example.englishAudio) && (
+        <IconButton
+          icon="volume"
+          label="Play English"
+          variant="bare"
+          size="fit"
+          iconSize="md"
+          tone="muted"
+          active={playing === clip}
+          onClick={() => {
+            onTogglePlay(clip, example.englishAudio);
+          }}
+        />
+      )}
       <span className={styles.sentence}>{example.english}</span>
     </div>
   );
@@ -186,7 +153,7 @@ function ActionsCell({
         />
       </span>
       {collected ? (
-        <span className={styles.inSetAction}>
+        <span className={styles.ownedAction}>
           <Button
             variant="ghost"
             muted
@@ -196,11 +163,11 @@ function ActionsCell({
               void studentFlashcards.deleteFlashcards([example.id]);
             }}
           >
-            In set
+            Owned
           </Button>
         </span>
       ) : (
-        <span className={styles.addAction}>
+        <span className={styles.collectAction}>
           <Button
             variant="primary"
             size="sm"
@@ -209,7 +176,7 @@ function ActionsCell({
               void studentFlashcards.createFlashcards([example]);
             }}
           >
-            Add
+            Collect
           </Button>
         </span>
       )}
@@ -235,27 +202,59 @@ function VocabDetail({
     };
   }, [closeContextual, exampleId, openContextual, vocabulary.id]);
 
-  const firstLesson = [...lessonPopup.lessonsByVocabulary].sort(
-    (left, right) => left.lessonNumber - right.lessonNumber,
-  )[0];
-
   return (
     <div className={styles.vocabDetail}>
-      <Eyebrow>{`\u201C${vocabulary.word}\u201D first taught in`}</Eyebrow>
-      {lessonPopup.lessonsLoading && (
-        <p className={styles.vocabLesson}>Loading…</p>
-      )}
-      {!lessonPopup.lessonsLoading && firstLesson !== undefined && (
-        <>
-          <p className={styles.vocabLesson}>
-            Lesson {firstLesson.lessonNumber}
-          </p>
-          <p className={styles.vocabUnit}>{firstLesson.courseName}</p>
-        </>
-      )}
-      {!lessonPopup.lessonsLoading && firstLesson === undefined && (
-        <p className={styles.vocabUnit}>No lessons found</p>
-      )}
+      <p className={styles.vocabWord}>{vocabulary.word}</p>
+      <p className={styles.vocabDescriptor}>{vocabulary.descriptor}</p>
+      <div className={styles.vocabMeta}>
+        <p>Part of Speech: {vocabulary.subcategory.partOfSpeech}</p>
+        {vocabulary.type === 'verb' ? (
+          <>
+            <p>Verb Infinitive: {vocabulary.verb.infinitive}</p>
+            {vocabulary.conjugationTags.length > 0 && (
+              <p>Conjugation Notes: {vocabulary.conjugationTags.join(', ')}</p>
+            )}
+          </>
+        ) : (
+          <p>Category: {vocabulary.subcategory.category}</p>
+        )}
+      </div>
+      <div className={styles.taughtIn}>
+        <Eyebrow tone="onDark">Taught in</Eyebrow>
+        {lessonPopup.lessonsLoading && (
+          <p className={styles.vocabLesson}>Loading…</p>
+        )}
+        {!lessonPopup.lessonsLoading &&
+          lessonPopup.lessonsByVocabulary.length === 0 && (
+            <p className={styles.vocabUnit}>No lessons found</p>
+          )}
+        {!lessonPopup.lessonsLoading &&
+          lessonPopup.lessonsByVocabulary.length > 0 && (
+            <ul className={styles.vocabLessonList}>
+              {lessonPopup.lessonsByVocabulary.map((lesson) => {
+                const isCurrentCourse =
+                  lessonPopup.currentCourseName != null &&
+                  lesson.courseName === lessonPopup.currentCourseName;
+
+                return (
+                  <li
+                    className={
+                      isCurrentCourse
+                        ? styles.vocabLessonItemCurrent
+                        : undefined
+                    }
+                    key={lesson.id}
+                  >
+                    <p className={styles.vocabLesson}>
+                      Lesson {lesson.lessonNumber}
+                    </p>
+                    <p className={styles.vocabUnit}>{lesson.courseName}</p>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+      </div>
     </div>
   );
 }
@@ -293,29 +292,40 @@ export function ExampleExpandPanel({
         {example.vocabulary.length > 0 && (
           <div className={styles.chipRow}>
             {example.vocabulary.map((item) => (
-              <span className={styles.vocabChip} key={item.id}>
-                <Chip
-                  label={item.word}
-                  tone="label"
-                  selected={openVocabId === item.id}
-                  selectedSkin="navy"
-                  onSelect={() => {
+              <Popover
+                key={item.id}
+                open={openVocabId === item.id}
+                onDismiss={() => {
+                  if (openVocabId === item.id) {
                     onToggleVocab(item.id);
-                  }}
+                  }
+                }}
+                skin="dark"
+                trigger={
+                  <span className={styles.vocabChip}>
+                    <Chip
+                      label={item.word}
+                      tone="label"
+                      selected={openVocabId === item.id}
+                      selectedSkin="navy"
+                      onSelect={() => {
+                        onToggleVocab(item.id);
+                      }}
+                    />
+                  </span>
+                }
+              >
+                <VocabDetail
+                  exampleId={example.id}
+                  vocabulary={item}
+                  lessonPopup={lessonPopup}
                 />
-              </span>
+              </Popover>
             ))}
           </div>
         )}
         {openVocab === undefined && example.vocabulary.length > 0 && (
           <p className={styles.hint}>Click a tag to see where it's taught.</p>
-        )}
-        {openVocab !== undefined && (
-          <VocabDetail
-            exampleId={example.id}
-            vocabulary={openVocab}
-            lessonPopup={lessonPopup}
-          />
         )}
       </div>
       <div>
