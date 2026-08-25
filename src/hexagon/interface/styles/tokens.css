@@ -29,5 +29,135 @@
     --z-overlay: 100;
     --z-toast: 999;
     --font-sans: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+
+    /* ----------------------------------------------------------------
+     * LearnCraft Design System v2.1 — student v2 surfaces.
+     *
+     * Namespaced `--lcs-` on purpose. Legacy stylesheets reference
+     * undefined generic names (--color-primary, --color-border,
+     * --color-danger, --color-text-muted, --color-gray-lighter, …) that
+     * currently resolve to their inline fallbacks. Unprefixed additions
+     * here would silently restyle those components. Add tokens; never
+     * change the values above.
+     * ---------------------------------------------------------------- */
+
+    /* Color */
+    --lcs-color-action: #449ac2;
+    --lcs-color-action-hover: #2672a0;
+    --lcs-color-on-action: #ffffff;
+    --lcs-color-page: #f0ede6;
+    --lcs-color-surface: #ffffff;
+    --lcs-color-surface-dark: #1c2232;
+    --lcs-color-on-surface-dark: #ffffff;
+    --lcs-color-ink: #3c3c3c;
+    --lcs-color-muted: #6f6259;
+    --lcs-color-placeholder: #9a9086;
+    --lcs-color-steel: #b8b0a0;
+    --lcs-color-label: #b0a96f;
+    --lcs-color-on-label: #6b673a;
+    --lcs-color-error: #b83232;
+    --lcs-color-success: #4e6b41;
+    --lcs-color-warning: #c99b20;
+    --lcs-color-warning-ink: #8a6a11;
+
+    /* Surface tints */
+    --lcs-tint-action: rgba(68, 154, 194, 0.12);
+    --lcs-tint-hover: rgba(68, 154, 194, 0.08);
+    --lcs-tint-row-selected: rgba(68, 154, 194, 0.06);
+    --lcs-tint-label-subtle: rgba(176, 169, 111, 0.1);
+    --lcs-tint-label: rgba(176, 169, 111, 0.18);
+    --lcs-tint-label-strong: rgba(176, 169, 111, 0.3);
+    --lcs-tint-warning: rgba(201, 155, 32, 0.16);
+    --lcs-tint-error: rgba(184, 50, 50, 0.12);
+    --lcs-tint-success: rgba(78, 107, 65, 0.12);
+
+    /* Lines */
+    --lcs-border-hairline: 0.5px;
+    --lcs-divider: rgba(60, 60, 60, 0.08);
+    --lcs-border-card: rgba(60, 60, 60, 0.13);
+    --lcs-border-control: rgba(60, 60, 60, 0.25);
+    --lcs-border-checkbox: rgba(60, 60, 60, 0.3);
+    --lcs-toggle-off: rgba(60, 60, 60, 0.22);
+
+    /* Ink on dark surfaces */
+    --lcs-on-dark-12: rgba(255, 255, 255, 0.12);
+    --lcs-on-dark-25: rgba(255, 255, 255, 0.25);
+    --lcs-on-dark-45: rgba(255, 255, 255, 0.45);
+    --lcs-on-dark-60: rgba(255, 255, 255, 0.6);
+    --lcs-on-dark-75: rgba(255, 255, 255, 0.75);
+    --lcs-on-dark-85: rgba(255, 255, 255, 0.85);
+
+    /* Space */
+    --lcs-space-1: 4px;
+    --lcs-space-2: 6px;
+    --lcs-space-3: 8px;
+    --lcs-space-4: 10px;
+    --lcs-space-5: 12px;
+    --lcs-space-6: 14px;
+    --lcs-space-7: 16px;
+    --lcs-space-8: 20px;
+    --lcs-space-9: 24px;
+    --lcs-space-10: 28px;
+    --lcs-space-11: 48px;
+
+    /* Radius */
+    --lcs-radius-sm: 6px;
+    --lcs-radius-md: 8px;
+    --lcs-radius-lg: 10px;
+    --lcs-radius-xl: 14px;
+    --lcs-radius-pill: 999px;
+
+    /* Elevation */
+    --lcs-shadow-lift: 0 2px 8px rgba(60, 60, 60, 0.1);
+    --lcs-shadow-popover: 0 8px 24px rgba(60, 60, 60, 0.12);
+    --lcs-shadow-menu: 0 8px 24px rgba(60, 60, 60, 0.18);
+
+    /* Motion */
+    --lcs-motion-micro: 180ms;
+    --lcs-motion-panel: 320ms;
+    --lcs-motion-load: 600ms;
+    --lcs-ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+    /* Layout — breakpoints are never tokens; use literal 480px / 768px */
+    --lcs-max-width: 1240px;
+    --lcs-page-pad: 24px;
+    --lcs-page-pad-narrow: 16px;
+    --lcs-page-pad-bottom: 140px;
+    --lcs-control-height: 44px;
+    --lcs-control-height-sm: 40px;
+    --lcs-control-border: 1.5px;
+
+    /* Typography */
+    /* Nunito Sans only. Avenir was dropped: it is a system font on macOS and
+     * iOS but absent elsewhere, so listing it first served two different
+     * typefaces depending on the platform. */
+    --lcs-font-sans:
+      'Nunito Sans', 'Helvetica Neue', helvetica, arial, sans-serif;
+    --lcs-text-display: 40px;
+    --lcs-text-h1: 28px;
+    --lcs-text-h2: 24px;
+    --lcs-text-h3: 18px;
+    --lcs-text-body: 16px;
+    --lcs-text-control: 15px;
+    --lcs-text-action: 14px;
+    --lcs-text-caption: 13px;
+    --lcs-text-chip: 12px;
+    --lcs-text-eyebrow: 11px;
+    --lcs-text-badge: 10px;
+    --lcs-weight-regular: 400;
+    --lcs-weight-medium: 500;
+    --lcs-weight-bold: 900;
+    --lcs-tracking-eyebrow: 0.08em;
+    --lcs-line-body: 1.6;
+    --lcs-line-tight: 1.3;
+
+    /* Focus — never removed */
+    --lcs-focus-ring: 2px solid #449ac2;
+    --lcs-focus-offset: 3px;
+
+    /* Stacking, slotted against the --z-* scale above */
+    --lcs-z-popover: 100;
+    --lcs-z-menu: 110;
+    --lcs-z-bottom-bar: 120;
   }
 }

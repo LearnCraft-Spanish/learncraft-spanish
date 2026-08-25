@@ -1,9 +1,9 @@
-import type { StudentUiFlag } from '@domain/uiFlags';
+import type { UiFlag } from '@domain/uiFlags';
 
 /**
- * Port for UI version feature flags.
+ * Port for UI feature flags.
  * Infrastructure reads enabled flag ids from environment config.
  */
 export interface FeatureFlagPort {
-  isEnabled: (flagId: StudentUiFlag) => boolean;
+  isEnabled: (flagId: UiFlag) => boolean;
 }

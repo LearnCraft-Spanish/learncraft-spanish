@@ -1,0 +1,38 @@
+/* Prototype `main`: border-box max-width 1240 with 24px padding inside. */
+.measure {
+  box-sizing: border-box;
+  max-width: var(--lcs-max-width);
+  margin: 0 auto;
+  padding: 0 var(--lcs-page-pad);
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--lcs-space-7);
+  min-height: calc(
+    (var(--lcs-text-eyebrow) * var(--lcs-line-body)) + 2px +
+      (var(--lcs-text-h1) * var(--lcs-line-body))
+  );
+  margin-bottom: var(--lcs-space-8);
+  text-align: left;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  /* Prototype: 2px under FLASHCARDS. One-off; scale starts at 4px. */
+  gap: 2px;
+}
+
+.title {
+  margin: 0;
+  color: var(--lcs-color-ink);
+  font-size: var(--lcs-text-h1);
+  font-weight: var(--lcs-weight-bold);
+  line-height: var(--lcs-line-body);
+  text-align: left;
+  text-wrap: balance;
+}

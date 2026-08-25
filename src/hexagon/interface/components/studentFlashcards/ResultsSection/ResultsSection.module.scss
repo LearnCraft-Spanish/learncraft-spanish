@@ -1,0 +1,129 @@
+.countRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--lcs-space-10) 0 var(--lcs-space-5);
+  gap: var(--lcs-space-7);
+}
+
+.count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--lcs-space-4);
+}
+
+.countNumber {
+  color: var(--lcs-color-ink);
+  font-family: var(--lcs-font-sans);
+  font-size: 22px;
+  font-weight: var(--lcs-weight-bold);
+  line-height: var(--lcs-line-tight);
+}
+
+.countLabel {
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-control);
+}
+
+.countTools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-left: auto;
+  gap: var(--lcs-space-3);
+}
+
+/* Prototype Select all is a 40px / 10×4 / 15/900 ghost.
+ * Button.inline stays padding 0 in the gallery. */
+.selectAll button {
+  min-height: var(--lcs-control-height-sm);
+  padding: var(--lcs-space-4) var(--lcs-space-1);
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.actionsMenu {
+  margin-left: var(--lcs-space-5);
+}
+
+.tableCard {
+  overflow: visible;
+  border: var(--lcs-border-hairline) solid var(--lcs-border-card);
+  border-radius: var(--lcs-radius-xl);
+  background-color: var(--lcs-color-surface);
+  --dt-header-pad: var(--lcs-space-5) var(--lcs-space-7);
+  --dt-row-pad: var(--lcs-space-6) var(--lcs-space-7);
+  --dt-column-gap: var(--lcs-space-7);
+  /* 40px Add + 14px pad above and below. Do not inherit DataTable's 56px. */
+  --dt-row-min-height: calc(
+    var(--lcs-control-height-sm) + var(--lcs-space-6) + var(--lcs-space-6)
+  );
+}
+
+/* Prototype SPANISH/ENGLISH is 400. DataTable gallery stays 500. */
+.tableCard [role='columnheader'] {
+  font-weight: var(--lcs-weight-regular);
+}
+
+/* DataTable already draws a card. Sit pagination in the same card.
+ * overflow stays visible so the vocab popover can sit above later rows. */
+.tableCard [role='table'] {
+  overflow: visible;
+  border: none;
+  border-radius: 0;
+}
+
+.tableCard [role='rowgroup']:first-child {
+  overflow: hidden;
+  border-radius: var(--lcs-radius-xl) var(--lcs-radius-xl) 0 0;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--lcs-space-7);
+  border-top: var(--lcs-border-hairline) solid var(--lcs-divider);
+  gap: var(--lcs-space-7);
+  --pg-gap: var(--lcs-space-2);
+  --pg-idle-weight: var(--lcs-weight-regular);
+}
+
+.range {
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+}
+
+.audio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* DataTable's empty slot is 20px. Prototype empty is 48px on the body itself. */
+.tableCard [role='rowgroup'] > :has(.finderEmpty),
+.tableCard [role='rowgroup'] > :has(.skeletonBody) {
+  padding: 0;
+  border-top: var(--lcs-border-hairline) solid var(--lcs-divider);
+}
+
+/* A class plus :first-child beats EmptyState .root so a CSS-order flip
+ * cannot restore the primitive's 12px stack on top of the 10px title margin. */
+.finderEmpty > :first-child {
+  gap: 0;
+}
+
+.finderEmpty > :first-child > p:first-of-type {
+  margin-top: var(--lcs-space-4);
+  font-weight: var(--lcs-weight-regular);
+}
+
+.skeletonBody {
+  padding: var(--lcs-space-11) var(--lcs-space-8);
+}

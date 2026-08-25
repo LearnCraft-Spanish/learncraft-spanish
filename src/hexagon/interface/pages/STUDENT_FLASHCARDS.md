@@ -65,7 +65,17 @@ flowchart TB
 
 **Treat Manager and Finder as one redesign surface.** Students move between them (`Find More Matching Flashcards`, `Use these filters on my flashcards` via `?enableFiltering=true`). They share filter chrome and list-item chrome.
 
-When implementation starts, use **one** flag: `ui.student.flashcards.v2`. Do not wrap Custom Quiz or Review My Flashcards.
+**Superseded, 2026-08: the two routes ship behind separate flags.** The design handoff covers the Finder only, so `ui.student.flashcards.finder.v2` gates `/flashcardfinder` and the Manager gets its own flag when its design lands. A shared flag would have put a half-redesigned Manager in front of anyone who turned the Finder on. Everything else on this page still holds — the two pages remain one redesign _surface_, they share the same primitives and the same filter coordinator, and the Manager's rewrite should reuse whatever the Finder builds.
+
+Do not wrap Custom Quiz or Review My Flashcards under either flag.
+
+The shared primitives those pages will compose are built ahead of the page work; see [`components/general/README.md`](../components/general/README.md) for the primitive contract and `/ui-gallery` (`VITE_UI_FLAGS=ui.dev.gallery`) to view them.
+
+### Two constraints on the results table
+
+**No lesson column on either table.** Neither the Finder nor the Manager shows a lesson per row. The value either is not stored against the record or is too expensive to derive for every row on the page. Both tables omit the column rather than showing a blank or paying for the lookup. A row is therefore: select, Spanish, English, expand.
+
+**Below 768px the row reflows** rather than scrolling sideways: Spanish stacks over English while the checkbox and chevron stay in place, spanning both lines. `DataTable` takes this as a `mobileLayout` prop; the areas are named by the caller.
 
 ---
 

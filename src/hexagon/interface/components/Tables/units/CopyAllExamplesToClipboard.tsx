@@ -1,3 +1,7 @@
+import type {
+  ExampleFilters,
+  ExamplePort,
+} from '@application/ports/examplePort';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
@@ -6,6 +10,28 @@ import React, { useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 
+export async function copyAllExamplesToClipboard(
+  exampleAdapter: ExamplePort,
+  filterState: ExampleFilters,
+): Promise<void> {
+  const { examples } = await exampleAdapter.getFilteredExamples({
+    skillTags: filterState.skillTags,
+    lessonRanges: filterState.lessonRanges,
+    excludeSpanglish: filterState.excludeSpanglish,
+    audioOnly: filterState.audioOnly,
+    page: 1,
+    limit: 1000000,
+    seed: uuidv4(),
+    disableCache: true,
+    includeUnpublished: filterState.includeUnpublished,
+  });
+  copyTableToClipboard({
+    displayOrder: examples.map((example) => ({ recordId: example.id })),
+    getExampleOrFlashcardById: (id) =>
+      examples.find((example) => example.id === id) ?? null,
+  });
+}
+
 export function CopyAllExamplesToClipboard(): React.ReactElement {
   const exampleAdapter = useExampleAdapter();
   const { isAdmin } = useAuthAdapter();
@@ -13,38 +39,12 @@ export function CopyAllExamplesToClipboard(): React.ReactElement {
     useCombinedFilters({ onFilterChange: () => {} });
 
   const handleCopyAllExamplesToClipboard = useCallback(() => {
-    const promise = (async () => {
-      const { examples } = await exampleAdapter.getFilteredExamples({
-        skillTags: filterState.skillTags,
-        lessonRanges: filterState.lessonRanges,
-        excludeSpanglish: filterState.excludeSpanglish,
-        audioOnly: filterState.audioOnly,
-        page: 1,
-        limit: 1000000,
-        seed: uuidv4(),
-        disableCache: true,
-        includeUnpublished: filterState.includeUnpublished,
-      });
-      copyTableToClipboard({
-        displayOrder: examples.map((example) => ({ recordId: example.id })),
-        getExampleOrFlashcardById: (id) =>
-          examples.find((example) => example.id === id) ?? null,
-      });
-    })();
-
-    toast.promise(promise, {
+    toast.promise(copyAllExamplesToClipboard(exampleAdapter, filterState), {
       pending: 'Loading examples...',
       success: 'Added to clipboard',
       error: 'Failed to load examples',
     });
-  }, [
-    exampleAdapter,
-    filterState.skillTags,
-    filterState.lessonRanges,
-    filterState.includeUnpublished,
-    filterState.excludeSpanglish,
-    filterState.audioOnly,
-  ]);
+  }, [exampleAdapter, filterState]);
 
   return (
     <button

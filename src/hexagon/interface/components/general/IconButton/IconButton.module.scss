@@ -1,0 +1,75 @@
+.root {
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  margin: 0;
+  background: none;
+  cursor: pointer;
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.root:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+/* Ends of a pagination range stay in place rather than reflowing the control. */
+.root:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.sm {
+  width: 32px;
+  height: 32px;
+}
+
+.md {
+  width: var(--lcs-control-height-sm);
+  height: var(--lcs-control-height-sm);
+}
+
+.fit {
+  width: auto;
+  height: auto;
+}
+
+.bare {
+  border-radius: var(--lcs-radius-sm);
+}
+
+.bare:hover {
+  background-color: var(--lcs-tint-hover);
+}
+
+.outlined {
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-surface);
+}
+
+.outlined:hover {
+  background-color: var(--lcs-tint-hover);
+}
+
+.onDark:hover {
+  background-color: var(--lcs-on-dark-12);
+}
+
+.onDark.outlined {
+  border-color: var(--lcs-on-dark-45);
+  background: none;
+}
+
+.steel {
+  color: var(--lcs-color-steel);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+}

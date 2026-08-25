@@ -1,0 +1,69 @@
+.root {
+  display: inline-flex;
+  gap: var(--lcs-space-3);
+  align-items: center;
+  cursor: pointer;
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-control);
+}
+
+.root:has(.input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* Native control stays in the accessibility tree and drives the visual box. */
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: -1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.box {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: var(--lcs-control-border) solid var(--lcs-border-checkbox);
+  border-radius: var(--lcs-radius-sm);
+  background-color: var(--lcs-color-surface);
+  transition:
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    border-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.checked {
+  border-color: var(--lcs-color-action);
+  background-color: var(--lcs-color-action);
+}
+
+.input:focus-visible + .box {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.label {
+  color: var(--lcs-color-ink);
+}
+
+.labelHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: -1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .box {
+    transition: none;
+  }
+}

@@ -1,4 +1,5 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { UiScope } from '@interface/components/general/UiScope/UiScope';
 import { Loading } from '@interface/components/Loading';
 import { lazy, Suspense } from 'react';
 import { Route } from 'react-router-dom';
@@ -26,6 +27,9 @@ const FlashcardFinderPage = lazy(
   () => import('@interface/pages/FlashcardFinder'),
 );
 const GetHelpPage = lazy(() => import('@interface/pages/GetHelpPage'));
+
+// Development-only, gated inside the page by the `ui.dev.gallery` flag
+const UiGallery = lazy(() => import('@interface/pages/UiGallery'));
 
 // Coach / Admin pages
 const FrequensayPage = lazy(() => import('@interface/pages/FrequensayPage'));
@@ -69,7 +73,13 @@ export default function AppRoutes() {
         />
         <Route
           path="/flashcardfinder"
-          element={(isStudent || isAdmin || isCoach) && <FlashcardFinderPage />}
+          element={
+            (isStudent || isAdmin || isCoach) && (
+              <UiScope flag="ui.student.flashcards.finder.v2">
+                <FlashcardFinderPage />
+              </UiScope>
+            )
+          }
         />
         <Route
           path="/frequensay"
@@ -96,6 +106,7 @@ export default function AppRoutes() {
           element={isAdmin && <DatabaseTables />}
         />
         <Route path="/example-manager/*" element={<ExampleManagerRouter />} />
+        <Route path="/ui-gallery" element={<UiGallery />} />
         <Route path="/*" element={<NotFoundPage />} />
         <Route
           path="/admin-dashboard"

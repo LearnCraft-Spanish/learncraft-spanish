@@ -7,11 +7,19 @@ import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFl
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
+import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
+import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import { useQueryPagination } from '@application/units/Pagination/useQueryPagination';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
+import {
+  generateVirtualLessonId,
+  getPrerequisitesForCourse,
+} from '@domain/coursePrerequisites';
+import { filterPublishedLessons } from '@domain/functions/filterPublishedLessons';
+import { sortLessonsByCurrentCourse } from '@domain/functions/sortLessonsByCurrentCourse';
 import { useEffect, useMemo, useRef } from 'react';
 
 export interface UseFlashcardFinderReturnType {
@@ -23,6 +31,7 @@ export interface UseFlashcardFinderReturnType {
   totalPages: number | null;
   lessonPopup: LessonPopup;
   skillTagSearch: UseSkillTagSearchReturnType;
+  resetFilters: () => void;
 
   // Loading states similar to FlashcardManager
   filteredExamplesLoading: boolean;
@@ -33,7 +42,9 @@ export interface UseFlashcardFinderReturnType {
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   // isCoach or isAdmin
   const { isCoach, isAdmin } = useAuthAdapter();
-  const { lessonPopup } = useLessonPopup();
+  const { lessonPopup: fetchedLessonPopup } = useLessonPopup();
+  const { data: publishedCourses, isLoading: publishedCoursesLoading } =
+    useCoursesWithLessons(false);
 
   const QUERY_PAGE_SIZE = 150;
   const PAGE_SIZE = 25;
@@ -57,6 +68,27 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     : null;
 
   const exampleFilter: UseCombinedFiltersReturnType = useCombinedFilters({});
+  const currentCourseName = exampleFilter.course?.name ?? null;
+  const lessonPopup = useMemo((): LessonPopup => {
+    return {
+      lessonsByVocabulary: sortLessonsByCurrentCourse(
+        filterPublishedLessons(
+          fetchedLessonPopup.lessonsByVocabulary,
+          publishedCourses ?? [],
+        ),
+        currentCourseName,
+      ),
+      lessonsLoading:
+        fetchedLessonPopup.lessonsLoading || publishedCoursesLoading,
+      currentCourseName,
+    };
+  }, [
+    currentCourseName,
+    fetchedLessonPopup.lessonsByVocabulary,
+    fetchedLessonPopup.lessonsLoading,
+    publishedCourses,
+    publishedCoursesLoading,
+  ]);
 
   // Track previous filter state to detect actual changes
   const previousFilterState = useRef<string | null>(null);
@@ -118,6 +150,33 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
 
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
 
+  const resetFilters = (): void => {
+    exampleFilter.bulkUpdateSkillTagKeys([]);
+    exampleFilter.updateExcludeSpanglish(false);
+    exampleFilter.updateAudioOnly(false);
+    exampleFilter.updateIncludeUnpublished(false);
+    exampleFilter.setFilterPreset(PreSetQuizPreset.None);
+    exampleFilter.skillTagSearch.updateTagSearchTerm();
+
+    const selectedCourse = exampleFilter.course;
+    if (!selectedCourse) {
+      return;
+    }
+
+    const prerequisites = getPrerequisitesForCourse(selectedCourse.id);
+    if (prerequisites && prerequisites.prerequisites.length > 0) {
+      exampleFilter.updateFromLessonNumber(
+        generateVirtualLessonId(selectedCourse.id, 0),
+      );
+      return;
+    }
+
+    const firstLesson = selectedCourse.lessons[0];
+    if (firstLesson) {
+      exampleFilter.updateFromLessonNumber(firstLesson.lessonNumber);
+    }
+  };
+
   return {
     pagination,
     exampleFilter,
@@ -127,6 +186,7 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     totalPages,
     lessonPopup,
     skillTagSearch,
+    resetFilters,
 
     // Loading states similar to FlashcardManager
     initialLoading:

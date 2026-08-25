@@ -1,9 +1,10 @@
+import type { JSX } from 'react';
 import useFlashcardFinder from '@application/useCases/useFlashcardFinder';
 import { FilterPanel } from '@interface/components/Filters';
 import { Loading } from '@interface/components/Loading';
 import { ExampleTable } from '@interface/components/Tables';
 
-export default function FlashcardFinder() {
+export function FlashcardFinderV1(): JSX.Element {
   const {
     exampleQuery,
     displayExamples,

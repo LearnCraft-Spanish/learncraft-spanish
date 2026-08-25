@@ -1,0 +1,27 @@
+.root {
+  display: block;
+  margin: 0;
+  color: var(--lcs-color-label);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-eyebrow);
+  font-weight: var(--lcs-weight-medium);
+  letter-spacing: var(--lcs-tracking-eyebrow);
+  line-height: var(--lcs-line-tight);
+  text-transform: uppercase;
+}
+
+.muted {
+  color: var(--lcs-color-muted);
+}
+
+.onDark {
+  color: var(--lcs-on-dark-75);
+}
+
+.regular {
+  font-weight: var(--lcs-weight-regular);
+}
+
+.leadingBody {
+  line-height: var(--lcs-line-body);
+}

@@ -2,9 +2,11 @@ import type { UseSelectedCourseAndLessonsReturnType } from '@application/coordin
 import type { UseExampleFilterCoordinatorReturnType } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import type { ExampleFilters as LocalExampleFilters } from '@application/ports/examplePort';
 import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
+import type { CourseWithLessons } from '@learncraft-spanish/shared';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleFilterCoordinator } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
+import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
 import { useReachableSkills } from '@application/queries/useReachableSkills';
 import {
   PreSetQuizPreset,
@@ -27,6 +29,8 @@ export type UseCombinedFiltersReturnType =
       outOfRangeSkillTagKeys: string[];
       filterPreset: PreSetQuizPreset;
       setFilterPreset: (preset: PreSetQuizPreset) => void;
+      /** Catalog of courses for the Course select. Optional so existing mocks typecheck. */
+      coursesWithLessons?: CourseWithLessons[];
     } & { isAdmin?: boolean };
 
 export interface UseCombinedFiltersProps {
@@ -61,6 +65,10 @@ export function useCombinedFilters({
   } = useExampleFilterCoordinator();
 
   const { isAdmin } = useAuthAdapter();
+
+  const { data: coursesWithLessons } = useCoursesWithLessons(
+    includeUnpublished ?? false,
+  );
 
   // Destructure the course and lesson properties from the coordinator
   const {
@@ -244,5 +252,6 @@ export function useCombinedFilters({
 
     // Is admin, for enabling unpublished courses and lessons toggle
     isAdmin,
+    coursesWithLessons: coursesWithLessons ?? [],
   };
 }

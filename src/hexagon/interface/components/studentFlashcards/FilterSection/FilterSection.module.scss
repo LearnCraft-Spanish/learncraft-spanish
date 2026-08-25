@@ -1,0 +1,391 @@
+.sectionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-5);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--lcs-space-7) var(--lcs-space-8);
+  border-bottom: var(--lcs-border-hairline) solid var(--lcs-divider);
+  border-top-left-radius: var(--lcs-radius-xl);
+  border-top-right-radius: var(--lcs-radius-xl);
+}
+
+.root {
+  position: relative;
+  z-index: var(--lcs-z-popover);
+  overflow: visible;
+}
+
+/*
+ * Prototype keeps one 20px rail on every band, including at 768.
+ * CardSection / CardFooterStrip collapse to 16px there; pin so header,
+ * bodies, admin strip, and footer stay on the same inset.
+ */
+.root > :first-child > * {
+  padding-left: var(--lcs-space-8);
+  padding-right: var(--lcs-space-8);
+}
+
+@media (max-width: 768px) {
+  .root > :first-child > * {
+    padding-left: var(--lcs-space-8);
+    padding-right: var(--lcs-space-8);
+  }
+
+  .root > :first-child > *:has(.scopeGrid),
+  .root > :first-child > *:has(.tagsHeader) {
+    padding-top: var(--lcs-space-8);
+    padding-bottom: var(--lcs-space-8);
+  }
+}
+
+.root > :first-child > :last-child {
+  padding-top: var(--lcs-space-7);
+  padding-bottom: var(--lcs-space-7);
+  border-bottom-left-radius: var(--lcs-radius-xl);
+  border-bottom-right-radius: var(--lcs-radius-xl);
+}
+
+.inlineAction :global(button[class]) {
+  padding: var(--lcs-space-1);
+  font-size: var(--lcs-text-action);
+  font-weight: var(--lcs-weight-bold);
+  /* Button.root is line-height 1 (~22px here). Prototype inherits normal
+   * leading, so 4px pad + 14px type lands ~27px. */
+  line-height: normal;
+}
+
+.scopeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--lcs-space-7) var(--lcs-space-8);
+}
+
+.startLesson {
+  display: flex;
+  min-width: 0;
+  align-items: flex-end;
+  padding-bottom: var(--lcs-space-5);
+}
+
+.startLesson :global(label),
+.adminStrip :global(label),
+.root > :first-child > :last-child :global(label) {
+  font-size: var(--lcs-text-action);
+  gap: var(--lcs-space-4);
+}
+
+.startLesson :global(span:last-of-type) {
+  color: var(--lcs-color-muted);
+}
+
+.fromLesson {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.scopeGrid :global(label),
+.fromLessonLabel {
+  line-height: var(--lcs-line-body);
+}
+
+.fromLessonLabel {
+  margin-bottom: var(--lcs-space-2);
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+}
+
+.scopeGrid :global(select) {
+  padding-left: var(--lcs-space-5);
+  padding-right: var(--lcs-space-5);
+}
+
+.fromLessonPlate {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--lcs-control-height);
+  padding: 0 var(--lcs-space-5);
+  border: var(--lcs-control-border) solid var(--lcs-border-card);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-page);
+  color: var(--lcs-color-muted);
+  font-family: inherit;
+  font-size: var(--lcs-text-control);
+}
+
+.adminStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-5);
+  align-items: center;
+  padding: var(--lcs-space-6) var(--lcs-space-8);
+  border-top: var(--lcs-border-hairline) solid var(--lcs-divider);
+  background-color: var(--lcs-tint-label-subtle);
+}
+
+.adminStrip > span {
+  padding: var(--lcs-space-1) var(--lcs-space-4);
+  font-weight: var(--lcs-weight-medium);
+  line-height: var(--lcs-line-body);
+}
+
+.tagsHeader {
+  display: flex;
+  margin-bottom: var(--lcs-space-5);
+}
+
+.modeTabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-page);
+}
+
+.modeTab {
+  position: relative;
+  display: flex;
+  min-height: var(--lcs-control-height-sm);
+  align-items: center;
+  justify-content: center;
+  padding: var(--lcs-space-3) var(--lcs-space-5);
+  border: none;
+  background: none;
+  color: var(--lcs-color-muted);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--lcs-text-action);
+  font-weight: var(--lcs-weight-medium);
+  line-height: var(--lcs-line-tight);
+  transition:
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.modeTab + .modeTab {
+  border-left: var(--lcs-control-border) solid var(--lcs-border-control);
+}
+
+.modeTab:first-child {
+  border-top-left-radius: var(--lcs-radius-md);
+  border-bottom-left-radius: var(--lcs-radius-md);
+}
+
+.modeTab:last-child {
+  border-top-right-radius: var(--lcs-radius-md);
+  border-bottom-right-radius: var(--lcs-radius-md);
+}
+
+.modeTab:hover {
+  background-color: var(--lcs-tint-hover);
+  color: var(--lcs-color-ink);
+}
+
+.modeTab:focus-visible {
+  z-index: 1;
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.modeTabOn {
+  background-color: var(--lcs-color-action);
+  color: var(--lcs-color-on-action);
+}
+
+.modeTabOn:hover {
+  background-color: var(--lcs-color-action-hover);
+  color: var(--lcs-color-on-action);
+}
+
+.tagSearchRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-5);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tagSearch {
+  position: relative;
+  z-index: var(--lcs-z-popover);
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 520px;
+}
+
+.tagSearch :global(svg) {
+  width: var(--lcs-space-7);
+  height: var(--lcs-space-7);
+}
+
+.tagSearch :global(input) {
+  padding-left: 40px;
+}
+
+.tagSearch > div {
+  display: block;
+  width: 100%;
+}
+
+.tagSearch > div > div {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/*
+ * Hang the suggestion sheet below the 44px field (plus the 6px gap).
+ * The card is unclipped so the sheet can paint past the footer and over
+ * the results. overflow on the panel only rounds the rows, not the page.
+ */
+.tagSearchOpen > div > div:last-child {
+  top: calc(var(--lcs-control-height) + var(--lcs-space-2));
+  right: 0;
+  overflow: hidden;
+  border-radius: var(--lcs-radius-xl);
+  box-shadow: var(--lcs-shadow-popover);
+}
+
+.suggestions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestion {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  /* Prototype 11px 16px. 11px is one-off; scale jumps 10 → 12. */
+  padding: 11px var(--lcs-space-7);
+  border: none;
+  border-bottom: var(--lcs-border-hairline) solid var(--lcs-divider);
+  background: none;
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--lcs-text-control);
+  line-height: var(--lcs-line-body);
+  text-align: left;
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.suggestion:last-child {
+  border-bottom: none;
+}
+
+.suggestion:hover {
+  background-color: var(--lcs-color-page);
+}
+
+.suggestion:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.suggestionMeta {
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-eyebrow);
+}
+
+.noSuggestions {
+  padding: var(--lcs-space-6) var(--lcs-space-7);
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-action);
+}
+
+.appliedTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-3);
+  margin-top: var(--lcs-space-6);
+}
+
+.appliedTags > span {
+  padding: 5px var(--lcs-space-3) 5px var(--lcs-space-5);
+  border-radius: var(--lcs-radius-sm);
+  font-weight: var(--lcs-weight-medium);
+  letter-spacing: 0.04em;
+  line-height: var(--lcs-line-body);
+  gap: var(--lcs-space-3);
+}
+
+.appliedTags button {
+  margin-right: 0;
+  opacity: 0.7;
+}
+
+.emptyTags {
+  margin: var(--lcs-space-6) 0 0;
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+}
+
+.presetsHint {
+  margin: 0 0 var(--lcs-space-4);
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+}
+
+.presetList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-3);
+}
+
+.preset {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px var(--lcs-space-6);
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-surface);
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--lcs-text-action);
+  font-weight: var(--lcs-weight-medium);
+  gap: var(--lcs-space-3);
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.preset:hover {
+  background-color: var(--lcs-tint-row-selected);
+}
+
+.preset:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.presetOn {
+  border-color: var(--lcs-color-action);
+  background-color: var(--lcs-color-action);
+  color: var(--lcs-color-on-action);
+}
+
+.presetOn:hover {
+  background-color: var(--lcs-color-action-hover);
+}
+
+.presetCount {
+  color: var(--lcs-color-muted);
+}
+
+.presetOn .presetCount {
+  color: inherit;
+  opacity: 0.65;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modeTab,
+  .suggestion,
+  .preset {
+    transition: none;
+  }
+}

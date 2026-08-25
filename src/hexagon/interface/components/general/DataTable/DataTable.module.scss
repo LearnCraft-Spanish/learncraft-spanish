@@ -1,0 +1,133 @@
+.root {
+  overflow: hidden;
+  border: var(--lcs-border-hairline) solid var(--lcs-border-card);
+  border-radius: var(--lcs-radius-xl);
+  background-color: var(--lcs-color-surface);
+}
+
+.headerRow {
+  display: grid;
+  align-items: center;
+  padding: var(--dt-header-pad, var(--lcs-space-5) var(--lcs-space-8));
+  gap: var(--dt-column-gap, var(--lcs-space-6));
+  background-color: var(--lcs-color-surface-dark);
+  grid-template-columns: var(--dt-columns);
+}
+
+.headerCell {
+  color: var(--lcs-on-dark-75);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-eyebrow);
+  font-weight: var(--lcs-weight-medium);
+  letter-spacing: var(--lcs-tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+/* No zebra striping and no vertical rules — one hairline between rows.
+ * 56px is the gallery floor. Finder sets --dt-row-min-height to the in-row
+ * Add (40px) plus the 14px row pad on each side. */
+.row {
+  display: grid;
+  box-sizing: border-box;
+  min-height: var(--dt-row-min-height, 56px);
+  align-items: center;
+  padding: var(--dt-row-pad, var(--lcs-space-5) var(--lcs-space-8));
+  gap: var(--dt-column-gap, var(--lcs-space-6));
+  grid-template-columns: var(--dt-columns);
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.row + .row,
+.expandRow + .row {
+  border-top: var(--lcs-border-hairline) solid var(--lcs-divider);
+}
+
+.row:hover {
+  background-color: var(--lcs-tint-hover);
+}
+
+.selected,
+.selected:hover {
+  background-color: var(--lcs-tint-row-selected);
+}
+
+.cell {
+  min-width: 0;
+  color: var(--lcs-color-ink);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-body);
+}
+
+.alignEnd {
+  text-align: right;
+}
+
+.expandRow {
+  display: block;
+  padding: var(--lcs-space-7) var(--lcs-space-8) var(--lcs-space-8);
+  border-top: var(--lcs-border-hairline) solid var(--lcs-divider);
+  background-color: var(--lcs-color-page);
+}
+
+.expandFlush {
+  padding: 0;
+  border-top: none;
+  background-color: transparent;
+}
+
+.record {
+  position: relative;
+  border-top: var(--lcs-border-hairline) solid var(--lcs-divider);
+}
+
+.selectedRecord::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--lcs-tint-row-selected);
+  pointer-events: none;
+}
+
+.noRowHover .row:hover {
+  background-color: transparent;
+}
+
+.noRowHover .selected,
+.noRowHover .selected:hover {
+  background-color: var(--lcs-tint-row-selected);
+}
+
+.empty {
+  padding: var(--lcs-space-8);
+}
+
+@media (max-width: 768px) {
+  .headerRow {
+    padding: var(--dt-header-pad, var(--lcs-space-5) var(--lcs-space-7));
+    /* Falls back to the desktop grid when the caller gave no mobile layout. */
+    grid-template-areas: var(--dt-mobile-areas, none);
+    grid-template-columns: var(--dt-mobile-columns, var(--dt-columns));
+    row-gap: var(--lcs-space-1);
+  }
+
+  .row {
+    padding: var(--dt-row-pad, var(--lcs-space-5) var(--lcs-space-7));
+    grid-template-areas: var(--dt-mobile-areas, none);
+    grid-template-columns: var(--dt-mobile-columns, var(--dt-columns));
+    row-gap: var(--lcs-space-1);
+  }
+
+  .placed {
+    grid-area: var(--dt-mobile-area);
+  }
+
+  .hiddenOnMobile {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row {
+    transition: none;
+  }
+}

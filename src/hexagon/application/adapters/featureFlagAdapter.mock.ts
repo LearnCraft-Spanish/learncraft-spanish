@@ -1,10 +1,10 @@
 import type { FeatureFlagPort } from '@application/ports/featureFlagPort';
-import type { StudentUiFlag } from '@domain/uiFlags';
+import type { UiFlag } from '@domain/uiFlags';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import { vi } from 'vitest';
 
 const defaultMockAdapter: FeatureFlagPort = {
-  isEnabled: vi.fn<(flagId: StudentUiFlag) => boolean>(() => false),
+  isEnabled: vi.fn<(flagId: UiFlag) => boolean>(() => false),
 };
 
 export const {
