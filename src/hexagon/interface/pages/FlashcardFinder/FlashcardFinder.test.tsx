@@ -89,6 +89,7 @@ vi.mock('@interface/components/studentFlashcards/ResultsSection', () => ({
     firstPageLoading,
     filteredExamplesLoading,
     mobileLayout,
+    rowAction,
     onApplyFilters,
     onCreateQuiz,
     onCopyPage,
@@ -100,6 +101,7 @@ vi.mock('@interface/components/studentFlashcards/ResultsSection', () => ({
     firstPageLoading?: boolean;
     filteredExamplesLoading?: boolean;
     mobileLayout?: boolean;
+    rowAction?: string;
     onApplyFilters?: () => void;
     onCreateQuiz?: () => void;
     onCopyPage?: () => void;
@@ -112,6 +114,7 @@ vi.mock('@interface/components/studentFlashcards/ResultsSection', () => ({
       data-first-page-loading={String(firstPageLoading ?? false)}
       data-filtered-loading={String(filteredExamplesLoading ?? false)}
       data-mobile-layout={String(mobileLayout ?? false)}
+      data-row-action={String(rowAction)}
     >
       <button type="button" onClick={onApplyFilters}>
         mock-apply-filters
@@ -284,6 +287,12 @@ describe('flashcard finder page', () => {
     expect(screen.getByTestId('results-section')).toHaveAttribute(
       'data-mobile-layout',
       'true',
+    );
+    // Finder omits rowAction so ResultsSection defaults to `collect` — Owned
+    // at rest on collected rows, never the Manager's always-Remove treatment.
+    expect(screen.getByTestId('results-section')).toHaveAttribute(
+      'data-row-action',
+      'undefined',
     );
     expect(screen.getByTestId('finder-bottom-bar')).toBeInTheDocument();
     expect(screen.queryByTestId('filter-panel')).not.toBeInTheDocument();

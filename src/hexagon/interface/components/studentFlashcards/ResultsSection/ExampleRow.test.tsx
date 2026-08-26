@@ -11,7 +11,7 @@ import {
   SpanishSentence,
 } from '@interface/components/studentFlashcards/ResultsSection/ExampleRow';
 import { PartOfSpeech } from '@learncraft-spanish/shared';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { createMockVocabulary } from '@testing/factories/vocabularyFactories';
@@ -83,6 +83,8 @@ const emptyLessonPopup: LessonPopup = {
 
 /** `makeExample` speaks this sentence, and every control is named after it. */
 const EXPAND_LABEL = 'Expand row: No quiero eso aquí.';
+/** Owned/Remove button keeps this accessible name at rest and on hover. */
+const OWNED_REMOVE_NAME = 'Remove No quiero eso aquí. from your collection';
 
 describe('spanish sentence', () => {
   afterEach(() => {
@@ -428,8 +430,8 @@ describe('buildExampleRow', () => {
       <DataTable
         columns={[
           { id: 'select', header: '' },
-          { id: 'spanish', header: 'Spanish' },
           { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
           { id: 'actions', header: '' },
         ]}
         rows={[row]}
@@ -446,6 +448,45 @@ describe('buildExampleRow', () => {
     expect(
       screen.getByRole('button', { name: EXPAND_LABEL }),
     ).toBeInTheDocument();
+  });
+
+  it('orders sentence cells English then Spanish', () => {
+    const row = buildExampleRow({
+      example: makeExample(),
+      selected: false,
+      expanded: false,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards: makeFlashcards(),
+      lessonPopup: emptyLessonPopup,
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    render(
+      <DataTable
+        columns={[
+          { id: 'select', header: '' },
+          { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
+          { id: 'actions', header: '' },
+        ]}
+        rows={[row]}
+        columnTemplate="44px 1fr 1fr 132px"
+        caption="Row"
+      />,
+    );
+
+    const dataRow = screen.getAllByRole('row')[1];
+    const english = within(dataRow).getByText("I don't want that here.");
+    const spanish = within(dataRow).getByText('No quiero eso aquí.');
+
+    expect(
+      english.compareDocumentPosition(spanish) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it('names the chevron for collapsing once the row is open', () => {
@@ -468,8 +509,8 @@ describe('buildExampleRow', () => {
         <DataTable
           columns={[
             { id: 'select', header: '' },
-            { id: 'spanish', header: 'Spanish' },
             { id: 'english', header: 'English' },
+            { id: 'spanish', header: 'Spanish' },
             { id: 'actions', header: '' },
           ]}
           rows={[row]}
@@ -516,8 +557,8 @@ describe('buildExampleRow', () => {
       <DataTable
         columns={[
           { id: 'select', header: '' },
-          { id: 'spanish', header: 'Spanish' },
           { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
           { id: 'actions', header: '' },
         ]}
         rows={[row]}
@@ -526,7 +567,7 @@ describe('buildExampleRow', () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Remove' }));
+    await user.click(screen.getByRole('button', { name: OWNED_REMOVE_NAME }));
 
     expect(calls).toEqual(['focus', 'delete']);
   });
@@ -556,8 +597,8 @@ describe('buildExampleRow', () => {
       <DataTable
         columns={[
           { id: 'select', header: '' },
-          { id: 'spanish', header: 'Spanish' },
           { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
           { id: 'actions', header: '' },
         ]}
         rows={[row]}
@@ -566,15 +607,100 @@ describe('buildExampleRow', () => {
       />,
     );
 
-    // Owned swaps back to Collect in place, so the button the student is
+    // Owned swaps back to Add in place, so the button the student is
     // standing on survives and focus must not move.
-    await user.click(screen.getByRole('button', { name: 'Owned' }));
+    await user.click(screen.getByRole('button', { name: OWNED_REMOVE_NAME }));
 
     expect(studentFlashcards.deleteFlashcards).toHaveBeenCalledWith([11]);
     expect(onRemoveRequested).not.toHaveBeenCalled();
   });
 
-  it('disables collect while a flashcard is pending', async () => {
+  it('shows Add on an uncollected finder row and Owned at rest once collected', () => {
+    const uncollected = buildExampleRow({
+      example: makeExample(),
+      selected: false,
+      expanded: false,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards: makeFlashcards(),
+      lessonPopup: emptyLessonPopup,
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    const { rerender } = render(
+      <DataTable
+        columns={[
+          { id: 'select', header: '' },
+          { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
+          { id: 'actions', header: '' },
+        ]}
+        rows={[uncollected]}
+        columnTemplate="44px 1fr 1fr 132px"
+        caption="Row"
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: OWNED_REMOVE_NAME }),
+    ).not.toBeInTheDocument();
+
+    const collected = buildExampleRow({
+      example: makeExample(),
+      selected: false,
+      expanded: false,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards: makeFlashcards({
+        isExampleCollected: vi.fn(() => true),
+      }),
+      lessonPopup: emptyLessonPopup,
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    rerender(
+      <DataTable
+        columns={[
+          { id: 'select', header: '' },
+          { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
+          { id: 'actions', header: '' },
+        ]}
+        rows={[collected]}
+        columnTemplate="44px 1fr 1fr 132px"
+        caption="Row"
+      />,
+    );
+
+    const owned = screen.getByRole('button', { name: OWNED_REMOVE_NAME });
+    expect(owned).toBeInTheDocument();
+    // Accessible name stays the remove phrasing — never "Owned" or "Remove".
+    expect(
+      screen.queryByRole('button', { name: 'Owned' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove' }),
+    ).not.toBeInTheDocument();
+    // Finder keeps the Owned/Remove width-reservation stack; Manager does not.
+    // This fails if someone later made the Finder show "Remove" at rest.
+    expect(
+      owned.querySelector(`.${rowStyles.ownedRestLabel}`),
+    ).toHaveTextContent('Owned');
+    expect(
+      owned.querySelector(`.${rowStyles.ownedHoverLabel}`),
+    ).toHaveTextContent('Remove');
+    expect(owned.parentElement).toHaveClass(rowStyles.ownedAction);
+    expect(owned.parentElement).not.toHaveClass(rowStyles.removeAction);
+  });
+
+  it('shows Adding... while an add is in flight', async () => {
     const user = userEvent.setup();
     const studentFlashcards = makeFlashcards({
       isAddingFlashcard: vi.fn(() => true),
@@ -597,8 +723,8 @@ describe('buildExampleRow', () => {
       <DataTable
         columns={[
           { id: 'select', header: '' },
-          { id: 'spanish', header: 'Spanish' },
           { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
           { id: 'actions', header: '' },
         ]}
         rows={[row]}
@@ -607,12 +733,13 @@ describe('buildExampleRow', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Collect' })).toBeDisabled();
-    await user.click(screen.getByRole('button', { name: 'Collect' }));
+    const button = screen.getByRole('button', { name: 'Adding...' });
+    expect(button).toBeDisabled();
+    await user.click(button);
     expect(studentFlashcards.createFlashcards).not.toHaveBeenCalled();
   });
 
-  it('disables owned while a flashcard is being removed', () => {
+  it('shows Removing... while a removal is in flight on a collected finder row', () => {
     const studentFlashcards = makeFlashcards({
       isExampleCollected: vi.fn(() => true),
       isRemovingFlashcard: vi.fn(() => true),
@@ -635,8 +762,8 @@ describe('buildExampleRow', () => {
       <DataTable
         columns={[
           { id: 'select', header: '' },
-          { id: 'spanish', header: 'Spanish' },
           { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
           { id: 'actions', header: '' },
         ]}
         rows={[row]}
@@ -645,10 +772,10 @@ describe('buildExampleRow', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Owned' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Removing...' })).toBeDisabled();
   });
 
-  it('offers a single Remove action in remove mode', async () => {
+  it('shows always-visible Remove on a manager row, not Owned', async () => {
     const user = userEvent.setup();
     const studentFlashcards = makeFlashcards({
       isExampleCollected: vi.fn(() => true),
@@ -672,8 +799,8 @@ describe('buildExampleRow', () => {
       <DataTable
         columns={[
           { id: 'select', header: '' },
-          { id: 'spanish', header: 'Spanish' },
           { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
           { id: 'actions', header: '' },
         ]}
         rows={[row]}
@@ -683,24 +810,45 @@ describe('buildExampleRow', () => {
     );
 
     expect(
-      screen.queryByRole('button', { name: 'Collect' }),
+      screen.queryByRole('button', { name: 'Add' }),
     ).not.toBeInTheDocument();
+    // Accessible name stays the per-row phrasing, never bare "Owned"/"Remove".
     expect(
       screen.queryByRole('button', { name: 'Owned' }),
     ).not.toBeInTheDocument();
     expect(
+      screen.queryByRole('button', { name: 'Remove' }),
+    ).not.toBeInTheDocument();
+
+    const remove = screen.getByRole('button', { name: OWNED_REMOVE_NAME });
+    expect(remove.parentElement).toHaveClass(rowStyles.removeAction);
+    expect(remove.parentElement).not.toHaveClass(rowStyles.ownedAction);
+    // Manager drops the Owned/Remove stack — visible label is Remove at rest.
+    expect(remove.querySelector(`.${rowStyles.ownedRestLabel}`)).toBeNull();
+    expect(remove.querySelector(`.${rowStyles.ownedHoverLabel}`)).toBeNull();
+    expect(remove).toHaveTextContent('Remove');
+    expect(remove).not.toHaveTextContent('Owned');
+    expect(
       screen.getByRole('button', { name: EXPAND_LABEL }),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Remove' }));
+    await user.click(remove);
 
     expect(studentFlashcards.deleteFlashcards).toHaveBeenCalledWith([11]);
   });
 
   it.each([
-    { name: 'Remove', rowAction: 'remove' as const, collected: true },
-    { name: 'Owned', rowAction: 'collect' as const, collected: true },
-    { name: 'Collect', rowAction: 'collect' as const, collected: false },
+    {
+      name: OWNED_REMOVE_NAME,
+      rowAction: 'remove' as const,
+      collected: true,
+    },
+    {
+      name: OWNED_REMOVE_NAME,
+      rowAction: 'collect' as const,
+      collected: true,
+    },
+    { name: 'Add', rowAction: 'collect' as const, collected: false },
   ])(
     'handles the rejection of $name instead of leaving it to escape',
     async ({ name, rowAction, collected }) => {
@@ -730,8 +878,8 @@ describe('buildExampleRow', () => {
         <DataTable
           columns={[
             { id: 'select', header: '' },
-            { id: 'spanish', header: 'Spanish' },
             { id: 'english', header: 'English' },
+            { id: 'spanish', header: 'Spanish' },
             { id: 'actions', header: '' },
           ]}
           rows={[row]}
@@ -774,8 +922,8 @@ describe('buildExampleRow', () => {
       <DataTable
         columns={[
           { id: 'select', header: '' },
-          { id: 'spanish', header: 'Spanish' },
           { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
           { id: 'actions', header: '' },
         ]}
         rows={[row]}
@@ -792,7 +940,7 @@ describe('buildExampleRow', () => {
     expect(studentFlashcards.deleteFlashcards).not.toHaveBeenCalled();
   });
 
-  it('disables Remove while the same example is being added', () => {
+  it('disables the owned button while the same example is being added', () => {
     const studentFlashcards = makeFlashcards({
       isExampleCollected: vi.fn(() => true),
       isAddingFlashcard: vi.fn(() => true),
@@ -816,8 +964,8 @@ describe('buildExampleRow', () => {
       <DataTable
         columns={[
           { id: 'select', header: '' },
-          { id: 'spanish', header: 'Spanish' },
           { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
           { id: 'actions', header: '' },
         ]}
         rows={[row]}
@@ -826,7 +974,9 @@ describe('buildExampleRow', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: OWNED_REMOVE_NAME }),
+    ).toBeDisabled();
   });
 
   it('hides play controls when the example has no audio links', () => {
@@ -848,8 +998,8 @@ describe('buildExampleRow', () => {
       <DataTable
         columns={[
           { id: 'select', header: '' },
-          { id: 'spanish', header: 'Spanish' },
           { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
           { id: 'actions', header: '' },
         ]}
         rows={[row]}
@@ -891,8 +1041,8 @@ describe('buildExampleRow', () => {
       <DataTable
         columns={[
           { id: 'select', header: '' },
-          { id: 'spanish', header: 'Spanish' },
           { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
           { id: 'actions', header: '' },
         ]}
         rows={[row]}
@@ -930,8 +1080,8 @@ describe('buildExampleRow', () => {
       <DataTable
         columns={[
           { id: 'select', header: '' },
-          { id: 'spanish', header: 'Spanish' },
           { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
           { id: 'actions', header: '' },
         ]}
         rows={[row]}

@@ -489,7 +489,8 @@ describe('flashcard manager v2 results wiring', () => {
     renderV2();
 
     const results = screen.getByTestId('results-section');
-    // Every row is already owned, so the row action is Remove.
+    // Manager passes `remove` so every row gets always-visible Remove (not
+    // the Finder's Owned ↔ hover-Remove). Same mutation; different labelMode.
     expect(results).toHaveAttribute('data-row-action', 'remove');
     // STUDENT_FLASHCARDS.md requires the results row to reflow below 768px
     // rather than scroll sideways.

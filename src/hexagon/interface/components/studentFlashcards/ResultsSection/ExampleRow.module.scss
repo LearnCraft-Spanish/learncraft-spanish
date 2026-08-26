@@ -45,7 +45,78 @@
 
 .ownedAction button,
 .removeAction button {
+  position: relative;
   border: var(--lcs-control-border) solid var(--lcs-border-control);
+}
+
+/* Visually-hidden stable name; Finder hover/focus swap only the aria-hidden stack. */
+.ownedA11yName {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: -1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Finder collected: Owned at rest, red Remove on hover/focus. */
+.ownedVisual {
+  display: inline-grid;
+  justify-items: center;
+}
+
+.ownedRestLabel,
+.ownedHoverLabel {
+  grid-area: 1 / 1;
+}
+
+.ownedHoverLabel {
+  visibility: hidden;
+}
+
+.ownedAction button:hover:not(:disabled),
+.ownedAction button:focus-visible:not(:disabled) {
+  border-color: var(--lcs-color-error);
+  color: var(--lcs-color-error);
+}
+
+.ownedAction button:hover:not(:disabled) .ownedRestLabel,
+.ownedAction button:focus-visible:not(:disabled) .ownedRestLabel {
+  visibility: hidden;
+}
+
+.ownedAction button:hover:not(:disabled) .ownedHoverLabel,
+.ownedAction button:focus-visible:not(:disabled) .ownedHoverLabel {
+  visibility: visible;
+}
+
+/*
+ * Manager: always "Remove". Red border/text at rest; red fill + on-action
+ * (white) text on hover/focus. Disabled keeps the Button's grey treatment —
+ * never the inverted hover fill. No dedicated --lcs-color-on-error token;
+ * Button.destructive already pairs --lcs-color-error with --lcs-color-on-action.
+ */
+.removeAction button:not(:disabled) {
+  border-color: var(--lcs-color-error);
+  color: var(--lcs-color-error);
+  transition:
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    border-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.removeAction button:hover:not(:disabled),
+.removeAction button:focus-visible:not(:disabled) {
+  background-color: var(--lcs-color-error);
+  border-color: var(--lcs-color-error);
+  color: var(--lcs-color-on-action);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .removeAction button:not(:disabled) {
+    transition: none;
+  }
 }
 
 .expandPanel {

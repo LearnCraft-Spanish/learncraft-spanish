@@ -72,8 +72,8 @@ export interface ResultsSectionProps {
    * the count row a labelled `tabIndex={-1}` landing spot and moves focus there
    * whenever the number changes or a row Remove fires, so a destroyed control
    * does not drop a keyboard user on `<body>`. Omitted on the finder, whose row
-   * action swaps Collect for Owned in place — a focusable button always
-   * survives there, so nothing should move.
+   * action swaps Add for Owned in place — a focusable button always survives
+   * there, so nothing should move.
    */
   focusRequest?: number;
   /** Noun beside the count, e.g. "flashcards match". */
@@ -91,7 +91,7 @@ export interface ResultsSectionProps {
   emptyIcon?: IconName;
   /** Replaces the built-in finder actions menu in the count row. */
   actionsMenu?: ReactNode;
-  /** `remove` gives every row a single Remove button. */
+  /** `remove` gives every row always-visible Remove (Manager). */
   rowAction?: ExampleRowAction;
   /** Supplies the expand panel's review-schedule column, per example. */
   getReviewSchedule?: (exampleId: number) => FlashcardReviewDates | undefined;
@@ -101,21 +101,21 @@ export interface ResultsSectionProps {
 
 const COLUMNS: DataTableColumn[] = [
   { id: 'select', header: '' },
-  { id: 'spanish', header: 'Spanish' },
   { id: 'english', header: 'English' },
+  { id: 'spanish', header: 'Spanish' },
   { id: 'actions', header: '', align: 'end' },
 ];
 
 const MOBILE_COLUMNS: DataTableColumn[] = [
   { id: 'select', header: '', mobileArea: 'select' },
-  { id: 'spanish', header: 'Spanish', mobileArea: 'spanish' },
   { id: 'english', header: 'English', mobileArea: 'english' },
+  { id: 'spanish', header: 'Spanish', mobileArea: 'spanish' },
   { id: 'actions', header: '', align: 'end', mobileArea: 'expand' },
 ];
 
 const MOBILE_LAYOUT: DataTableMobileLayout = {
   columnTemplate: '44px 1fr 44px',
-  templateAreas: '"select spanish expand" "select english expand"',
+  templateAreas: '"select english expand" "select spanish expand"',
 };
 
 const COLUMN_TEMPLATE = '44px minmax(240px, 1fr) minmax(240px, 1fr) 132px';

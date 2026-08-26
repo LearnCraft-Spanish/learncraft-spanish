@@ -35,7 +35,7 @@ import { SkillType } from '@learncraft-spanish/shared';
 import { useState } from 'react';
 import styles from './FilterSection.module.scss';
 
-const TAG_PLACEHOLDER = 'Search tags — grammar, vocabulary, verb form…';
+const TAG_PLACEHOLDER = 'Search tags — vocabulary, idiom, verb…';
 const SUGGESTION_CAP = 6;
 const EMPTY_TAGS_COPY =
   'No tags applied. Results cover every flashcard in the lesson range.';
@@ -59,14 +59,51 @@ function tagLabel(tag: SkillTag): string {
 function tagCategory(tag: SkillTag): string {
   switch (tag.type) {
     case SkillType.Vocabulary:
-      return tag.frequency != null ? 'frequency' : 'vocabulary';
-    case SkillType.Idiom:
       return 'vocabulary';
+    case SkillType.Idiom:
+      return 'idiom';
     case SkillType.Subcategory:
-      return 'grammar';
+      return 'subcategory';
     case SkillType.Verb:
+      return 'verb';
     case SkillType.Conjugation:
-      return 'verb form';
+      return 'conjugation';
+  }
+}
+
+/** Secondary line under the name — same field mapping as v1 TagFilter. */
+function tagDescriptor(tag: SkillTag): string | null {
+  switch (tag.type) {
+    case SkillType.Vocabulary: {
+      const descriptor = tag.descriptor.trim();
+      return descriptor.length > 0 ? descriptor : null;
+    }
+    case SkillType.Idiom: {
+      const subcategoryName = tag.subcategoryName.trim();
+      return subcategoryName.length > 0 ? subcategoryName : null;
+    }
+    case SkillType.Verb: {
+      const joined = tag.verbTags.join(' - ').trim();
+      return joined.length > 0 ? joined : null;
+    }
+    case SkillType.Subcategory:
+    case SkillType.Conjugation:
+      return null;
+  }
+}
+
+function suggestionTypeClass(tag: SkillTag): string {
+  switch (tag.type) {
+    case SkillType.Vocabulary:
+      return styles.suggestionVocabulary;
+    case SkillType.Idiom:
+      return styles.suggestionIdiom;
+    case SkillType.Subcategory:
+      return styles.suggestionSubcategory;
+    case SkillType.Verb:
+      return styles.suggestionVerb;
+    case SkillType.Conjugation:
+      return styles.suggestionConjugation;
   }
 }
 
@@ -150,16 +187,22 @@ function fromLessonOptions(
   if (!course) {
     return [];
   }
+  const start = startFromLesson(course);
   const regular =
     toLessonNumber === null
       ? []
       : course.lessons.filter(
           (lesson) => lesson.lessonNumber <= toLessonNumber,
         );
-  return [...virtualLessons(course), ...regular].map((lesson) => ({
-    value: String(lesson.lessonNumber),
-    label: lessonLabel(lesson),
-  }));
+  return [...virtualLessons(course), ...regular].map((lesson) => {
+    const base = lessonLabel(lesson);
+    const isStart =
+      start !== null && lesson.lessonNumber === start.lessonNumber;
+    return {
+      value: String(lesson.lessonNumber),
+      label: isStart ? `${base} — from the start` : base,
+    };
+  });
 }
 
 function tagCountLabel(count: number): string {
@@ -209,13 +252,6 @@ export function FilterSection({
     updateAudioOnly,
   } = exampleFilter;
 
-  const start = startFromLesson(course);
-  const [useStartingLesson, setUseStartingLesson] = useState(
-    () =>
-      fromLessonNumber !== null &&
-      start !== null &&
-      fromLessonNumber !== start.lessonNumber,
-  );
   const [tagFilterMode, setTagFilterMode] = useState<TagFilterMode>(() =>
     filterPreset !== PreSetQuizPreset.None ? 'preset' : 'search',
   );
@@ -226,9 +262,6 @@ export function FilterSection({
     .slice(0, SUGGESTION_CAP);
   const searchOpen = skillTagSearch.tagSearchTerm.trim().length > 0;
   const hasTags = selectedSkillTags.length > 0;
-  const startReadoutLabel = start
-    ? `${lessonLabel(start)} — from the start`
-    : '';
 
   function changeFromLesson(value: string): void {
     updateFromLessonNumber(Number.parseInt(value, 10));
@@ -262,7 +295,6 @@ export function FilterSection({
               size="inline"
               muted
               onClick={() => {
-                setUseStartingLesson(false);
                 setTagFilterMode('search');
                 onResetAll?.();
               }}
@@ -273,24 +305,35 @@ export function FilterSection({
         </div>
 
         <CardSection>
+          {isAdmin === true && (
+            <div className={styles.adminStrip}>
+              <Badge>Admin only</Badge>
+              <Toggle
+                id="finder-unpublished"
+                checked={includeUnpublished}
+                onChange={updateIncludeUnpublished}
+                label="Include unpublished courses and lessons"
+              />
+            </div>
+          )}
           <div className={styles.scopeGrid}>
-            {isAdmin === true && (
-              <div className={styles.adminStrip}>
-                <Badge>Admin only</Badge>
-                <Toggle
-                  id="finder-unpublished"
-                  checked={includeUnpublished}
-                  onChange={updateIncludeUnpublished}
-                  label="Include unpublished courses and lessons"
-                />
-              </div>
-            )}
             <Field htmlFor="finder-course" label="Course">
               <Select
                 id="finder-course"
                 value={courseId !== null ? String(courseId) : ''}
                 options={courseOptions(exampleFilter)}
                 onChange={changeCourse}
+              />
+            </Field>
+
+            <Field htmlFor="finder-from-lesson" label="From lesson">
+              <Select
+                id="finder-from-lesson"
+                value={
+                  fromLessonNumber !== null ? String(fromLessonNumber) : ''
+                }
+                options={fromLessonOptions(course, toLessonNumber)}
+                onChange={changeFromLesson}
               />
             </Field>
 
@@ -303,42 +346,6 @@ export function FilterSection({
                 emphasis
               />
             </Field>
-
-            <div className={styles.startLesson}>
-              <Toggle
-                id="finder-set-start"
-                checked={useStartingLesson}
-                onChange={(checked) => {
-                  setUseStartingLesson(checked);
-                  if (!checked && start) {
-                    updateFromLessonNumber(start.lessonNumber);
-                  }
-                }}
-                label="Set a starting lesson"
-              />
-            </div>
-
-            <div className={styles.fromLesson}>
-              {useStartingLesson ? (
-                <Field htmlFor="finder-from-lesson" label="From lesson">
-                  <Select
-                    id="finder-from-lesson"
-                    value={
-                      fromLessonNumber !== null ? String(fromLessonNumber) : ''
-                    }
-                    options={fromLessonOptions(course, toLessonNumber)}
-                    onChange={changeFromLesson}
-                  />
-                </Field>
-              ) : (
-                <>
-                  <span className={styles.fromLessonLabel}>From lesson</span>
-                  <div className={styles.fromLessonPlate}>
-                    {startReadoutLabel}
-                  </div>
-                </>
-              )}
-            </div>
           </div>
         </CardSection>
 
@@ -419,30 +426,45 @@ export function FilterSection({
                       </div>
                     ) : (
                       <ul className={styles.suggestions} role="listbox">
-                        {suggestions.map((tag) => (
-                          <li key={tag.key}>
-                            <button
-                              type="button"
-                              className={styles.suggestion}
-                              role="option"
-                              onClick={() => {
-                                addSkillTagToFilters(tag.key);
-                                skillTagSearch.removeTagFromSuggestions(
-                                  tag.key,
-                                );
-                                setTagQuery(
-                                  skillTagSearch.updateTagSearchTerm,
-                                  '',
-                                );
-                              }}
-                            >
-                              <span>{tagLabel(tag)}</span>
-                              <span className={styles.suggestionMeta}>
-                                {tagCategory(tag)}
-                              </span>
-                            </button>
-                          </li>
-                        ))}
+                        {suggestions.map((tag) => {
+                          const descriptor = tagDescriptor(tag);
+                          return (
+                            <li key={tag.key}>
+                              <button
+                                type="button"
+                                className={`${styles.suggestion} ${suggestionTypeClass(tag)}`}
+                                role="option"
+                                onClick={() => {
+                                  addSkillTagToFilters(tag.key);
+                                  skillTagSearch.removeTagFromSuggestions(
+                                    tag.key,
+                                  );
+                                  setTagQuery(
+                                    skillTagSearch.updateTagSearchTerm,
+                                    '',
+                                  );
+                                }}
+                              >
+                                <span className={styles.suggestionBody}>
+                                  <span className={styles.suggestionName}>
+                                    {tagLabel(tag)}
+                                  </span>
+                                  {descriptor !== null && (
+                                    <span
+                                      className={styles.suggestionDescriptor}
+                                      aria-hidden="true"
+                                    >
+                                      {descriptor}
+                                    </span>
+                                  )}
+                                </span>
+                                <span className={styles.suggestionMeta}>
+                                  {tagCategory(tag)}
+                                </span>
+                              </button>
+                            </li>
+                          );
+                        })}
                       </ul>
                     )}
                   </Popover>
@@ -468,17 +490,29 @@ export function FilterSection({
 
               {hasTags ? (
                 <div className={styles.appliedTags}>
-                  {selectedSkillTags.map((tag) => (
-                    <Chip
-                      key={tag.key}
-                      label={tagLabel(tag)}
-                      tone="action"
-                      onRemove={() => {
-                        removeSkillTagFromFilters(tag.key);
-                        skillTagSearch.addTagBackToSuggestions(tag.key);
-                      }}
-                    />
-                  ))}
+                  {selectedSkillTags.map((tag) => {
+                    const descriptor = tagDescriptor(tag);
+                    return (
+                      <span key={tag.key} className={styles.appliedTag}>
+                        <Chip
+                          label={tagLabel(tag)}
+                          tone="action"
+                          onRemove={() => {
+                            removeSkillTagFromFilters(tag.key);
+                            skillTagSearch.addTagBackToSuggestions(tag.key);
+                          }}
+                        />
+                        {descriptor !== null && (
+                          <span
+                            className={styles.appliedTagHint}
+                            aria-hidden="true"
+                          >
+                            {descriptor}
+                          </span>
+                        )}
+                      </span>
+                    );
+                  })}
                 </div>
               ) : (
                 <p className={styles.emptyTags}>{EMPTY_TAGS_COPY}</p>

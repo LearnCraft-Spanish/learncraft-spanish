@@ -73,9 +73,11 @@ The shared primitives those pages will compose are built ahead of the page work;
 
 ### Two constraints on the results table
 
-**No lesson column on either table.** Neither the Finder nor the Manager shows a lesson per row. The value either is not stored against the record or is too expensive to derive for every row on the page. Both tables omit the column rather than showing a blank or paying for the lookup. A row is therefore: select, Spanish, English, expand.
+**No lesson column on either table.** Neither the Finder nor the Manager shows a lesson per row. The value either is not stored against the record or is too expensive to derive for every row on the page. Both tables omit the column rather than showing a blank or paying for the lookup. A row is therefore: select, English, Spanish, expand.
 
-**Below 768px the row reflows** rather than scrolling sideways: Spanish stacks over English while the checkbox and chevron stay in place, spanning both lines. `DataTable` takes this as a `mobileLayout` prop; the areas are named by the caller.
+**Below 768px the row reflows** rather than scrolling sideways: English stacks over Spanish while the checkbox and chevron stay in place, spanning both lines. `DataTable` takes this as a `mobileLayout` prop; the areas are named by the caller.
+
+**Per-row remove looks different on Manager vs Finder.** Finder collected rows keep Owned at rest and swap the visible label to a red Remove on hover. Manager rows always show Remove (red border/text at rest, red fill on hover) — every row is already owned, so there is no Owned state. Both branch off `rowAction` (`collect` / `remove`), keep the same delete mutation, and keep a stable accessible name `Remove <row> from your collection`.
 
 ---
 
@@ -83,19 +85,21 @@ The shared primitives those pages will compose are built ahead of the page work;
 
 The UI looks similar; the data paths are different. Redesign must not merge them.
 
-|                    | Flashcard Finder                                    | Flashcard Manager                                                             |
-| ------------------ | --------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Source             | Catalog examples via `useExampleQuery`              | Owned flashcards via `useStudentFlashcards`                                   |
-| Filter application | Server query (coordinator → API)                    | Client `filterExamplesCombined` in `useFilterOwnedFlashcards`                 |
-| Pagination         | `useQueryPagination` — fetch 150, show 25, prefetch | `usePagination` — slice owned list, page size 25                              |
-| Filter UI          | Always on (`FilterPanel`)                           | Optional (`CloseableFilterPanel` toggle)                                      |
-| Row actions        | Add/remove from collection                          | Bulk select + remove; copy; delete all owned Spanglish; quiz / find-more menu |
+|                    | Flashcard Finder                                    | Flashcard Manager                                                                           |
+| ------------------ | --------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Source             | Catalog examples via `useExampleQuery`              | Owned flashcards via `useStudentFlashcards`                                                 |
+| Filter application | Server query (coordinator → API)                    | Client `filterExamplesCombined` in `useFilterOwnedFlashcards`                               |
+| Pagination         | `useQueryPagination` — fetch 150, show 25, prefetch | `usePagination` — slice owned list, page size 25                                            |
+| Filter UI          | Always on (`FilterPanel`)                           | Optional (`CloseableFilterPanel` toggle)                                                    |
+| Row actions        | Add; collected → Owned (Remove on hover)            | Always Remove; bulk select + menus; copy; delete all owned Spanglish; quiz / find-more menu |
 
 Filter **state** is global: [`useExampleFilterCoordinator`](../../application/coordinators/hooks/useExampleFilterCoordinator.ts) plus course/lesson selection. That is why Finder → Manager and Manager → Review My Flashcards can reuse filters without copying URL state. **Do not replace the coordinator for the redesign.** New filter UI must read/write the same coordinator, preferably through the page use case rather than by calling it from the panel.
 
 `useFlashcardFinder` already returns `exampleFilter` and `skillTagSearch`; the page ignores them. `useCombinedFilters` is subscribed **three times** on Finder (page use case, `useExampleQuery`, and `FilterPanel`). That is the seam to close when the new filter section is presentational.
 
 Finder fetch is gated: `useExampleQuery` only runs when a filter seed exists (lesson range, tags, exclude-Spanglish, or audio-only). An empty-looking Finder with no course/lesson selected is current behavior, not a loading bug. Preserve that unless product says otherwise.
+
+Tag suggestions in the v2 `FilterSection` keep a subdued echo of the v1 per-type palette (left rail + tint, not saturated cards). Vocabulary `frequency` ranks results but is never shown as a label or value. Selected tag chips surface the same descriptor the suggestion list uses (hover / keyboard focus).
 
 ---
 

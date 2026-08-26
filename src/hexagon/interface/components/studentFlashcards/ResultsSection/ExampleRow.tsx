@@ -22,9 +22,10 @@ import styles from './ExampleRow.module.scss';
 export type PlayingClip = `${number}:es` | `${number}:en`;
 
 /**
- * `collect` is the finder: Collect on a catalog example, Owned once it is in
- * the collection. `remove` is the manager, where every row is already owned
- * and the only row action is taking it back out.
+ * `collect` is the finder: Add on a catalog example, Owned (hover → Remove)
+ * once it is in the collection. `remove` is the manager, where every row is
+ * already owned — always-visible Remove with a focus handoff before the row
+ * unmounts. Visuals diverge on purpose; the mutation path does not.
  */
 export type ExampleRowAction = 'collect' | 'remove';
 
@@ -40,9 +41,9 @@ export interface ExampleRowModel {
   /** Review dates for the expand panel. Omitted on the finder. */
   reviewSchedule?: FlashcardReviewDates;
   /**
-   * Fired just before a row Remove deletes the row that holds the button, so
-   * the caller can take focus somewhere that survives. Never runs under the
-   * `collect` action, whose cell swaps Collect for Owned in place.
+   * Fired just before a Manager row Remove deletes the row that holds the
+   * button, so the caller can take focus somewhere that survives. Never runs
+   * under the `collect` action, whose cell swaps Add for Owned in place.
    */
   onRemoveRequested?: () => void;
   onToggleSelected: (exampleId: number, selected: boolean) => void;
@@ -170,6 +171,72 @@ function EnglishCell({
   );
 }
 
+function OwnedActionButton({
+  example,
+  rowLabel,
+  pending,
+  removing,
+  /** Finder: Owned ↔ Remove swap. Manager: always-visible Remove. */
+  labelMode,
+  handOffFocusOnRemove,
+  onRemoveRequested,
+  studentFlashcards,
+}: {
+  example: ExampleWithVocabulary;
+  rowLabel: string;
+  pending: boolean;
+  removing: boolean;
+  labelMode: 'owned' | 'remove';
+  /** Manager rows unmount on remove; Finder rows stay — only hand off then. */
+  handOffFocusOnRemove: boolean;
+  onRemoveRequested?: () => void;
+  studentFlashcards: UseStudentFlashcardsReturn;
+}): JSX.Element {
+  // Stable name on both pages so a rotor is not 25 copies of "Remove".
+  const accessibleName = `Remove ${rowLabel} from your collection`;
+  const isManagerRemove = labelMode === 'remove';
+
+  return (
+    <span
+      className={isManagerRemove ? styles.removeAction : styles.ownedAction}
+    >
+      <Button
+        variant="ghost"
+        muted
+        size="sm"
+        disabled={pending}
+        onClick={() => {
+          if (handOffFocusOnRemove) {
+            // This button is about to be disabled and then unmounted with
+            // its row, either of which drops focus to <body>. Hand it over
+            // before starting the removal.
+            onRemoveRequested?.();
+          }
+          studentFlashcards
+            .deleteFlashcards([example.id])
+            .catch(ignoreRowActionRejection);
+        }}
+      >
+        {removing ? (
+          'Removing...'
+        ) : (
+          <>
+            <span className={styles.ownedA11yName}>{accessibleName}</span>
+            {isManagerRemove ? (
+              <span aria-hidden="true">Remove</span>
+            ) : (
+              <span className={styles.ownedVisual} aria-hidden="true">
+                <span className={styles.ownedRestLabel}>Owned</span>
+                <span className={styles.ownedHoverLabel}>Remove</span>
+              </span>
+            )}
+          </>
+        )}
+      </Button>
+    </span>
+  );
+}
+
 function ActionsCell({
   example,
   expanded,
@@ -188,13 +255,18 @@ function ActionsCell({
   const collected = studentFlashcards.isExampleCollected({
     exampleId: example.id,
   });
+  const adding = studentFlashcards.isAddingFlashcard({
+    exampleId: example.id,
+  });
   const removing = studentFlashcards.isRemovingFlashcard({
     exampleId: example.id,
   });
-  const pending =
-    studentFlashcards.isAddingFlashcard({ exampleId: example.id }) || removing;
+  const pending = adding || removing;
 
   const rowLabel = exampleRowLabel(example);
+  // Manager (`remove`): every row is owned → always-Remove. Finder (`collect`):
+  // owned once collected → Owned / hover-Remove. Same mutation, different UI.
+  const showOwned = rowAction === 'remove' || collected;
 
   const expandToggle = (
     <span className={styles.expandToggle}>
@@ -215,52 +287,20 @@ function ActionsCell({
     </span>
   );
 
-  if (rowAction === 'remove') {
-    return (
-      <div className={styles.actions}>
-        {expandToggle}
-        <span className={styles.removeAction}>
-          <Button
-            variant="ghost"
-            muted
-            size="sm"
-            disabled={pending}
-            onClick={() => {
-              // This button is about to be disabled and then unmounted with
-              // its row, either of which drops focus to <body>. Hand it over
-              // before starting the removal.
-              onRemoveRequested?.();
-              studentFlashcards
-                .deleteFlashcards([example.id])
-                .catch(ignoreRowActionRejection);
-            }}
-          >
-            {removing ? 'Removing...' : 'Remove'}
-          </Button>
-        </span>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.actions}>
       {expandToggle}
-      {collected ? (
-        <span className={styles.ownedAction}>
-          <Button
-            variant="ghost"
-            muted
-            size="sm"
-            disabled={pending}
-            onClick={() => {
-              studentFlashcards
-                .deleteFlashcards([example.id])
-                .catch(ignoreRowActionRejection);
-            }}
-          >
-            Owned
-          </Button>
-        </span>
+      {showOwned ? (
+        <OwnedActionButton
+          example={example}
+          rowLabel={rowLabel}
+          pending={pending}
+          removing={removing}
+          labelMode={rowAction === 'remove' ? 'remove' : 'owned'}
+          handOffFocusOnRemove={rowAction === 'remove'}
+          onRemoveRequested={onRemoveRequested}
+          studentFlashcards={studentFlashcards}
+        />
       ) : (
         <span className={styles.collectAction}>
           <Button
@@ -273,7 +313,7 @@ function ActionsCell({
                 .catch(ignoreRowActionRejection);
             }}
           >
-            Collect
+            {adding ? 'Adding...' : 'Add'}
           </Button>
         </span>
       )}
@@ -513,14 +553,14 @@ export function buildExampleRow(model: ExampleRowModel): DataTableRow {
           model.onToggleSelected(example.id, checked);
         }}
       />,
-      <SpanishCell
-        key="spanish"
+      <EnglishCell
+        key="english"
         example={example}
         playing={model.playing}
         onTogglePlay={model.onTogglePlay}
       />,
-      <EnglishCell
-        key="english"
+      <SpanishCell
+        key="spanish"
         example={example}
         playing={model.playing}
         onTogglePlay={model.onTogglePlay}
