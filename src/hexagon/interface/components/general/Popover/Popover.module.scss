@@ -56,6 +56,29 @@
   }
 }
 
+/*
+ * Opt-in mobile escape hatch. Root goes static so a caller can make a wider
+ * ancestor (e.g. a chip row) the containing block. Panel stays `absolute`
+ * (scrolls with the page), hangs below that ancestor, and centers at 85vw
+ * via margin — not transform — so the shared `rise` translateY animation
+ * cannot knock it off-center. Anchored placement (default) never enters.
+ */
+@media (max-width: 768px) {
+  .mobileCenteredRoot {
+    position: static;
+  }
+
+  .mobileCentered {
+    top: calc(100% + var(--lcs-space-2));
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    width: 85vw;
+    margin-left: -42.5vw;
+    overflow-x: hidden;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .panel {
     animation: none;
