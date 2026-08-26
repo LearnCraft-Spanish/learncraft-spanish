@@ -735,6 +735,12 @@ describe('buildExampleRow', () => {
 
     const button = screen.getByRole('button', { name: 'Adding...' });
     expect(button).toBeDisabled();
+    // Pending label still names the button; the plus glyph must not leak in.
+    expect(button.querySelector(`.${rowStyles.actionIcon}`)).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+    expect(within(button).queryByRole('img')).not.toBeInTheDocument();
     await user.click(button);
     expect(studentFlashcards.createFlashcards).not.toHaveBeenCalled();
   });
@@ -772,7 +778,13 @@ describe('buildExampleRow', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Removing...' })).toBeDisabled();
+    const button = screen.getByRole('button', { name: 'Removing...' });
+    expect(button).toBeDisabled();
+    expect(button.querySelector(`.${rowStyles.actionIcon}`)).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+    expect(within(button).queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('shows always-visible Remove on a manager row, not Owned', async () => {
@@ -836,6 +848,106 @@ describe('buildExampleRow', () => {
 
     expect(studentFlashcards.deleteFlashcards).toHaveBeenCalledWith([11]);
   });
+
+  it('adds an uncollected finder example when Add is clicked', async () => {
+    const user = userEvent.setup();
+    const example = makeExample();
+    const studentFlashcards = makeFlashcards();
+    const row = buildExampleRow({
+      example,
+      selected: false,
+      expanded: false,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards,
+      lessonPopup: emptyLessonPopup,
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    render(
+      <DataTable
+        columns={[
+          { id: 'select', header: '' },
+          { id: 'english', header: 'English' },
+          { id: 'spanish', header: 'Spanish' },
+          { id: 'actions', header: '' },
+        ]}
+        rows={[row]}
+        columnTemplate="44px 1fr 1fr 132px"
+        caption="Row"
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+
+    expect(studentFlashcards.createFlashcards).toHaveBeenCalledWith([example]);
+  });
+
+  it.each([
+    {
+      caseName: 'an uncollected finder row',
+      name: 'Add',
+      rowAction: 'collect' as const,
+      collected: false,
+    },
+    {
+      caseName: 'a collected finder row',
+      name: OWNED_REMOVE_NAME,
+      rowAction: 'collect' as const,
+      collected: true,
+    },
+    {
+      caseName: 'a manager row',
+      name: OWNED_REMOVE_NAME,
+      rowAction: 'remove' as const,
+      collected: true,
+    },
+  ])(
+    'keeps the row-action name exact and hides the mobile icon on $caseName',
+    ({ name, rowAction, collected }) => {
+      const row = buildExampleRow({
+        example: makeExample(),
+        selected: false,
+        expanded: false,
+        playing: null,
+        openVocabId: null,
+        studentFlashcards: makeFlashcards({
+          isExampleCollected: vi.fn(() => collected),
+        }),
+        lessonPopup: emptyLessonPopup,
+        rowAction,
+        onToggleSelected: vi.fn(),
+        onToggleExpanded: vi.fn(),
+        onTogglePlay: vi.fn(),
+        onToggleVocab: vi.fn(),
+      });
+
+      render(
+        <DataTable
+          columns={[
+            { id: 'select', header: '' },
+            { id: 'english', header: 'English' },
+            { id: 'spanish', header: 'Spanish' },
+            { id: 'actions', header: '' },
+          ]}
+          rows={[row]}
+          columnTemplate="44px 1fr 1fr 132px"
+          caption="Row"
+        />,
+      );
+
+      // Decorative plus/check/x must not change or duplicate the accessible name.
+      expect(screen.getAllByRole('button', { name })).toHaveLength(1);
+      const button = screen.getByRole('button', { name });
+      const icon = button.querySelector(`.${rowStyles.actionIcon}`);
+      expect(icon).toHaveAttribute('aria-hidden', 'true');
+      expect(icon?.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+      expect(within(button).queryByRole('img')).not.toBeInTheDocument();
+    },
+  );
 
   it.each([
     {

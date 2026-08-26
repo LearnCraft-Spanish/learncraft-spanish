@@ -968,7 +968,7 @@ describe('results section', () => {
     const row = screen.getAllByRole('row')[1];
 
     expect(row.style.getPropertyValue('--dt-mobile-columns')).toBe(
-      '44px 1fr 44px',
+      '40px 1fr 44px',
     );
     expect(row.style.getPropertyValue('--dt-mobile-areas')).toBe(
       '"select english expand" "select spanish expand"',

@@ -24,6 +24,7 @@ const ALL_ICONS: IconName[] = [
   'clipboardCopy',
   'filter',
   'language',
+  'plus',
   'search',
   'searchOff',
   'user',
