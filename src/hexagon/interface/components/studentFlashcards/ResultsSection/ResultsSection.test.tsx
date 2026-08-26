@@ -19,6 +19,7 @@ import userEvent from '@testing-library/user-event';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { createMockVocabulary } from '@testing/factories/vocabularyFactories';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import rowStyles from './ExampleRow.module.scss';
 import resultsStyles from './ResultsSection.module.scss';
 
 function makePagination(
@@ -100,6 +101,7 @@ const emptyLessonPopup: LessonPopup = {
 const SELECT_LABEL = 'Select No quiero eso aquí.';
 const EXPAND_LABEL = 'Expand row: No quiero eso aquí.';
 const COLLAPSE_LABEL = 'Collapse row: No quiero eso aquí.';
+const OWNED_REMOVE_NAME = 'Remove No quiero eso aquí. from your collection';
 
 function renderSection(
   overrides: Partial<ResultsSectionProps> = {},
@@ -206,12 +208,10 @@ describe('results section', () => {
 
     expect(screen.getByText('6')).toBeInTheDocument();
     expect(screen.getByText('flashcards match')).toBeInTheDocument();
-    expect(
-      screen.getByRole('columnheader', { name: 'Spanish' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('columnheader', { name: 'English' }),
-    ).toBeInTheDocument();
+    const headers = screen
+      .getAllByRole('columnheader')
+      .map((header) => header.textContent);
+    expect(headers).toEqual(['', 'English', 'Spanish', '']);
     expect(
       screen.queryByRole('columnheader', { name: /lesson/i }),
     ).not.toBeInTheDocument();
@@ -220,7 +220,7 @@ describe('results section', () => {
     );
     expect(
       screen
-        .getByRole('columnheader', { name: 'Spanish' })
+        .getByRole('columnheader', { name: 'English' })
         .closest(`.${resultsStyles.tableCard}`),
     ).not.toBeNull();
   });
@@ -331,7 +331,7 @@ describe('results section', () => {
     const studentFlashcards = makeFlashcards();
     renderSection({ studentFlashcards });
 
-    await user.click(screen.getByRole('button', { name: 'Collect' }));
+    await user.click(screen.getByRole('button', { name: 'Add' }));
 
     expect(studentFlashcards.createFlashcards).toHaveBeenCalledWith([
       expect.objectContaining({ id: 11 }),
@@ -345,7 +345,7 @@ describe('results section', () => {
     });
     renderSection({ studentFlashcards });
 
-    await user.click(screen.getByRole('button', { name: 'Owned' }));
+    await user.click(screen.getByRole('button', { name: OWNED_REMOVE_NAME }));
 
     expect(studentFlashcards.deleteFlashcards).toHaveBeenCalledWith([11]);
   });
@@ -892,11 +892,22 @@ describe('results section', () => {
     });
     renderSection({ studentFlashcards, rowAction: 'remove' });
 
+    // Manager: always-visible Remove, never Add / Owned as the accessible name.
+    expect(
+      screen.queryByRole('button', { name: 'Add' }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Owned' }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove' }),
+    ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Remove' }));
+    const remove = screen.getByRole('button', { name: OWNED_REMOVE_NAME });
+    expect(remove).toHaveTextContent('Remove');
+    expect(remove).not.toHaveTextContent('Owned');
+
+    await user.click(remove);
 
     expect(studentFlashcards.deleteFlashcards).toHaveBeenCalledWith([11]);
   });
@@ -907,12 +918,26 @@ describe('results section', () => {
     renderSection({ studentFlashcards });
 
     expect(
-      screen.queryByRole('button', { name: 'Remove' }),
+      screen.queryByRole('button', { name: OWNED_REMOVE_NAME }),
     ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Collect' }));
+    await user.click(screen.getByRole('button', { name: 'Add' }));
 
     expect(studentFlashcards.createFlashcards).toHaveBeenCalled();
+  });
+
+  it('keeps Owned at rest on a collected finder row when rowAction is collect', () => {
+    const studentFlashcards = makeFlashcards({
+      isExampleCollected: vi.fn(() => true),
+    });
+    renderSection({ studentFlashcards, rowAction: 'collect' });
+
+    const owned = screen.getByRole('button', { name: OWNED_REMOVE_NAME });
+    // Would fail if the Finder were switched to always-visible Remove.
+    expect(owned).toHaveTextContent('Owned');
+    expect(
+      owned.querySelector(`.${rowStyles.ownedRestLabel}`),
+    ).toHaveTextContent('Owned');
   });
 
   it('looks up review dates per example for the expand panel', async () => {
@@ -946,8 +971,13 @@ describe('results section', () => {
       '44px 1fr 44px',
     );
     expect(row.style.getPropertyValue('--dt-mobile-areas')).toBe(
-      '"select spanish expand" "select english expand"',
+      '"select english expand" "select spanish expand"',
     );
+    expect(
+      screen
+        .getByRole('columnheader', { name: 'English' })
+        .style.getPropertyValue('--dt-mobile-area'),
+    ).toBe('english');
     expect(
       screen
         .getByRole('columnheader', { name: 'Spanish' })
@@ -993,8 +1023,9 @@ describe('results section', () => {
 /**
  * Every destructive action on the manager destroys the control that ran it, so
  * without this the browser drops focus on `<body>` — above the filter card and
- * up to 25 rows from where the student was. The finder's rows swap Collect for
- * Owned in place, so it omits `focusRequest` and nothing here applies to it.
+ * up to 25 rows from where the student was. The finder's rows swap Add for
+ * Owned in place (and Owned for Add again on remove), so it omits
+ * `focusRequest` and nothing here applies to it.
  */
 describe('results section focus recovery', () => {
   afterEach(() => {
@@ -1078,7 +1109,7 @@ describe('results section focus recovery', () => {
     });
     renderSection({ studentFlashcards, rowAction: 'remove', focusRequest: 0 });
 
-    await user.click(screen.getByRole('button', { name: 'Remove' }));
+    await user.click(screen.getByRole('button', { name: OWNED_REMOVE_NAME }));
 
     expect(studentFlashcards.deleteFlashcards).toHaveBeenCalledWith([11]);
     expect(document.activeElement).toBe(anchor());
@@ -1091,7 +1122,7 @@ describe('results section focus recovery', () => {
     });
     renderSection({ studentFlashcards });
 
-    const owned = screen.getByRole('button', { name: 'Owned' });
+    const owned = screen.getByRole('button', { name: OWNED_REMOVE_NAME });
     await user.click(owned);
 
     expect(screen.queryByRole('group')).not.toBeInTheDocument();

@@ -61,60 +61,19 @@
   gap: var(--lcs-space-7) var(--lcs-space-8);
 }
 
-.startLesson {
-  display: flex;
-  min-width: 0;
-  align-items: flex-end;
-  padding-bottom: var(--lcs-space-5);
-}
-
-.startLesson :global(label),
 .adminStrip :global(label),
 .root > :first-child > :last-child :global(label) {
   font-size: var(--lcs-text-action);
   gap: var(--lcs-space-4);
 }
 
-.startLesson :global(span:last-of-type) {
-  color: var(--lcs-color-muted);
-}
-
-.fromLesson {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-}
-
-.scopeGrid :global(label),
-.fromLessonLabel {
+.scopeGrid :global(label) {
   line-height: var(--lcs-line-body);
-}
-
-.fromLessonLabel {
-  margin-bottom: var(--lcs-space-2);
-  color: var(--lcs-color-muted);
-  font-family: var(--lcs-font-sans);
-  font-size: var(--lcs-text-caption);
 }
 
 .scopeGrid :global(select) {
   padding-left: var(--lcs-space-5);
   padding-right: var(--lcs-space-5);
-}
-
-.fromLessonPlate {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: var(--lcs-control-height);
-  padding: 0 var(--lcs-space-5);
-  border: var(--lcs-control-border) solid var(--lcs-border-card);
-  border-radius: var(--lcs-radius-lg);
-  background-color: var(--lcs-color-page);
-  color: var(--lcs-color-muted);
-  font-family: inherit;
-  font-size: var(--lcs-text-control);
 }
 
 .adminStrip {
@@ -251,6 +210,14 @@
 }
 
 .suggestions {
+  /*
+   * Per-type accents echo the v1 TagFilter palette (App.css *Card rules:
+   * Vocabulary→brand, Idiom→accent, Subcategory→theme, Verb→dark+accent).
+   * Hues come from existing tokens; tints for subcategory/verb are local
+   * because tokens.css has no muted/ink surface tints.
+   */
+  --suggestion-subcategory-tint: rgba(111, 98, 89, 0.1);
+  --suggestion-verb-tint: rgba(60, 60, 60, 0.06);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -259,12 +226,14 @@
 .suggestion {
   display: flex;
   width: 100%;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: var(--lcs-space-5);
   /* Prototype 11px 16px. 11px is one-off; scale jumps 10 → 12. */
   padding: 11px var(--lcs-space-7);
   border: none;
   border-bottom: var(--lcs-border-hairline) solid var(--lcs-divider);
+  border-left: 3px solid transparent;
   background: none;
   color: var(--lcs-color-ink);
   cursor: pointer;
@@ -288,9 +257,89 @@
   outline-offset: var(--lcs-focus-offset);
 }
 
+.suggestionBody {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--lcs-space-1);
+}
+
+.suggestionName {
+  color: var(--lcs-color-ink);
+}
+
+.suggestionDescriptor {
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+  line-height: var(--lcs-line-tight);
+}
+
 .suggestionMeta {
+  flex-shrink: 0;
   color: var(--lcs-color-muted);
   font-size: var(--lcs-text-eyebrow);
+}
+
+/* Subtle type cues: left rail + low-alpha tint + meta hue. Not full cards. */
+.suggestionVocabulary {
+  border-left-color: var(--lcs-color-action);
+  background-color: var(--lcs-tint-row-selected);
+}
+
+.suggestionVocabulary:hover {
+  background-color: var(--lcs-tint-hover);
+}
+
+.suggestionVocabulary .suggestionMeta {
+  color: var(--lcs-color-action);
+}
+
+.suggestionIdiom {
+  border-left-color: var(--lcs-color-label);
+  background-color: var(--lcs-tint-label-subtle);
+}
+
+.suggestionIdiom:hover {
+  background-color: var(--lcs-tint-label);
+}
+
+.suggestionIdiom .suggestionMeta {
+  color: var(--lcs-color-on-label);
+}
+
+.suggestionSubcategory {
+  border-left-color: var(--lcs-color-muted);
+  background-color: var(--suggestion-subcategory-tint);
+}
+
+.suggestionSubcategory:hover {
+  background-color: color-mix(in srgb, var(--lcs-color-muted) 16%, transparent);
+}
+
+.suggestionSubcategory .suggestionMeta {
+  color: var(--lcs-color-muted);
+}
+
+.suggestionVerb {
+  border-left-color: var(--lcs-color-ink);
+  background-color: var(--suggestion-verb-tint);
+}
+
+.suggestionVerb:hover {
+  background-color: color-mix(in srgb, var(--lcs-color-ink) 10%, transparent);
+}
+
+.suggestionVerb .suggestionMeta {
+  color: var(--lcs-color-label);
+}
+
+.suggestionConjugation {
+  border-left-color: var(--lcs-color-steel);
+}
+
+.suggestionConjugation:hover {
+  background-color: var(--lcs-color-page);
 }
 
 .noSuggestions {
@@ -304,9 +353,30 @@
   flex-wrap: wrap;
   gap: var(--lcs-space-3);
   margin-top: var(--lcs-space-6);
+  overflow: visible;
 }
 
-.appliedTags > span {
+.appliedTag {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+  z-index: 0;
+  /*
+   * Reused name is fine: the hint's nearest ancestor wins, and
+   * anchor-scope keeps each chip's name from leaking to siblings.
+   * Enables position-try flip against the viewport (not the chip box).
+   */
+  anchor-name: --applied-tag;
+  anchor-scope: --applied-tag;
+}
+
+.appliedTag:hover,
+.appliedTag:focus-within {
+  z-index: 1;
+}
+
+/* Chip only — exclude .appliedTagHint, which is also a direct child span. */
+.appliedTag > span:not(.appliedTagHint) {
   padding: 5px var(--lcs-space-3) 5px var(--lcs-space-5);
   border-radius: var(--lcs-radius-sm);
   font-weight: var(--lcs-weight-medium);
@@ -315,9 +385,64 @@
   gap: var(--lcs-space-3);
 }
 
-.appliedTags button {
+.appliedTag button {
   margin-right: 0;
   opacity: 0.7;
+}
+
+/*
+ * Same descriptor as the suggestion list. Overlay below the chip so it
+ * never reflows the row or covers the remove control (pointer-events: none).
+ *
+ * Width: max-content breaks abspos shrink-to-fit against the chip; the
+ * box sizes to its text, then max-width clamps. position-try flip-inline
+ * re-anchors left↔right when a right-edge chip would spill past the
+ * viewport — pure CSS, no measurement.
+ */
+.appliedTagHint {
+  --applied-tag-hint-max: 240px;
+  /* Same 2× space-8 gutter as ExampleRow vocab popover. */
+  --applied-tag-hint-gutter: calc(2 * var(--lcs-space-8));
+
+  position: absolute;
+  position-anchor: --applied-tag;
+  top: calc(100% + var(--lcs-space-2));
+  left: 0;
+  z-index: var(--lcs-z-popover);
+  box-sizing: border-box;
+  /*
+   * max-content = readable floor for long copy on a short chip (intrinsic
+   * text width, not the chip). Short copy stays hugged — a larger CSS
+   * min-width would pad one-word descriptors into empty boxes.
+   */
+  width: max-content;
+  max-width: min(
+    var(--applied-tag-hint-max),
+    calc(100vw - var(--applied-tag-hint-gutter))
+  );
+  padding: var(--lcs-space-3) var(--lcs-space-5);
+  border: var(--lcs-border-hairline) solid var(--lcs-border-card);
+  border-radius: var(--lcs-radius-md);
+  background-color: var(--lcs-color-surface);
+  box-shadow: var(--lcs-shadow-lift);
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+  line-height: var(--lcs-line-tight);
+  overflow-wrap: anywhere;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--lcs-motion-micro) var(--lcs-ease-standard),
+    visibility var(--lcs-motion-micro) var(--lcs-ease-standard);
+  position-try-fallbacks: flip-inline;
+}
+
+.appliedTag:hover .appliedTagHint,
+.appliedTag:focus-within .appliedTagHint {
+  opacity: 1;
+  visibility: visible;
 }
 
 .emptyTags {
@@ -385,7 +510,8 @@
 @media (prefers-reduced-motion: reduce) {
   .modeTab,
   .suggestion,
-  .preset {
+  .preset,
+  .appliedTagHint {
     transition: none;
   }
 }

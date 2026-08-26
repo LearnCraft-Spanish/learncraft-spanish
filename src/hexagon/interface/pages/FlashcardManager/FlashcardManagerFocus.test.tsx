@@ -68,7 +68,11 @@ describe('flashcard manager v2 focus after a destructive action', () => {
     renderManagerV2();
 
     // The row that holds this button is about to leave the collection.
-    await user.click(screen.getAllByRole('button', { name: 'Remove' })[0]);
+    await user.click(
+      screen.getAllByRole('button', {
+        name: /Remove .+ from your collection/,
+      })[0],
+    );
 
     expect(document.activeElement).toBe(resultsRegion());
   });

@@ -5,7 +5,7 @@ import cardStyles from '@interface/components/general/Card/Card.module.scss';
 import popoverStyles from '@interface/components/general/Popover/Popover.module.scss';
 import { FilterSection } from '@interface/components/studentFlashcards/FilterSection/FilterSection';
 import { PartOfSpeech, SkillType } from '@learncraft-spanish/shared';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import styles from './FilterSection.module.scss';
@@ -62,7 +62,7 @@ const frequencyTag: SkillTag = {
   descriptor: 'high frequency',
   vocabularyId: 500,
   subcategoryName: 'Frequency',
-  frequency: 1,
+  frequency: 42,
 };
 
 const idiomTag: SkillTag = {
@@ -164,10 +164,10 @@ function renderSection(
   return exampleFilter;
 }
 
-function fromLessonPlate(): HTMLElement {
-  const plate = document.querySelector(`.${styles.fromLessonPlate}`);
-  expect(plate).not.toBeNull();
-  return plate as HTMLElement;
+function scopeSelectIds(): string[] {
+  const grid = document.querySelector(`.${styles.scopeGrid}`);
+  expect(grid).not.toBeNull();
+  return Array.from(grid!.querySelectorAll('select')).map((el) => el.id);
 }
 
 describe('filter section', () => {
@@ -190,18 +190,20 @@ describe('filter section', () => {
     expect(
       screen.getByRole('option', { name: 'Essential Spanish' }),
     ).toBeInTheDocument();
+    expect(screen.getByLabelText('From lesson')).toHaveDisplayValue(
+      'Lesson 1 — from the start',
+    );
     expect(screen.getByLabelText('Through lesson')).toHaveDisplayValue(
       'Lesson 8',
     );
-    const fromLesson = fromLessonPlate();
-    expect(fromLesson.tagName).toBe('DIV');
-    expect(fromLesson).toHaveTextContent('Lesson 1 — from the start');
-    expect(fromLesson).not.toHaveAttribute('tabindex');
-    expect(fromLesson.closest(`.${styles.fromLesson}`)).not.toBeNull();
+    expect(scopeSelectIds()).toEqual([
+      'finder-course',
+      'finder-from-lesson',
+      'finder-to-lesson',
+    ]);
     expect(
-      screen.queryByDisplayValue('Lesson 1 — from the start'),
+      screen.queryByRole('switch', { name: 'Set a starting lesson' }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('From lesson')).not.toBeInTheDocument();
     expect(
       screen
         .getByRole('button', { name: 'Reset all filters' })
@@ -278,42 +280,22 @@ describe('filter section', () => {
       screen.getByLabelText('Course').querySelectorAll('option'),
     ).toHaveLength(0);
     expect(
-      screen.getByLabelText('Through lesson').querySelectorAll('option'),
-    ).toHaveLength(0);
-    expect(fromLessonPlate()).toHaveTextContent('');
-  });
-
-  it('opens an empty from-lesson select when there is no course', async () => {
-    const user = userEvent.setup();
-    renderSection(
-      createFilter({
-        course: null,
-        courseId: null,
-        fromLesson: null,
-        fromLessonNumber: null,
-        toLesson: null,
-        toLessonNumber: null,
-        coursesWithLessons: [],
-      }),
-    );
-
-    await user.click(
-      screen.getByRole('switch', { name: 'Set a starting lesson' }),
-    );
-
-    expect(
       screen.getByLabelText('From lesson').querySelectorAll('option'),
     ).toHaveLength(0);
-
-    await user.click(
-      screen.getByRole('switch', { name: 'Set a starting lesson' }),
-    );
-
-    expect(fromLessonPlate()).toHaveTextContent('');
-    expect(screen.queryByLabelText('From lesson')).not.toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Through lesson').querySelectorAll('option'),
+    ).toHaveLength(0);
+    expect(scopeSelectIds()).toEqual([
+      'finder-course',
+      'finder-from-lesson',
+      'finder-to-lesson',
+    ]);
+    expect(
+      screen.queryByRole('switch', { name: 'Set a starting lesson' }),
+    ).not.toBeInTheDocument();
   });
 
-  it('shows a blank from-lesson readout when the course has no lessons', () => {
+  it('renders an empty from-lesson select when the course has no lessons', () => {
     renderSection(
       createFilter({
         course: emptyCourse,
@@ -326,10 +308,12 @@ describe('filter section', () => {
       }),
     );
 
-    expect(fromLessonPlate()).toHaveTextContent('');
+    expect(
+      screen.getByLabelText('From lesson').querySelectorAll('option'),
+    ).toHaveLength(0);
   });
 
-  it('calls onResetAll and restores the from-lesson readout', async () => {
+  it('calls onResetAll without a starting-lesson toggle', async () => {
     const user = userEvent.setup();
     const onResetAll = vi.fn<() => void>();
     const exampleFilter = createFilter({ fromLessonNumber: 8 });
@@ -340,8 +324,10 @@ describe('filter section', () => {
     await user.click(screen.getByRole('button', { name: 'Reset all filters' }));
 
     expect(onResetAll).toHaveBeenCalledOnce();
-    expect(fromLessonPlate()).toHaveTextContent('Lesson 1 — from the start');
-    expect(screen.queryByLabelText('From lesson')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('From lesson')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('switch', { name: 'Set a starting lesson' }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Search tags' })).toHaveAttribute(
       'aria-selected',
       'true',
@@ -412,14 +398,10 @@ describe('filter section', () => {
     expect(exampleFilter.updateToLessonNumber).toHaveBeenCalledWith(2);
   });
 
-  it('turns the from-lesson readout into a live select', async () => {
+  it('updates the from-lesson select', async () => {
     const user = userEvent.setup();
     const exampleFilter = createFilter();
     renderSection(exampleFilter);
-
-    await user.click(
-      screen.getByRole('switch', { name: 'Set a starting lesson' }),
-    );
 
     const fromLesson = screen.getByLabelText('From lesson');
     expect(fromLesson.tagName).toBe('SELECT');
@@ -428,72 +410,81 @@ describe('filter section', () => {
     expect(exampleFilter.updateFromLessonNumber).toHaveBeenCalledWith(2);
   });
 
-  it('resets from-lesson to the start when the toggle is turned off', async () => {
-    const user = userEvent.setup();
-    const exampleFilter = createFilter({ fromLessonNumber: 8 });
-    renderSection(exampleFilter);
+  it('marks only the course starting lesson with the from-the-start suffix', () => {
+    renderSection();
 
-    await user.click(
-      screen.getByRole('switch', { name: 'Set a starting lesson' }),
-    );
-
-    expect(exampleFilter.updateFromLessonNumber).toHaveBeenCalledWith(1);
-    expect(fromLessonPlate()).toHaveTextContent('Lesson 1 — from the start');
-    expect(screen.queryByLabelText('From lesson')).not.toBeInTheDocument();
-  });
-
-  it('uses the prerequisite as the from-the-start readout', () => {
-    renderSection(
-      createFilter({
-        course: postChallengeCourse,
-        courseId: postChallengeCourse.id,
-        fromLessonNumber: -5001,
-        toLessonNumber: 2,
-        coursesWithLessons: [postChallengeCourse],
-      }),
-    );
-
-    expect(fromLessonPlate()).toHaveTextContent(
-      'All si1m Lessons (1-20) — from the start',
-    );
-    expect(screen.queryByLabelText('From lesson')).not.toBeInTheDocument();
-  });
-
-  it('lists every through-lesson when from is a prerequisite', async () => {
-    const user = userEvent.setup();
-    renderSection(
-      createFilter({
-        course: postChallengeCourse,
-        courseId: postChallengeCourse.id,
-        fromLessonNumber: -5001,
-        toLessonNumber: 2,
-        coursesWithLessons: [postChallengeCourse],
-      }),
-    );
-
-    await user.click(
-      screen.getByRole('switch', { name: 'Set a starting lesson' }),
-    );
-
+    const fromLesson = screen.getByLabelText('From lesson');
     expect(
-      screen.getByRole('option', { name: 'All si1m Lessons (1-20)' }),
+      within(fromLesson).getByRole('option', {
+        name: 'Lesson 1 — from the start',
+      }),
     ).toBeInTheDocument();
     expect(
-      screen.getAllByRole('option', { name: 'Lesson 1' }).length,
-    ).toBeGreaterThan(0);
+      within(fromLesson).getByRole('option', { name: /^Lesson 2$/ }),
+    ).toBeInTheDocument();
+    expect(
+      within(fromLesson).queryByRole('option', {
+        name: 'Lesson 2 — from the start',
+      }),
+    ).not.toBeInTheDocument();
   });
 
-  it('omits regular from-lessons until a through-lesson is chosen', async () => {
-    const user = userEvent.setup();
+  it('puts the from-the-start suffix on the prerequisite, not lesson 1', () => {
+    renderSection(
+      createFilter({
+        course: postChallengeCourse,
+        courseId: postChallengeCourse.id,
+        fromLessonNumber: -5001,
+        toLessonNumber: 2,
+        coursesWithLessons: [postChallengeCourse],
+      }),
+    );
+
+    const fromLesson = screen.getByLabelText('From lesson');
+    expect(fromLesson).toHaveDisplayValue(
+      'All si1m Lessons (1-20) — from the start',
+    );
+    expect(
+      within(fromLesson).getByRole('option', {
+        name: 'All si1m Lessons (1-20) — from the start',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(fromLesson).getByRole('option', { name: /^Lesson 1$/ }),
+    ).toBeInTheDocument();
+    expect(
+      within(fromLesson).queryByRole('option', {
+        name: 'Lesson 1 — from the start',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('lists every through-lesson when from is a prerequisite', () => {
+    renderSection(
+      createFilter({
+        course: postChallengeCourse,
+        courseId: postChallengeCourse.id,
+        fromLessonNumber: -5001,
+        toLessonNumber: 2,
+        coursesWithLessons: [postChallengeCourse],
+      }),
+    );
+
+    const throughLesson = screen.getByLabelText('Through lesson');
+    expect(
+      within(throughLesson).getByRole('option', { name: /^Lesson 1$/ }),
+    ).toBeInTheDocument();
+    expect(
+      within(throughLesson).getByRole('option', { name: /^Lesson 2$/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('omits regular from-lessons until a through-lesson is chosen', () => {
     renderSection(
       createFilter({
         toLesson: null,
         toLessonNumber: null,
       }),
-    );
-
-    await user.click(
-      screen.getByRole('switch', { name: 'Set a starting lesson' }),
     );
 
     const fromLesson = screen.getByLabelText('From lesson');
@@ -508,11 +499,22 @@ describe('filter section', () => {
     expect(throughLesson).toHaveTextContent('Lesson 8');
   });
 
+  it('filters from-lessons to those at or before through', () => {
+    renderSection(createFilter({ toLessonNumber: 2 }));
+
+    const fromLesson = screen.getByLabelText('From lesson');
+    expect(fromLesson).toHaveTextContent('Lesson 1 — from the start');
+    expect(fromLesson).toHaveTextContent('Lesson 2');
+    expect(fromLesson).not.toHaveTextContent('Lesson 8');
+  });
+
   it('lists every through-lesson when from is unset', () => {
     renderSection(createFilter({ fromLesson: null, fromLessonNumber: null }));
 
     expect(
-      screen.getByRole('option', { name: 'Lesson 1' }),
+      within(screen.getByLabelText('Through lesson')).getByRole('option', {
+        name: /^Lesson 1$/,
+      }),
     ).toBeInTheDocument();
   });
 
@@ -535,7 +537,7 @@ describe('filter section', () => {
       screen.getByRole('option', { name: 'por vocabulary' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('option', { name: 'Essential 500 frequency' }),
+      screen.getByRole('option', { name: 'Essential 500 vocabulary' }),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole('option', { name: 'por vocabulary' }));
@@ -549,6 +551,153 @@ describe('filter section', () => {
     expect(
       exampleFilter.skillTagSearch.updateTagSearchTerm,
     ).toHaveBeenCalledWith();
+  });
+
+  it('shows vocabulary and verb descriptors and labels vocabulary tags as vocabulary', () => {
+    const emptyDescriptorTag: SkillTag = {
+      type: SkillType.Vocabulary,
+      key: 'Vocabulary-empty',
+      name: 'sin',
+      descriptor: '   ',
+      vocabularyId: 9,
+      subcategoryName: 'Prepositions',
+      frequency: null,
+    };
+    const emptyVerbTag: SkillTag = {
+      type: SkillType.Verb,
+      key: 'Verb-empty',
+      name: 'haber',
+      verbId: 2,
+      verbTags: [],
+    };
+    const multiVerbTag: SkillTag = {
+      type: SkillType.Verb,
+      key: 'Verb-multi',
+      name: 'Poder',
+      verbId: 3,
+      verbTags: ['direct and indirect', 'Er', 'irreg: stem change'],
+    };
+
+    renderSection(
+      createFilter({
+        skillTagSearch: {
+          tagSearchTerm: 'a',
+          tagSuggestions: [
+            vocabularyTag,
+            frequencyTag,
+            idiomTag,
+            subcategoryTag,
+            multiVerbTag,
+            emptyDescriptorTag,
+          ],
+          updateTagSearchTerm: vi.fn(),
+          removeTagFromSuggestions: vi.fn(),
+          addTagBackToSuggestions: vi.fn(),
+          isLoading: false,
+          error: null,
+        },
+      }),
+    );
+
+    const vocabOption = screen.getByRole('option', { name: 'por vocabulary' });
+    expect(vocabOption).toHaveClass(styles.suggestionVocabulary);
+    expect(vocabOption).toHaveTextContent('for');
+    expect(
+      vocabOption.querySelector(`.${styles.suggestionDescriptor}`),
+    ).toHaveTextContent('for');
+
+    const rankedVocab = screen.getByRole('option', {
+      name: 'Essential 500 vocabulary',
+    });
+    expect(rankedVocab).toHaveClass(styles.suggestionVocabulary);
+    expect(rankedVocab).toHaveTextContent('high frequency');
+    // Frequency ranks suggestions; the numeric value and the old "frequency"
+    // type label must not appear. Descriptor text may still say "frequency".
+    expect(rankedVocab.textContent).not.toContain(
+      String(frequencyTag.frequency),
+    );
+    expect(
+      rankedVocab.querySelector(`.${styles.suggestionMeta}`),
+    ).toHaveTextContent('vocabulary');
+    expect(
+      screen.queryByRole('option', { name: /Essential 500 frequency/i }),
+    ).not.toBeInTheDocument();
+
+    const idiomOption = screen.getByRole('option', {
+      name: 'por eso idiom',
+    });
+    expect(idiomOption).toHaveClass(styles.suggestionIdiom);
+    expect(
+      idiomOption.querySelector(`.${styles.suggestionDescriptor}`),
+    ).toHaveTextContent('Cluster, Idiom');
+
+    const subcategoryOption = screen.getByRole('option', {
+      name: 'Idioms cluster subcategory',
+    });
+    expect(subcategoryOption).toHaveClass(styles.suggestionSubcategory);
+    expect(
+      subcategoryOption.querySelector(`.${styles.suggestionDescriptor}`),
+    ).toBeNull();
+
+    const verbOption = screen.getByRole('option', {
+      name: 'Poder verb',
+    });
+    expect(verbOption).toHaveClass(styles.suggestionVerb);
+    expect(
+      verbOption.querySelector(`.${styles.suggestionDescriptor}`),
+    ).toHaveTextContent('direct and indirect - Er - irreg: stem change');
+
+    const blankDescriptorOption = screen.getByRole('option', {
+      name: 'sin vocabulary',
+    });
+    expect(
+      blankDescriptorOption.querySelector(`.${styles.suggestionDescriptor}`),
+    ).toBeNull();
+
+    cleanup();
+    renderSection(
+      createFilter({
+        skillTagSearch: {
+          tagSearchTerm: 'hab',
+          tagSuggestions: [emptyVerbTag],
+          updateTagSearchTerm: vi.fn(),
+          removeTagFromSuggestions: vi.fn(),
+          addTagBackToSuggestions: vi.fn(),
+          isLoading: false,
+          error: null,
+        },
+      }),
+    );
+    const blankVerbOption = screen.getByRole('option', {
+      name: 'haber verb',
+    });
+    expect(
+      blankVerbOption.querySelector(`.${styles.suggestionDescriptor}`),
+    ).toBeNull();
+  });
+
+  it('keeps suggestion order from the search results', () => {
+    renderSection(
+      createFilter({
+        skillTagSearch: {
+          tagSearchTerm: 'por',
+          // Application ranks most-frequent first; FilterSection must not reorder.
+          tagSuggestions: [frequencyTag, vocabularyTag, idiomTag],
+          updateTagSearchTerm: vi.fn(),
+          removeTagFromSuggestions: vi.fn(),
+          addTagBackToSuggestions: vi.fn(),
+          isLoading: false,
+          error: null,
+        },
+      }),
+    );
+
+    const listbox = screen.getByRole('listbox');
+    const options = within(listbox).getAllByRole('option');
+    expect(options).toHaveLength(3);
+    expect(options[0]).toHaveAccessibleName('Essential 500 vocabulary');
+    expect(options[1]).toHaveAccessibleName('por vocabulary');
+    expect(options[2]).toHaveAccessibleName('por eso idiom');
   });
 
   it('paints the tag sheet outside the unclipped card without stretching it', () => {
@@ -608,7 +757,13 @@ describe('filter section', () => {
       createFilter({
         skillTagSearch: {
           tagSearchTerm: 'a',
-          tagSuggestions: [subcategoryTag, verbTag, conjugationTag, idiomTag],
+          tagSuggestions: [
+            vocabularyTag,
+            subcategoryTag,
+            verbTag,
+            conjugationTag,
+            idiomTag,
+          ],
           updateTagSearchTerm: vi.fn(),
           removeTagFromSuggestions: vi.fn(),
           addTagBackToSuggestions: vi.fn(),
@@ -618,12 +773,47 @@ describe('filter section', () => {
       }),
     );
 
+    const vocabularyOption = screen.getByRole('option', {
+      name: 'por vocabulary',
+    });
+    const idiomOption = screen.getByRole('option', { name: 'por eso idiom' });
+    const subcategoryOption = screen.getByRole('option', {
+      name: 'Idioms cluster subcategory',
+    });
+    const verbOption = screen.getByRole('option', { name: 'ser verb' });
+    const conjugationOption = screen.getByRole('option', {
+      name: 'Subjunctive present conjugation',
+    });
+
+    expect(vocabularyOption).toHaveClass(styles.suggestionVocabulary);
+    expect(idiomOption).toHaveClass(styles.suggestionIdiom);
+    expect(subcategoryOption).toHaveClass(styles.suggestionSubcategory);
+    expect(verbOption).toHaveClass(styles.suggestionVerb);
+    expect(conjugationOption).toHaveClass(styles.suggestionConjugation);
+
+    // One distinct lowercase label per SkillType — not collapsed/renamed.
     expect(
-      screen.getByRole('option', { name: /Idioms cluster/ }),
-    ).toBeInTheDocument();
-    expect(screen.getAllByText('grammar')).toHaveLength(1);
-    expect(screen.getAllByText('verb form')).toHaveLength(2);
-    expect(screen.getByText('vocabulary')).toBeInTheDocument();
+      vocabularyOption.querySelector(`.${styles.suggestionMeta}`),
+    ).toHaveTextContent('vocabulary');
+    expect(
+      idiomOption.querySelector(`.${styles.suggestionMeta}`),
+    ).toHaveTextContent('idiom');
+    expect(
+      subcategoryOption.querySelector(`.${styles.suggestionMeta}`),
+    ).toHaveTextContent('subcategory');
+    expect(
+      verbOption.querySelector(`.${styles.suggestionMeta}`),
+    ).toHaveTextContent('verb');
+    expect(
+      conjugationOption.querySelector(`.${styles.suggestionMeta}`),
+    ).toHaveTextContent('conjugation');
+    expect(screen.getAllByText('vocabulary')).toHaveLength(1);
+    expect(screen.getAllByText('idiom')).toHaveLength(1);
+    expect(screen.getAllByText('subcategory')).toHaveLength(1);
+    expect(screen.getAllByText('verb')).toHaveLength(1);
+    expect(screen.getAllByText('conjugation')).toHaveLength(1);
+    expect(screen.queryByText('grammar')).not.toBeInTheDocument();
+    expect(screen.queryByText('verb form')).not.toBeInTheDocument();
   });
 
   it('caps suggestions at six and hides tags that are already applied', () => {
@@ -687,9 +877,7 @@ describe('filter section', () => {
     renderSection(exampleFilter);
 
     await user.type(
-      screen.getByPlaceholderText(
-        'Search tags — grammar, vocabulary, verb form…',
-      ),
+      screen.getByPlaceholderText('Search tags — vocabulary, idiom, verb…'),
       'r',
     );
     expect(exampleFilter.skillTagSearch.updateTagSearchTerm).toHaveBeenCalled();
@@ -707,9 +895,105 @@ describe('filter section', () => {
       }),
     );
 
+    const chipHost = screen.getByText('por').closest(`.${styles.appliedTag}`);
     expect(
       screen.getByText('por').closest(`.${styles.appliedTags}`),
     ).not.toBeNull();
+    expect(chipHost).not.toBeNull();
+    expect(chipHost?.querySelector(`.${styles.appliedTagHint}`)).toHaveClass(
+      styles.appliedTagHint,
+    );
+  });
+
+  it('surfaces the shared descriptor on selected tags that have one', () => {
+    const multiVerbTag: SkillTag = {
+      type: SkillType.Verb,
+      key: 'Verb-multi',
+      name: 'Poder',
+      verbId: 3,
+      verbTags: ['direct and indirect', 'Er', 'irreg: stem change'],
+    };
+    const emptyDescriptorTag: SkillTag = {
+      type: SkillType.Vocabulary,
+      key: 'Vocabulary-empty',
+      name: 'sin',
+      descriptor: '   ',
+      vocabularyId: 9,
+      subcategoryName: 'Prepositions',
+      frequency: null,
+    };
+    const emptyIdiomTag: SkillTag = {
+      type: SkillType.Idiom,
+      key: 'Idiom-empty',
+      name: 'de nada',
+      vocabularyId: 99,
+      subcategoryName: '  ',
+      frequency: null,
+    };
+
+    renderSection(
+      createFilter({
+        selectedSkillTags: [
+          vocabularyTag,
+          multiVerbTag,
+          idiomTag,
+          subcategoryTag,
+          conjugationTag,
+          emptyDescriptorTag,
+          emptyIdiomTag,
+        ],
+      }),
+    );
+
+    const vocabChip = screen
+      .getByRole('button', { name: 'Remove por' })
+      .closest(`.${styles.appliedTag}`);
+    expect(vocabChip).not.toBeNull();
+    const vocabHint = vocabChip?.querySelector(`.${styles.appliedTagHint}`);
+    expect(vocabHint).toHaveTextContent('for');
+    expect(vocabHint).toHaveAttribute('aria-hidden', 'true');
+
+    const verbChip = screen
+      .getByRole('button', { name: 'Remove Poder' })
+      .closest(`.${styles.appliedTag}`);
+    expect(
+      verbChip?.querySelector(`.${styles.appliedTagHint}`),
+    ).toHaveTextContent('direct and indirect - Er - irreg: stem change');
+
+    const idiomChip = screen
+      .getByRole('button', { name: 'Remove por eso' })
+      .closest(`.${styles.appliedTag}`);
+    expect(
+      idiomChip?.querySelector(`.${styles.appliedTagHint}`),
+    ).toHaveTextContent('Cluster, Idiom');
+
+    const subcategoryChip = screen
+      .getByRole('button', { name: 'Remove Idioms cluster' })
+      .closest(`.${styles.appliedTag}`);
+    expect(
+      subcategoryChip?.querySelector(`.${styles.appliedTagHint}`),
+    ).toBeNull();
+
+    const conjugationChip = screen
+      .getByRole('button', { name: 'Remove Subjunctive present' })
+      .closest(`.${styles.appliedTag}`);
+    expect(
+      conjugationChip?.querySelector(`.${styles.appliedTagHint}`),
+    ).toBeNull();
+
+    const blankVocabChip = screen
+      .getByRole('button', { name: 'Remove sin' })
+      .closest(`.${styles.appliedTag}`);
+    expect(
+      blankVocabChip?.querySelector(`.${styles.appliedTagHint}`),
+    ).toBeNull();
+
+    const blankIdiomChip = screen
+      .getByRole('button', { name: 'Remove de nada' })
+      .closest(`.${styles.appliedTag}`);
+    expect(
+      blankIdiomChip?.querySelector(`.${styles.appliedTagHint}`),
+    ).toBeNull();
   });
 
   it('clears a single applied tag and the full set', async () => {
@@ -754,9 +1038,7 @@ describe('filter section', () => {
     renderSection(exampleFilter);
 
     expect(
-      screen.getByPlaceholderText(
-        'Search tags — grammar, vocabulary, verb form…',
-      ),
+      screen.getByPlaceholderText('Search tags — vocabulary, idiom, verb…'),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole('tab', { name: 'Presets' }));
@@ -773,9 +1055,7 @@ describe('filter section', () => {
       'false',
     );
     expect(
-      screen.queryByPlaceholderText(
-        'Search tags — grammar, vocabulary, verb form…',
-      ),
+      screen.queryByPlaceholderText('Search tags — vocabulary, idiom, verb…'),
     ).not.toBeInTheDocument();
     expect(
       screen.getByText('One click applies a saved group of tags.'),
@@ -794,9 +1074,7 @@ describe('filter section', () => {
       'true',
     );
     expect(
-      screen.getByPlaceholderText(
-        'Search tags — grammar, vocabulary, verb form…',
-      ),
+      screen.getByPlaceholderText('Search tags — vocabulary, idiom, verb…'),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: /Ser\/Estar/ }),
@@ -821,9 +1099,7 @@ describe('filter section', () => {
       screen.getByRole('button', { name: /Ser\/Estar/ }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByPlaceholderText(
-        'Search tags — grammar, vocabulary, verb form…',
-      ),
+      screen.queryByPlaceholderText('Search tags — vocabulary, idiom, verb…'),
     ).not.toBeInTheDocument();
   });
 
@@ -845,9 +1121,7 @@ describe('filter section', () => {
       'true',
     );
     expect(
-      screen.getByPlaceholderText(
-        'Search tags — grammar, vocabulary, verb form…',
-      ),
+      screen.getByPlaceholderText('Search tags — vocabulary, idiom, verb…'),
     ).toBeInTheDocument();
   });
 
@@ -893,7 +1167,7 @@ describe('filter section', () => {
     renderSection(exampleFilter);
 
     const tagSearch = screen.getByPlaceholderText(
-      'Search tags — grammar, vocabulary, verb form…',
+      'Search tags — vocabulary, idiom, verb…',
     );
     expect(tagSearch.closest(`.${styles.tagSearch}`)).not.toHaveClass(
       styles.tagSearchOpen,
