@@ -1,11 +1,13 @@
 import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
+import type { FlashcardReviewDates } from '@domain/functions/formatFlashcardReviewDates';
 import type { DataTableRow } from '@interface/components/general/DataTable/DataTable';
 import type {
   ExampleWithVocabulary,
   Vocabulary,
 } from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
+import { formatFlashcardReviewDates } from '@domain/functions/formatFlashcardReviewDates';
 import { splitSpanishTextRuns } from '@domain/functions/splitSpanishTextRuns';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
 import { Checkbox } from '@interface/components/general/Checkbox/Checkbox';
@@ -19,6 +21,13 @@ import styles from './ExampleRow.module.scss';
 
 export type PlayingClip = `${number}:es` | `${number}:en`;
 
+/**
+ * `collect` is the finder: Collect on a catalog example, Owned once it is in
+ * the collection. `remove` is the manager, where every row is already owned
+ * and the only row action is taking it back out.
+ */
+export type ExampleRowAction = 'collect' | 'remove';
+
 export interface ExampleRowModel {
   example: ExampleWithVocabulary;
   selected: boolean;
@@ -27,6 +36,15 @@ export interface ExampleRowModel {
   openVocabId: number | null;
   studentFlashcards: UseStudentFlashcardsReturn;
   lessonPopup: LessonPopup;
+  rowAction?: ExampleRowAction;
+  /** Review dates for the expand panel. Omitted on the finder. */
+  reviewSchedule?: FlashcardReviewDates;
+  /**
+   * Fired just before a row Remove deletes the row that holds the button, so
+   * the caller can take focus somewhere that survives. Never runs under the
+   * `collect` action, whose cell swaps Collect for Owned in place.
+   */
+  onRemoveRequested?: () => void;
   onToggleSelected: (exampleId: number, selected: boolean) => void;
   onToggleExpanded: (exampleId: number) => void;
   onTogglePlay: (clip: PlayingClip, url: string) => void;
@@ -53,6 +71,40 @@ export function SpanishSentence({ spanish }: { spanish: string }): JSX.Element {
 function hasAudioLink(url: string): boolean {
   return url.length > 0;
 }
+
+/** Long enough to tell two rows apart, short enough for a rotor listing. */
+const ROW_LABEL_MAX_LENGTH = 60;
+
+/**
+ * Names a row's controls by what the row says, so a rotor listing reads as
+ * sentences rather than 25 copies of "Expand row". Asterisk markers around
+ * embedded English are dropped, and an example with no Spanish falls back to
+ * its id so the name is never empty.
+ */
+export function exampleRowLabel(example: ExampleWithVocabulary): string {
+  const text = splitSpanishTextRuns(example.spanish)
+    .map((run) => run.text)
+    .join('')
+    .trim();
+
+  if (text.length === 0) {
+    return `example ${example.id}`;
+  }
+  if (text.length <= ROW_LABEL_MAX_LENGTH) {
+    return text;
+  }
+  return `${text.slice(0, ROW_LABEL_MAX_LENGTH).trimEnd()}…`;
+}
+
+/**
+ * A row action swallows a rejected mutation because the row has no notice
+ * channel of its own. What the student sees depends on which rejection it is:
+ * `useFlashcardsQuery` toasts a failed create or delete from the mutation's
+ * `onError`, but its access guards (no student role) only `console.error` and
+ * reject, so that path is silent by design. Without a handler either one would
+ * go unhandled — `void` alone silences the lint rule, not the runtime.
+ */
+function ignoreRowActionRejection(): void {}
 
 function SpanishCell({
   example,
@@ -122,36 +174,77 @@ function ActionsCell({
   example,
   expanded,
   studentFlashcards,
+  rowAction,
   onToggleExpanded,
+  onRemoveRequested,
 }: {
   example: ExampleWithVocabulary;
   expanded: boolean;
   studentFlashcards: UseStudentFlashcardsReturn;
+  rowAction: ExampleRowAction;
   onToggleExpanded: (exampleId: number) => void;
+  onRemoveRequested?: () => void;
 }): JSX.Element {
   const collected = studentFlashcards.isExampleCollected({
     exampleId: example.id,
   });
+  const removing = studentFlashcards.isRemovingFlashcard({
+    exampleId: example.id,
+  });
   const pending =
-    studentFlashcards.isAddingFlashcard({ exampleId: example.id }) ||
-    studentFlashcards.isRemovingFlashcard({ exampleId: example.id });
+    studentFlashcards.isAddingFlashcard({ exampleId: example.id }) || removing;
+
+  const rowLabel = exampleRowLabel(example);
+
+  const expandToggle = (
+    <span className={styles.expandToggle}>
+      <IconButton
+        icon={expanded ? 'chevronUp' : 'chevronDown'}
+        label={
+          expanded ? `Collapse row: ${rowLabel}` : `Expand row: ${rowLabel}`
+        }
+        variant="bare"
+        size="fit"
+        iconSize="md"
+        tone={expanded ? 'action' : 'muted'}
+        active={expanded}
+        onClick={() => {
+          onToggleExpanded(example.id);
+        }}
+      />
+    </span>
+  );
+
+  if (rowAction === 'remove') {
+    return (
+      <div className={styles.actions}>
+        {expandToggle}
+        <span className={styles.removeAction}>
+          <Button
+            variant="ghost"
+            muted
+            size="sm"
+            disabled={pending}
+            onClick={() => {
+              // This button is about to be disabled and then unmounted with
+              // its row, either of which drops focus to <body>. Hand it over
+              // before starting the removal.
+              onRemoveRequested?.();
+              studentFlashcards
+                .deleteFlashcards([example.id])
+                .catch(ignoreRowActionRejection);
+            }}
+          >
+            {removing ? 'Removing...' : 'Remove'}
+          </Button>
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.actions}>
-      <span className={styles.expandToggle}>
-        <IconButton
-          icon={expanded ? 'chevronUp' : 'chevronDown'}
-          label={expanded ? 'Collapse row' : 'Expand row'}
-          variant="bare"
-          size="fit"
-          iconSize="md"
-          tone={expanded ? 'action' : 'muted'}
-          active={expanded}
-          onClick={() => {
-            onToggleExpanded(example.id);
-          }}
-        />
-      </span>
+      {expandToggle}
       {collected ? (
         <span className={styles.ownedAction}>
           <Button
@@ -160,7 +253,9 @@ function ActionsCell({
             size="sm"
             disabled={pending}
             onClick={() => {
-              void studentFlashcards.deleteFlashcards([example.id]);
+              studentFlashcards
+                .deleteFlashcards([example.id])
+                .catch(ignoreRowActionRejection);
             }}
           >
             Owned
@@ -173,7 +268,9 @@ function ActionsCell({
             size="sm"
             disabled={pending}
             onClick={() => {
-              void studentFlashcards.createFlashcards([example]);
+              studentFlashcards
+                .createFlashcards([example])
+                .catch(ignoreRowActionRejection);
             }}
           >
             Collect
@@ -259,19 +356,54 @@ function VocabDetail({
   );
 }
 
+function ReviewScheduleColumn({
+  reviewSchedule,
+}: {
+  reviewSchedule: FlashcardReviewDates;
+}): JSX.Element {
+  const dates = formatFlashcardReviewDates(reviewSchedule);
+
+  return (
+    <div>
+      <div className={styles.columnEyebrow}>
+        <Eyebrow as="h3">Review schedule</Eyebrow>
+      </div>
+      <dl className={styles.dateList}>
+        <div className={styles.dateRow}>
+          <dt className={styles.dateLabel}>Added on:</dt>
+          <dd className={styles.dateValue}>{dates.addedOn}</dd>
+        </div>
+        <div className={styles.dateRow}>
+          <dt className={styles.dateLabel}>Last Reviewed:</dt>
+          <dd className={styles.dateValue}>{dates.lastReviewed}</dd>
+        </div>
+        <div className={styles.dateRow}>
+          <dt className={styles.dateLabel}>Next SRS Review:</dt>
+          <dd className={styles.dateValue}>{dates.nextReview}</dd>
+        </div>
+      </dl>
+    </div>
+  );
+}
+
+export interface ExampleExpandPanelProps {
+  example: ExampleWithVocabulary;
+  openVocabId: number | null;
+  lessonPopup: LessonPopup;
+  studentFlashcards: UseStudentFlashcardsReturn;
+  /** Adds the review-schedule column. Omitted on the finder. */
+  reviewSchedule?: FlashcardReviewDates;
+  onToggleVocab: (vocabId: number) => void;
+}
+
 export function ExampleExpandPanel({
   example,
   openVocabId,
   lessonPopup,
   studentFlashcards,
+  reviewSchedule,
   onToggleVocab,
-}: {
-  example: ExampleWithVocabulary;
-  openVocabId: number | null;
-  lessonPopup: LessonPopup;
-  studentFlashcards: UseStudentFlashcardsReturn;
-  onToggleVocab: (vocabId: number) => void;
-}): JSX.Element {
+}: ExampleExpandPanelProps): JSX.Element {
   const openVocab =
     openVocabId === null
       ? undefined
@@ -356,6 +488,9 @@ export function ExampleExpandPanel({
           </p>
         )}
       </div>
+      {reviewSchedule !== undefined && (
+        <ReviewScheduleColumn reviewSchedule={reviewSchedule} />
+      )}
     </div>
   );
 }
@@ -372,7 +507,7 @@ export function buildExampleRow(model: ExampleRowModel): DataTableRow {
         id={`select-example-${example.id}`}
         key="select"
         checked={model.selected}
-        label={`Select example ${example.id}`}
+        label={`Select ${exampleRowLabel(example)}`}
         labelHidden
         onChange={(checked) => {
           model.onToggleSelected(example.id, checked);
@@ -395,7 +530,9 @@ export function buildExampleRow(model: ExampleRowModel): DataTableRow {
         example={example}
         expanded={model.expanded}
         studentFlashcards={model.studentFlashcards}
+        rowAction={model.rowAction ?? 'collect'}
         onToggleExpanded={model.onToggleExpanded}
+        onRemoveRequested={model.onRemoveRequested}
       />,
     ],
     expandPanel: (
@@ -404,6 +541,7 @@ export function buildExampleRow(model: ExampleRowModel): DataTableRow {
         openVocabId={model.expanded ? model.openVocabId : null}
         lessonPopup={model.lessonPopup}
         studentFlashcards={model.studentFlashcards}
+        reviewSchedule={model.reviewSchedule}
         onToggleVocab={model.onToggleVocab}
       />
     ),

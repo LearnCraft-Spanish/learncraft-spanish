@@ -88,6 +88,7 @@ vi.mock('@interface/components/studentFlashcards/ResultsSection', () => ({
     examples,
     firstPageLoading,
     filteredExamplesLoading,
+    mobileLayout,
     onApplyFilters,
     onCreateQuiz,
     onCopyPage,
@@ -98,6 +99,7 @@ vi.mock('@interface/components/studentFlashcards/ResultsSection', () => ({
     examples: ExampleWithVocabulary[];
     firstPageLoading?: boolean;
     filteredExamplesLoading?: boolean;
+    mobileLayout?: boolean;
     onApplyFilters?: () => void;
     onCreateQuiz?: () => void;
     onCopyPage?: () => void;
@@ -109,6 +111,7 @@ vi.mock('@interface/components/studentFlashcards/ResultsSection', () => ({
       data-testid="results-section"
       data-first-page-loading={String(firstPageLoading ?? false)}
       data-filtered-loading={String(filteredExamplesLoading ?? false)}
+      data-mobile-layout={String(mobileLayout ?? false)}
     >
       <button type="button" onClick={onApplyFilters}>
         mock-apply-filters
@@ -266,18 +269,22 @@ describe('flashcard finder page', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the context bar and heading when the version is v2', () => {
+  it('renders the heading and sections when the version is v2', () => {
     overrideMockUseStudentUiVersion({ version: 'v2' });
 
     renderFinder();
 
-    expect(screen.getByText('Building for')).toBeInTheDocument();
-    expect(screen.getByText('Alex Rivera · Lesson 8')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 1, name: 'Flashcard Finder' }),
     ).toBeInTheDocument();
     expect(screen.getByTestId('filter-section')).toBeInTheDocument();
     expect(screen.getByTestId('results-section')).toBeInTheDocument();
+    // STUDENT_FLASHCARDS.md requires the results row to reflow below 768px
+    // rather than scroll sideways.
+    expect(screen.getByTestId('results-section')).toHaveAttribute(
+      'data-mobile-layout',
+      'true',
+    );
     expect(screen.getByTestId('finder-bottom-bar')).toBeInTheDocument();
     expect(screen.queryByTestId('filter-panel')).not.toBeInTheDocument();
     expect(screen.queryByTestId('example-table')).not.toBeInTheDocument();
@@ -289,7 +296,6 @@ describe('flashcard finder page', () => {
 
     renderFinder();
 
-    expect(screen.getByText('Building for')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 1, name: 'Flashcard Finder' }),
     ).toBeInTheDocument();
