@@ -1,3 +1,4 @@
+import type { PaginationState } from '@application/units/Pagination/usePagination';
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
@@ -11,6 +12,7 @@ import skeletonStyles from '@interface/components/general/Skeleton/Skeleton.modu
 import {
   formatRangeLabel,
   ResultsSection,
+  toResultsPagination,
 } from '@interface/components/studentFlashcards/ResultsSection/ResultsSection';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -91,6 +93,14 @@ const emptyLessonPopup: LessonPopup = {
   lessonsLoading: false,
 };
 
+/**
+ * Row controls are named after the sentence the row shows, so every query goes
+ * through the default `makeExample` text rather than an opaque id.
+ */
+const SELECT_LABEL = 'Select No quiero eso aquí.';
+const EXPAND_LABEL = 'Expand row: No quiero eso aquí.';
+const COLLAPSE_LABEL = 'Collapse row: No quiero eso aquí.';
+
 function renderSection(
   overrides: Partial<ResultsSectionProps> = {},
 ): ReturnType<typeof render> {
@@ -109,7 +119,7 @@ function renderSection(
         filteredExamplesLoading={overrides.filteredExamplesLoading ?? false}
         firstPageLoading={overrides.firstPageLoading ?? false}
         newPageLoading={overrides.newPageLoading ?? false}
-        isAdmin={overrides.isAdmin ?? false}
+        isAdmin={overrides.isAdmin}
         onNotice={overrides.onNotice}
         onApplyFilters={overrides.onApplyFilters}
         onCreateQuiz={overrides.onCreateQuiz}
@@ -118,10 +128,51 @@ function renderSection(
         selectedIds={overrides.selectedIds}
         onSelectionChange={overrides.onSelectionChange}
         resetEpoch={overrides.resetEpoch}
+        countLabel={overrides.countLabel}
+        rangeNoun={overrides.rangeNoun}
+        caption={overrides.caption}
+        emptyTitle={overrides.emptyTitle}
+        emptyGuidance={overrides.emptyGuidance}
+        emptyIcon={overrides.emptyIcon}
+        actionsMenu={overrides.actionsMenu}
+        rowAction={overrides.rowAction}
+        getReviewSchedule={overrides.getReviewSchedule}
+        mobileLayout={overrides.mobileLayout}
+        focusRequest={overrides.focusRequest}
       />
     </ContextualMenuProvider>,
   );
 }
+
+describe('toResultsPagination', () => {
+  it('renames the sliced-list page so the section can take either unit', () => {
+    const goToPage = vi.fn<(page: number) => void>();
+    const managerPagination: PaginationState = {
+      totalItems: 140,
+      pageNumber: 3,
+      maxPageNumber: 6,
+      startIndex: 50,
+      endIndex: 75,
+      pageSize: 25,
+      isOnFirstPage: false,
+      isOnLastPage: false,
+      previousPage: vi.fn<() => void>(),
+      nextPage: vi.fn<() => void>(),
+      goToFirstPage: vi.fn<() => void>(),
+      goToPage,
+    };
+
+    const pagination = toResultsPagination(managerPagination);
+
+    expect(pagination.page).toBe(3);
+    expect(pagination.pageSize).toBe(25);
+    expect(pagination.maxPageNumber).toBe(6);
+
+    pagination.goToPage(4);
+
+    expect(goToPage).toHaveBeenCalledWith(4);
+  });
+});
 
 describe('formatRangeLabel', () => {
   it('reports no matches when the set is empty', () => {
@@ -131,6 +182,16 @@ describe('formatRangeLabel', () => {
   it('uses the current page and page size, not the prototype page of 5', () => {
     expect(formatRangeLabel(1, 25, 40)).toBe('Showing 1–25 of 40 matches');
     expect(formatRangeLabel(2, 25, 40)).toBe('Showing 26–40 of 40 matches');
+  });
+
+  it('counts the noun it is given instead of hardcoding matches', () => {
+    expect(formatRangeLabel(1, 25, 0, 'flashcards')).toBe('No flashcards');
+    expect(formatRangeLabel(1, 25, 32, 'flashcards')).toBe(
+      'Showing 1–25 of 32 flashcards',
+    );
+    expect(formatRangeLabel(2, 25, 32, 'flashcards')).toBe(
+      'Showing 26–32 of 32 flashcards',
+    );
   });
 });
 
@@ -230,9 +291,7 @@ describe('results section', () => {
     const user = userEvent.setup();
     renderSection();
 
-    await user.click(
-      screen.getByRole('checkbox', { name: 'Select example 11' }),
-    );
+    await user.click(screen.getByRole('checkbox', { name: SELECT_LABEL }));
 
     expect(screen.getAllByRole('row', { selected: true })).toHaveLength(1);
   });
@@ -241,10 +300,8 @@ describe('results section', () => {
     const user = userEvent.setup();
     renderSection();
 
-    await user.click(screen.getByRole('button', { name: 'Expand row' }));
-    await user.click(
-      screen.getByRole('checkbox', { name: 'Select example 11' }),
-    );
+    await user.click(screen.getByRole('button', { name: EXPAND_LABEL }));
+    await user.click(screen.getByRole('checkbox', { name: SELECT_LABEL }));
 
     const sentence = screen.getByRole('row', { selected: true });
     const tags = screen.getByText('Vocabulary tags');
@@ -303,14 +360,14 @@ describe('results section', () => {
     });
     renderSection({ examples: [first, second] });
 
-    await user.click(screen.getAllByRole('button', { name: 'Expand row' })[0]);
+    await user.click(screen.getAllByRole('button', { name: EXPAND_LABEL })[0]);
 
     expect(screen.getByText('Vocabulary tags')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Collapse row' }),
+      screen.getByRole('button', { name: COLLAPSE_LABEL }),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Collapse row' }));
+    await user.click(screen.getByRole('button', { name: COLLAPSE_LABEL }));
 
     expect(screen.queryByText('Vocabulary tags')).not.toBeInTheDocument();
   });
@@ -337,7 +394,7 @@ describe('results section', () => {
       },
     });
 
-    await user.click(screen.getByRole('button', { name: 'Expand row' }));
+    await user.click(screen.getByRole('button', { name: EXPAND_LABEL }));
     await user.click(screen.getByRole('button', { name: 'eso' }));
 
     expect(screen.getByText('Taught in')).toBeInTheDocument();
@@ -358,7 +415,7 @@ describe('results section', () => {
     const user = userEvent.setup();
     renderSection();
 
-    await user.click(screen.getByRole('button', { name: 'Expand row' }));
+    await user.click(screen.getByRole('button', { name: EXPAND_LABEL }));
     await user.click(screen.getByRole('button', { name: 'eso' }));
     await user.click(screen.getByRole('button', { name: 'eso' }));
 
@@ -391,13 +448,17 @@ describe('results section', () => {
       studentFlashcards,
     });
 
-    await user.click(screen.getAllByRole('button', { name: 'Expand row' })[0]);
+    await user.click(screen.getByRole('button', { name: EXPAND_LABEL }));
 
     expect(screen.getByText('Spanglish')).toBeInTheDocument();
     expect(screen.getByText('Audio flashcard')).toBeInTheDocument();
     expect(screen.getByText('Custom flashcard')).toBeInTheDocument();
 
-    await user.click(screen.getAllByRole('button', { name: 'Expand row' })[0]);
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Expand row: Sí, eso nada rápidamente.',
+      }),
+    );
 
     expect(
       screen.getByText('No special tags on this flashcard.'),
@@ -535,7 +596,7 @@ describe('results section', () => {
     const user = userEvent.setup();
     const { rerender } = renderSection({ examples: [makeExample({ id: 11 })] });
 
-    await user.click(screen.getByRole('button', { name: 'Expand row' }));
+    await user.click(screen.getByRole('button', { name: EXPAND_LABEL }));
     expect(screen.getByText('Vocabulary tags')).toBeInTheDocument();
 
     rerender(
@@ -562,7 +623,7 @@ describe('results section', () => {
     const user = userEvent.setup();
     renderSection();
 
-    const box = screen.getByRole('checkbox', { name: 'Select example 11' });
+    const box = screen.getByRole('checkbox', { name: SELECT_LABEL });
     await user.click(box);
     await user.click(box);
 
@@ -687,13 +748,14 @@ describe('results section', () => {
     const user = userEvent.setup();
     const onSelectionChange = vi.fn<(ids: ReadonlySet<number>) => void>();
     renderSection({
-      examples: [makeExample({ id: 11 }), makeExample({ id: 12 })],
+      examples: [
+        makeExample({ id: 11 }),
+        makeExample({ id: 12, spanish: 'Necesito eso para mañana.' }),
+      ],
       onSelectionChange,
     });
 
-    await user.click(
-      screen.getByRole('checkbox', { name: 'Select example 11' }),
-    );
+    await user.click(screen.getByRole('checkbox', { name: SELECT_LABEL }));
 
     expect(onSelectionChange).toHaveBeenCalledWith(new Set([11]));
 
@@ -759,6 +821,143 @@ describe('results section', () => {
     expect(onCopyAll).toHaveBeenCalledOnce();
   });
 
+  it('takes manager copy for the count, caption, and empty state', () => {
+    renderSection({
+      examples: [],
+      totalCount: 0,
+      countLabel: 'flashcards in your collection',
+      caption: 'Flashcard manager results',
+      emptyTitle: 'No flashcards yet',
+      emptyGuidance: 'Collect flashcards from the finder to see them here.',
+      emptyIcon: 'bookmark',
+    });
+
+    expect(
+      screen.getByText('flashcards in your collection'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('table')).toHaveAccessibleName(
+      'Flashcard manager results',
+    );
+    expect(screen.getByText('No flashcards yet')).toBeInTheDocument();
+    expect(
+      screen.getByText('Collect flashcards from the finder to see them here.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('flashcards match')).not.toBeInTheDocument();
+  });
+
+  it('counts flashcards rather than matches when given the manager noun', () => {
+    renderSection({
+      totalCount: 32,
+      pagination: makePagination({ page: 1, pageSize: 25, maxPageNumber: 2 }),
+      totalPages: 2,
+      rangeNoun: 'flashcards',
+    });
+
+    expect(
+      screen.getByText('Showing 1–25 of 32 flashcards'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/matches/)).not.toBeInTheDocument();
+  });
+
+  it('says no flashcards rather than no matches when the collection is empty', () => {
+    renderSection({
+      examples: [],
+      totalCount: 0,
+      countLabel: 'flashcards in your collection',
+      emptyTitle: 'No flashcards yet',
+      rangeNoun: 'flashcards',
+    });
+
+    expect(screen.getByText('No flashcards')).toBeInTheDocument();
+    expect(screen.queryByText('No matches')).not.toBeInTheDocument();
+  });
+
+  it('renders a supplied actions menu instead of the finder one', () => {
+    renderSection({
+      actionsMenu: <button type="button">Manager actions</button>,
+    });
+
+    expect(
+      screen.getByRole('button', { name: 'Manager actions' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Do more with these' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('passes the remove row action down to every row', async () => {
+    const user = userEvent.setup();
+    const studentFlashcards = makeFlashcards({
+      isExampleCollected: vi.fn(() => true),
+    });
+    renderSection({ studentFlashcards, rowAction: 'remove' });
+
+    expect(
+      screen.queryByRole('button', { name: 'Owned' }),
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Remove' }));
+
+    expect(studentFlashcards.deleteFlashcards).toHaveBeenCalledWith([11]);
+  });
+
+  it('defaults to the collect row action so the finder is unaffected', async () => {
+    const user = userEvent.setup();
+    const studentFlashcards = makeFlashcards();
+    renderSection({ studentFlashcards });
+
+    expect(
+      screen.queryByRole('button', { name: 'Remove' }),
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Collect' }));
+
+    expect(studentFlashcards.createFlashcards).toHaveBeenCalled();
+  });
+
+  it('looks up review dates per example for the expand panel', async () => {
+    const user = userEvent.setup();
+    const getReviewSchedule = vi.fn((exampleId: number) =>
+      exampleId === 11
+        ? {
+            addedOn: '2024-03-07T12:00:00Z',
+            lastReviewed: '',
+            nextReview: '2025-01-09T12:00:00Z',
+          }
+        : undefined,
+    );
+    renderSection({ getReviewSchedule });
+
+    await user.click(screen.getByRole('button', { name: EXPAND_LABEL }));
+
+    expect(getReviewSchedule).toHaveBeenCalledWith(11);
+    expect(screen.getByText('Added on:')).toBeInTheDocument();
+    expect(screen.getByText('03/07/2024')).toBeInTheDocument();
+    expect(screen.getByText('Never')).toBeInTheDocument();
+    expect(screen.getByText('01/09/2025')).toBeInTheDocument();
+  });
+
+  it('reflows the row below 768px only when mobile layout is on', () => {
+    renderSection({ mobileLayout: true });
+
+    const row = screen.getAllByRole('row')[1];
+
+    expect(row.style.getPropertyValue('--dt-mobile-columns')).toBe(
+      '44px 1fr 44px',
+    );
+    expect(row.style.getPropertyValue('--dt-mobile-areas')).toBe(
+      '"select spanish expand" "select english expand"',
+    );
+    expect(
+      screen
+        .getByRole('columnheader', { name: 'Spanish' })
+        .style.getPropertyValue('--dt-mobile-area'),
+    ).toBe('spanish');
+    expect(screen.getByRole('table')).not.toHaveTextContent(
+      'No flashcards match',
+    );
+  });
+
   it('collapses an expanded row when resetEpoch increments', async () => {
     const user = userEvent.setup();
     const { rerender } = renderSection({
@@ -766,7 +965,7 @@ describe('results section', () => {
       resetEpoch: 0,
     });
 
-    await user.click(screen.getByRole('button', { name: 'Expand row' }));
+    await user.click(screen.getByRole('button', { name: EXPAND_LABEL }));
     expect(screen.getByText('Vocabulary tags')).toBeInTheDocument();
 
     rerender(
@@ -788,5 +987,114 @@ describe('results section', () => {
     );
 
     expect(screen.queryByText('Vocabulary tags')).not.toBeInTheDocument();
+  });
+});
+
+/**
+ * Every destructive action on the manager destroys the control that ran it, so
+ * without this the browser drops focus on `<body>` — above the filter card and
+ * up to 25 rows from where the student was. The finder's rows swap Collect for
+ * Owned in place, so it omits `focusRequest` and nothing here applies to it.
+ */
+describe('results section focus recovery', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  function anchor(): HTMLElement {
+    return screen.getByRole('group', { name: 'Flashcard finder results' });
+  }
+
+  function rerenderWithFocusRequest(
+    rerender: ReturnType<typeof render>['rerender'],
+    focusRequest: number,
+    studentFlashcards = makeFlashcards({
+      isExampleCollected: vi.fn(() => true),
+    }),
+  ): void {
+    rerender(
+      <ContextualMenuProvider>
+        <ResultsSection
+          examples={[makeExample({ id: 11 })]}
+          totalCount={1}
+          studentFlashcards={studentFlashcards}
+          pagination={makePagination()}
+          totalPages={1}
+          lessonPopup={emptyLessonPopup}
+          filteredExamplesLoading={false}
+          firstPageLoading={false}
+          newPageLoading={false}
+          rowAction="remove"
+          focusRequest={focusRequest}
+        />
+      </ContextualMenuProvider>,
+    );
+  }
+
+  it('offers a named landing spot that is not in the tab order', () => {
+    renderSection({ focusRequest: 0 });
+
+    expect(anchor()).toHaveAttribute('tabindex', '-1');
+    expect(anchor()).toHaveAccessibleName('Flashcard finder results');
+  });
+
+  it('takes no focus on first render', () => {
+    renderSection({ focusRequest: 0 });
+
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it('takes no focus on a re-render that is not a fresh request', async () => {
+    const user = userEvent.setup();
+    const { rerender } = renderSection({
+      rowAction: 'remove',
+      focusRequest: 3,
+    });
+
+    await user.click(screen.getByRole('button', { name: EXPAND_LABEL }));
+    const chevron = screen.getByRole('button', { name: COLLAPSE_LABEL });
+    chevron.focus();
+
+    rerenderWithFocusRequest(rerender, 3);
+
+    expect(document.activeElement).toBe(chevron);
+  });
+
+  it('lands focus on the results region when the request increments', () => {
+    const { rerender } = renderSection({
+      rowAction: 'remove',
+      focusRequest: 0,
+    });
+
+    rerenderWithFocusRequest(rerender, 1);
+
+    expect(document.activeElement).toBe(anchor());
+  });
+
+  it('lands focus on the results region when a row Remove fires', async () => {
+    const user = userEvent.setup();
+    const studentFlashcards = makeFlashcards({
+      isExampleCollected: vi.fn(() => true),
+    });
+    renderSection({ studentFlashcards, rowAction: 'remove', focusRequest: 0 });
+
+    await user.click(screen.getByRole('button', { name: 'Remove' }));
+
+    expect(studentFlashcards.deleteFlashcards).toHaveBeenCalledWith([11]);
+    expect(document.activeElement).toBe(anchor());
+  });
+
+  it('leaves the finder untouched: no anchor, and focus stays on the row', async () => {
+    const user = userEvent.setup();
+    const studentFlashcards = makeFlashcards({
+      isExampleCollected: vi.fn(() => true),
+    });
+    renderSection({ studentFlashcards });
+
+    const owned = screen.getByRole('button', { name: 'Owned' });
+    await user.click(owned);
+
+    expect(screen.queryByRole('group')).not.toBeInTheDocument();
+    expect(document.activeElement).toBe(owned);
   });
 });

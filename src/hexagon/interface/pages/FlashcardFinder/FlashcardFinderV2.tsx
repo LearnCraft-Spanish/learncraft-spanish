@@ -134,6 +134,7 @@ function FlashcardFinderV2Loaded({
           onResetAll={handleResetAll}
         />
         <ResultsSection
+          mobileLayout
           examples={displayExamples}
           totalCount={exampleQuery.totalCount ?? 0}
           studentFlashcards={flashcardsQuery}

@@ -1,8 +1,6 @@
 import type { MenuItem } from '@interface/components/general/Menu/Menu';
 import type { JSX } from 'react';
-import { Button } from '@interface/components/general/Buttons/Button/Button';
-import { Menu } from '@interface/components/general/Menu/Menu';
-import { useState } from 'react';
+import { ActionsMenu } from '@interface/components/studentFlashcards/ActionsMenu';
 import styles from './FinderActionsMenu.module.scss';
 
 export interface FinderActionsMenuProps {
@@ -34,8 +32,6 @@ export function FinderActionsMenu({
   onCopyAll,
   onNotice,
 }: FinderActionsMenuProps): JSX.Element {
-  const [open, setOpen] = useState(false);
-
   const run = (action: () => void, message: string): void => {
     action();
     onNotice(message);
@@ -85,30 +81,10 @@ export function FinderActionsMenu({
   }
 
   return (
-    <div className={styles.root} data-state={open ? 'open' : 'closed'}>
-      <Menu
-        open={open}
-        onDismiss={() => {
-          setOpen(false);
-        }}
-        align="end"
-        density="list"
-        label="Do more with these"
-        trigger={
-          <Button
-            variant="secondary"
-            size="sm"
-            leadingIcon="bolt"
-            trailingIcon={open ? 'chevronUp' : 'chevronDown'}
-            onClick={() => {
-              setOpen((isOpen) => !isOpen);
-            }}
-          >
-            Do more with these
-          </Button>
-        }
-        items={items}
-      />
-    </div>
+    <ActionsMenu
+      className={styles.root}
+      label="Do more with these"
+      items={items}
+    />
   );
 }

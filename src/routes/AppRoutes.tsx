@@ -62,7 +62,14 @@ export default function AppRoutes() {
           path="/myflashcards"
           element={isAuthenticated && <ReviewMyFlashcards />}
         />
-        <Route path="/manage-flashcards" element={<FlashcardManager />} />
+        <Route
+          path="/manage-flashcards"
+          element={
+            <UiScope flag="ui.student.flashcards.manager.v2">
+              <FlashcardManager />
+            </UiScope>
+          }
+        />
         <Route path="/officialquizzes/*" element={<OfficialQuizzesRoutes />} />
         <Route
           path="/customquiz"

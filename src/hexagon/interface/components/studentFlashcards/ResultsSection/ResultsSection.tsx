@@ -1,10 +1,18 @@
-import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
+import type { PaginationState } from '@application/units/Pagination/usePagination';
 import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
-import type { DataTableColumn } from '@interface/components/general/DataTable/DataTable';
-import type { PlayingClip } from '@interface/components/studentFlashcards/ResultsSection/ExampleRow';
+import type { FlashcardReviewDates } from '@domain/functions/formatFlashcardReviewDates';
+import type {
+  DataTableColumn,
+  DataTableMobileLayout,
+} from '@interface/components/general/DataTable/DataTable';
+import type { IconName } from '@interface/components/general/Icon/Icon';
+import type {
+  ExampleRowAction,
+  PlayingClip,
+} from '@interface/components/studentFlashcards/ResultsSection/ExampleRow';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import type { JSX } from 'react';
+import type { HTMLAttributes, JSX, ReactNode } from 'react';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
 import { DataTable } from '@interface/components/general/DataTable/DataTable';
 import { EmptyState } from '@interface/components/general/EmptyState/EmptyState';
@@ -15,17 +23,41 @@ import { buildExampleRow } from '@interface/components/studentFlashcards/Results
 import { useEffect, useRef, useState } from 'react';
 import styles from './ResultsSection.module.scss';
 
+/**
+ * The slice of a pagination unit this section actually uses.
+ * `QueryPaginationState` satisfies it as-is; `PaginationState` names its page
+ * `pageNumber`, so pass it through `toResultsPagination`.
+ */
+export interface ResultsPagination {
+  page: number;
+  pageSize: number;
+  maxPageNumber: number;
+  goToPage: (page: number) => void;
+}
+
+export function toResultsPagination(
+  pagination: PaginationState,
+): ResultsPagination {
+  return {
+    page: pagination.pageNumber,
+    pageSize: pagination.pageSize,
+    maxPageNumber: pagination.maxPageNumber,
+    goToPage: pagination.goToPage,
+  };
+}
+
 export interface ResultsSectionProps {
   examples: ExampleWithVocabulary[];
   totalCount: number;
   studentFlashcards: UseStudentFlashcardsReturn;
-  pagination: QueryPaginationState;
+  pagination: ResultsPagination;
   totalPages: number | null;
   lessonPopup: LessonPopup;
   filteredExamplesLoading: boolean;
   firstPageLoading: boolean;
   newPageLoading: boolean;
-  isAdmin: boolean;
+  /** Only reaches the built-in finder actions menu. Omit when replacing it. */
+  isAdmin?: boolean;
   onNotice?: (message: string) => void;
   onApplyFilters?: () => void;
   onCreateQuiz?: () => void;
@@ -35,6 +67,36 @@ export interface ResultsSectionProps {
   onSelectionChange?: (selectedIds: ReadonlySet<number>) => void;
   /** Increment to collapse expanded rows (reset-all). */
   resetEpoch?: number;
+  /**
+   * Opt in to focus recovery, and increment to trigger it. Passing this makes
+   * the count row a labelled `tabIndex={-1}` landing spot and moves focus there
+   * whenever the number changes or a row Remove fires, so a destroyed control
+   * does not drop a keyboard user on `<body>`. Omitted on the finder, whose row
+   * action swaps Collect for Owned in place — a focusable button always
+   * survives there, so nothing should move.
+   */
+  focusRequest?: number;
+  /** Noun beside the count, e.g. "flashcards match". */
+  countLabel?: string;
+  /**
+   * Noun the footer range counts, e.g. `No matches` / `… of 32 matches`. The
+   * manager only matches while its filters are on, so it says `flashcards`
+   * otherwise.
+   */
+  rangeNoun?: string;
+  /** Accessible name for the table. */
+  caption?: string;
+  emptyTitle?: string;
+  emptyGuidance?: string;
+  emptyIcon?: IconName;
+  /** Replaces the built-in finder actions menu in the count row. */
+  actionsMenu?: ReactNode;
+  /** `remove` gives every row a single Remove button. */
+  rowAction?: ExampleRowAction;
+  /** Supplies the expand panel's review-schedule column, per example. */
+  getReviewSchedule?: (exampleId: number) => FlashcardReviewDates | undefined;
+  /** Opt in to the sub-768px reflow. Off keeps the desktop grid at any width. */
+  mobileLayout?: boolean;
 }
 
 const COLUMNS: DataTableColumn[] = [
@@ -44,6 +106,18 @@ const COLUMNS: DataTableColumn[] = [
   { id: 'actions', header: '', align: 'end' },
 ];
 
+const MOBILE_COLUMNS: DataTableColumn[] = [
+  { id: 'select', header: '', mobileArea: 'select' },
+  { id: 'spanish', header: 'Spanish', mobileArea: 'spanish' },
+  { id: 'english', header: 'English', mobileArea: 'english' },
+  { id: 'actions', header: '', align: 'end', mobileArea: 'expand' },
+];
+
+const MOBILE_LAYOUT: DataTableMobileLayout = {
+  columnTemplate: '44px 1fr 44px',
+  templateAreas: '"select spanish expand" "select english expand"',
+};
+
 const COLUMN_TEMPLATE = '44px minmax(240px, 1fr) minmax(240px, 1fr) 132px';
 
 function ignoreAction(): void {}
@@ -52,14 +126,15 @@ export function formatRangeLabel(
   page: number,
   pageSize: number,
   totalCount: number,
+  noun = 'matches',
 ): string {
   if (totalCount === 0) {
-    return 'No matches';
+    return `No ${noun}`;
   }
 
   const start = (page - 1) * pageSize + 1;
   const end = Math.min(page * pageSize, totalCount);
-  return `Showing ${start}–${end} of ${totalCount} matches`;
+  return `Showing ${start}–${end} of ${totalCount} ${noun}`;
 }
 
 export function ResultsSection({
@@ -71,7 +146,7 @@ export function ResultsSection({
   lessonPopup,
   filteredExamplesLoading,
   firstPageLoading,
-  isAdmin,
+  isAdmin = false,
   onNotice,
   onApplyFilters,
   onCreateQuiz,
@@ -80,8 +155,21 @@ export function ResultsSection({
   selectedIds: selectedIdsProp,
   onSelectionChange,
   resetEpoch = 0,
+  countLabel = 'flashcards match',
+  rangeNoun = 'matches',
+  caption = 'Flashcard finder results',
+  emptyTitle = 'No flashcards match',
+  emptyGuidance = 'Try removing a tag or widening the lesson range.',
+  emptyIcon = 'searchOff',
+  actionsMenu,
+  rowAction = 'collect',
+  getReviewSchedule,
+  mobileLayout = false,
+  focusRequest,
 }: ResultsSectionProps): JSX.Element {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const focusAnchorRef = useRef<HTMLDivElement>(null);
+  const lastFocusRequest = useRef(focusRequest);
   const [internalSelectedIds, setInternalSelectedIds] = useState<
     ReadonlySet<number>
   >(() => new Set());
@@ -106,6 +194,28 @@ export function ResultsSection({
     audioRef.current?.pause();
   }, [pagination.page, exampleKey, resetEpoch]);
 
+  // Seeded with the incoming value, so the first render and every re-render
+  // that is not a fresh request leave focus exactly where the student put it.
+  useEffect(() => {
+    if (
+      focusRequest === undefined ||
+      focusRequest === lastFocusRequest.current
+    ) {
+      return;
+    }
+    lastFocusRequest.current = focusRequest;
+    focusAnchorRef.current?.focus();
+  }, [focusRequest]);
+
+  const recoversFocus = focusRequest !== undefined;
+  const focusAnchorProps: HTMLAttributes<HTMLDivElement> = recoversFocus
+    ? { role: 'group', tabIndex: -1, 'aria-label': caption }
+    : {};
+
+  const focusResults = (): void => {
+    focusAnchorRef.current?.focus();
+  };
+
   const showSkeleton =
     (firstPageLoading || filteredExamplesLoading) && examples.length === 0;
   const allPageSelected =
@@ -124,6 +234,9 @@ export function ResultsSection({
           openVocabId,
           studentFlashcards,
           lessonPopup,
+          rowAction,
+          reviewSchedule: getReviewSchedule?.(example.id),
+          onRemoveRequested: recoversFocus ? focusResults : undefined,
           onToggleSelected: (exampleId, selected) => {
             const next = new Set(selectedIds);
             if (selected) {
@@ -177,12 +290,16 @@ export function ResultsSection({
 
   return (
     <section>
-      <div className={styles.countRow}>
+      <div
+        className={styles.countRow}
+        ref={focusAnchorRef}
+        {...focusAnchorProps}
+      >
         <div className={styles.count}>
           {!showSkeleton && (
             <>
               <span className={styles.countNumber}>{totalCount}</span>
-              <span className={styles.countLabel}>flashcards match</span>
+              <span className={styles.countLabel}>{countLabel}</span>
             </>
           )}
         </div>
@@ -197,16 +314,18 @@ export function ResultsSection({
             </span>
           )}
           <div className={styles.actionsMenu}>
-            <FinderActionsMenu
-              isAdmin={isAdmin}
-              pageExampleCount={examples.length}
-              totalExampleCount={totalCount}
-              onApplyFilters={onApplyFilters ?? ignoreAction}
-              onCreateQuiz={onCreateQuiz ?? ignoreAction}
-              onCopyPage={onCopyPage ?? ignoreAction}
-              onCopyAll={onCopyAll ?? ignoreAction}
-              onNotice={onNotice ?? ignoreAction}
-            />
+            {actionsMenu ?? (
+              <FinderActionsMenu
+                isAdmin={isAdmin}
+                pageExampleCount={examples.length}
+                totalExampleCount={totalCount}
+                onApplyFilters={onApplyFilters ?? ignoreAction}
+                onCreateQuiz={onCreateQuiz ?? ignoreAction}
+                onCopyPage={onCopyPage ?? ignoreAction}
+                onCopyAll={onCopyAll ?? ignoreAction}
+                onNotice={onNotice ?? ignoreAction}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -220,10 +339,11 @@ export function ResultsSection({
           }}
         />
         <DataTable
-          columns={COLUMNS}
+          columns={mobileLayout ? MOBILE_COLUMNS : COLUMNS}
           rows={rows}
           columnTemplate={COLUMN_TEMPLATE}
-          caption="Flashcard finder results"
+          mobileLayout={mobileLayout ? MOBILE_LAYOUT : undefined}
+          caption={caption}
           expandTone="flush"
           groupSelection
           disableRowHover
@@ -235,9 +355,9 @@ export function ResultsSection({
             ) : (
               <div className={styles.finderEmpty}>
                 <EmptyState
-                  icon="searchOff"
-                  title="No flashcards match"
-                  guidance="Try removing a tag or widening the lesson range."
+                  icon={emptyIcon}
+                  title={emptyTitle}
+                  guidance={emptyGuidance}
                 />
               </div>
             )
@@ -251,6 +371,7 @@ export function ResultsSection({
                   pagination.page,
                   pagination.pageSize,
                   totalCount,
+                  rangeNoun,
                 )}
           </span>
           <PaginationV2

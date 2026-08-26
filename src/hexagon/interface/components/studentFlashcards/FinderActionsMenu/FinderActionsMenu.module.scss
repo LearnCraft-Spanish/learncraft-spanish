@@ -1,19 +1,5 @@
+/* Trigger chrome lives in ActionsMenu. This class is the finder's hook on
+ * that root for anything finder-specific. */
 .root {
   display: inline-block;
-}
-
-/* Prototype outline is 10×16 / 15/900 at ~42px. Button.sm clamps to 40px
- * because min-height includes the 1.5px border. Drop the floor and keep the
- * padding local so 15px type + outline can land at 42. */
-.root > * > button {
-  min-height: 0;
-  padding: var(--lcs-space-4) var(--lcs-space-7);
-  font-size: var(--lcs-text-control);
-  font-weight: var(--lcs-weight-bold);
-  line-height: normal;
-}
-
-/* Button has no open/pressed prop. Scope to the trigger, not menu rows. */
-.root[data-state='open'] > * > button {
-  background-color: var(--lcs-tint-hover);
 }

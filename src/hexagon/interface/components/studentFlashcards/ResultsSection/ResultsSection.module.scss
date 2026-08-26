@@ -7,6 +7,14 @@
   gap: var(--lcs-space-7);
 }
 
+/* The row doubles as the landing spot after a removal destroys the control
+ * that was activated. It only takes focus programmatically, so the ring is
+ * the sighted keyboard user's only clue that focus moved here. */
+.countRow:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
 .count {
   display: flex;
   align-items: baseline;

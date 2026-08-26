@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import useFlashcardManager from '@application/useCases/useFlashcardManager';
 import { CloseableFilterPanel } from '@interface/components/Filters';
 import { Loading } from '@interface/components/Loading';
@@ -5,7 +6,7 @@ import { FlashcardTable } from '@interface/components/Tables';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-export default function FlashcardManager() {
+export function FlashcardManagerV1(): JSX.Element {
   const location = useLocation();
   const navigate = useNavigate();
 
