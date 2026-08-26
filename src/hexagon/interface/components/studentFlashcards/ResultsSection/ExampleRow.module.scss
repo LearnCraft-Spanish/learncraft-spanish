@@ -43,6 +43,11 @@
   min-width: 88px;
 }
 
+/* Desktop: labeled button only. Shown as the compact glyph below 768px. */
+.actionIcon {
+  display: none;
+}
+
 .ownedAction button,
 .removeAction button {
   position: relative;
@@ -119,6 +124,61 @@
   }
 }
 
+/*
+ * Mobile action column is 44px. Icon-only controls + column-reverse keep the
+ * DOM order (chevron then action) for desktop/tab, while stacking action on
+ * top and chevron below. Labels stay in the accessibility tree via the
+ * visually-hidden idiom — never display:none / visibility:hidden.
+ */
+@media (max-width: 768px) {
+  .actions {
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: center;
+    gap: var(--lcs-space-1);
+  }
+
+  .collectAction button,
+  .ownedAction button,
+  .removeAction button {
+    position: relative;
+    width: var(--lcs-control-height-sm);
+    min-width: 0;
+    height: var(--lcs-control-height-sm);
+    min-height: var(--lcs-control-height-sm);
+    padding: 0;
+  }
+
+  /*
+   * --lcs-control-border is 1.5px; browsers rasterize a fractional stroke
+   * unevenly around border-radius (corners read thicker than the sides).
+   * Integer 1px keeps the outline uniform on the 40×40 control — 2px looked
+   * heavy next to the 16px glyph. No matching integer token; raw px is
+   * intentional. Desktop keeps the token.
+   */
+  .ownedAction button,
+  .removeAction button {
+    border-width: 1px;
+  }
+
+  .actionVisibleLabel,
+  .ownedVisual {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    margin: -1px;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .actionIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 .expandPanel {
   position: relative;
   z-index: 1;
@@ -184,6 +244,36 @@
   padding: 5px var(--lcs-space-5);
   border-radius: var(--lcs-radius-sm);
   font-weight: var(--lcs-weight-medium);
+}
+
+/*
+ * Mobile: larger vocabulary tags for thumb targets (~44px). Special tags
+ * match so the two columns in the expand panel stay visually even.
+ * Desktop stays on the compact rule above.
+ */
+@media (max-width: 768px) {
+  .expandPanel {
+    /* Match right padding so the content block centers in the card. */
+    padding-left: var(--lcs-space-7);
+  }
+
+  /*
+   * Containing block for Popover's mobileCentered panel once the popover
+   * root is position: static. Symmetric expandPanel padding keeps this row
+   * centered in the card, so left: 50% + margin-left: -42.5vw centers on
+   * the screen.
+   */
+  .chipRow {
+    position: relative;
+    gap: var(--lcs-space-7);
+  }
+
+  .vocabChip button,
+  .specialChip > * {
+    min-height: var(--lcs-control-height);
+    padding: var(--lcs-space-5) var(--lcs-space-7);
+    font-size: var(--lcs-text-action);
+  }
 }
 
 .vocabChip button {
@@ -266,4 +356,21 @@
 
 .vocabLessonItemCurrent .vocabUnit {
   color: var(--lcs-color-on-surface-dark);
+}
+
+/*
+ * Mobile centered vocab popover is ~85vw. Drop the 280px desktop width so
+ * the detail fills the panel. Keep the lesson list as the internal scroll
+ * (tighter than desktop's 220px) so many lessons do not stretch the panel.
+ */
+@media (max-width: 768px) {
+  .vocabDetail {
+    width: 100%;
+    max-width: none;
+    padding: var(--lcs-space-6) var(--lcs-space-7);
+  }
+
+  .vocabLessonList {
+    max-height: 160px;
+  }
 }

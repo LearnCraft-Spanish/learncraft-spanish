@@ -13,6 +13,7 @@ import { Button } from '@interface/components/general/Buttons/Button/Button';
 import { Checkbox } from '@interface/components/general/Checkbox/Checkbox';
 import { Chip } from '@interface/components/general/Chip/Chip';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
+import { Icon } from '@interface/components/general/Icon/Icon';
 import { IconButton } from '@interface/components/general/IconButton/IconButton';
 import { Popover } from '@interface/components/general/Popover/Popover';
 import { useContextualMenu } from '@interface/hooks/useContextualMenu';
@@ -218,12 +219,14 @@ function OwnedActionButton({
         }}
       >
         {removing ? (
-          'Removing...'
+          <span className={styles.actionVisibleLabel}>Removing...</span>
         ) : (
           <>
             <span className={styles.ownedA11yName}>{accessibleName}</span>
             {isManagerRemove ? (
-              <span aria-hidden="true">Remove</span>
+              <span className={styles.actionVisibleLabel} aria-hidden="true">
+                Remove
+              </span>
             ) : (
               <span className={styles.ownedVisual} aria-hidden="true">
                 <span className={styles.ownedRestLabel}>Owned</span>
@@ -232,6 +235,10 @@ function OwnedActionButton({
             )}
           </>
         )}
+        {/* Mobile-only glyph; desktop keeps the labeled button via CSS. */}
+        <span className={styles.actionIcon} aria-hidden="true">
+          <Icon name={isManagerRemove ? 'x' : 'check'} size="md" />
+        </span>
       </Button>
     </span>
   );
@@ -313,7 +320,13 @@ function ActionsCell({
                 .catch(ignoreRowActionRejection);
             }}
           >
-            {adding ? 'Adding...' : 'Add'}
+            <span className={styles.actionVisibleLabel}>
+              {adding ? 'Adding...' : 'Add'}
+            </span>
+            {/* Mobile-only glyph; desktop keeps the labeled button via CSS. */}
+            <span className={styles.actionIcon} aria-hidden="true">
+              <Icon name="plus" size="md" />
+            </span>
           </Button>
         </span>
       )}
@@ -473,6 +486,7 @@ export function ExampleExpandPanel({
                   }
                 }}
                 skin="dark"
+                mobilePlacement="centered"
                 trigger={
                   <span className={styles.vocabChip}>
                     <Chip

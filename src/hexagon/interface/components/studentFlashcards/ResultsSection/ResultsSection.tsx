@@ -114,7 +114,8 @@ const MOBILE_COLUMNS: DataTableColumn[] = [
 ];
 
 const MOBILE_LAYOUT: DataTableMobileLayout = {
-  columnTemplate: '44px 1fr 44px',
+  /* 40px select keeps a ~40px touch target while sitting closer to the text. */
+  columnTemplate: '40px 1fr 44px',
   templateAreas: '"select english expand" "select spanish expand"',
 };
 

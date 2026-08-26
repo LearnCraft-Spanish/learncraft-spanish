@@ -135,3 +135,16 @@
 .skeletonBody {
   padding: var(--lcs-space-11) var(--lcs-space-8);
 }
+
+/* Mobile-only: tighter select↔text, more air between English and Spanish.
+ * Desktop keeps the .tableCard vars above unchanged. */
+@media (max-width: 768px) {
+  .tableCard {
+    /* Was space-1 (4px). space-4 (10px) separates the lines; between-row
+     * pad stays space-6×2 + hairline (28.5px), so rows still group clearly. */
+    --dt-mobile-row-gap: var(--lcs-space-4);
+    /* Was space-7 (16px) via --dt-column-gap. space-3 (8px) pulls the
+     * checkbox toward the sentence without crowding the 40px select col. */
+    --dt-mobile-column-gap: var(--lcs-space-3);
+  }
+}
