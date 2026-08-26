@@ -4,15 +4,12 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import styles from './FinderBottomBar.module.scss';
 
-/** FixedBottomStack is `position: fixed`; jsdom reports that as inaccessible. */
-const hidden = { hidden: true } as const;
-
 describe('finder bottom bar', () => {
   afterEach(() => {
     cleanup();
   });
 
-  it('renders nothing when there is no notice and no selection', () => {
+  it('keeps an empty live region mounted when there is no notice and no selection', () => {
     const { container } = render(
       <FinderBottomBar
         notice={null}
@@ -23,11 +20,36 @@ describe('finder bottom bar', () => {
       />,
     );
 
-    expect(container).toBeEmptyDOMElement();
-    expect(screen.queryByRole('status', hidden)).not.toBeInTheDocument();
+    // The region has to exist before the text does, or the announcement is
+    // lost. It must cost nothing visually while it waits.
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    expect(container).not.toHaveTextContent(/\S/);
+    expect(container.firstElementChild).not.toHaveClass(styles.slab);
     expect(
-      screen.queryByRole('button', { name: 'Collect flashcards', ...hidden }),
+      screen.queryByRole('button', { name: 'Collect flashcards' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('announces a notice through the region that was already there', () => {
+    const { rerender } = render(
+      <FinderBottomBar notice={null} selectedCount={0} />,
+    );
+
+    const region = screen.getByRole('status');
+    expect(region).toBeEmptyDOMElement();
+
+    rerender(
+      <FinderBottomBar
+        notice="25 flashcards removed from your collection."
+        selectedCount={0}
+      />,
+    );
+
+    // Same node, now populated: that is what NVDA, JAWS, and VoiceOver read.
+    expect(screen.getByRole('status')).toBe(region);
+    expect(region).toHaveTextContent(
+      '25 flashcards removed from your collection.',
+    );
   });
 
   it('treats an empty notice as absent', () => {
@@ -41,7 +63,9 @@ describe('finder bottom bar', () => {
       />,
     );
 
-    expect(container).toBeEmptyDOMElement();
+    expect(container).not.toHaveTextContent(/\S/);
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    expect(container.firstElementChild).not.toHaveClass(styles.slab);
   });
 
   it('shows only the notice layer', () => {
@@ -55,14 +79,14 @@ describe('finder bottom bar', () => {
       />,
     );
 
-    expect(screen.getByRole('status', hidden)).toHaveTextContent(
+    expect(screen.getByRole('status')).toHaveTextContent(
       'Filters applied to your flashcards.',
     );
     expect(
-      screen.getByRole('button', { name: 'Dismiss', ...hidden }).parentElement,
+      screen.getByRole('button', { name: 'Dismiss' }).parentElement,
     ).toHaveClass(styles.dismiss);
     expect(
-      screen.queryByRole('button', { name: 'Collect flashcards', ...hidden }),
+      screen.queryByRole('button', { name: 'Collect flashcards' }),
     ).not.toBeInTheDocument();
   });
 
@@ -79,9 +103,7 @@ describe('finder bottom bar', () => {
       />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Dismiss', ...hidden }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Dismiss' }));
 
     expect(onDismissNotice).toHaveBeenCalledOnce();
   });
@@ -99,10 +121,9 @@ describe('finder bottom bar', () => {
 
     expect(container).toHaveTextContent('3 flashcards selected');
     expect(
-      screen.getByRole('button', { name: 'Clear selection', ...hidden })
-        .parentElement,
+      screen.getByRole('button', { name: 'Clear selection' }).parentElement,
     ).toHaveClass(styles.clear);
-    expect(screen.queryByRole('status', hidden)).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 
   it('shows a singular selection label', () => {
@@ -132,9 +153,7 @@ describe('finder bottom bar', () => {
       />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: 'Clear selection', ...hidden }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Clear selection' }));
 
     expect(onClearSelection).toHaveBeenCalledOnce();
   });
@@ -153,7 +172,7 @@ describe('finder bottom bar', () => {
     );
 
     await user.click(
-      screen.getByRole('button', { name: 'Collect flashcards', ...hidden }),
+      screen.getByRole('button', { name: 'Collect flashcards' }),
     );
 
     expect(onCollect).toHaveBeenCalledOnce();
@@ -170,11 +189,8 @@ describe('finder bottom bar', () => {
       />,
     );
 
-    const notice = screen.getByRole('status', hidden);
-    const add = screen.getByRole('button', {
-      name: 'Collect flashcards',
-      ...hidden,
-    });
+    const notice = screen.getByRole('status');
+    const add = screen.getByRole('button', { name: 'Collect flashcards' });
 
     expect(notice).toHaveTextContent('Quiz created from 12 examples.');
     expect(
@@ -194,13 +210,14 @@ describe('finder bottom bar', () => {
     );
 
     const slab = container.firstElementChild;
-    const notice = screen.getByRole('status', hidden);
+    const notice = screen.getByRole('status');
     const selection = screen.getByText('2 flashcards selected').closest('div');
 
+    expect(slab).toHaveClass(styles.slab);
     expect(slab?.childElementCount).toBe(2);
     expect(slab?.firstElementChild).toBe(notice);
     expect(slab).toContainElement(
-      screen.getByRole('button', { name: 'Collect flashcards', ...hidden }),
+      screen.getByRole('button', { name: 'Collect flashcards' }),
     );
     expect(selection).not.toBe(notice);
   });
@@ -217,21 +234,43 @@ describe('finder bottom bar', () => {
     );
 
     expect(container).toHaveTextContent('4 flashcards selected');
-    expect(screen.queryByRole('status', hidden)).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 
-  it('renders nothing when only the unused flashcards query is passed', () => {
-    const { container } = render(<FinderBottomBar flashcardsQuery={{}} />);
+  it('renders nothing visible when no notice and no selection are passed', () => {
+    const { container } = render(<FinderBottomBar />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(container).not.toHaveTextContent(/\S/);
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+  });
+
+  it('labels the bulk action for the manager', async () => {
+    const user = userEvent.setup();
+    const onCollect = vi.fn<() => void>();
+    render(
+      <FinderBottomBar
+        notice={null}
+        onDismissNotice={vi.fn()}
+        selectedCount={2}
+        onClearSelection={vi.fn()}
+        onCollect={onCollect}
+        primaryActionLabel="Remove flashcards"
+      />,
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'Collect flashcards' }),
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Remove flashcards' }));
+
+    expect(onCollect).toHaveBeenCalledOnce();
   });
 
   it('dismisses a notice when no dismiss handler is provided', async () => {
     const user = userEvent.setup();
     render(<FinderBottomBar notice="Filters applied to your flashcards." />);
 
-    await user.click(
-      screen.getByRole('button', { name: 'Dismiss', ...hidden }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Dismiss' }));
   });
 });

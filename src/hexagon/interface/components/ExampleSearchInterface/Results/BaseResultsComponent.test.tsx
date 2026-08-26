@@ -1,6 +1,5 @@
 import {
   defaultMockImplementation,
-  overrideMockUseSelectedExamplesContext,
   resetMockUseSelectedExamplesContext,
 } from '@application/coordinators/hooks/useSelectedExamplesContext.mock';
 import { BaseResultsComponent } from '@interface/components/ExampleSearchInterface/Results/BaseResultsComponent';
@@ -201,13 +200,9 @@ describe('component: BaseResultsComponent', () => {
       mockExamples.forEach((example, index) => {
         example.id = index + 1;
       });
-      const updateSelectedExamples = vi.fn();
-
-      overrideMockUseSelectedExamplesContext(() => ({
-        ...defaultMockImplementation,
-        selectedExampleIds: [],
-        updateSelectedExamples,
-      }));
+      // The module mock above always hands the component
+      // defaultMockImplementation, so assert on its spy rather than a local one.
+      const { updateSelectedExamples } = defaultMockImplementation;
 
       render(
         <BaseResultsComponent
@@ -225,7 +220,7 @@ describe('component: BaseResultsComponent', () => {
       await waitFor(async () => {
         fireEvent.click(button);
       });
-      waitFor(() => {
+      await waitFor(() => {
         expect(updateSelectedExamples).toHaveBeenCalledWith(
           mockExamples.map((example) => example.id),
         );

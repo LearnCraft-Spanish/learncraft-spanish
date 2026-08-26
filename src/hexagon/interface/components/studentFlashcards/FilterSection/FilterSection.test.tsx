@@ -594,13 +594,13 @@ describe('filter section', () => {
     expect(search).toHaveClass(styles.tagSearchOpen);
     expect(card?.contains(search)).toBe(true);
     expect(tagsSection).not.toBeNull();
-    expect(card?.contains(tagsSection)).toBe(true);
+    expect(card?.contains(tagsSection ?? null)).toBe(true);
     expect(panel).not.toBeNull();
     expect(panel).toHaveClass(popoverStyles.panel);
     expect(card?.getBoundingClientRect().height).toBe(closedHeight);
     expect(search).toHaveClass(styles.tagSearch);
     expect(footer).not.toBeNull();
-    expect(card?.contains(footer)).toBe(true);
+    expect(card?.contains(footer ?? null)).toBe(true);
   });
 
   it('labels suggestion categories for every skill type', () => {

@@ -1,0 +1,5 @@
+/* Trigger chrome lives in ActionsMenu. This class is the manager's hook on
+ * that root for anything manager-specific. */
+.root {
+  display: inline-block;
+}

@@ -1,5 +1,7 @@
 export type StudentUiFlag =
-  'ui.student.help.v2' | 'ui.student.flashcards.finder.v2';
+  | 'ui.student.help.v2'
+  | 'ui.student.flashcards.finder.v2'
+  | 'ui.student.flashcards.manager.v2';
 
 export type DevUiFlag = 'ui.dev.gallery';
 

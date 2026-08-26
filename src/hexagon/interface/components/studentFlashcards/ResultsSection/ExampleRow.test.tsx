@@ -7,6 +7,7 @@ import iconButtonStyles from '@interface/components/general/IconButton/IconButto
 import {
   buildExampleRow,
   ExampleExpandPanel,
+  exampleRowLabel,
   SpanishSentence,
 } from '@interface/components/studentFlashcards/ResultsSection/ExampleRow';
 import { PartOfSpeech } from '@learncraft-spanish/shared';
@@ -14,6 +15,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { createMockVocabulary } from '@testing/factories/vocabularyFactories';
+import { trackedRejection } from '@testing/utils/trackedRejection';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import rowStyles from './ExampleRow.module.scss';
 
@@ -78,6 +80,9 @@ const emptyLessonPopup: LessonPopup = {
   lessonsByVocabulary: [],
   lessonsLoading: false,
 };
+
+/** `makeExample` speaks this sentence, and every control is named after it. */
+const EXPAND_LABEL = 'Expand row: No quiero eso aquí.';
 
 describe('spanish sentence', () => {
   afterEach(() => {
@@ -281,6 +286,75 @@ describe('example expand panel', () => {
     expect(onToggleVocab).toHaveBeenCalledWith(example.vocabulary[0].id);
   });
 
+  it('leaves out the review-schedule column when no dates are given', () => {
+    render(
+      <ContextualMenuProvider>
+        <ExampleExpandPanel
+          example={makeExample()}
+          openVocabId={null}
+          lessonPopup={emptyLessonPopup}
+          studentFlashcards={makeFlashcards()}
+          onToggleVocab={vi.fn()}
+        />
+      </ContextualMenuProvider>,
+    );
+
+    expect(screen.queryByText('Review schedule')).not.toBeInTheDocument();
+    expect(screen.queryByText('Added on:')).not.toBeInTheDocument();
+    expect(screen.queryByText('Last Reviewed:')).not.toBeInTheDocument();
+    expect(screen.queryByText('Next SRS Review:')).not.toBeInTheDocument();
+  });
+
+  it('shows the review-schedule dates when they are given', () => {
+    render(
+      <ContextualMenuProvider>
+        <ExampleExpandPanel
+          example={makeExample()}
+          openVocabId={null}
+          lessonPopup={emptyLessonPopup}
+          studentFlashcards={makeFlashcards()}
+          reviewSchedule={{
+            addedOn: '2024-03-07T12:00:00Z',
+            lastReviewed: '2024-11-21T12:00:00Z',
+            nextReview: '2025-01-09T12:00:00Z',
+          }}
+          onToggleVocab={vi.fn()}
+        />
+      </ContextualMenuProvider>,
+    );
+
+    expect(screen.getByText('Review schedule')).toBeInTheDocument();
+    expect(screen.getByText('Added on:')).toBeInTheDocument();
+    expect(screen.getByText('03/07/2024')).toBeInTheDocument();
+    expect(screen.getByText('Last Reviewed:')).toBeInTheDocument();
+    expect(screen.getByText('11/21/2024')).toBeInTheDocument();
+    expect(screen.getByText('Next SRS Review:')).toBeInTheDocument();
+    expect(screen.getByText('01/09/2025')).toBeInTheDocument();
+  });
+
+  it('falls back to unknown, Never, and Today for missing dates', () => {
+    render(
+      <ContextualMenuProvider>
+        <ExampleExpandPanel
+          example={makeExample()}
+          openVocabId={null}
+          lessonPopup={emptyLessonPopup}
+          studentFlashcards={makeFlashcards()}
+          reviewSchedule={{
+            addedOn: null,
+            lastReviewed: '',
+            nextReview: '',
+          }}
+          onToggleVocab={vi.fn()}
+        />
+      </ContextualMenuProvider>,
+    );
+
+    expect(screen.getByText('unknown')).toBeInTheDocument();
+    expect(screen.getByText('Never')).toBeInTheDocument();
+    expect(screen.getByText('Today')).toBeInTheDocument();
+  });
+
   it('omits the tag hint when the flashcard has no vocabulary', () => {
     render(
       <ContextualMenuProvider>
@@ -300,9 +374,204 @@ describe('example expand panel', () => {
   });
 });
 
+describe('exampleRowLabel', () => {
+  it('names a row by what it says', () => {
+    expect(exampleRowLabel(makeExample())).toBe('No quiero eso aquí.');
+  });
+
+  it('drops the asterisks around embedded English', () => {
+    expect(exampleRowLabel(makeExample({ spanish: 'Son de *wood.*' }))).toBe(
+      'Son de wood.',
+    );
+  });
+
+  it('truncates a long sentence rather than reading a paragraph', () => {
+    const label = exampleRowLabel(
+      makeExample({
+        spanish:
+          'Cuando termine de trabajar voy a pasar por la tienda para comprar algo de cenar.',
+      }),
+    );
+
+    expect(label).toBe(
+      'Cuando termine de trabajar voy a pasar por la tienda para co…',
+    );
+    expect(label.length).toBeLessThanOrEqual(61);
+  });
+
+  it('falls back to the id so a name is never empty', () => {
+    expect(exampleRowLabel(makeExample({ spanish: '   ' }))).toBe('example 11');
+  });
+});
+
 describe('buildExampleRow', () => {
   afterEach(() => {
     cleanup();
+  });
+
+  it('names the checkbox and the chevron after the row, not the row number', () => {
+    const row = buildExampleRow({
+      example: makeExample(),
+      selected: false,
+      expanded: false,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards: makeFlashcards(),
+      lessonPopup: emptyLessonPopup,
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    render(
+      <DataTable
+        columns={[
+          { id: 'select', header: '' },
+          { id: 'spanish', header: 'Spanish' },
+          { id: 'english', header: 'English' },
+          { id: 'actions', header: '' },
+        ]}
+        rows={[row]}
+        columnTemplate="44px 1fr 1fr 132px"
+        caption="Row"
+      />,
+    );
+
+    // "Select example 8412" and 25 copies of "Expand row" identify nothing in
+    // a screen-reader rotor listing.
+    expect(
+      screen.getByRole('checkbox', { name: 'Select No quiero eso aquí.' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: EXPAND_LABEL }),
+    ).toBeInTheDocument();
+  });
+
+  it('names the chevron for collapsing once the row is open', () => {
+    const row = buildExampleRow({
+      example: makeExample(),
+      selected: false,
+      expanded: true,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards: makeFlashcards(),
+      lessonPopup: emptyLessonPopup,
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    render(
+      <ContextualMenuProvider>
+        <DataTable
+          columns={[
+            { id: 'select', header: '' },
+            { id: 'spanish', header: 'Spanish' },
+            { id: 'english', header: 'English' },
+            { id: 'actions', header: '' },
+          ]}
+          rows={[row]}
+          columnTemplate="44px 1fr 1fr 132px"
+          caption="Row"
+        />
+      </ContextualMenuProvider>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Collapse row: No quiero eso aquí.' }),
+    ).toBeInTheDocument();
+  });
+
+  it('hands focus off before a row Remove deletes the button holding it', async () => {
+    const user = userEvent.setup();
+    const calls: string[] = [];
+    const studentFlashcards = makeFlashcards({
+      isExampleCollected: vi.fn(() => true),
+      deleteFlashcards: vi.fn(async () => {
+        calls.push('delete');
+        return 1;
+      }),
+    });
+    const row = buildExampleRow({
+      example: makeExample(),
+      selected: false,
+      expanded: false,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards,
+      lessonPopup: emptyLessonPopup,
+      rowAction: 'remove',
+      onRemoveRequested: () => {
+        calls.push('focus');
+      },
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    render(
+      <DataTable
+        columns={[
+          { id: 'select', header: '' },
+          { id: 'spanish', header: 'Spanish' },
+          { id: 'english', header: 'English' },
+          { id: 'actions', header: '' },
+        ]}
+        rows={[row]}
+        columnTemplate="44px 1fr 1fr 132px"
+        caption="Row"
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Remove' }));
+
+    expect(calls).toEqual(['focus', 'delete']);
+  });
+
+  it('never asks for a focus hand-off under the finder row action', async () => {
+    const user = userEvent.setup();
+    const onRemoveRequested = vi.fn<() => void>();
+    const studentFlashcards = makeFlashcards({
+      isExampleCollected: vi.fn(() => true),
+    });
+    const row = buildExampleRow({
+      example: makeExample(),
+      selected: false,
+      expanded: false,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards,
+      lessonPopup: emptyLessonPopup,
+      onRemoveRequested,
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    render(
+      <DataTable
+        columns={[
+          { id: 'select', header: '' },
+          { id: 'spanish', header: 'Spanish' },
+          { id: 'english', header: 'English' },
+          { id: 'actions', header: '' },
+        ]}
+        rows={[row]}
+        columnTemplate="44px 1fr 1fr 132px"
+        caption="Row"
+      />,
+    );
+
+    // Owned swaps back to Collect in place, so the button the student is
+    // standing on survives and focus must not move.
+    await user.click(screen.getByRole('button', { name: 'Owned' }));
+
+    expect(studentFlashcards.deleteFlashcards).toHaveBeenCalledWith([11]);
+    expect(onRemoveRequested).not.toHaveBeenCalled();
   });
 
   it('disables collect while a flashcard is pending', async () => {
@@ -379,6 +648,187 @@ describe('buildExampleRow', () => {
     expect(screen.getByRole('button', { name: 'Owned' })).toBeDisabled();
   });
 
+  it('offers a single Remove action in remove mode', async () => {
+    const user = userEvent.setup();
+    const studentFlashcards = makeFlashcards({
+      isExampleCollected: vi.fn(() => true),
+    });
+    const row = buildExampleRow({
+      example: makeExample(),
+      selected: false,
+      expanded: false,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards,
+      lessonPopup: emptyLessonPopup,
+      rowAction: 'remove',
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    render(
+      <DataTable
+        columns={[
+          { id: 'select', header: '' },
+          { id: 'spanish', header: 'Spanish' },
+          { id: 'english', header: 'English' },
+          { id: 'actions', header: '' },
+        ]}
+        rows={[row]}
+        columnTemplate="44px 1fr 1fr 132px"
+        caption="Row"
+      />,
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'Collect' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Owned' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: EXPAND_LABEL }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Remove' }));
+
+    expect(studentFlashcards.deleteFlashcards).toHaveBeenCalledWith([11]);
+  });
+
+  it.each([
+    { name: 'Remove', rowAction: 'remove' as const, collected: true },
+    { name: 'Owned', rowAction: 'collect' as const, collected: true },
+    { name: 'Collect', rowAction: 'collect' as const, collected: false },
+  ])(
+    'handles the rejection of $name instead of leaving it to escape',
+    async ({ name, rowAction, collected }) => {
+      const user = userEvent.setup();
+      const rejection = trackedRejection('No access to this flashcard');
+      const studentFlashcards = makeFlashcards({
+        isExampleCollected: vi.fn(() => collected),
+        deleteFlashcards: vi.fn(rejection.reject),
+        createFlashcards: vi.fn(rejection.reject),
+      });
+      const row = buildExampleRow({
+        example: makeExample(),
+        selected: false,
+        expanded: false,
+        playing: null,
+        openVocabId: null,
+        studentFlashcards,
+        lessonPopup: emptyLessonPopup,
+        rowAction,
+        onToggleSelected: vi.fn(),
+        onToggleExpanded: vi.fn(),
+        onTogglePlay: vi.fn(),
+        onToggleVocab: vi.fn(),
+      });
+
+      render(
+        <DataTable
+          columns={[
+            { id: 'select', header: '' },
+            { id: 'spanish', header: 'Spanish' },
+            { id: 'english', header: 'English' },
+            { id: 'actions', header: '' },
+          ]}
+          rows={[row]}
+          columnTemplate="44px 1fr 1fr 132px"
+          caption="Row"
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name }));
+
+      expect(rejection.wasHandled()).toBe(true);
+      // The query layer owns the failure toast, so the row itself must look
+      // exactly as it did before the failed click.
+      expect(screen.getByRole('button', { name })).toBeInTheDocument();
+    },
+  );
+
+  it('reports a removal in flight and blocks a second click', async () => {
+    const user = userEvent.setup();
+    const studentFlashcards = makeFlashcards({
+      isExampleCollected: vi.fn(() => true),
+      isRemovingFlashcard: vi.fn(() => true),
+    });
+    const row = buildExampleRow({
+      example: makeExample(),
+      selected: false,
+      expanded: false,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards,
+      lessonPopup: emptyLessonPopup,
+      rowAction: 'remove',
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    render(
+      <DataTable
+        columns={[
+          { id: 'select', header: '' },
+          { id: 'spanish', header: 'Spanish' },
+          { id: 'english', header: 'English' },
+          { id: 'actions', header: '' },
+        ]}
+        rows={[row]}
+        columnTemplate="44px 1fr 1fr 132px"
+        caption="Row"
+      />,
+    );
+
+    const button = screen.getByRole('button', { name: 'Removing...' });
+    expect(button).toBeDisabled();
+
+    await user.click(button);
+
+    expect(studentFlashcards.deleteFlashcards).not.toHaveBeenCalled();
+  });
+
+  it('disables Remove while the same example is being added', () => {
+    const studentFlashcards = makeFlashcards({
+      isExampleCollected: vi.fn(() => true),
+      isAddingFlashcard: vi.fn(() => true),
+    });
+    const row = buildExampleRow({
+      example: makeExample(),
+      selected: false,
+      expanded: false,
+      playing: null,
+      openVocabId: null,
+      studentFlashcards,
+      lessonPopup: emptyLessonPopup,
+      rowAction: 'remove',
+      onToggleSelected: vi.fn(),
+      onToggleExpanded: vi.fn(),
+      onTogglePlay: vi.fn(),
+      onToggleVocab: vi.fn(),
+    });
+
+    render(
+      <DataTable
+        columns={[
+          { id: 'select', header: '' },
+          { id: 'spanish', header: 'Spanish' },
+          { id: 'english', header: 'English' },
+          { id: 'actions', header: '' },
+        ]}
+        rows={[row]}
+        columnTemplate="44px 1fr 1fr 132px"
+        caption="Row"
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Remove' })).toBeDisabled();
+  });
+
   it('hides play controls when the example has no audio links', () => {
     const row = buildExampleRow({
       example: makeExample({ spanishAudio: '', englishAudio: '' }),
@@ -415,7 +865,7 @@ describe('buildExampleRow', () => {
       screen.queryByRole('button', { name: 'Play English' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Expand row' }),
+      screen.getByRole('button', { name: EXPAND_LABEL }),
     ).toBeInTheDocument();
   });
 
@@ -496,7 +946,7 @@ describe('buildExampleRow', () => {
     expect(screen.getByRole('button', { name: 'Play English' })).toHaveClass(
       iconButtonStyles.fit,
     );
-    expect(screen.getByRole('button', { name: 'Expand row' })).toHaveClass(
+    expect(screen.getByRole('button', { name: EXPAND_LABEL })).toHaveClass(
       iconButtonStyles.fit,
     );
     expect(

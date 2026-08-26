@@ -10,11 +10,8 @@ export interface FinderBottomBarProps {
   selectedCount?: number;
   onClearSelection?: () => void;
   onCollect?: () => void;
-  /**
-   * Accepted so the current page slot compiles. Unused — pass notice and
-   * selection instead of the flashcards query.
-   */
-  flashcardsQuery?: unknown;
+  /** Bulk action label. The manager sends selected cards the other way. */
+  primaryActionLabel?: string;
 }
 
 function selectionLabel(count: number): string {
@@ -27,6 +24,13 @@ function dismissNoop(): void {}
  * Finder notices + bulk-collect bar. One full-bleed Deep Navy slab: notice
  * on top, hairline, selection under it. The page owns the notice slot, the
  * selection count, and the collect/clear work.
+ *
+ * The `role="status"` element is never unmounted. A live region that is
+ * inserted already holding its text is not reliably announced by NVDA, JAWS,
+ * or VoiceOver, and for a removal that confirmation is the only signal the
+ * student gets. Empty, it is an unstyled div with no children: no height, no
+ * navy, and no `.slab`, so the docked bar still appears only when there is
+ * something to show.
  */
 export function FinderBottomBar({
   notice = null,
@@ -34,18 +38,16 @@ export function FinderBottomBar({
   selectedCount = 0,
   onClearSelection,
   onCollect,
-}: FinderBottomBarProps): JSX.Element | null {
+  primaryActionLabel = 'Collect flashcards',
+}: FinderBottomBarProps): JSX.Element {
   const showNotice = Boolean(notice);
   const showSelection = selectedCount > 0;
-
-  if (!showNotice && !showSelection) {
-    return null;
-  }
+  const docked = showNotice || showSelection;
 
   return (
-    <div className={styles.slab}>
-      {notice ? (
-        <div role="status">
+    <div className={docked ? styles.slab : undefined}>
+      <div role="status">
+        {showNotice ? (
           <div className={styles.row}>
             <span className={styles.message}>{notice}</span>
             <span className={styles.dismiss}>
@@ -59,8 +61,8 @@ export function FinderBottomBar({
               </Button>
             </span>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
       {showSelection ? (
         <div className={styles.selection}>
           <div className={styles.row}>
@@ -80,7 +82,7 @@ export function FinderBottomBar({
               </span>
               <span className={styles.collect}>
                 <Button variant="primary" tone="onDark" onClick={onCollect}>
-                  Collect flashcards
+                  {primaryActionLabel}
                 </Button>
               </span>
             </span>

@@ -38,11 +38,13 @@
 }
 
 .collectAction button,
-.ownedAction button {
+.ownedAction button,
+.removeAction button {
   min-width: 88px;
 }
 
-.ownedAction button {
+.ownedAction button,
+.removeAction button {
   border: var(--lcs-control-border) solid var(--lcs-border-control);
 }
 
@@ -77,6 +79,33 @@
   color: var(--lcs-color-muted);
   font-family: var(--lcs-font-sans);
   font-size: var(--lcs-text-caption);
+}
+
+.dateList {
+  display: flex;
+  margin: 0;
+  flex-direction: column;
+  gap: var(--lcs-space-2);
+}
+
+.dateRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-3);
+}
+
+.dateLabel {
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+}
+
+.dateValue {
+  margin: 0;
+  color: var(--lcs-color-ink);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+  font-weight: var(--lcs-weight-medium);
 }
 
 .vocabChip button,

@@ -165,7 +165,7 @@ Do not boil the ocean in a writeup or flag-wrap PR. Record these so the first im
 - `FilterPanel` and `LessonRangeSelector` call application hooks directly (one-hook-per-component / presentational-components rule). New v2 filter should receive props from the page use case.
 - `FlashcardTable` calls a second use case (`useFlashcardTable` — selection + delete). Fold that into `useFlashcardManager` or keep it as the table’s single hook, but the page should not grow a third orchestration path.
 - `ExampleTable` calls `useAuthAdapter` for an admin clipboard item. Push that flag through the Finder use case if the v2 table still needs it.
-- Both pages parse `enableFiltering` with `useLocation` / `useNavigate` beside the use case. Move URL bootstrap into the use case (or a tiny visual-only wrapper) when the page is rewritten.
+- `enableFiltering` is parsed with `useLocation` / `useNavigate` beside the use case. The Finder does **not** parse it — it only navigates _to_ `?enableFiltering=true`. Manager v2 now uses the visual-only `useEnableFilteringParam` wrapper; `FlashcardManagerV1` (dies with the flag) and `ReviewMyFlashcards` still hand-roll it. Point Review My Flashcards at the same hook when that page is touched.
 - Finder use case has no tests; neither page has tests. Add them when the v2 page/components land ([`TESTING_STANDARDS.md`](../../../../documentation/TESTING_STANDARDS.md), 100% interface).
 - `onGoingToQuiz` on Manager sets local filter state then navigates away; Review My Flashcards actually keys off the URL param. Revisit that when wiring the ellipsis menu.
 - Manager table options include `DeleteAllOwnedSpanglish` (extra application hooks in a leaf). Keep the action in the v2 menu; move the mutation through the page/table hook.
