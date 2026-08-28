@@ -27,6 +27,7 @@ const defaultMockCoachingStudentsAdapter: CoachingStudentsPort = {
     advancedStudent: false,
     fluencyGoal: 'Lorem ipsum dolor sit amet',
     startingLevel: 'Lorem ipsum dolor sit amet',
+    profileDocument: '',
   }),
   createBundleCredit: async () => ({
     bundle_credit_id: 1,

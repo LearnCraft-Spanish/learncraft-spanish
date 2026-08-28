@@ -4,13 +4,16 @@ import { useUpdateCoachingStudentMutation } from '@application/queries/CoachingS
 import { useAllCoachesQuery } from '@application/queries/CoachQueries/useAllCoachesQuery';
 import CoachStudentDrillDown from '@interface/components/CoachStudentDrillDown/CoachStudentDrillDown';
 import { Dropdown, TextInput } from '@interface/components/FormComponents';
+import { useModal } from '@interface/hooks/useModal';
 import React, { useEffect, useMemo, useState } from 'react';
 import pencil from 'src/assets/icons/pencil.svg';
 import {
   Checkbox,
   CoachDropdown,
   FormControls,
+  LinkInput,
 } from 'src/components/FormComponents';
+import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
@@ -32,6 +35,7 @@ export default function StudentInfoCard({
   isAdmin: boolean;
 }) {
   const { contextual, openContextual } = useContextualMenu();
+  const profileDocument = student.profileDocument ?? '';
   return (
     <>
       {contextual === 'edit-student' && (
@@ -73,6 +77,18 @@ export default function StudentInfoCard({
         <div className="info-row">
           <div className="info-label">Starting Level:</div>
           <div className="info-value">{student.startingLevel}</div>
+        </div>
+        <div className="info-row">
+          <div className="info-label">Profile Document:</div>
+          <div className="info-value">
+            {profileDocument.startsWith('http') ? (
+              <a href={profileDocument} target="_blank" rel="noreferrer">
+                {profileDocument}
+              </a>
+            ) : (
+              profileDocument
+            )}
+          </div>
         </div>
         <div className="info-row">
           <div className="info-label">Primary Coach:</div>
@@ -133,6 +149,7 @@ export function StudentInfoContextual({
   const { updateCoachingStudentMutation } = useUpdateCoachingStudentMutation();
   const { coaches } = useAllCoachesQuery();
   const { allTimeZonesQuery } = useAllTimeZonesQuery();
+  const { openModal } = useModal();
 
   const { closeContextual } = useContextualMenu();
 
@@ -150,6 +167,15 @@ export function StudentInfoContextual({
 
   function captureSubmitForm() {
     if (!data) return;
+
+    if (data.profileDocument && !isValidUrl(data.profileDocument)) {
+      openModal({
+        title: 'Error',
+        body: 'Profile Document must be a valid url',
+        type: 'error',
+      });
+      return;
+    }
 
     let primaryCoach: number | undefined =
       student?.primaryCoach?.coach_id || undefined;
@@ -176,6 +202,7 @@ export function StudentInfoContextual({
         timeZone: timeZoneId,
         startingLevel: data.startingLevel || undefined,
         fluencyGoal: data.fluencyGoal || undefined,
+        profileDocument: data.profileDocument || '',
         advancedStudent: data.advancedStudent || false,
         billingEmail: data.billingEmail || undefined,
         billingNotes: data.billingNotes || undefined,
@@ -271,6 +298,14 @@ export function StudentInfoContextual({
           value={data.fluencyGoal}
           onChange={(value) => {
             setData({ ...data, fluencyGoal: value });
+          }}
+          editMode
+        />
+        <LinkInput
+          label="Profile Document"
+          value={data.profileDocument}
+          onChange={(value) => {
+            setData({ ...data, profileDocument: value });
           }}
           editMode
         />
