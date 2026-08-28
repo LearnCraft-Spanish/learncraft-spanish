@@ -8,6 +8,7 @@ import Menu from '../sections/Menu';
 import SentryRoutes from './SentryRoutes';
 
 // Student / authenticated user pages
+const HomePage = lazy(() => import('@interface/pages/Home'));
 const OfficialQuizzesRoutes = lazy(
   () => import('@interface/pages/OfficialQuizzes/OfficialQuizzesRoutes'),
 );
@@ -57,7 +58,18 @@ export default function AppRoutes() {
   return (
     <Suspense fallback={<Loading message="Loading..." />}>
       <SentryRoutes>
-        <Route path="/" element={<Menu />} />
+        <Route
+          path="/"
+          element={
+            isStudent ? (
+              <UiScope flag="ui.student.home.v2">
+                <HomePage />
+              </UiScope>
+            ) : (
+              <Menu />
+            )
+          }
+        />
         <Route
           path="/myflashcards"
           element={isAuthenticated && <ReviewMyFlashcards />}

@@ -1,8 +1,10 @@
 import { render, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import { overrideMockFeatureFlagAdapter } from 'src/hexagon/application/adapters/featureFlagAdapter.mock';
 import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { describe, expect, it } from 'vitest';
 import App from './App';
@@ -17,15 +19,19 @@ describe('app', () => {
     );
   });
 
-  it('shows a log out button when logged in', async () => {
-    const { getByText } = render(
+  it('shows a log out option in the account menu when logged in', async () => {
+    const user = userEvent.setup();
+    const { getByRole } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
     );
-    await waitFor(() => {
-      expect(getByText(/log out/i)).toBeInTheDocument();
-    });
+    const accountTrigger = await waitFor(() =>
+      getByRole('button', { name: 'Account' }),
+    );
+    await user.click(accountTrigger);
+
+    expect(getByRole('menuitem', { name: /log out/i })).toBeInTheDocument();
   });
 
   it('shows a log in button when logged out', async () => {
@@ -125,6 +131,32 @@ describe('app', () => {
     await waitFor(() => {
       expect(getByText(/quiz my flashcards/i)).toBeInTheDocument();
     });
+  });
+
+  it('hides the sub-header on the v2 student home screen', async () => {
+    overrideMockFeatureFlagAdapter({
+      isEnabled: (flag) => flag === 'ui.student.home.v2',
+    });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByRole, queryByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+
+    await waitFor(() => {
+      expect(getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
+    });
+    expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
   });
 
   it('displays example manager if admin', async () => {

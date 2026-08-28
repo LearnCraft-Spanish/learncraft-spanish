@@ -1,0 +1,122 @@
+.root {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 240px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lcs-space-11);
+  overflow: hidden;
+  border: none;
+  border-radius: var(--lcs-radius-xl);
+  background-color: var(--lcs-color-surface-dark);
+  padding: var(--lcs-space-9) var(--lcs-space-11) var(--lcs-space-9)
+    var(--lcs-space-9);
+  cursor: pointer;
+  text-align: left;
+  transition: filter var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.root:hover {
+  filter: brightness(1.14);
+}
+
+.root:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.headline {
+  position: relative;
+  color: var(--lcs-color-on-surface-dark);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-display);
+  font-weight: var(--lcs-weight-bold);
+  letter-spacing: -0.01em;
+  line-height: var(--lcs-line-display);
+}
+
+/* The wheel is centered ON the arrow, not on the card; the card's own
+ * `overflow: hidden` crops it to a horizontal slice through the hub. */
+.arrowSlot {
+  position: relative;
+  display: flex;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Direct-child selector: matches only the BrandMark svg, not the arrow
+ * glyph's svg nested two levels down inside `.arrow` — a descendant
+ * selector here would match both and blow up the arrow icon's size. */
+.arrowSlot > svg:first-child {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.arrow {
+  position: relative;
+  display: flex;
+  width: 64px;
+  height: 64px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--lcs-radius-pill);
+  background-color: var(--lcs-color-action);
+  transition: transform var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.root:hover .arrow {
+  transform: translateX(6px);
+}
+
+@media (max-width: 768px) {
+  .root {
+    min-height: 185px;
+    gap: var(--lcs-space-5);
+    padding: var(--lcs-space-9) var(--lcs-space-9) var(--lcs-space-9)
+      var(--lcs-space-7);
+  }
+
+  .headline {
+    max-width: 230px;
+    font-size: var(--lcs-text-display-mobile);
+    line-height: 1.14;
+  }
+
+  .arrowSlot,
+  .arrow {
+    width: 48px;
+    height: 48px;
+  }
+
+  .arrowSlot > svg:first-child {
+    width: 190px;
+    height: 190px;
+  }
+
+  .arrow svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .arrow {
+    transition: none;
+  }
+
+  .root:hover {
+    filter: none;
+  }
+
+  .root:hover .arrow {
+    transform: none;
+  }
+}

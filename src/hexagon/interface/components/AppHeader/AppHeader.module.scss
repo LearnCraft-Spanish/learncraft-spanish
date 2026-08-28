@@ -1,0 +1,93 @@
+.root {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--lcs-space-9);
+  background-color: var(--lcs-color-action);
+  padding: var(--lcs-space-6) var(--lcs-space-9);
+}
+
+/* Not interactive — matches the handoff exactly, and keeps the logged-out
+ * bar down to a single header action (the Log in button). */
+.brand {
+  display: flex;
+  grid-column: 1;
+  align-items: center;
+  gap: var(--lcs-space-4);
+  justify-self: start;
+  color: var(--lcs-color-on-action);
+}
+
+.wordmark {
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-medium);
+  letter-spacing: var(--lcs-tracking-wordmark);
+}
+
+.nav {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.account {
+  display: flex;
+  grid-column: 3;
+  justify-self: end;
+}
+
+.logIn {
+  display: flex;
+  height: var(--lcs-control-height-sm);
+  align-items: center;
+  gap: var(--lcs-space-3);
+  padding: 0 var(--lcs-space-7);
+  border: none;
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-on-action-20);
+  color: var(--lcs-color-on-action);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-action);
+  font-weight: var(--lcs-weight-bold);
+  cursor: pointer;
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.logIn:hover {
+  background-color: var(--lcs-on-action-30);
+}
+
+.logIn:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+@media (max-width: 768px) {
+  .root {
+    grid-template-columns: 1fr auto;
+    padding: var(--lcs-space-4) var(--lcs-space-7);
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .account {
+    grid-column: 2;
+  }
+
+  .logInIcon {
+    display: none;
+  }
+
+  .logIn {
+    height: var(--lcs-control-height);
+    padding: 0 var(--lcs-space-6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logIn {
+    transition: none;
+  }
+}
