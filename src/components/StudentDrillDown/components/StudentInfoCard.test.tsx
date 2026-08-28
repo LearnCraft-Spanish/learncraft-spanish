@@ -1,10 +1,9 @@
-import type { UseMutationResult } from '@tanstack/react-query';
 import type {
   CoachingStudent,
   UpdateCoachingStudentCommand,
 } from '@learncraft-spanish/shared';
-import { fireEvent, render, screen } from '@testing-library/react';
-import { createMockCoachingStudent } from '@testing/factories/coachingStudentFactory';
+import type { UseMutationResult } from '@tanstack/react-query';
+import type * as FormComponentsModule from 'src/components/FormComponents';
 import {
   mockUseAllTimeZonesQuery,
   resetMockUseAllTimeZonesQuery,
@@ -18,23 +17,27 @@ import {
   mockUseAllCoachesQuery,
   resetMockUseAllCoachesQuery,
 } from '@application/queries/CoachQueries/useAllCoachesQuery.mock';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { createMockCoachingStudent } from '@testing/factories/coachingStudentFactory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import StudentInfoCard, {
-  StudentInfoContextual,
-} from './StudentInfoCard';
+import StudentInfoCard, { StudentInfoContextual } from './StudentInfoCard';
 
 const openModal = vi.fn();
 const closeContextual = vi.fn();
 const mutate = vi.fn();
 
-vi.mock('@application/queries/CoachingStudentQueries/useAllTimeZonesQuery', () => ({
-  useAllTimeZonesQuery: () => mockUseAllTimeZonesQuery,
-}));
+vi.mock(
+  '@application/queries/CoachingStudentQueries/useAllTimeZonesQuery',
+  () => ({
+    useAllTimeZonesQuery: () => mockUseAllTimeZonesQuery,
+  }),
+);
 
 vi.mock(
   '@application/queries/CoachingStudentQueries/useUpdateCoachingStudentMutation',
   () => ({
-    useUpdateCoachingStudentMutation: () => mockUseUpdateCoachingStudentMutation,
+    useUpdateCoachingStudentMutation: () =>
+      mockUseUpdateCoachingStudentMutation,
   }),
 );
 
@@ -71,15 +74,14 @@ vi.mock(
 );
 
 vi.mock('src/components/FormComponents', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('src/components/FormComponents')>();
+  const actual = await importOriginal<typeof FormComponentsModule>();
   return {
     ...actual,
     CoachDropdown: () => <div data-testid="coach-dropdown" />,
   };
 });
 
-describe('StudentInfoCard', () => {
+describe('studentInfoCard', () => {
   beforeEach(() => {
     resetMockUseAllTimeZonesQuery();
     resetMockUseUpdateCoachingStudentMutation();
