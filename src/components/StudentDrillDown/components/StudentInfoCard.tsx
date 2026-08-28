@@ -303,7 +303,7 @@ export function StudentInfoContextual({
         />
         <LinkInput
           label="Profile Document"
-          value={data.profileDocument}
+          value={data.profileDocument ?? ''}
           onChange={(value) => {
             setData({ ...data, profileDocument: value });
           }}
