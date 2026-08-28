@@ -1,0 +1,33 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-9);
+}
+
+.desktopEntries {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--lcs-space-9);
+}
+
+.mobileEntries {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .column {
+    gap: var(--lcs-space-7);
+    /* Room for the fixed TabBar so the last card is never covered. */
+    padding-bottom: 76px;
+  }
+
+  .desktopEntries {
+    display: none;
+  }
+
+  .mobileEntries {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lcs-space-7);
+  }
+}

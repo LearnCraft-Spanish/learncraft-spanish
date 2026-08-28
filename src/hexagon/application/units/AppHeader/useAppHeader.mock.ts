@@ -1,0 +1,22 @@
+import type useAppHeader from '@application/units/AppHeader/useAppHeader';
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
+import { vi } from 'vitest';
+
+type UseAppHeaderResult = ReturnType<typeof useAppHeader>;
+
+const defaultMockResult: UseAppHeaderResult = {
+  isAuthenticated: false,
+  isLoading: false,
+  studentName: undefined,
+  studentEmail: undefined,
+  login: vi.fn<() => void>(),
+  logout: vi.fn<() => void>(),
+};
+
+export const {
+  mock: mockUseAppHeader,
+  override: overrideMockUseAppHeader,
+  reset: resetMockUseAppHeader,
+} = createOverrideableMock<UseAppHeaderResult>(defaultMockResult);
+
+export default mockUseAppHeader;

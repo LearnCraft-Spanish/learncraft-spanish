@@ -1,6 +1,9 @@
 .root {
   box-sizing: border-box;
-  min-height: 100%;
+  /* `100%` only resolves against an ancestor with a set height, which
+   * nothing up to `html` provides — so on short content this collapsed
+   * and let the legacy paper background show through below the fold. */
+  min-height: 100vh;
   padding: var(--lcs-space-9) var(--lcs-page-pad);
   background-color: var(--lcs-color-page);
   color: var(--lcs-color-ink);
