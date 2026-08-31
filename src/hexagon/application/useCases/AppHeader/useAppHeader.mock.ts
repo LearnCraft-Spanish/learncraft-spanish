@@ -1,8 +1,6 @@
-import type useAppHeader from '@application/units/AppHeader/useAppHeader';
+import type { UseAppHeaderResult } from '@application/useCases/AppHeader/useAppHeader';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import { vi } from 'vitest';
-
-type UseAppHeaderResult = ReturnType<typeof useAppHeader>;
 
 const defaultMockResult: UseAppHeaderResult = {
   isAuthenticated: false,

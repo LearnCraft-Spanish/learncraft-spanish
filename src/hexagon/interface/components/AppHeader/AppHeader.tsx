@@ -1,5 +1,5 @@
 import type { JSX, ReactNode } from 'react';
-import { useAppHeader } from '@application/units/AppHeader';
+import { useAppHeader } from '@application/useCases/AppHeader';
 import { AccountMenu } from '@interface/components/AppHeader/AccountMenu';
 import { BrandMark } from '@interface/components/general/BrandMark/BrandMark';
 import { Icon } from '@interface/components/general/Icon/Icon';

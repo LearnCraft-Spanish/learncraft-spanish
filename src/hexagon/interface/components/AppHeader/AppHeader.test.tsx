@@ -2,14 +2,14 @@ import {
   mockUseAppHeader,
   overrideMockUseAppHeader,
   resetMockUseAppHeader,
-} from '@application/units/AppHeader/useAppHeader.mock';
+} from '@application/useCases/AppHeader/useAppHeader.mock';
 import { AppHeader } from '@interface/components/AppHeader/AppHeader';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@application/units/AppHeader', () => ({
+vi.mock('@application/useCases/AppHeader', () => ({
   useAppHeader: () => mockUseAppHeader,
 }));
 

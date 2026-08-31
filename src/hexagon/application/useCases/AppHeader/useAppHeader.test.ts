@@ -8,7 +8,7 @@ import {
   overrideMockActiveStudent,
   resetMockActiveStudent,
 } from '@application/coordinators/hooks/useActiveStudent.mock';
-import useAppHeader from '@application/units/AppHeader/useAppHeader';
+import useAppHeader from '@application/useCases/AppHeader/useAppHeader';
 import { renderHook } from '@testing-library/react';
 import { createMockAppUser } from '@testing/factories/appUserFactories';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
