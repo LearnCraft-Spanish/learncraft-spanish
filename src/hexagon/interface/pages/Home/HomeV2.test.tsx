@@ -18,6 +18,7 @@ function renderHomeWithRoutes() {
       <Routes>
         <Route path="/" element={<HomeV2 />} />
         <Route path="/quizzes" element={<div>Quizzes page</div>} />
+        <Route path="/myflashcards" element={<div>My flashcards page</div>} />
       </Routes>
     </MemoryRouter>,
   );
@@ -75,15 +76,12 @@ describe('home v2', () => {
 
   it('navigates to /myflashcards when the CTA is chosen', async () => {
     const user = userEvent.setup();
-    renderHome();
+    renderHomeWithRoutes();
 
     await user.click(
       screen.getByRole('button', { name: /Quiz my flashcards/ }),
     );
-    // No crash / navigation is exercised via react-router's MemoryRouter;
-    // deeper route assertions live at the AppRoutes level.
-    expect(
-      screen.getByRole('button', { name: /Quiz my flashcards/ }),
-    ).toBeInTheDocument();
+
+    expect(screen.getByText('My flashcards page')).toBeInTheDocument();
   });
 });

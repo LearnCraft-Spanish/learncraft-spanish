@@ -29,5 +29,3 @@ export function LoggedOut({ onLogIn }: LoggedOutProps): JSX.Element {
     </PageShell>
   );
 }
-
-export default LoggedOut;
