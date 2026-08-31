@@ -22,6 +22,7 @@ export function HomeV2(): JSX.Element {
   const goToManageFlashcards = (): void => navigate('/manage-flashcards');
   const goToOfficialQuizzes = (): void => navigate('/officialquizzes');
   const goToCustomQuiz = (): void => navigate('/customquiz');
+  const goToQuizzes = (): void => navigate('/quizzes');
   const goToHelp = (): void => navigate('/get-help');
 
   const tabs: TabBarItem[] = [
@@ -33,7 +34,7 @@ export function HomeV2(): JSX.Element {
       onSelect: () => navigate('/'),
     },
     { id: 'search', icon: 'search', label: 'Finder', onSelect: goToFinder },
-    { id: 'quiz', icon: 'checklist', label: 'Quiz', onSelect: goToCustomQuiz },
+    { id: 'quiz', icon: 'checklist', label: 'Quiz', onSelect: goToQuizzes },
     {
       id: 'cards',
       icon: 'cards',

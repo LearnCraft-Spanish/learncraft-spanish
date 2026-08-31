@@ -8,8 +8,8 @@
   padding: var(--lcs-space-6) var(--lcs-space-9);
 }
 
-/* Not interactive — matches the handoff exactly, and keeps the logged-out
- * bar down to a single header action (the Log in button). */
+/* Always links home — logged-out users still land on the marketing-facing
+ * root, so this doesn't add a second header action there. */
 .brand {
   display: flex;
   grid-column: 1;
@@ -17,12 +17,35 @@
   gap: var(--lcs-space-4);
   justify-self: start;
   color: var(--lcs-color-on-action);
+  text-decoration: none;
+}
+
+.brand:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.brand svg {
+  transition: transform var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+.brand:hover svg {
+  /* The mark has 4-fold symmetry (spokes every 45deg), so a multiple of
+   * 45 would settle back into a shape that looks unrotated — this lands
+   * off-axis so the turn is still visible once hover settles. */
+  transform: rotate(75deg);
 }
 
 .wordmark {
+  display: inline-block;
   font-size: var(--lcs-text-control);
   font-weight: var(--lcs-weight-medium);
   letter-spacing: var(--lcs-tracking-wordmark);
+  transition: transform var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+.brand:hover .wordmark {
+  transform: scale(1.1);
 }
 
 .nav {
@@ -87,7 +110,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .logIn {
+  .logIn,
+  .brand svg,
+  .wordmark {
     transition: none;
   }
 }

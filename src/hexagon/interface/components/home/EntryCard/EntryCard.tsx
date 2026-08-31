@@ -12,12 +12,13 @@ interface EntryCardProps {
   onGo: () => void;
 }
 
-/** One tappable row on the home screen: a leading icon tile, a title, a
- * meta line, and a trailing chevron. Built on the shared `Card` primitive
- * for the border/radius only — the bar's "no shadows on press states" rule
- * rules out `Card`'s own `interactive` hover-lift shadow, so hover feedback
- * here is a plain background tint instead. A full-bleed reset button inside
- * makes the whole tile one keyboard-reachable target. */
+/** One tappable row on the home screen: a top line with a leading icon tile
+ * and a trailing chevron, then a left-aligned title and meta line below.
+ * Built on the shared `Card` primitive for the border/radius only — the
+ * bar's "no shadows on press states" rule rules out `Card`'s own
+ * `interactive` hover-lift shadow, so hover feedback here is a plain
+ * background tint instead. A full-bleed reset button inside makes the
+ * whole tile one keyboard-reachable target. */
 export function EntryCard({
   icon,
   title,
