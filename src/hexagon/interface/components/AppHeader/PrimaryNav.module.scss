@@ -1,0 +1,25 @@
+.link,
+.linkActive {
+  display: inline-flex;
+  height: var(--lcs-control-height);
+  align-items: center;
+  padding: 0 var(--lcs-space-5);
+  color: var(--lcs-color-on-action);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-medium);
+  opacity: 0.85;
+  text-decoration: none;
+}
+
+.link:focus-visible,
+.linkActive:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.linkActive {
+  font-weight: var(--lcs-weight-bold);
+  opacity: 1;
+  box-shadow: inset 0 -2px 0 0 var(--lcs-color-on-action);
+}

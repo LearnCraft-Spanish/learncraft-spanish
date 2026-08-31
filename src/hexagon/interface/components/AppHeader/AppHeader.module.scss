@@ -1,0 +1,118 @@
+.root {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--lcs-space-9);
+  background-color: var(--lcs-color-action);
+  padding: var(--lcs-space-6) var(--lcs-space-9);
+}
+
+/* Always links home — logged-out users still land on the marketing-facing
+ * root, so this doesn't add a second header action there. */
+.brand {
+  display: flex;
+  grid-column: 1;
+  align-items: center;
+  gap: var(--lcs-space-4);
+  justify-self: start;
+  color: var(--lcs-color-on-action);
+  text-decoration: none;
+}
+
+.brand:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.brand svg {
+  transition: transform var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+.brand:hover svg {
+  /* The mark has 4-fold symmetry (spokes every 45deg), so a multiple of
+   * 45 would settle back into a shape that looks unrotated — this lands
+   * off-axis so the turn is still visible once hover settles. */
+  transform: rotate(75deg);
+}
+
+.wordmark {
+  display: inline-block;
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-medium);
+  letter-spacing: var(--lcs-tracking-wordmark);
+  transition: transform var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+.brand:hover .wordmark {
+  transform: scale(1.1);
+}
+
+.nav {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.account {
+  display: flex;
+  grid-column: 3;
+  justify-self: end;
+}
+
+.logIn {
+  display: flex;
+  height: var(--lcs-control-height-sm);
+  align-items: center;
+  gap: var(--lcs-space-3);
+  padding: 0 var(--lcs-space-7);
+  border: none;
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-on-action-20);
+  color: var(--lcs-color-on-action);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-action);
+  font-weight: var(--lcs-weight-bold);
+  cursor: pointer;
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.logIn:hover {
+  background-color: var(--lcs-on-action-30);
+}
+
+.logIn:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+@media (max-width: 768px) {
+  .root {
+    grid-template-columns: 1fr auto;
+    padding: var(--lcs-space-4) var(--lcs-space-7);
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .account {
+    grid-column: 2;
+  }
+
+  .logInIcon {
+    display: none;
+  }
+
+  .logIn {
+    height: var(--lcs-control-height);
+    padding: 0 var(--lcs-space-6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logIn,
+  .brand svg,
+  .wordmark {
+    transition: none;
+  }
+}

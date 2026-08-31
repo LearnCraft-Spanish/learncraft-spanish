@@ -1,4 +1,5 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
 import { UiScope } from '@interface/components/general/UiScope/UiScope';
 import { Loading } from '@interface/components/Loading';
 import { lazy, Suspense } from 'react';
@@ -8,6 +9,7 @@ import Menu from '../sections/Menu';
 import SentryRoutes from './SentryRoutes';
 
 // Student / authenticated user pages
+const HomePage = lazy(() => import('@interface/pages/Home'));
 const OfficialQuizzesRoutes = lazy(
   () => import('@interface/pages/OfficialQuizzes/OfficialQuizzesRoutes'),
 );
@@ -17,6 +19,7 @@ const ReviewMyFlashcards = lazy(
 const FlashcardManager = lazy(
   () => import('@interface/pages/FlashcardManager'),
 );
+const QuizzesPage = lazy(() => import('@interface/pages/Quizzes'));
 const CombinedCustomQuiz = lazy(
   () => import('@interface/pages/CombinedCustomQuiz'),
 );
@@ -53,11 +56,25 @@ const ExampleManagerRouter = lazy(
 export default function AppRoutes() {
   const { isAdmin, isCoach, isStudent, isLimited, isAuthenticated } =
     useAuthAdapter();
+  const { version: quizzesVersion } = useStudentUiVersion(
+    'ui.student.home.v2',
+  );
 
   return (
     <Suspense fallback={<Loading message="Loading..." />}>
       <SentryRoutes>
-        <Route path="/" element={<Menu />} />
+        <Route
+          path="/"
+          element={
+            isStudent ? (
+              <UiScope flag="ui.student.home.v2">
+                <HomePage />
+              </UiScope>
+            ) : (
+              <Menu />
+            )
+          }
+        />
         <Route
           path="/myflashcards"
           element={isAuthenticated && <ReviewMyFlashcards />}
@@ -68,6 +85,17 @@ export default function AppRoutes() {
             <UiScope flag="ui.student.flashcards.manager.v2">
               <FlashcardManager />
             </UiScope>
+          }
+        />
+        <Route
+          path="/quizzes"
+          element={
+            isAuthenticated &&
+            quizzesVersion === 'v2' && (
+              <UiScope flag="ui.student.home.v2">
+                <QuizzesPage />
+              </UiScope>
+            )
           }
         />
         <Route path="/officialquizzes/*" element={<OfficialQuizzesRoutes />} />

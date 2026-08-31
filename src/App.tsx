@@ -1,7 +1,10 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useFlushFlashcardUpdatesOnLoad } from '@application/units/flushFlashcardUpdatesOnLoad';
+import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
+import { AppHeader } from '@interface/components/AppHeader';
+import { PrimaryNav } from '@interface/components/AppHeader/PrimaryNav';
 import { Loading } from '@interface/components/Loading';
-import Nav from '@interface/components/Nav/Nav';
+import { LoggedOut } from '@interface/components/LoggedOut';
 import { SubHeaderComponent } from '@interface/components/SubHeader';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
@@ -14,18 +17,46 @@ import './contextual.scss';
 export const App: React.FC = () => {
   // React Router hooks
   const location = useLocation();
-  const { isAuthenticated, isLoading } = useAuthAdapter();
+  const { isAuthenticated, isLoading, isStudent, login } = useAuthAdapter();
+  const { version: studentHomeVersion } =
+    useStudentUiVersion('ui.student.home.v2');
+  const { version: flashcardFinderVersion } = useStudentUiVersion(
+    'ui.student.flashcards.finder.v2',
+  );
+  const { version: flashcardManagerVersion } = useStudentUiVersion(
+    'ui.student.flashcards.manager.v2',
+  );
 
   // Auto-flush any pending SRS updates from localStorage on app load
   useFlushFlashcardUpdatesOnLoad();
 
+  // None of the v2 surfaces below have a "Welcome back" banner in their own
+  // design — it's redundant with the account menu's name display, and each
+  // still falls back to the legacy sub-header when its flag is off, since
+  // the v1 sibling on that same route still relies on it.
+  const isStudentHomeV2 =
+    location.pathname === '/' &&
+    isAuthenticated &&
+    isStudent &&
+    studentHomeVersion === 'v2';
+  const isFlashcardFinderV2 =
+    location.pathname === '/flashcardfinder' && flashcardFinderVersion === 'v2';
+  const isFlashcardManagerV2 =
+    location.pathname === '/manage-flashcards' &&
+    flashcardManagerVersion === 'v2';
+
   return (
     <div className="App">
       <ExtraCoachingCTA />
-      <Nav />
-      {location.pathname !== '/student-drill-down' &&
+      <AppHeader>{isAuthenticated && <PrimaryNav />}</AppHeader>
+      {isAuthenticated &&
+        !isStudentHomeV2 &&
+        !isFlashcardFinderV2 &&
+        !isFlashcardManagerV2 &&
+        location.pathname !== '/student-drill-down' &&
         location.pathname !== '/customquiz' &&
         location.pathname !== '/myflashcards' &&
+        location.pathname !== '/quizzes' &&
         location.pathname !== '/coaching-dashboard' &&
         location.pathname.split('/')[1] !== 'example-manager' &&
         location.pathname.split('/')[1] !== 'officialquizzes' && (
@@ -34,8 +65,10 @@ export const App: React.FC = () => {
 
       {isLoading && !isAuthenticated ? (
         <Loading message="Logging in..." />
-      ) : (
+      ) : isAuthenticated ? (
         <AppRoutes />
+      ) : (
+        <LoggedOut onLogIn={login} />
       )}
       <ToastContainer
         theme="colored"

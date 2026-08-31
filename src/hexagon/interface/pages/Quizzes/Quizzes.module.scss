@@ -1,0 +1,19 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-8);
+}
+
+.title {
+  margin: 0;
+  color: var(--lcs-color-ink);
+  font-size: var(--lcs-text-h1);
+  font-weight: var(--lcs-weight-bold);
+  line-height: var(--lcs-line-body);
+}
+
+.entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-7);
+}
