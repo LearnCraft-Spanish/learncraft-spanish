@@ -3,6 +3,7 @@ import { useAppHeader } from '@application/units/AppHeader';
 import { AccountMenu } from '@interface/components/AppHeader/AccountMenu';
 import { BrandMark } from '@interface/components/general/BrandMark/BrandMark';
 import { Icon } from '@interface/components/general/Icon/Icon';
+import { Link } from 'react-router-dom';
 import styles from './AppHeader.module.scss';
 
 interface AppHeaderProps {
@@ -27,10 +28,10 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
 
   return (
     <header className={styles.root}>
-      <div className={styles.brand}>
+      <Link to="/" className={styles.brand}>
         <BrandMark size={22} color="var(--lcs-color-on-action)" />
         <span className={styles.wordmark}>LEARNCRAFT</span>
-      </div>
+      </Link>
 
       {Boolean(children) && <nav className={styles.nav}>{children}</nav>}
 

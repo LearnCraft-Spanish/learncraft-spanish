@@ -32,6 +32,15 @@ describe('component AppHeader', () => {
     expect(screen.getByText('LEARNCRAFT')).toBeInTheDocument();
   });
 
+  it('links the brand (logo + wordmark) to the home page', () => {
+    renderHeader();
+
+    expect(screen.getByRole('link', { name: /LEARNCRAFT/ })).toHaveAttribute(
+      'href',
+      '/',
+    );
+  });
+
   it('shows exactly one header action when logged out', () => {
     overrideMockUseAppHeader({ isAuthenticated: false, isLoading: false });
 

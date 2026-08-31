@@ -36,28 +36,29 @@ describe('app', () => {
 
   it('shows a log in button when logged out', async () => {
     overrideMockAuthAdapter({ isAuthenticated: false });
-    const { getByText } = render(
+    const { getAllByText } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(getByText(/log in/i)).toBeInTheDocument();
+      expect(getAllByText(/log in/i).length).toBeGreaterThan(0);
     });
   });
 
-  it("says it won't do anything if not logged in", async () => {
+  it('shows the logged-out screen instead of the app when not logged in', async () => {
     overrideMockAuthAdapter({ isAuthenticated: false });
-    const { getByText } = render(
+    const { getByText, queryByText } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(
-        getByText('You must be logged in to use this app.'),
-      ).toBeInTheDocument();
+      expect(getByText('Please log in to use this app')).toBeInTheDocument();
     });
+    expect(
+      queryByText('You must be logged in to use this app.'),
+    ).not.toBeInTheDocument();
   });
 
   it('shows welcome message', async () => {
@@ -156,6 +157,82 @@ describe('app', () => {
     await waitFor(() => {
       expect(getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
     });
+    expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
+  });
+
+  it('hides the sub-header on the v2 flashcard finder screen', async () => {
+    overrideMockFeatureFlagAdapter({
+      isEnabled: (flag) => flag === 'ui.student.flashcards.finder.v2',
+    });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const user = userEvent.setup();
+    const { getByRole, queryByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+
+    await waitFor(() => {
+      expect(
+        getByRole('link', { name: 'Flashcard Finder' }),
+      ).toBeInTheDocument();
+    });
+    await user.click(getByRole('link', { name: 'Flashcard Finder' }));
+
+    await waitFor(
+      () => {
+        expect(
+          getByRole('heading', { name: 'Flashcard Finder' }),
+        ).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
+    expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
+  });
+
+  it('hides the sub-header on the v2 flashcard manager screen', async () => {
+    overrideMockFeatureFlagAdapter({
+      isEnabled: (flag) => flag === 'ui.student.flashcards.manager.v2',
+    });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const user = userEvent.setup();
+    const { getByRole, queryByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+
+    await waitFor(() => {
+      expect(getByRole('link', { name: 'My flashcards' })).toBeInTheDocument();
+    });
+    await user.click(getByRole('link', { name: 'My flashcards' }));
+
+    await waitFor(
+      () => {
+        expect(
+          getByRole('heading', { name: 'Flashcard Manager' }),
+        ).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
     expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
   });
 

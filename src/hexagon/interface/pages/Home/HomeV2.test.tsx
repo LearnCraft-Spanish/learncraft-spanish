@@ -1,13 +1,24 @@
 import { HomeV2 } from '@interface/pages/Home/HomeV2';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it } from 'vitest';
 
 function renderHome() {
   return render(
     <MemoryRouter>
       <HomeV2 />
+    </MemoryRouter>,
+  );
+}
+
+function renderHomeWithRoutes() {
+  return render(
+    <MemoryRouter initialEntries={['/']}>
+      <Routes>
+        <Route path="/" element={<HomeV2 />} />
+        <Route path="/quizzes" element={<div>Quizzes page</div>} />
+      </Routes>
     </MemoryRouter>,
   );
 }
@@ -51,6 +62,15 @@ describe('home v2', () => {
     expect(
       screen.getByRole('navigation', { name: 'Primary' }),
     ).toBeInTheDocument();
+  });
+
+  it('navigates to /quizzes when the tab bar Quiz tab is chosen', async () => {
+    const user = userEvent.setup();
+    renderHomeWithRoutes();
+
+    await user.click(screen.getByRole('button', { name: 'Quiz' }));
+
+    expect(screen.getByText('Quizzes page')).toBeInTheDocument();
   });
 
   it('navigates to /myflashcards when the CTA is chosen', async () => {

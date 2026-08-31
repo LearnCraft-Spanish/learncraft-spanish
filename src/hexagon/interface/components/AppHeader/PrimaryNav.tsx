@@ -5,8 +5,8 @@ import styles from './PrimaryNav.module.scss';
 const LINKS: Array<{ to: string; label: string; end?: boolean }> = [
   { to: '/', label: 'Home', end: true },
   { to: '/flashcardfinder', label: 'Flashcard Finder' },
-  { to: '/myflashcards', label: 'My flashcards' },
-  { to: '/officialquizzes', label: 'Quizzes' },
+  { to: '/manage-flashcards', label: 'My flashcards' },
+  { to: '/quizzes', label: 'Quizzes' },
 ];
 
 /**

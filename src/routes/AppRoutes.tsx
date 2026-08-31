@@ -18,6 +18,7 @@ const ReviewMyFlashcards = lazy(
 const FlashcardManager = lazy(
   () => import('@interface/pages/FlashcardManager'),
 );
+const QuizzesPage = lazy(() => import('@interface/pages/Quizzes'));
 const CombinedCustomQuiz = lazy(
   () => import('@interface/pages/CombinedCustomQuiz'),
 );
@@ -82,6 +83,7 @@ export default function AppRoutes() {
             </UiScope>
           }
         />
+        <Route path="/quizzes" element={isAuthenticated && <QuizzesPage />} />
         <Route path="/officialquizzes/*" element={<OfficialQuizzesRoutes />} />
         <Route
           path="/customquiz"
