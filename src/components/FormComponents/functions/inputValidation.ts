@@ -15,10 +15,7 @@ export function isValidUrl(url: string): boolean {
   }
   try {
     const newUrl = new URL(url);
-    if (newUrl) {
-      return true;
-    }
-    return false;
+    return newUrl.protocol === 'http:' || newUrl.protocol === 'https:';
   } catch {
     return false;
   }

@@ -168,7 +168,7 @@ export function StudentInfoContextual({
   function captureSubmitForm() {
     if (!data) return;
 
-    if (data.profileDocument && !isValidUrl(data.profileDocument)) {
+    if (!isValidUrl(data.profileDocument ?? '')) {
       openModal({
         title: 'Error',
         body: 'Profile Document must be a valid url',
