@@ -20,9 +20,7 @@ const FlashcardManager = lazy(
   () => import('@interface/pages/FlashcardManager'),
 );
 const QuizzesPage = lazy(() => import('@interface/pages/Quizzes'));
-const CombinedCustomQuiz = lazy(
-  () => import('@interface/pages/CombinedCustomQuiz'),
-);
+const CustomQuiz = lazy(() => import('@interface/pages/CustomQuiz'));
 const LimitedCustomQuiz = lazy(
   () => import('@interface/pages/LimitedCustomQuiz'),
 );
@@ -101,7 +99,13 @@ export default function AppRoutes() {
           path="/customquiz"
           element={
             (isLimited || isStudent || isCoach || isAdmin) &&
-            (isLimited ? <LimitedCustomQuiz /> : <CombinedCustomQuiz />)
+            (isLimited ? (
+              <LimitedCustomQuiz />
+            ) : (
+              <UiScope flag="ui.student.customquiz.v2">
+                <CustomQuiz />
+              </UiScope>
+            ))
           }
         />
         <Route
