@@ -4,6 +4,7 @@ import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/pre
 import cardStyles from '@interface/components/general/Card/Card.module.scss';
 import popoverStyles from '@interface/components/general/Popover/Popover.module.scss';
 import { FilterSection } from '@interface/components/studentFlashcards/FilterSection/FilterSection';
+import suggestionStyles from '@interface/components/tagFilter/TagSuggestionList/TagSuggestionList.module.scss';
 import { PartOfSpeech, SkillType } from '@learncraft-spanish/shared';
 import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -600,16 +601,16 @@ describe('filter section', () => {
     );
 
     const vocabOption = screen.getByRole('option', { name: 'por vocabulary' });
-    expect(vocabOption).toHaveClass(styles.suggestionVocabulary);
+    expect(vocabOption).toHaveClass(suggestionStyles.suggestionVocabulary);
     expect(vocabOption).toHaveTextContent('for');
     expect(
-      vocabOption.querySelector(`.${styles.suggestionDescriptor}`),
+      vocabOption.querySelector(`.${suggestionStyles.suggestionDescriptor}`),
     ).toHaveTextContent('for');
 
     const rankedVocab = screen.getByRole('option', {
       name: 'Essential 500 vocabulary',
     });
-    expect(rankedVocab).toHaveClass(styles.suggestionVocabulary);
+    expect(rankedVocab).toHaveClass(suggestionStyles.suggestionVocabulary);
     expect(rankedVocab).toHaveTextContent('high frequency');
     // Frequency ranks suggestions; the numeric value and the old "frequency"
     // type label must not appear. Descriptor text may still say "frequency".
@@ -617,7 +618,7 @@ describe('filter section', () => {
       String(frequencyTag.frequency),
     );
     expect(
-      rankedVocab.querySelector(`.${styles.suggestionMeta}`),
+      rankedVocab.querySelector(`.${suggestionStyles.suggestionMeta}`),
     ).toHaveTextContent('vocabulary');
     expect(
       screen.queryByRole('option', { name: /Essential 500 frequency/i }),
@@ -626,32 +627,38 @@ describe('filter section', () => {
     const idiomOption = screen.getByRole('option', {
       name: 'por eso idiom',
     });
-    expect(idiomOption).toHaveClass(styles.suggestionIdiom);
+    expect(idiomOption).toHaveClass(suggestionStyles.suggestionIdiom);
     expect(
-      idiomOption.querySelector(`.${styles.suggestionDescriptor}`),
+      idiomOption.querySelector(`.${suggestionStyles.suggestionDescriptor}`),
     ).toHaveTextContent('Cluster, Idiom');
 
     const subcategoryOption = screen.getByRole('option', {
       name: 'Idioms cluster subcategory',
     });
-    expect(subcategoryOption).toHaveClass(styles.suggestionSubcategory);
+    expect(subcategoryOption).toHaveClass(
+      suggestionStyles.suggestionSubcategory,
+    );
     expect(
-      subcategoryOption.querySelector(`.${styles.suggestionDescriptor}`),
+      subcategoryOption.querySelector(
+        `.${suggestionStyles.suggestionDescriptor}`,
+      ),
     ).toBeNull();
 
     const verbOption = screen.getByRole('option', {
       name: 'Poder verb',
     });
-    expect(verbOption).toHaveClass(styles.suggestionVerb);
+    expect(verbOption).toHaveClass(suggestionStyles.suggestionVerb);
     expect(
-      verbOption.querySelector(`.${styles.suggestionDescriptor}`),
+      verbOption.querySelector(`.${suggestionStyles.suggestionDescriptor}`),
     ).toHaveTextContent('direct and indirect - Er - irreg: stem change');
 
     const blankDescriptorOption = screen.getByRole('option', {
       name: 'sin vocabulary',
     });
     expect(
-      blankDescriptorOption.querySelector(`.${styles.suggestionDescriptor}`),
+      blankDescriptorOption.querySelector(
+        `.${suggestionStyles.suggestionDescriptor}`,
+      ),
     ).toBeNull();
 
     cleanup();
@@ -672,7 +679,9 @@ describe('filter section', () => {
       name: 'haber verb',
     });
     expect(
-      blankVerbOption.querySelector(`.${styles.suggestionDescriptor}`),
+      blankVerbOption.querySelector(
+        `.${suggestionStyles.suggestionDescriptor}`,
+      ),
     ).toBeNull();
   });
 
@@ -785,27 +794,31 @@ describe('filter section', () => {
       name: 'Subjunctive present conjugation',
     });
 
-    expect(vocabularyOption).toHaveClass(styles.suggestionVocabulary);
-    expect(idiomOption).toHaveClass(styles.suggestionIdiom);
-    expect(subcategoryOption).toHaveClass(styles.suggestionSubcategory);
-    expect(verbOption).toHaveClass(styles.suggestionVerb);
-    expect(conjugationOption).toHaveClass(styles.suggestionConjugation);
+    expect(vocabularyOption).toHaveClass(suggestionStyles.suggestionVocabulary);
+    expect(idiomOption).toHaveClass(suggestionStyles.suggestionIdiom);
+    expect(subcategoryOption).toHaveClass(
+      suggestionStyles.suggestionSubcategory,
+    );
+    expect(verbOption).toHaveClass(suggestionStyles.suggestionVerb);
+    expect(conjugationOption).toHaveClass(
+      suggestionStyles.suggestionConjugation,
+    );
 
     // One distinct lowercase label per SkillType — not collapsed/renamed.
     expect(
-      vocabularyOption.querySelector(`.${styles.suggestionMeta}`),
+      vocabularyOption.querySelector(`.${suggestionStyles.suggestionMeta}`),
     ).toHaveTextContent('vocabulary');
     expect(
-      idiomOption.querySelector(`.${styles.suggestionMeta}`),
+      idiomOption.querySelector(`.${suggestionStyles.suggestionMeta}`),
     ).toHaveTextContent('idiom');
     expect(
-      subcategoryOption.querySelector(`.${styles.suggestionMeta}`),
+      subcategoryOption.querySelector(`.${suggestionStyles.suggestionMeta}`),
     ).toHaveTextContent('subcategory');
     expect(
-      verbOption.querySelector(`.${styles.suggestionMeta}`),
+      verbOption.querySelector(`.${suggestionStyles.suggestionMeta}`),
     ).toHaveTextContent('verb');
     expect(
-      conjugationOption.querySelector(`.${styles.suggestionMeta}`),
+      conjugationOption.querySelector(`.${suggestionStyles.suggestionMeta}`),
     ).toHaveTextContent('conjugation');
     expect(screen.getAllByText('vocabulary')).toHaveLength(1);
     expect(screen.getAllByText('idiom')).toHaveLength(1);

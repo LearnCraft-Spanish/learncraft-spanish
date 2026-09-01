@@ -50,7 +50,11 @@ root.render(
             <App />
           </Providers>
         </BrowserRouter>
-        <ReactQueryDevtools initialIsOpen={false} />
+        {/* On by default; set VITE_QUERY_DEVTOOLS=false to get the floating
+            button out of the way when checking a mobile layout. */}
+        {import.meta.env.VITE_QUERY_DEVTOOLS !== 'false' && (
+          <ReactQueryDevtools initialIsOpen={false} />
+        )}
       </QueryClientProvider>
     </Sentry.ErrorBoundary>
   </React.StrictMode>,

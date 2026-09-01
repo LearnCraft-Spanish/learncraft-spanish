@@ -7,6 +7,9 @@
   font-weight: var(--lcs-weight-medium);
   letter-spacing: var(--lcs-tracking-eyebrow);
   line-height: var(--lcs-line-tight);
+  /* When rendered as a heading, the legacy global `h2..h6` rule in App.css
+   * would centre it. Follow the surrounding surface instead. */
+  text-align: inherit;
   text-transform: uppercase;
 }
 

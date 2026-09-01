@@ -1,0 +1,67 @@
+.root {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  padding: var(--lcs-space-6);
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-surface);
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+  gap: var(--lcs-space-4);
+  text-align: left;
+  transition:
+    border-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.root:hover {
+  background-color: var(--lcs-tint-hover);
+}
+
+.root:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.on {
+  border-color: var(--lcs-color-action);
+  background-color: var(--lcs-tint-action);
+}
+
+.on:hover {
+  background-color: var(--lcs-tint-action);
+}
+
+/* Tag mode cards: no tile, glyph beside a centered label. */
+.compact {
+  padding: var(--lcs-space-5);
+  gap: var(--lcs-space-3);
+  justify-content: center;
+  text-align: center;
+}
+
+.label {
+  min-width: 0;
+}
+
+@media (min-width: 769px) {
+  .roomy {
+    padding: var(--lcs-space-7);
+    font-size: var(--lcs-text-h3);
+  }
+
+  .compact {
+    padding: var(--lcs-space-6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+}

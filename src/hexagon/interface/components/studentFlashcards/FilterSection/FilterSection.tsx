@@ -1,21 +1,12 @@
-import type { PreSetQuiz } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import type { UseCombinedFiltersReturnType } from '@application/units/Filtering/useCombinedFilters';
 import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
-import type { SelectOption } from '@interface/components/general/Select/Select';
-import type {
-  CourseWithLessons,
-  Lesson,
-  SkillTag,
-} from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
+import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import {
-  PreSetQuizPreset,
-  preSetQuizzes,
-} from '@application/units/Filtering/FilterPresets/preSetQuizzes';
-import {
-  generateVirtualLessonId,
-  getPrerequisitesForCourse,
-} from '@domain/coursePrerequisites';
+  courseOptions,
+  fromLessonOptions,
+  toLessonOptions,
+} from '@interface/components/courseScope/lessonOptions';
 import { Badge } from '@interface/components/general/Badge/Badge';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
 import {
@@ -26,12 +17,19 @@ import {
 import { Chip } from '@interface/components/general/Chip/Chip';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { Field } from '@interface/components/general/Field/Field';
-import { Icon } from '@interface/components/general/Icon/Icon';
 import { Popover } from '@interface/components/general/Popover/Popover';
 import { Select } from '@interface/components/general/Select/Select';
 import { TextInput } from '@interface/components/general/TextInput/TextInput';
 import { Toggle } from '@interface/components/general/Toggle/Toggle';
-import { SkillType } from '@learncraft-spanish/shared';
+import {
+  PresetList,
+  tagCountLabel,
+} from '@interface/components/quizPresets/PresetList';
+import {
+  tagDescriptor,
+  tagLabel,
+  TagSuggestionList,
+} from '@interface/components/tagFilter/TagSuggestionList';
 import { useState } from 'react';
 import styles from './FilterSection.module.scss';
 
@@ -45,172 +43,6 @@ type TagFilterMode = 'search' | 'preset';
 export interface FilterSectionProps {
   exampleFilter: UseCombinedFiltersReturnType;
   onResetAll?: () => void;
-}
-
-interface NamedLesson {
-  lessonNumber: number;
-  displayName?: string;
-}
-
-function tagLabel(tag: SkillTag): string {
-  return tag.type === SkillType.Subcategory ? tag.subcategory : tag.name;
-}
-
-function tagCategory(tag: SkillTag): string {
-  switch (tag.type) {
-    case SkillType.Vocabulary:
-      return 'vocabulary';
-    case SkillType.Idiom:
-      return 'idiom';
-    case SkillType.Subcategory:
-      return 'subcategory';
-    case SkillType.Verb:
-      return 'verb';
-    case SkillType.Conjugation:
-      return 'conjugation';
-  }
-}
-
-/** Secondary line under the name — same field mapping as v1 TagFilter. */
-function tagDescriptor(tag: SkillTag): string | null {
-  switch (tag.type) {
-    case SkillType.Vocabulary: {
-      const descriptor = tag.descriptor.trim();
-      return descriptor.length > 0 ? descriptor : null;
-    }
-    case SkillType.Idiom: {
-      const subcategoryName = tag.subcategoryName.trim();
-      return subcategoryName.length > 0 ? subcategoryName : null;
-    }
-    case SkillType.Verb: {
-      const joined = tag.verbTags.join(' - ').trim();
-      return joined.length > 0 ? joined : null;
-    }
-    case SkillType.Subcategory:
-    case SkillType.Conjugation:
-      return null;
-  }
-}
-
-function suggestionTypeClass(tag: SkillTag): string {
-  switch (tag.type) {
-    case SkillType.Vocabulary:
-      return styles.suggestionVocabulary;
-    case SkillType.Idiom:
-      return styles.suggestionIdiom;
-    case SkillType.Subcategory:
-      return styles.suggestionSubcategory;
-    case SkillType.Verb:
-      return styles.suggestionVerb;
-    case SkillType.Conjugation:
-      return styles.suggestionConjugation;
-  }
-}
-
-function lessonLabel(lesson: NamedLesson): string {
-  if (lesson.displayName !== undefined) {
-    return lesson.displayName;
-  }
-  return `Lesson ${lesson.lessonNumber}`;
-}
-
-function virtualLessons(course: CourseWithLessons): NamedLesson[] {
-  const config = getPrerequisitesForCourse(course.id);
-  if (!config) {
-    return [];
-  }
-  return config.prerequisites.map((prereq, index) => ({
-    lessonNumber: generateVirtualLessonId(course.id, index),
-    displayName: prereq.displayName,
-  }));
-}
-
-function startFromLesson(course: CourseWithLessons | null): NamedLesson | null {
-  if (!course) {
-    return null;
-  }
-  const virtual = virtualLessons(course);
-  if (virtual[0]) {
-    return virtual[0];
-  }
-  const first = course.lessons[0];
-  if (!first) {
-    return null;
-  }
-  return { lessonNumber: first.lessonNumber };
-}
-
-function listedCourses(
-  exampleFilter: UseCombinedFiltersReturnType,
-): CourseWithLessons[] {
-  if (
-    exampleFilter.coursesWithLessons &&
-    exampleFilter.coursesWithLessons.length > 0
-  ) {
-    return exampleFilter.coursesWithLessons;
-  }
-  return exampleFilter.course ? [exampleFilter.course] : [];
-}
-
-function courseOptions(
-  exampleFilter: UseCombinedFiltersReturnType,
-): SelectOption[] {
-  return listedCourses(exampleFilter).map((listed) => ({
-    value: String(listed.id),
-    label: listed.name,
-  }));
-}
-
-function toLessonOptions(
-  course: CourseWithLessons | null,
-  fromLessonNumber: number | null,
-): SelectOption[] {
-  if (!course) {
-    return [];
-  }
-  const lessons: Lesson[] =
-    fromLessonNumber === null || fromLessonNumber < 0
-      ? course.lessons
-      : course.lessons.filter(
-          (lesson) => lesson.lessonNumber >= fromLessonNumber,
-        );
-  return lessons.map((lesson) => ({
-    value: String(lesson.lessonNumber),
-    label: lessonLabel(lesson),
-  }));
-}
-
-function fromLessonOptions(
-  course: CourseWithLessons | null,
-  toLessonNumber: number | null,
-): SelectOption[] {
-  if (!course) {
-    return [];
-  }
-  const start = startFromLesson(course);
-  const regular =
-    toLessonNumber === null
-      ? []
-      : course.lessons.filter(
-          (lesson) => lesson.lessonNumber <= toLessonNumber,
-        );
-  return [...virtualLessons(course), ...regular].map((lesson) => {
-    const base = lessonLabel(lesson);
-    const isStart =
-      start !== null && lesson.lessonNumber === start.lessonNumber;
-    return {
-      value: String(lesson.lessonNumber),
-      label: isStart ? `${base} — from the start` : base,
-    };
-  });
-}
-
-function tagCountLabel(count: number): string {
-  return `${count} ${count === 1 ? 'tag' : 'tags'}`;
-}
-
-function visiblePresets(): PreSetQuiz[] {
-  return preSetQuizzes.filter((quiz) => quiz.preset !== PreSetQuizPreset.None);
 }
 
 function setTagQuery(
@@ -420,53 +252,14 @@ export function FilterSection({
                       />
                     }
                   >
-                    {suggestions.length === 0 ? (
-                      <div className={styles.noSuggestions}>
-                        No tags match that.
-                      </div>
-                    ) : (
-                      <ul className={styles.suggestions} role="listbox">
-                        {suggestions.map((tag) => {
-                          const descriptor = tagDescriptor(tag);
-                          return (
-                            <li key={tag.key}>
-                              <button
-                                type="button"
-                                className={`${styles.suggestion} ${suggestionTypeClass(tag)}`}
-                                role="option"
-                                onClick={() => {
-                                  addSkillTagToFilters(tag.key);
-                                  skillTagSearch.removeTagFromSuggestions(
-                                    tag.key,
-                                  );
-                                  setTagQuery(
-                                    skillTagSearch.updateTagSearchTerm,
-                                    '',
-                                  );
-                                }}
-                              >
-                                <span className={styles.suggestionBody}>
-                                  <span className={styles.suggestionName}>
-                                    {tagLabel(tag)}
-                                  </span>
-                                  {descriptor !== null && (
-                                    <span
-                                      className={styles.suggestionDescriptor}
-                                      aria-hidden="true"
-                                    >
-                                      {descriptor}
-                                    </span>
-                                  )}
-                                </span>
-                                <span className={styles.suggestionMeta}>
-                                  {tagCategory(tag)}
-                                </span>
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
+                    <TagSuggestionList
+                      suggestions={suggestions}
+                      onSelect={(tag) => {
+                        addSkillTagToFilters(tag.key);
+                        skillTagSearch.removeTagFromSuggestions(tag.key);
+                        setTagQuery(skillTagSearch.updateTagSearchTerm, '');
+                      }}
+                    />
                   </Popover>
                 </div>
                 {hasTags && (
@@ -524,41 +317,11 @@ export function FilterSection({
               role="tabpanel"
               aria-labelledby="finder-tab-presets"
             >
-              <p className={styles.presetsHint}>
-                One click applies a saved group of tags.
-              </p>
-              <div className={styles.presetList}>
-                {visiblePresets().map((quiz) => {
-                  const selected = filterPreset === quiz.preset;
-                  return (
-                    <button
-                      key={quiz.preset}
-                      type="button"
-                      className={
-                        selected
-                          ? `${styles.preset} ${styles.presetOn}`
-                          : styles.preset
-                      }
-                      aria-pressed={selected}
-                      onClick={() =>
-                        setFilterPreset(
-                          selected ? PreSetQuizPreset.None : quiz.preset,
-                        )
-                      }
-                    >
-                      <Icon
-                        name="bookmark"
-                        size="inline"
-                        tone={selected ? 'onAction' : 'muted'}
-                      />
-                      {quiz.preset}
-                      <span className={styles.presetCount}>
-                        {tagCountLabel(quiz.SkillTagKeys.length)}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+              <PresetList
+                filterPreset={filterPreset}
+                setFilterPreset={setFilterPreset}
+                hint="One click applies a saved group of tags."
+              />
             </div>
           )}
         </CardSection>

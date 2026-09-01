@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 import {
+  IconArrowLeft,
   IconArrowRight,
   IconBell,
   IconBolt,
@@ -16,9 +17,11 @@ import {
   IconClipboard,
   IconClipboardCopy,
   IconFilter,
+  IconHeadphones,
   IconHome,
   IconLanguage,
   IconLogout,
+  IconMicrophone,
   IconPlus,
   IconSearch,
   IconSearchOff,
@@ -36,6 +39,7 @@ import styles from './Icon.module.scss';
  * Register an icon here before using it.
  */
 const GLYPHS = {
+  arrowLeft: IconArrowLeft,
   arrowRight: IconArrowRight,
   bell: IconBell,
   bolt: IconBolt,
@@ -52,9 +56,11 @@ const GLYPHS = {
   clipboard: IconClipboard,
   clipboardCopy: IconClipboardCopy,
   filter: IconFilter,
+  headphones: IconHeadphones,
   home: IconHome,
   language: IconLanguage,
   logout: IconLogout,
+  microphone: IconMicrophone,
   plus: IconPlus,
   search: IconSearch,
   searchOff: IconSearchOff,

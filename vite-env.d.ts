@@ -9,6 +9,7 @@ interface ImportMetaEnv {
   readonly VITE_AUTH0_CLIENTID: string;
   readonly VITE_ENVIRONMENT: string;
   readonly VITE_UI_FLAGS?: string;
+  readonly VITE_QUERY_DEVTOOLS?: string;
 }
 
 interface ImportMeta {
