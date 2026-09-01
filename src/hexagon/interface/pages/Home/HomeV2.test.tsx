@@ -17,7 +17,6 @@ function renderHomeWithRoutes() {
     <MemoryRouter initialEntries={['/']}>
       <Routes>
         <Route path="/" element={<HomeV2 />} />
-        <Route path="/quizzes" element={<div>Quizzes page</div>} />
         <Route path="/myflashcards" element={<div>My flashcards page</div>} />
       </Routes>
     </MemoryRouter>,
@@ -55,23 +54,6 @@ describe('home v2', () => {
     renderHome();
 
     expect(screen.getByText('Help & walkthroughs')).toBeInTheDocument();
-  });
-
-  it('renders the tab bar with a Home tab', () => {
-    renderHome();
-
-    expect(
-      screen.getByRole('navigation', { name: 'Primary' }),
-    ).toBeInTheDocument();
-  });
-
-  it('navigates to /quizzes when the tab bar Quiz tab is chosen', async () => {
-    const user = userEvent.setup();
-    renderHomeWithRoutes();
-
-    await user.click(screen.getByRole('button', { name: 'Quiz' }));
-
-    expect(screen.getByText('Quizzes page')).toBeInTheDocument();
   });
 
   it('navigates to /myflashcards when the CTA is chosen', async () => {

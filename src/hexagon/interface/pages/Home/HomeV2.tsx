@@ -1,10 +1,8 @@
-import type { TabBarItem } from '@interface/components/home/TabBar/TabBar';
 import type { JSX } from 'react';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { EntryCard } from '@interface/components/home/EntryCard/EntryCard';
 import { HelpRow } from '@interface/components/home/HelpRow/HelpRow';
 import { QuizCTA } from '@interface/components/home/QuizCTA/QuizCTA';
-import { TabBar } from '@interface/components/home/TabBar/TabBar';
 import { useNavigate } from 'react-router-dom';
 import styles from './HomeV2.module.scss';
 
@@ -13,6 +11,10 @@ import styles from './HomeV2.module.scss';
  * mobile components — both entry-card sets render and CSS shows the one
  * that matches the viewport, so the CTA stays the first child of the
  * scrolling column at every width.
+ *
+ * The mobile tab bar is not rendered here — it is global chrome mounted
+ * once in `App.tsx` (`AppHeader/PrimaryTabBar`) so it persists across every
+ * route instead of disappearing once the student leaves Home.
  */
 export function HomeV2(): JSX.Element {
   const navigate = useNavigate();
@@ -22,26 +24,7 @@ export function HomeV2(): JSX.Element {
   const goToManageFlashcards = (): void => navigate('/manage-flashcards');
   const goToOfficialQuizzes = (): void => navigate('/officialquizzes');
   const goToCustomQuiz = (): void => navigate('/customquiz');
-  const goToQuizzes = (): void => navigate('/quizzes');
   const goToHelp = (): void => navigate('/get-help');
-
-  const tabs: TabBarItem[] = [
-    {
-      id: 'home',
-      icon: 'home',
-      label: 'Home',
-      active: true,
-      onSelect: () => navigate('/'),
-    },
-    { id: 'search', icon: 'search', label: 'Finder', onSelect: goToFinder },
-    { id: 'quiz', icon: 'checklist', label: 'Quiz', onSelect: goToQuizzes },
-    {
-      id: 'cards',
-      icon: 'cards',
-      label: 'Cards',
-      onSelect: goToManageFlashcards,
-    },
-  ];
 
   return (
     <PageShell>
@@ -92,8 +75,6 @@ export function HomeV2(): JSX.Element {
 
         <HelpRow onGo={goToHelp} />
       </div>
-
-      <TabBar items={tabs} />
     </PageShell>
   );
 }

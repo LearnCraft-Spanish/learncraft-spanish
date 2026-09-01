@@ -3,12 +3,14 @@ import { useFlushFlashcardUpdatesOnLoad } from '@application/units/flushFlashcar
 import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
 import { AppHeader } from '@interface/components/AppHeader';
 import { PrimaryNav } from '@interface/components/AppHeader/PrimaryNav';
+import { PrimaryTabBar } from '@interface/components/AppHeader/PrimaryTabBar';
 import { Loading } from '@interface/components/Loading';
 import { LoggedOut } from '@interface/components/LoggedOut';
 import { SubHeaderComponent } from '@interface/components/SubHeader';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
+import styles from './App.module.scss';
 import ExtraCoachingCTA from './hexagon/interface/components/BuyMoreCoachingSessionsBanner/BuyMoreCoachingSessionsBanner';
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
@@ -45,6 +47,11 @@ export const App: React.FC = () => {
     location.pathname === '/manage-flashcards' &&
     flashcardManagerVersion === 'v2';
 
+  // Mobile chrome mirrors the desktop `PrimaryNav`: same gate
+  // (`isAuthenticated`, no role check), just also requiring the home v2
+  // flag, since the bar's four destinations are the v2 student surfaces.
+  const showMobileTabBar = isAuthenticated && studentHomeVersion === 'v2';
+
   return (
     <div className="App">
       <ExtraCoachingCTA />
@@ -63,13 +70,27 @@ export const App: React.FC = () => {
           <SubHeaderComponent />
         )}
 
-      {isLoading && !isAuthenticated ? (
-        <Loading message="Logging in..." />
-      ) : isAuthenticated ? (
-        <AppRoutes />
-      ) : (
-        <LoggedOut onLogIn={login} />
-      )}
+      <div
+        className={styles.mainContent}
+        style={
+          {
+            '--lcs-mobile-tabbar-offset': showMobileTabBar
+              ? 'calc(var(--lcs-tab-bar-height) + env(safe-area-inset-bottom, 0px))'
+              : '0px',
+          } as React.CSSProperties
+        }
+      >
+        {isLoading && !isAuthenticated ? (
+          <Loading message="Logging in..." />
+        ) : isAuthenticated ? (
+          <AppRoutes />
+        ) : (
+          <LoggedOut onLogIn={login} />
+        )}
+      </div>
+
+      {showMobileTabBar && <PrimaryTabBar />}
+
       <ToastContainer
         theme="colored"
         transition={Zoom}

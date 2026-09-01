@@ -17,8 +17,6 @@
 @media (max-width: 768px) {
   .column {
     gap: var(--lcs-space-7);
-    /* Room for the fixed TabBar so the last card is never covered. */
-    padding-bottom: 76px;
   }
 
   .desktopEntries {
