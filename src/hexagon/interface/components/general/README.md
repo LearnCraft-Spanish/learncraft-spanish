@@ -19,15 +19,15 @@ A file in this folder is a v2 primitive only if all of the following hold.
 
 ## What exists
 
-|          |                                                                                                   |
-| -------- | ------------------------------------------------------------------------------------------------- |
-| Layout   | `PageShell`, `FixedBottomStack`, `Card` + `CardSection` + `CardSectionHeader` + `CardFooterStrip` |
-| Type     | `Eyebrow`, `Badge`                                                                                |
-| Icons    | `Icon`, `IconButton`, `IconTile`                                                                  |
-| Controls | `Button`, `Field`, `Select`, `TextInput`, `Checkbox`, `Toggle`                                    |
-| Overlays | `Popover` (+ `useDismissable`), `Menu`                                                            |
-| Feedback | `EmptyState`, `NoticeBar`, `Skeleton`                                                             |
-| Data     | `Chip`, `DataTable`, `PaginationV2`                                                               |
+|          |                                                                                                             |
+| -------- | ----------------------------------------------------------------------------------------------------------- |
+| Layout   | `PageShell`, `FixedBottomStack`, `TabBar`, `Card` + `CardSection` + `CardSectionHeader` + `CardFooterStrip` |
+| Type     | `Eyebrow`, `Badge`                                                                                          |
+| Icons    | `Icon`, `IconButton`, `IconTile`                                                                            |
+| Controls | `Button`, `Field`, `Select`, `TextInput`, `Checkbox`, `Toggle`                                              |
+| Overlays | `Popover` (+ `useDismissable`), `Menu`                                                                      |
+| Feedback | `EmptyState`, `NoticeBar`, `Skeleton`                                                                       |
+| Data     | `Chip`, `DataTable`, `PaginationV2`                                                                         |
 
 `Icon` is the only file that imports an icon package. Call sites name a glyph by string, so swapping `@tabler/icons-react` for another set is a change to one map. Register a glyph in `Icon.tsx` before using it.
 

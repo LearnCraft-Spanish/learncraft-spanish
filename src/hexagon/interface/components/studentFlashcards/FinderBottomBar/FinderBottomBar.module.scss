@@ -80,9 +80,12 @@
   }
 }
 
-/* Stay edge-to-edge at the narrow breakpoint — no page-pad inset. */
+/* Stay edge-to-edge at the narrow breakpoint — no page-pad inset. Dock above
+ * the fixed mobile `TabBar` (via the offset `App.tsx` sets) rather than
+ * `bottom: 0`, so the two bars stack instead of overlapping. */
 @media (max-width: 768px) {
   .slab {
     padding: 0;
+    bottom: var(--lcs-mobile-tabbar-offset, 0px);
   }
 }

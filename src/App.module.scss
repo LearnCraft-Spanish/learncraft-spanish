@@ -1,0 +1,10 @@
+/* Keeps the routed page scrollable past the fixed mobile `PrimaryTabBar`
+ * instead of letting it cover the last row of content. The actual reserved
+ * space comes from `--lcs-mobile-tabbar-offset`, set inline by `App.tsx`
+ * only while the tab bar is mounted — 0 otherwise, so desktop and
+ * flag-off students get no extra gap. */
+@media (max-width: 768px) {
+  .mainContent {
+    padding-bottom: var(--lcs-mobile-tabbar-offset, 0px);
+  }
+}

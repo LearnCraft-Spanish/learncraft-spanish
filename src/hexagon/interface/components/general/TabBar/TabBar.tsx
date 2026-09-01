@@ -17,8 +17,10 @@ interface TabBarProps {
 
 /**
  * Persistent bottom navigation, mobile only — hidden at 769px and up by CSS.
- * New pattern for this app: previously nothing pinned the viewport bottom on
- * small screens. Fixed to the viewport, not the page column.
+ * Fixed to the viewport, not the page column, so it stays on screen while
+ * the page beneath it scrolls. Mounted once in `App.tsx` (see
+ * `AppHeader/PrimaryTabBar`) rather than per page, so it survives route
+ * changes and always reflects the current one.
  */
 export function TabBar({ items }: TabBarProps): JSX.Element {
   return (

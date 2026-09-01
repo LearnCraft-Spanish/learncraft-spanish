@@ -1,5 +1,5 @@
-import type { TabBarItem } from '@interface/components/home/TabBar/TabBar';
-import { TabBar } from '@interface/components/home/TabBar/TabBar';
+import type { TabBarItem } from '@interface/components/general/TabBar/TabBar';
+import { TabBar } from '@interface/components/general/TabBar/TabBar';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';

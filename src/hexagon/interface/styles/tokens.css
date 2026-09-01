@@ -136,6 +136,16 @@
     --lcs-control-height-sm: 40px;
     --lcs-control-border: 1.5px;
 
+    /* Height of the fixed mobile `TabBar` (icon + label + its own vertical
+     * padding), excluding the safe-area inset it also pads itself with.
+     * `App.tsx` sets `--lcs-mobile-tabbar-offset` from this whenever
+     * `PrimaryTabBar` is mounted, so any fixed-to-viewport element below it
+     * (page bottom padding, `FinderBottomBar`) can dock above the tab bar
+     * instead of guessing its height. Defaults to 0 so nothing shifts when
+     * the tab bar isn't mounted (desktop, or the flag is off). */
+    --lcs-tab-bar-height: 76px;
+    --lcs-mobile-tabbar-offset: 0px;
+
     /* Typography */
     /* Nunito Sans only. Avenir was dropped: it is a system font on macOS and
      * iOS but absent elsewhere, so listing it first served two different

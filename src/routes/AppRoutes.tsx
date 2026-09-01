@@ -56,9 +56,7 @@ const ExampleManagerRouter = lazy(
 export default function AppRoutes() {
   const { isAdmin, isCoach, isStudent, isLimited, isAuthenticated } =
     useAuthAdapter();
-  const { version: quizzesVersion } = useStudentUiVersion(
-    'ui.student.home.v2',
-  );
+  const { version: quizzesVersion } = useStudentUiVersion('ui.student.home.v2');
 
   return (
     <Suspense fallback={<Loading message="Loading..." />}>
