@@ -1,3 +1,4 @@
+import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
 import type { SkillTag } from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
 import { SkillType } from '@learncraft-spanish/shared';
@@ -46,6 +47,23 @@ export function tagDescriptor(tag: SkillTag): string | null {
     case SkillType.Conjugation:
       return null;
   }
+}
+
+/**
+ * `updateTagSearchTerm` takes a DOM event target rather than a plain string,
+ * so callers setting the term programmatically (clearing it, seeding it from
+ * a click) fabricate a minimal fake one here rather than each repeating the
+ * cast.
+ */
+export function setTagQuery(
+  updateTagSearchTerm: UseSkillTagSearchReturnType['updateTagSearchTerm'],
+  value: string,
+): void {
+  if (value.length > 0) {
+    updateTagSearchTerm({ value } as HTMLInputElement);
+    return;
+  }
+  updateTagSearchTerm();
 }
 
 function suggestionTypeClass(tag: SkillTag): string {

@@ -4,7 +4,7 @@ import {
   courseOptions,
   fromLessonOptions,
   toLessonOptions,
-} from '@interface/components/courseScope/lessonOptions';
+} from '@domain/functions/lessonOptions';
 import { Card } from '@interface/components/general/Card/Card';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { Field } from '@interface/components/general/Field/Field';
@@ -37,6 +37,7 @@ export function CourseCard({
   const {
     course,
     courseId,
+    coursesWithLessons,
     fromLessonNumber,
     toLessonNumber,
     updateUserSelectedCourseId,
@@ -91,7 +92,7 @@ export function CourseCard({
             <Select
               id="custom-quiz-course"
               value={courseId !== null ? String(courseId) : ''}
-              options={courseOptions(exampleFilter)}
+              options={courseOptions(coursesWithLessons, course)}
               onChange={(value) =>
                 updateUserSelectedCourseId(Number.parseInt(value, 10))
               }
