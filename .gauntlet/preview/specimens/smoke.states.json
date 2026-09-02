@@ -1,0 +1,14 @@
+{
+  "states": [
+    {
+      "label": "smoke-mobile",
+      "formFactor": "mobile",
+      "query": "specimen=smoke"
+    },
+    {
+      "label": "smoke-desktop",
+      "formFactor": "desktop",
+      "query": "specimen=smoke"
+    }
+  ]
+}

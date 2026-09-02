@@ -1,0 +1,25 @@
+{
+  "states": [
+    {
+      "label": "A-mobile",
+      "formFactor": "mobile",
+      "query": "specimen=home&role=student"
+    },
+    {
+      "label": "A-desktop",
+      "formFactor": "desktop",
+      "query": "specimen=home&role=student"
+    },
+    {
+      "label": "B-mobile",
+      "formFactor": "mobile",
+      "query": "specimen=home&role=student"
+    },
+    {
+      "label": "B-desktop",
+      "formFactor": "desktop",
+      "query": "specimen=home&role=student"
+    }
+  ],
+  "barHint": "~/Downloads/handoff (index.html with data-screen-label frames)"
+}

@@ -58,8 +58,11 @@ Reference `documentation/ENGINEERING_DOCTRINE.md` and `src/hexagon/ARCHITECTURE.
 pnpm start              # Dev server
 pnpm test:hexagon:ai    # Runs test once (AI/CI mode)
 pnpm validate:ai        # Lint + format + typecheck
+pnpm gauntlet:preview   # Auth0-free visual specimen (port 5273)
 ```
 
-**Sandbox note:** `pnpm test:hexagon:ai` stubs CSS/SCSS in Vitest and is safe to run in Cursor’s default sandbox. `pnpm start` (and any real Vite SCSS compile) still uses `sass-embedded`’s native Dart worker — run those Shell commands with `required_permissions: ["all"]`.
+**Sandbox note:** `pnpm test:hexagon:ai` stubs CSS/SCSS in Vitest and is safe to run in Cursor’s default sandbox. `pnpm start` / `pnpm gauntlet:preview` (real Vite SCSS) still use `sass-embedded`’s native Dart worker — run those Shell commands with `required_permissions: ["all"]`.
+
+**Visual redesign / gauntlet screenshots:** Use [`.gauntlet/README.md`](./.gauntlet/README.md) and the [visual-gauntlet skill](./.cursor/skills/visual-gauntlet/SKILL.md). Never Auth0 and never real backend calls. Main fans out a **capture specialist** (`required_permissions: ["all"]`) for PNGs, then a **critic** that only `Read`s blind image paths — critics must not run Vite/Playwright. Do not claim visual review without `.gauntlet/out/<specimen>/bar/` + `app/` PNGs. `GenerateImage` is not a substitute.
 
 All scripts: [`documentation/SCRIPTS.md`](./documentation/SCRIPTS.md)

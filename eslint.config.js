@@ -53,6 +53,8 @@ export default antfu(
       '**/mocks/data/**/*.js',
       '*.yml',
       '**/*.md',
+      // Separate tooling package: CLI scripts use top-level await + console.log
+      '.gauntlet/**',
     ],
   },
   {

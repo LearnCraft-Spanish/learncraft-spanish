@@ -1,14 +1,14 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import type { Plugin } from 'vite';
+import path from 'node:path';
+
+import { fileURLToPath } from 'node:url';
 
 const STYLE_MOCK_PATH = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   './styleMock.ts',
 );
 
-const CSS_FILE_RE = /\.(css|scss|sass)(\?.*)?$/i;
+const CSS_FILE_RE = /\.(?:css|scss|sass)(?:\?.*)?$/i;
 
 /**
  * Vitest-only Vite plugin: short-circuit CSS/SCSS imports to {@link styleMock}

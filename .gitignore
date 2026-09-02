@@ -47,3 +47,13 @@ mocks/data/serverlike/actualServerData.json
 src/mocks/data/serverlike/actualServerData.json
 # stryker temp files
 .stryker-tmp
+
+# Visual gauntlet harness (generated / local)
+.gauntlet/out/
+.gauntlet/browsers/
+.gauntlet/.vite-cache/
+.gauntlet/node_modules/
+.gauntlet/**/crop-manifest.json
+
+# Accidental local pnpm store
+.pnpm-store/
