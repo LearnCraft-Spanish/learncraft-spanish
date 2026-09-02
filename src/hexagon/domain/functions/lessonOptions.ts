@@ -1,5 +1,3 @@
-import type { UseCombinedFiltersReturnType } from '@application/units/Filtering/useCombinedFilters';
-import type { SelectOption } from '@interface/components/general/Select/Select';
 import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
 import {
   generateVirtualLessonId,
@@ -9,6 +7,12 @@ import {
 export interface NamedLesson {
   lessonNumber: number;
   displayName?: string;
+}
+
+/** Shape a `<select>` needs; matches `interface`'s `SelectOption` structurally. */
+export interface LabeledOption {
+  value: string;
+  label: string;
 }
 
 export function lessonLabel(lesson: NamedLesson): string {
@@ -51,21 +55,20 @@ export function startFromLesson(
 }
 
 export function listedCourses(
-  exampleFilter: UseCombinedFiltersReturnType,
+  coursesWithLessons: CourseWithLessons[] | null | undefined,
+  course: CourseWithLessons | null,
 ): CourseWithLessons[] {
-  if (
-    exampleFilter.coursesWithLessons &&
-    exampleFilter.coursesWithLessons.length > 0
-  ) {
-    return exampleFilter.coursesWithLessons;
+  if (coursesWithLessons && coursesWithLessons.length > 0) {
+    return coursesWithLessons;
   }
-  return exampleFilter.course ? [exampleFilter.course] : [];
+  return course ? [course] : [];
 }
 
 export function courseOptions(
-  exampleFilter: UseCombinedFiltersReturnType,
-): SelectOption[] {
-  return listedCourses(exampleFilter).map((listed) => ({
+  coursesWithLessons: CourseWithLessons[] | null | undefined,
+  course: CourseWithLessons | null,
+): LabeledOption[] {
+  return listedCourses(coursesWithLessons, course).map((listed) => ({
     value: String(listed.id),
     label: listed.name,
   }));
@@ -74,7 +77,7 @@ export function courseOptions(
 export function toLessonOptions(
   course: CourseWithLessons | null,
   fromLessonNumber: number | null,
-): SelectOption[] {
+): LabeledOption[] {
   if (!course) {
     return [];
   }
@@ -93,7 +96,7 @@ export function toLessonOptions(
 export function fromLessonOptions(
   course: CourseWithLessons | null,
   toLessonNumber: number | null,
-): SelectOption[] {
+): LabeledOption[] {
   if (!course) {
     return [];
   }

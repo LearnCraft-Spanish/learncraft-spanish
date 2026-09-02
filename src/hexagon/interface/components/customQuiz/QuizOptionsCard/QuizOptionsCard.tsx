@@ -1,7 +1,10 @@
 import type { JSX } from 'react';
 import { CustomQuizType } from '@application/useCases/useCustomQuizV2';
 import { AudioQuizType } from '@domain/audioQuizzing';
-import { SelectorCard } from '@interface/components/customQuiz/SelectorCard';
+import {
+  handleRadioGroupKeyDown,
+  SelectorCard,
+} from '@interface/components/customQuiz/SelectorCard';
 import { Card } from '@interface/components/general/Card/Card';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { Field } from '@interface/components/general/Field/Field';
@@ -49,7 +52,12 @@ export function QuizOptionsCard({
       <div className={styles.root}>
         <Eyebrow as="h2">Quiz type</Eyebrow>
 
-        <div className={styles.types} role="radiogroup" aria-label="Quiz type">
+        <div
+          className={styles.types}
+          role="radiogroup"
+          aria-label="Quiz type"
+          onKeyDown={handleRadioGroupKeyDown}
+        >
           <SelectorCard
             icon="cards"
             label="Flashcards"
@@ -72,6 +80,7 @@ export function QuizOptionsCard({
                   className={styles.modes}
                   role="radiogroup"
                   aria-label="Audio quiz type"
+                  onKeyDown={handleRadioGroupKeyDown}
                 >
                   <SelectorCard
                     icon="microphone"

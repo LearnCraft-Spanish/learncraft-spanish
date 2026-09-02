@@ -1,7 +1,10 @@
 import type { UseCombinedFiltersReturnType } from '@application/units/Filtering/useCombinedFilters';
 import type { SkillTag } from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
-import { SelectorCard } from '@interface/components/customQuiz/SelectorCard';
+import {
+  handleRadioGroupKeyDown,
+  SelectorCard,
+} from '@interface/components/customQuiz/SelectorCard';
 import { Card } from '@interface/components/general/Card/Card';
 import { Chip } from '@interface/components/general/Chip/Chip';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
@@ -9,6 +12,7 @@ import { Popover } from '@interface/components/general/Popover/Popover';
 import { TextInput } from '@interface/components/general/TextInput/TextInput';
 import { PresetList } from '@interface/components/quizPresets/PresetList';
 import {
+  setTagQuery,
   tagCategory,
   tagLabel,
   TagSuggestionList,
@@ -55,11 +59,7 @@ export function TagsCard({
   const searchOpen = skillTagSearch.tagSearchTerm.trim().length > 0;
 
   function setQuery(value: string): void {
-    if (value.length > 0) {
-      skillTagSearch.updateTagSearchTerm({ value } as HTMLInputElement);
-      return;
-    }
-    skillTagSearch.updateTagSearchTerm();
+    setTagQuery(skillTagSearch.updateTagSearchTerm, value);
   }
 
   function changeMode(next: TagMode): void {
@@ -85,6 +85,7 @@ export function TagsCard({
           className={styles.modes}
           role="radiogroup"
           aria-label="Tag selection mode"
+          onKeyDown={handleRadioGroupKeyDown}
         >
           <SelectorCard
             icon="search"

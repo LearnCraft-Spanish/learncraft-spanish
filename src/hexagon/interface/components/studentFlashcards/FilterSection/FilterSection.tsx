@@ -1,12 +1,11 @@
 import type { UseCombinedFiltersReturnType } from '@application/units/Filtering/useCombinedFilters';
-import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
 import type { JSX } from 'react';
 import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import {
   courseOptions,
   fromLessonOptions,
   toLessonOptions,
-} from '@interface/components/courseScope/lessonOptions';
+} from '@domain/functions/lessonOptions';
 import { Badge } from '@interface/components/general/Badge/Badge';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
 import {
@@ -26,6 +25,7 @@ import {
   tagCountLabel,
 } from '@interface/components/quizPresets/PresetList';
 import {
+  setTagQuery,
   tagDescriptor,
   tagLabel,
   TagSuggestionList,
@@ -45,17 +45,6 @@ export interface FilterSectionProps {
   onResetAll?: () => void;
 }
 
-function setTagQuery(
-  updateTagSearchTerm: UseSkillTagSearchReturnType['updateTagSearchTerm'],
-  value: string,
-): void {
-  if (value.length > 0) {
-    updateTagSearchTerm({ value } as HTMLInputElement);
-    return;
-  }
-  updateTagSearchTerm();
-}
-
 export function FilterSection({
   exampleFilter,
   onResetAll,
@@ -63,6 +52,7 @@ export function FilterSection({
   const {
     course,
     courseId,
+    coursesWithLessons,
     fromLessonNumber,
     toLessonNumber,
     updateUserSelectedCourseId,
@@ -153,7 +143,7 @@ export function FilterSection({
               <Select
                 id="finder-course"
                 value={courseId !== null ? String(courseId) : ''}
-                options={courseOptions(exampleFilter)}
+                options={courseOptions(coursesWithLessons, course)}
                 onChange={changeCourse}
               />
             </Field>
