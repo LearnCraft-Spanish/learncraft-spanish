@@ -3,7 +3,8 @@ export type StudentUiFlag =
   | 'ui.student.flashcards.finder.v2'
   | 'ui.student.flashcards.manager.v2'
   | 'ui.student.home.v2'
-  | 'ui.student.customquiz.v2';
+  | 'ui.student.customquiz.v2'
+  | 'ui.student.textquiz.v2';
 
 export type DevUiFlag = 'ui.dev.gallery';
 

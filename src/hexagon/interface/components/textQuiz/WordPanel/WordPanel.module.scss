@@ -1,0 +1,69 @@
+.root {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--lcs-space-7);
+  border-radius: var(--lcs-radius-xl);
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+.word {
+  margin: 0;
+  font-size: var(--lcs-text-h3);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.gloss {
+  margin: var(--lcs-space-2) 0 0;
+  color: var(--lcs-on-dark-75);
+  font-size: var(--lcs-text-caption);
+}
+
+.meta {
+  margin: var(--lcs-space-4) 0 0;
+  color: var(--lcs-on-dark-85);
+  font-size: var(--lcs-text-caption);
+}
+
+.divider {
+  height: var(--lcs-border-hairline);
+  margin: var(--lcs-space-6) 0;
+  background-color: var(--lcs-on-dark-12);
+}
+
+.loading {
+  margin: var(--lcs-space-4) 0 0;
+  color: var(--lcs-on-dark-75);
+  font-size: var(--lcs-text-caption);
+}
+
+.lessons {
+  display: grid;
+  margin: var(--lcs-space-4) 0 0;
+  padding: 0;
+  gap: var(--lcs-space-3);
+  grid-template-columns: 1fr;
+  list-style: none;
+}
+
+.lessonRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--lcs-space-3) 0;
+  color: var(--lcs-on-dark-85);
+  font-size: var(--lcs-text-caption);
+  gap: var(--lcs-space-4);
+}
+
+@media (min-width: 769px) {
+  /* 700px is the handoff's literal panel width, not a scale step. */
+  .root {
+    width: 700px;
+    max-width: 100%;
+  }
+
+  .lessons {
+    grid-template-columns: 1fr 1fr;
+  }
+}

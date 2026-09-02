@@ -1,0 +1,67 @@
+.root {
+  position: relative;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-4);
+}
+
+.chip {
+  display: inline-flex;
+  box-sizing: border-box;
+  padding: var(--lcs-space-5) var(--lcs-space-7);
+  border: var(--lcs-control-border) solid
+    color-mix(in srgb, var(--lcs-color-action) 55%, transparent);
+  border-radius: var(--lcs-radius-sm);
+  background-color: var(--lcs-color-surface);
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  font-family: inherit;
+  /* Handoff wants 17px here; 16 (--lcs-text-body) is the closest token. */
+  font-size: var(--lcs-text-body);
+  font-weight: var(--lcs-weight-medium);
+  transition:
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    border-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.chip:hover:not(.selected) {
+  background-color: var(--lcs-tint-hover);
+}
+
+.chip:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.selected {
+  border-color: var(--lcs-color-surface-dark);
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+.panelSlot {
+  margin-top: var(--lcs-space-5);
+}
+
+@media (min-width: 769px) {
+  .chip {
+    /* Handoff wants 7px vertical padding; 8 (--lcs-space-3) is closest. */
+    padding: var(--lcs-space-3) var(--lcs-space-5);
+  }
+
+  .panelSlot {
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
+  }
+}

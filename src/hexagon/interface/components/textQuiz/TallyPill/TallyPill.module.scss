@@ -1,0 +1,53 @@
+.root {
+  position: absolute;
+  top: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 44px;
+  /* 10px/14px are the handoff's literal pill padding, not scale steps once
+   * rounded to the nearest token (--lcs-space-4 / --lcs-space-6). */
+  padding: var(--lcs-space-4) var(--lcs-space-6);
+  border-radius: var(--lcs-radius-pill);
+  gap: var(--lcs-space-1);
+}
+
+/* Border alpha (35%) intentionally differs from `QuizDock`'s dock-button
+ * tints (45%) — the handoff specifies a lighter ring for the pill. */
+.error {
+  border: var(--lcs-control-border) solid
+    color-mix(in srgb, var(--lcs-color-error) 35%, transparent);
+  background-color: color-mix(in srgb, var(--lcs-color-error) 8%, transparent);
+  color: var(--lcs-color-error);
+}
+
+.success {
+  border: var(--lcs-control-border) solid
+    color-mix(in srgb, var(--lcs-color-success) 35%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--lcs-color-success) 8%,
+    transparent
+  );
+  color: var(--lcs-color-success);
+}
+
+/* -64px is the handoff's literal flanking offset, not a scale step. */
+.left {
+  left: -64px;
+}
+
+.right {
+  right: -64px;
+}
+
+.count {
+  font-size: var(--lcs-text-body);
+  font-weight: var(--lcs-weight-bold);
+}
+
+@media (min-width: 769px) {
+  .root {
+    display: flex;
+  }
+}

@@ -1,0 +1,41 @@
+/*
+ * No `PageShell` here on purpose: this is a feature component, not a page
+ * (compare `customQuiz/CustomQuizSetup`, which is also unwrapped — the page
+ * that renders it wraps it in `PageShell`). Wiring this screen into a route
+ * is a later pass; that page will supply the parchment background, the
+ * `--lcs-font-sans` font, and the 1240px outer column. This component only
+ * owns its own 860px-max inner column, reusing the same page-padding tokens
+ * `PageShell` itself switches on at the same breakpoint.
+ */
+.root {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  max-width: 860px;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 0 var(--lcs-page-pad);
+  gap: var(--lcs-space-9);
+}
+
+.cardRow {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.empty {
+  margin: auto;
+  color: var(--lcs-color-muted);
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .root {
+    padding: 0 var(--lcs-page-pad-narrow);
+    gap: var(--lcs-space-6);
+  }
+}
