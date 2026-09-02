@@ -1,12 +1,15 @@
 import type { ConfigEnv } from 'vite';
 import { mergeConfig } from 'vite';
 import { defineConfig } from 'vitest/config';
+
+import { stubCssPlugin } from './src/hexagon/testing/stubCssPlugin';
 import viteConfig from './vite.config';
 
 export default defineConfig((configEnv: ConfigEnv) =>
   mergeConfig(
     viteConfig(configEnv),
     defineConfig({
+      plugins: [stubCssPlugin()],
       test: {
         silent: true,
         globals: true,

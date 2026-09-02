@@ -60,4 +60,6 @@ pnpm test:hexagon:ai    # Runs test once (AI/CI mode)
 pnpm validate:ai        # Lint + format + typecheck
 ```
 
+**Sandbox note:** `pnpm test:hexagon:ai` stubs CSS/SCSS in Vitest and is safe to run in Cursor’s default sandbox. `pnpm start` (and any real Vite SCSS compile) still uses `sass-embedded`’s native Dart worker — run those Shell commands with `required_permissions: ["all"]`.
+
 All scripts: [`documentation/SCRIPTS.md`](./documentation/SCRIPTS.md)

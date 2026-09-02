@@ -262,6 +262,18 @@ pnpm --version
 
 ---
 
+### Issue: Mass SCSS / Sass failures in Cursor sandbox (`Timeout calling fetch`, closed dispatcher, Sass TDZ)
+
+**Problem**: Vitest used to inherit Vite’s real SCSS pipeline (`sass-embedded` + `modern-compiler`). That package spawns a native Dart worker over IPC, which Cursor’s agent sandbox blocks or flakes. Symptoms include `Timeout calling fetch` (often with a `.scss` path), `Tried writing to closed dispatcher`, `[sass] Cannot access 'compilation' before initialization`, and dozens of unrelated suites failing on transform — not assertion failures.
+
+**Solution**:
+
+1. **Unit tests:** CSS/SCSS is stubbed in Vitest via `stubCssPlugin` (`src/hexagon/testing/stubCssPlugin.ts`). Re-run `pnpm test:hexagon:ai` in the default sandbox; Sass should not run at all.
+2. **Dev server / production build:** Still use real `sass-embedded`. If `pnpm start` fails the same way in a sandboxed Shell, re-run with `required_permissions: ["all"]`.
+3. If tests still show Sass errors after a pull, confirm both `vitest.config.ts` and `vitest.config-hexagon.ts` register `stubCssPlugin()` and that you are not overriding CSS handling.
+
+---
+
 ### Issue: Tests timeout or hang
 
 **Problem**: Async operations not completing or infinite loops.
