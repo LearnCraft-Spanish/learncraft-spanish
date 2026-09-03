@@ -6,6 +6,11 @@
   gap: var(--lcs-space-9);
   background-color: var(--lcs-color-action);
   padding: var(--lcs-space-6) var(--lcs-space-9);
+  /* Full-viewport screens subtract `--lcs-app-header-height` from 100dvh,
+   * so this bar must never render shorter than the token. If the padding
+   * or content height above changes, update the token (and its mobile
+   * media query) in `tokens.css` to match. */
+  min-height: var(--lcs-app-header-height);
 }
 
 /* Always links home — logged-out users still land on the marketing-facing

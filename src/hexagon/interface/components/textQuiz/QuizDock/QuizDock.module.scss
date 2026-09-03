@@ -1,0 +1,148 @@
+.root {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--lcs-space-4);
+}
+
+/* 52/56px are the handoff's literal dock button heights, not scale steps. */
+.slot {
+  display: flex;
+  min-height: 52px;
+}
+
+.placeholder {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  /* Parchment page fill + card border — 1px so the hairline-tone ring stays
+   * readable on parchment in 2× mobile captures (0.5px often vanishes). */
+  border: 1px solid var(--lcs-border-card);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-page);
+  box-shadow: none;
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+  font-weight: var(--lcs-weight-regular);
+  text-align: center;
+}
+
+.buttons {
+  display: flex;
+  width: 100%;
+  gap: var(--lcs-space-3);
+}
+
+.hard,
+.easy,
+.previous,
+.next {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--lcs-radius-lg);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+  gap: var(--lcs-space-3);
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.hard:focus-visible,
+.easy:focus-visible,
+.previous:focus-visible,
+.next:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.hard {
+  border: var(--lcs-control-border) solid
+    color-mix(in srgb, var(--lcs-color-error) 35%, transparent);
+  background-color: color-mix(in srgb, var(--lcs-color-error) 8%, transparent);
+  color: var(--lcs-color-error);
+}
+
+.hard:hover {
+  background-color: color-mix(in srgb, var(--lcs-color-error) 14%, transparent);
+}
+
+.easy {
+  border: var(--lcs-control-border) solid
+    color-mix(in srgb, var(--lcs-color-success) 35%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--lcs-color-success) 8%,
+    transparent
+  );
+  color: var(--lcs-color-success);
+}
+
+.easy:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--lcs-color-success) 14%,
+    transparent
+  );
+}
+
+/* White plate + blue stroke vs solid Next — transparent/token fills read
+ * as a light-blue filled chip in mobile-help captures. */
+.previous {
+  border: 1.5px solid #449ac2;
+  background-color: var(--lcs-color-surface);
+  color: #449ac2;
+}
+
+.previous:hover:not(:disabled) {
+  background-color: var(--lcs-tint-hover);
+}
+
+.previous:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.next {
+  border: var(--lcs-control-border) solid var(--lcs-color-action);
+  background-color: var(--lcs-color-action);
+  color: var(--lcs-color-on-action);
+}
+
+.next:hover {
+  border-color: var(--lcs-color-action-hover);
+  background-color: var(--lcs-color-action-hover);
+}
+
+.swipeCaption {
+  margin: 0;
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+  text-align: center;
+}
+
+@media (min-width: 769px) {
+  .slot {
+    min-height: 56px;
+  }
+
+  .buttons {
+    gap: var(--lcs-space-7);
+  }
+
+  .swipeCaption {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hard,
+  .easy,
+  .previous,
+  .next {
+    transition: none;
+  }
+}

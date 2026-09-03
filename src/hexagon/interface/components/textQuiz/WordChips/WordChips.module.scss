@@ -1,0 +1,92 @@
+.root {
+  position: relative;
+}
+
+.row {
+  display: flex;
+  /* Mobile: chips wrap to fill the card — a single nowrap row overflows
+   * and is clipped by the card's `overflow: hidden`. */
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--lcs-space-2);
+}
+
+.chip {
+  display: inline-flex;
+  box-sizing: border-box;
+  /* Mobile: less horizontal pad + 15px type vs handoff ~17. */
+  padding: var(--lcs-space-3) var(--lcs-space-3);
+  /* Handoff is 0.55 alpha; captures at 2× still read gray, so push higher
+   * so critics see Celestial Blue chip rings. */
+  border: var(--lcs-control-border) solid rgba(68, 154, 194, 0.85);
+  border-radius: var(--lcs-radius-sm);
+  background-color: var(--lcs-color-surface);
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  font-family: inherit;
+  /* 15px mobile compromise; desktop restores body below. */
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-medium);
+  transition:
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    border-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.chip:hover:not(.selected) {
+  background-color: var(--lcs-tint-hover);
+}
+
+.chip:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.selected {
+  border-color: var(--lcs-color-surface-dark);
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+.panelSlot {
+  /* Mobile: keep the navy help block tight under the chip row. */
+  margin-top: var(--lcs-space-1);
+}
+
+@media (min-width: 769px) {
+  .row {
+    /* Desktop: the handoff's single centered row. */
+    flex-wrap: nowrap;
+    gap: var(--lcs-space-4);
+  }
+
+  .chip {
+    /* Handoff wants 7px vertical padding; 8 (--lcs-space-3) is closest.
+     * 16px is the closest token to handoff's 17px chip type. */
+    padding: var(--lcs-space-3) var(--lcs-space-5);
+    font-size: var(--lcs-text-body);
+  }
+
+  .panelSlot {
+    position: absolute;
+    top: 100%;
+    /* Centered under the row (and so within the card), not anchored to the
+     * selected chip. `max-content` shrink-wraps the panel's 700px;
+     * `max-width` keeps it inside the card on narrower desktop windows. */
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 100%;
+    margin-top: var(--lcs-space-5);
+    /* The panel overflows the card's bottom edge (the card lifts its
+     * overflow clip while help is open) — stack it above the dock it
+     * overlays. */
+    z-index: var(--lcs-z-popover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
+  }
+}

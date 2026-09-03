@@ -1,0 +1,107 @@
+.root {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  /* Mobile: tighter top pad so the panel sits closer under the chips. */
+  padding: var(--lcs-space-4) var(--lcs-space-5) var(--lcs-space-5);
+  border-radius: var(--lcs-radius-xl);
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+/* Desktop close button, overlaid on the panel's top-right corner. */
+.close {
+  position: absolute;
+  top: var(--lcs-space-3);
+  right: var(--lcs-space-3);
+}
+
+.word {
+  margin: 0;
+  font-size: var(--lcs-text-h3);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.gloss {
+  margin: var(--lcs-space-1) 0 0;
+  color: var(--lcs-on-dark-75);
+  font-size: var(--lcs-text-caption);
+}
+
+.meta {
+  margin: var(--lcs-space-3) 0 0;
+  color: var(--lcs-on-dark-85);
+  font-size: var(--lcs-text-caption);
+}
+
+.divider {
+  height: var(--lcs-border-hairline);
+  margin: var(--lcs-space-4) 0;
+  background-color: var(--lcs-on-dark-12);
+}
+
+.loading {
+  margin: var(--lcs-space-3) 0 0;
+  color: var(--lcs-on-dark-75);
+  font-size: var(--lcs-text-caption);
+}
+
+.lessons {
+  display: grid;
+  margin: var(--lcs-space-3) 0 0;
+  padding: 0;
+  gap: var(--lcs-space-2);
+  grid-template-columns: 1fr;
+  list-style: none;
+}
+
+.lessonRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--lcs-space-2) 0;
+  color: var(--lcs-on-dark-85);
+  font-size: var(--lcs-text-caption);
+  gap: var(--lcs-space-4);
+}
+
+@media (min-width: 769px) {
+  /* 700px is the handoff's literal panel width, not a scale step. */
+  .root {
+    width: 700px;
+    max-width: 100%;
+    /* Long taught-in lists overflow the card freely up to half the
+     * viewport; past that the panel itself scrolls. */
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: var(--lcs-space-7);
+  }
+
+  .gloss {
+    margin-top: var(--lcs-space-2);
+  }
+
+  .meta {
+    margin-top: var(--lcs-space-4);
+  }
+
+  .divider {
+    margin: var(--lcs-space-6) 0;
+  }
+
+  .loading {
+    margin-top: var(--lcs-space-4);
+  }
+
+  .lessons {
+    margin-top: var(--lcs-space-4);
+    gap: var(--lcs-space-3);
+    /* One full-width column, matching the flashcard finder's vocab details —
+     * the handoff's two-column split read as cramped. */
+    grid-template-columns: 1fr;
+  }
+
+  .lessonRow {
+    padding: var(--lcs-space-3) 0;
+  }
+}

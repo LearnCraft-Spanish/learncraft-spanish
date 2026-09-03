@@ -1,0 +1,210 @@
+/* 20px is the handoff's literal frame radius — outside the token scale
+ * (sm/md/lg/xl/pill = 6/8/10/14/999), so it is a documented one-off rather
+ * than a snap to the nearest step. */
+.root {
+  display: flex;
+  position: relative;
+  box-sizing: border-box;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  /* Clip to radius so hint/help never visually “escape” the white plate. */
+  overflow: hidden;
+  padding: var(--lcs-space-7);
+  border: var(--lcs-border-hairline) solid var(--lcs-border-card);
+  border-radius: 20px;
+  /* Flat plate — no drop shadow (handoff is hairline border only). */
+  box-shadow: none;
+  background-color: var(--lcs-color-surface);
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  gap: var(--lcs-space-5);
+  text-align: center;
+}
+
+/* SRS only. The transition times the spring-back when a drag doesn't clear
+ * the grade threshold; `touch-action: pan-y` lets a vertical page scroll
+ * through while still capturing the horizontal swipe gesture. */
+.swipeable {
+  touch-action: pan-y;
+  transition: transform var(--lcs-motion-micro) var(--lcs-ease-standard);
+  user-select: none;
+}
+
+/* Full-card swipe tints, stacked above the card background and below its
+ * content (which relies on normal flow to stack over these two absolutely
+ * positioned, `pointer-events: none` layers). The handoff's rgba(184,50,50)
+ * and rgba(78,107,65) are exactly `--lcs-color-error`/`--lcs-color-success`,
+ * so those tokens are mixed to the handoff's literal 14% rather than
+ * hardcoding the colors. */
+.tintHard,
+.tintEasy {
+  position: absolute;
+  inset: 0;
+  /* The card's own `overflow: hidden` clips these to its radius, but help
+   * open lifts that clip (see the desktop block below) — so the tints carry
+   * the radius themselves. */
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.tintHard {
+  background-color: color-mix(in srgb, var(--lcs-color-error) 14%, transparent);
+}
+
+.tintEasy {
+  background-color: color-mix(
+    in srgb,
+    var(--lcs-color-success) 14%,
+    transparent
+  );
+}
+
+.root:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.utilityRow {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  cursor: default;
+}
+
+/* Stronger Dorado on the favourite star — muted token alone can read soft
+ * gray next to the blue audio tile on help chrome. margin-inline-start: auto
+ * keeps the star on the right when the audio tile is absent (CardAudioButton
+ * renders nothing). */
+.favourite {
+  margin-inline-start: auto;
+  color: #6f6259;
+
+  svg {
+    color: #6f6259;
+    stroke: currentColor;
+  }
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  overflow-y: auto;
+  gap: var(--lcs-space-7);
+}
+
+/* Left-aligns so the sentence does not move as the help panel grows. */
+.content.helpOpen {
+  justify-content: flex-start;
+}
+
+.face {
+  /* Handoff wants 26px mobile / 36px desktop — outside the type scale
+   * (body 16 / h3 18 / display-mobile 28 / display 40), so these are
+   * documented one-offs rather than snaps to the nearest step.
+   * Prompt/English stays regular 400 — never inherit parent bold. */
+  font-size: 26px;
+  font-weight: var(--lcs-weight-regular);
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+/* Explicit regular on non-bold runs so they cannot inherit bold. */
+.regular {
+  font-weight: var(--lcs-weight-regular);
+}
+
+/* Spanish runs in Spanglish faces (and markdown `**target**` words): bold
+ * AND italic, so Spanish reads as emphasis against the regular English. */
+.bold {
+  font-style: italic;
+  font-weight: var(--lcs-weight-bold);
+}
+
+.helpContent {
+  width: 100%;
+  animation: helpContentIn var(--lcs-motion-panel) var(--lcs-ease-standard);
+  cursor: default;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .helpContent {
+    /* Floor under the in-flow navy panel so Hide help isn’t crowded. */
+    padding-bottom: var(--lcs-space-4);
+  }
+}
+
+.helpButtonRow {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  cursor: default;
+}
+
+.hint {
+  flex: none;
+  margin: 0;
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+  text-align: center;
+}
+
+@keyframes helpContentIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 769px) {
+  .root {
+    padding: var(--lcs-space-8);
+  }
+
+  /* Desktop help: let the word panel spill past the card's bottom edge and
+   * overlay the dock rather than trapping it in the card's scroll region.
+   * The panel caps itself at 50vh and scrolls internally beyond that (see
+   * `WordPanel.module.scss`); the swipe tints keep the radius clip via their
+   * own `border-radius: inherit`. Mobile is untouched — its word details
+   * live in `WordPanelModal`, outside the card entirely. */
+  .root.helpOpen {
+    overflow: visible;
+  }
+
+  .content.helpOpen {
+    overflow-y: visible;
+  }
+
+  .face {
+    font-size: 36px;
+    line-height: 1.25;
+  }
+
+  .hint {
+    padding-bottom: var(--lcs-space-6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .helpContent {
+    animation: none;
+  }
+
+  /* Snaps the spring-back instantly instead of animating it. The rotate
+   * term of the drag transform itself is zeroed in JS — see
+   * `prefersReducedMotion` in `QuizCard.tsx`. */
+  .swipeable {
+    transition: none;
+  }
+}

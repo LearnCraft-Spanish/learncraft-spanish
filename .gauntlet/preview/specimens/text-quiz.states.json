@@ -1,0 +1,65 @@
+{
+  "states": [
+    {
+      "label": "A-mobile",
+      "formFactor": "mobile",
+      "query": "specimen=text-quiz&variant=srs&flipped=0"
+    },
+    {
+      "label": "A-mobile-help",
+      "formFactor": "mobile",
+      "query": "specimen=text-quiz&variant=srs&flipped=1&help=1&word=2&lessons=1"
+    },
+    {
+      "label": "A-mobile-help-chips",
+      "formFactor": "mobile",
+      "query": "specimen=text-quiz&variant=srs&flipped=1&help=1&extrawords=1"
+    },
+    {
+      "label": "A-desktop",
+      "formFactor": "desktop",
+      "query": "specimen=text-quiz&variant=srs&flipped=1"
+    },
+    {
+      "label": "A-desktop-help",
+      "formFactor": "desktop",
+      "query": "specimen=text-quiz&variant=srs&flipped=1&help=1&word=2&lessons=2"
+    },
+    {
+      "label": "A-desktop-help-overflow",
+      "formFactor": "desktop",
+      "query": "specimen=text-quiz&variant=srs&flipped=1&help=1&word=2&lessons=4"
+    },
+    {
+      "label": "B-mobile",
+      "formFactor": "mobile",
+      "query": "specimen=text-quiz&variant=plain&flipped=1"
+    },
+    {
+      "label": "B-mobile-help",
+      "formFactor": "mobile",
+      "query": "specimen=text-quiz&variant=plain&flipped=1&help=1&word=2&lessons=2"
+    },
+    {
+      "label": "B-mobile-help-chips",
+      "formFactor": "mobile",
+      "query": "specimen=text-quiz&variant=plain&flipped=1&help=1&extrawords=1"
+    },
+    {
+      "label": "B-desktop",
+      "formFactor": "desktop",
+      "query": "specimen=text-quiz&variant=plain&flipped=1"
+    },
+    {
+      "label": "B-desktop-help",
+      "formFactor": "desktop",
+      "query": "specimen=text-quiz&variant=plain&flipped=1&help=1&word=2&lessons=2"
+    },
+    {
+      "label": "B-desktop-help-overflow",
+      "formFactor": "desktop",
+      "query": "specimen=text-quiz&variant=plain&flipped=1&help=1&word=2&lessons=14"
+    }
+  ],
+  "barHint": "~/Downloads/design_handoff_text_quiz (Quiz Card Redesign.dc.html)"
+}

@@ -8,7 +8,11 @@ import { describe, expect, it } from 'vitest';
 function Group(): React.JSX.Element {
   const [selected, setSelected] = useState<'a' | 'b' | 'c'>('a');
   return (
-    <div role="radiogroup" aria-label="Example" onKeyDown={handleRadioGroupKeyDown}>
+    <div
+      role="radiogroup"
+      aria-label="Example"
+      onKeyDown={handleRadioGroupKeyDown}
+    >
       <SelectorCard
         icon="cards"
         label="A"

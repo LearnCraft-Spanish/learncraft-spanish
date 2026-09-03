@@ -7,6 +7,7 @@ import { PrimaryTabBar } from '@interface/components/AppHeader/PrimaryTabBar';
 import { Loading } from '@interface/components/Loading';
 import { LoggedOut } from '@interface/components/LoggedOut';
 import { SubHeaderComponent } from '@interface/components/SubHeader';
+import { useQuizActive } from '@interface/hooks/useQuizChrome';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
@@ -50,7 +51,9 @@ export const App: React.FC = () => {
   // Mobile chrome mirrors the desktop `PrimaryNav`: same gate
   // (`isAuthenticated`, no role check), just also requiring the home v2
   // flag, since the bar's four destinations are the v2 student surfaces.
-  const showMobileTabBar = isAuthenticated && studentHomeVersion === 'v2';
+  const quizActive = useQuizActive();
+  const showMobileTabBar =
+    isAuthenticated && studentHomeVersion === 'v2' && !quizActive;
 
   return (
     <div className="App">
