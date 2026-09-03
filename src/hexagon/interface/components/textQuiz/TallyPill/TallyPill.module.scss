@@ -1,28 +1,37 @@
 .root {
   position: absolute;
   top: 0;
+  box-sizing: border-box;
   display: none;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  /* Vertical capsules — handoff 44×68, icon stacked over count. */
   width: 44px;
-  /* 10px/14px are the handoff's literal pill padding, not scale steps once
-   * rounded to the nearest token (--lcs-space-4 / --lcs-space-6). */
-  padding: var(--lcs-space-4) var(--lcs-space-6);
+  min-height: 68px;
+  padding: var(--lcs-space-5) var(--lcs-space-4);
   border-radius: var(--lcs-radius-pill);
   gap: var(--lcs-space-1);
 }
 
-/* Border alpha (35%) intentionally differs from `QuizDock`'s dock-button
- * tints (45%) — the handoff specifies a lighter ring for the pill. */
+/* Soft pastel pills: 8% fill + 35% border like the handoff. Glyphs stay
+ * error/success-colored — never white / on-action. */
 .error {
-  border: var(--lcs-control-border) solid
+  border: var(--lcs-border-hairline) solid
     color-mix(in srgb, var(--lcs-color-error) 35%, transparent);
   background-color: color-mix(in srgb, var(--lcs-color-error) 8%, transparent);
   color: var(--lcs-color-error);
+
+  svg {
+    color: var(--lcs-color-error);
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.75;
+  }
 }
 
 .success {
-  border: var(--lcs-control-border) solid
+  border: var(--lcs-border-hairline) solid
     color-mix(in srgb, var(--lcs-color-success) 35%, transparent);
   background-color: color-mix(
     in srgb,
@@ -30,6 +39,13 @@
     transparent
   );
   color: var(--lcs-color-success);
+
+  svg {
+    color: var(--lcs-color-success);
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.75;
+  }
 }
 
 /* -64px is the handoff's literal flanking offset, not a scale step. */

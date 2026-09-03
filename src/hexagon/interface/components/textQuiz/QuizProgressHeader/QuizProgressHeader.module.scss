@@ -19,23 +19,51 @@
 }
 
 .miniPill {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  padding: var(--lcs-space-2) var(--lcs-space-5);
+  /* Handoff: padding 4px 10px — keep soft pastel pill, not icon discs. */
+  padding: 4px 10px;
   border-radius: var(--lcs-radius-pill);
   font-size: var(--lcs-text-caption);
   font-weight: var(--lcs-weight-bold);
-  gap: var(--lcs-space-2);
+  gap: 6px;
 }
 
+/* Soft 1.5px / 35% ring + 6% pastel fill. Glyphs MUST stay error/success
+ * ink (never white / on-action) — force stroke+color on the SVG. */
 .miniPill.hard {
-  background-color: var(--lcs-tint-error);
+  border: 1.5px solid
+    color-mix(in srgb, var(--lcs-color-error) 35%, transparent);
+  background-color: color-mix(in srgb, var(--lcs-color-error) 6%, transparent);
   color: var(--lcs-color-error);
+
+  svg {
+    color: var(--lcs-color-error) !important;
+    stroke: var(--lcs-color-error) !important;
+    fill: none !important;
+    opacity: 1;
+    stroke-width: 1.75;
+  }
 }
 
 .miniPill.easy {
-  background-color: var(--lcs-tint-success);
+  border: 1.5px solid
+    color-mix(in srgb, var(--lcs-color-success) 35%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--lcs-color-success) 6%,
+    transparent
+  );
   color: var(--lcs-color-success);
+
+  svg {
+    color: var(--lcs-color-success) !important;
+    stroke: var(--lcs-color-success) !important;
+    fill: none !important;
+    opacity: 1;
+    stroke-width: 1.75;
+  }
 }
 
 .desktopRow {

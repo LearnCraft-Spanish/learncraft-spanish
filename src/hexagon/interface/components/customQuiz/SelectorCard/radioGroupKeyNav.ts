@@ -15,9 +15,7 @@ export function handleRadioGroupKeyDown(
     return;
   }
   const radios = Array.from(
-    event.currentTarget.querySelectorAll<HTMLButtonElement>(
-      '[role="radio"]',
-    ),
+    event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="radio"]'),
   );
   const currentIndex = radios.indexOf(
     document.activeElement as HTMLButtonElement,
@@ -26,7 +24,8 @@ export function handleRadioGroupKeyDown(
     return;
   }
   event.preventDefault();
-  const direction = event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 1;
+  const direction =
+    event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 1;
   const nextIndex = (currentIndex + direction + radios.length) % radios.length;
   const next = radios[nextIndex];
   next.focus();

@@ -16,10 +16,15 @@
   flex: 1;
   align-items: center;
   justify-content: center;
-  border: var(--lcs-control-border) solid var(--lcs-border-card);
+  /* Parchment page fill + card border — 1px so the hairline-tone ring stays
+   * readable on parchment in 2× mobile captures (0.5px often vanishes). */
+  border: 1px solid var(--lcs-border-card);
   border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-page);
+  box-shadow: none;
   color: var(--lcs-color-muted);
   font-size: var(--lcs-text-caption);
+  font-weight: var(--lcs-weight-regular);
   text-align: center;
 }
 
@@ -56,7 +61,7 @@
 
 .hard {
   border: var(--lcs-control-border) solid
-    color-mix(in srgb, var(--lcs-color-error) 45%, transparent);
+    color-mix(in srgb, var(--lcs-color-error) 35%, transparent);
   background-color: color-mix(in srgb, var(--lcs-color-error) 8%, transparent);
   color: var(--lcs-color-error);
 }
@@ -67,7 +72,7 @@
 
 .easy {
   border: var(--lcs-control-border) solid
-    color-mix(in srgb, var(--lcs-color-success) 45%, transparent);
+    color-mix(in srgb, var(--lcs-color-success) 35%, transparent);
   background-color: color-mix(
     in srgb,
     var(--lcs-color-success) 8%,
@@ -84,10 +89,12 @@
   );
 }
 
+/* White plate + blue stroke vs solid Next — transparent/token fills read
+ * as a light-blue filled chip in mobile-help captures. */
 .previous {
-  border: var(--lcs-control-border) solid var(--lcs-color-action);
-  background: none;
-  color: var(--lcs-color-action);
+  border: 1.5px solid #449ac2;
+  background-color: var(--lcs-color-surface);
+  color: #449ac2;
 }
 
 .previous:hover:not(:disabled) {
@@ -100,12 +107,13 @@
 }
 
 .next {
-  border: none;
+  border: var(--lcs-control-border) solid var(--lcs-color-action);
   background-color: var(--lcs-color-action);
   color: var(--lcs-color-on-action);
 }
 
 .next:hover {
+  border-color: var(--lcs-color-action-hover);
   background-color: var(--lcs-color-action-hover);
 }
 

@@ -136,6 +136,18 @@
     --lcs-control-height-sm: 40px;
     --lcs-control-border: 1.5px;
 
+    /* Rendered height of the `AppHeader` bar: a control-height (44px) nav
+     * row inside space-6 (14px) vertical padding = 72px. `AppHeader.root`
+     * holds itself to this as a min-height, and full-viewport screens like
+     * `TextQuizV2` subtract it from 100dvh so they fill exactly the space
+     * the chrome leaves behind. Below 768px the header's padding steps
+     * down to space-4 around a control-height-sm (40px) account trigger —
+     * the media query at the foot of this layer switches the token to
+     * match (60px). */
+    --lcs-app-header-height: calc(
+      var(--lcs-control-height) + 2 * var(--lcs-space-6)
+    );
+
     /* Height of the fixed mobile `TabBar` (icon + label + its own vertical
      * padding), excluding the safe-area inset it also pads itself with.
      * `App.tsx` sets `--lcs-mobile-tabbar-offset` from this whenever
@@ -182,5 +194,17 @@
     --lcs-z-popover: 100;
     --lcs-z-menu: 110;
     --lcs-z-bottom-bar: 120;
+    /* Modal scrims sit above every persistent chrome layer, tab bar included. */
+    --lcs-z-modal: 130;
+  }
+
+  /* Mobile `AppHeader`: space-4 (10px) vertical padding around the 40px
+   * account trigger (the centered nav is hidden below 768px) = 60px. */
+  @media (max-width: 768px) {
+    :root {
+      --lcs-app-header-height: calc(
+        var(--lcs-control-height-sm) + 2 * var(--lcs-space-4)
+      );
+    }
   }
 }

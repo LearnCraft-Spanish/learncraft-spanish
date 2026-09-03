@@ -8,6 +8,14 @@ describe('quizFaceRuns', () => {
     ]);
   });
 
+  it('bolds a markdown **target** in an otherwise plain Spanish sentence', () => {
+    expect(quizFaceRuns('Lo **sabré** cuando ellos lo sepan.')).toEqual([
+      { text: 'Lo ', bold: false },
+      { text: 'sabré', bold: true },
+      { text: ' cuando ellos lo sepan.', bold: false },
+    ]);
+  });
+
   it('bolds only the Spanish of a Spanglish sentence', () => {
     expect(quizFaceRuns('Son de *wood.*')).toEqual([
       { text: 'Son de ', bold: true },

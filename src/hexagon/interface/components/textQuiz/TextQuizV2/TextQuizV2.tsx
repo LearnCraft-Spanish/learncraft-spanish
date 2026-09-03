@@ -8,6 +8,8 @@ import { QuizProgressHeader } from '@interface/components/textQuiz/QuizProgressH
 import { TallyPill } from '@interface/components/textQuiz/TallyPill';
 import { WordChips } from '@interface/components/textQuiz/WordChips';
 import { WordPanel } from '@interface/components/textQuiz/WordPanel';
+import { WordPanelModal } from '@interface/components/textQuiz/WordPanelModal';
+import { useMediaQuery } from '@interface/hooks/useMediaQuery';
 import { useEffect, useState } from 'react';
 import styles from './TextQuizV2.module.scss';
 
@@ -57,6 +59,10 @@ export function TextQuizV2({
   tallies,
 }: TextQuizV2Props): JSX.Element {
   const [selectedWordId, setSelectedWordId] = useState<number | null>(null);
+  /* Below the desktop breakpoint a selected word opens `WordPanelModal`
+   * instead of the chip-anchored panel — in-flow, the panel was cramped
+   * into the card's own scroll region. */
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   // A new card can never carry over the previous one's chip selection, even
   // if the caller navigates by some path other than `onPrevious`/`onNext`.
@@ -197,11 +203,12 @@ export function TextQuizV2({
       selectedId={selectedWordId}
       onSelect={handleSelectWord}
       panel={
-        selectedVocab ? (
+        !isMobile && selectedVocab ? (
           <WordPanel
             key={selectedVocab.id}
             vocabulary={selectedVocab}
             vocabInfoHook={vocabInfoHook}
+            onClose={() => setSelectedWordId(null)}
           />
         ) : undefined
       }
@@ -266,6 +273,15 @@ export function TextQuizV2({
       />
 
       <KeyboardHints srs={srs} />
+
+      {isMobile && selectedVocab && (
+        <WordPanelModal
+          key={selectedVocab.id}
+          vocabulary={selectedVocab}
+          vocabInfoHook={vocabInfoHook}
+          onClose={() => setSelectedWordId(null)}
+        />
+      )}
     </div>
   );
 }

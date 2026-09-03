@@ -6,8 +6,9 @@
   .root {
     display: flex;
     justify-content: center;
-    color: var(--lcs-color-muted);
-    font-size: var(--lcs-text-caption);
+    /* Ghost under the dock — softer than body muted. */
+    color: var(--lcs-color-placeholder);
+    font-size: var(--lcs-text-caption-mobile);
     gap: var(--lcs-space-3);
   }
 }
@@ -15,19 +16,43 @@
 .item {
   display: inline-flex;
   align-items: center;
-  gap: var(--lcs-space-3);
+  gap: var(--lcs-space-2);
 }
 
 .sep {
-  margin-right: var(--lcs-space-3);
+  margin-right: var(--lcs-space-2);
+  color: var(--lcs-border-card);
 }
 
+/* White keycap shell — shared by ← / space / →. Keep bg/border opaque;
+ * mute only the glyph span so the plate never reads flat grey. */
 .key {
-  padding: var(--lcs-space-1) var(--lcs-space-3);
-  border: var(--lcs-border-hairline) solid var(--lcs-border-control);
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 var(--lcs-space-2);
+  border: var(--lcs-control-border) solid rgba(60, 60, 60, 0.25);
   border-radius: var(--lcs-radius-sm);
-  background-color: var(--lcs-color-surface);
+  background-color: #ffffff;
+  color: var(--lcs-color-ink);
   font-family: inherit;
-  font-size: var(--lcs-text-caption);
+  font-size: var(--lcs-text-caption-mobile);
+  line-height: 1;
+}
+
+/* Space is the primary shortcut — full ink + bold. */
+.strong {
+  color: var(--lcs-color-ink);
   font-weight: var(--lcs-weight-bold);
+  opacity: 1;
+}
+
+/* Arrow glyphs only — shell stays solid white. */
+.muted {
+  color: var(--lcs-color-ink);
+  font-weight: var(--lcs-weight-regular);
+  opacity: 0.85;
 }

@@ -4,12 +4,16 @@ import type { JSX } from 'react';
 import { sortLessonsByCurrentCourse } from '@domain/functions/sortLessonsByCurrentCourse';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { Icon } from '@interface/components/general/Icon/Icon';
+import { IconButton } from '@interface/components/general/IconButton/IconButton';
 import styles from './WordPanel.module.scss';
 
 interface WordPanelProps {
   vocabulary: Vocabulary;
   /** `useVocabInfo` in production. A real hook — see the component note. */
   vocabInfoHook: (vocab: Vocabulary) => VocabInfo;
+  /** Renders an X in the top-right corner. Desktop only — the mobile
+   * `WordPanelModal` supplies its own close button. */
+  onClose?: () => void;
 }
 
 /**
@@ -21,6 +25,7 @@ interface WordPanelProps {
 export function WordPanel({
   vocabulary,
   vocabInfoHook,
+  onClose,
 }: WordPanelProps): JSX.Element {
   const info = vocabInfoHook(vocabulary);
   // No course context is available on this prop contract, so lessons sort
@@ -30,6 +35,17 @@ export function WordPanel({
 
   return (
     <div className={styles.root}>
+      {onClose && (
+        <div className={styles.close}>
+          <IconButton
+            icon="x"
+            label="Close word details"
+            size="sm"
+            tone="onDark"
+            onClick={onClose}
+          />
+        </div>
+      )}
       <p className={styles.word}>{info.word}</p>
       <p className={styles.gloss}>{info.descriptor}</p>
       <p className={styles.meta}>

@@ -64,6 +64,15 @@
   background: none;
 }
 
+/* Dorado — bare favourites and other quiet chrome. */
+.muted {
+  color: var(--lcs-color-muted);
+}
+
+.action {
+  color: var(--lcs-color-action);
+}
+
 .steel {
   color: var(--lcs-color-steel);
 }

@@ -30,9 +30,14 @@ export function TallyPill({
 
   return (
     <div className={className} role="status" aria-label={label}>
-      {/* `inherit` picks up the tone color set on `.root` below — `Icon`
-       * has no `success` tone, only `error`. */}
-      <Icon name={icon} tone="inherit" />
+      {/* Prefer `error` when available; success has no Icon tone — SCSS
+       * forces `--lcs-color-success` on the SVG (never white). `sm` softens
+       * desktop tally weight vs default md. */}
+      <Icon
+        name={icon}
+        size="sm"
+        tone={tone === 'error' ? 'error' : 'inherit'}
+      />
       <span className={styles.count}>{count}</span>
     </div>
   );

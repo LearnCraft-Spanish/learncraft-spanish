@@ -18,6 +18,17 @@
   margin: 0 auto;
   padding: 0 var(--lcs-page-pad);
   gap: var(--lcs-space-9);
+  /* Fill exactly the viewport the app chrome leaves behind. In the real
+   * app the quiz is mounted inside legacy pages (`ReviewMyFlashcards`,
+   * `CombinedCustomQuiz`, `OfficialQuiz`) whose plain block wrappers give
+   * no height, so `flex: 1` alone collapsed the card to content height.
+   * A definite height here is what lets `.cardRow`'s `flex: 1` stretch the
+   * card; over-tall help content then scrolls inside the card (`.content`
+   * in `QuizCard`) instead of pushing the dock off screen. Where a flex
+   * ancestor does provide height (the gauntlet specimen), `flex: 1` wins
+   * and this is ignored. */
+  height: calc(100vh - var(--lcs-app-header-height));
+  height: calc(100dvh - var(--lcs-app-header-height));
 }
 
 .cardRow {
@@ -37,5 +48,22 @@
   .root {
     padding: 0 var(--lcs-page-pad-narrow);
     gap: var(--lcs-space-6);
+    /* The fixed `PrimaryTabBar` covers the bottom edge on mobile; `App`
+     * reserves exactly `--lcs-mobile-tabbar-offset` of room for it (0px
+     * when the bar isn't mounted). Only subtracted here, below 768px —
+     * the bar is `display: none` on desktop even when the flag sets the
+     * variable. */
+    height: calc(
+      100vh - var(--lcs-app-header-height) - var(
+          --lcs-mobile-tabbar-offset,
+          0px
+        )
+    );
+    height: calc(
+      100dvh - var(--lcs-app-header-height) - var(
+          --lcs-mobile-tabbar-offset,
+          0px
+        )
+    );
   }
 }

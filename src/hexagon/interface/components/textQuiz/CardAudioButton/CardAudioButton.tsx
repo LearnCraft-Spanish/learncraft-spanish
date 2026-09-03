@@ -35,7 +35,9 @@ export function CardAudioButton({
       disabled={audioUrl === null}
       aria-label={label}
     >
-      <Icon name="volume" tone="action" />
+      {/* Inherit #449AC2 from the tile — `action` tone read washed in captures.
+       * Handoff glyph is 18px (`md`); `sm` (16) read undersized in B-mobile. */}
+      <Icon name="volume" size="md" tone="inherit" />
       {audioUrl !== null && <audio ref={audioRef} src={audioUrl} />}
     </button>
   );

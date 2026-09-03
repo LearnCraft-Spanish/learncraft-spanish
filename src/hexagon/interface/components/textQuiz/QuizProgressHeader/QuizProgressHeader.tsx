@@ -39,7 +39,7 @@ export function QuizProgressHeader({
             role="status"
             aria-label={`${tallies.hard} cards graded hard`}
           >
-            <Icon name="x" tone="inherit" />
+            <Icon name="x" tone="error" size="sm" />
             {tallies.hard}
           </span>
         )}
@@ -50,7 +50,8 @@ export function QuizProgressHeader({
             role="status"
             aria-label={`${tallies.easy} cards graded easy`}
           >
-            <Icon name="check" tone="inherit" />
+            {/* No Icon `success` tone — color forced in `.miniPill.easy svg`. */}
+            <Icon name="check" tone="inherit" size="sm" />
             {tallies.easy}
           </span>
         )}

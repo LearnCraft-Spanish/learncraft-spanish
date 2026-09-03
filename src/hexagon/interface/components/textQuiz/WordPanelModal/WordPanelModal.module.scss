@@ -1,0 +1,71 @@
+.scrim {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--lcs-space-7);
+  background-color: color-mix(
+    in srgb,
+    var(--lcs-color-surface-dark) 60%,
+    transparent
+  );
+  animation: scrimIn var(--lcs-motion-micro) var(--lcs-ease-standard);
+  inset: 0;
+  z-index: var(--lcs-z-modal);
+}
+
+.dialog {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  /* One-off geometry (no dialog-width token): phones are ≤430px, so this
+   * is full-width on the small screens this modal serves and centered on
+   * anything wider. */
+  max-width: 420px;
+  max-height: 100%;
+  overflow-y: auto;
+  border-radius: var(--lcs-radius-xl);
+  background-color: var(--lcs-color-surface-dark);
+  box-shadow: var(--lcs-shadow-menu);
+  animation: dialogIn var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+/* Programmatically focused on open (a11y) — never show a ring for it. */
+.dialog:focus {
+  outline: none;
+}
+
+.closeRow {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--lcs-space-3) var(--lcs-space-3) 0;
+}
+
+@keyframes scrimIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialogIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim,
+  .dialog {
+    animation: none;
+  }
+}

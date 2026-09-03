@@ -186,7 +186,13 @@ export function QuizCard({
       aria-label={`Flashcard, showing the ${
         answerShowing ? 'answer' : 'prompt'
       }. Press to flip.`}
-      className={srs ? `${styles.root} ${styles.swipeable}` : styles.root}
+      className={[
+        styles.root,
+        srs ? styles.swipeable : null,
+        helpOpen ? styles.helpOpen : null,
+      ]
+        .filter(Boolean)
+        .join(' ')}
       style={dragStyle}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
@@ -207,17 +213,25 @@ export function QuizCard({
       <div className={styles.utilityRow} onClick={stopPropagation}>
         <CardAudioButton audioUrl={audioUrl} label="Play sentence audio" />
         {favourite && (
-          <IconButton
-            icon={favourite.isFavourited ? 'starFilled' : 'star'}
-            label={
-              favourite.isFavourited
-                ? 'Remove from my flashcards'
-                : 'Add to my flashcards'
-            }
-            tone="muted"
-            disabled={favourite.isPending}
-            onClick={favourite.onToggle}
-          />
+          /* Handoff: bare Dorado star (no circular fill). `sm` keeps a
+           * square 32px hit target near the 34×34 audio tile. Glyph color
+           * is forced in `.favourite svg` so it stays Dorado, not steel. */
+          <span className={styles.favourite}>
+            <IconButton
+              icon={favourite.isFavourited ? 'starFilled' : 'star'}
+              label={
+                favourite.isFavourited
+                  ? 'Remove from my flashcards'
+                  : 'Add to my flashcards'
+              }
+              size="sm"
+              iconSize="lg"
+              tone="muted"
+              variant="bare"
+              disabled={favourite.isPending}
+              onClick={favourite.onToggle}
+            />
+          </span>
         )}
       </div>
 
@@ -231,7 +245,7 @@ export function QuizCard({
             ? quizFaceRuns(face.text).map((run, index) => (
                 <span
                   key={index}
-                  className={run.bold ? styles.bold : undefined}
+                  className={run.bold ? styles.bold : styles.regular}
                 >
                   {run.text}
                 </span>

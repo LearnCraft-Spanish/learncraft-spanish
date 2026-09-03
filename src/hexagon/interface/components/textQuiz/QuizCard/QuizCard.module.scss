@@ -8,9 +8,13 @@
   flex: 1;
   flex-direction: column;
   min-height: 0;
+  /* Clip to radius so hint/help never visually “escape” the white plate. */
+  overflow: hidden;
   padding: var(--lcs-space-7);
   border: var(--lcs-border-hairline) solid var(--lcs-border-card);
   border-radius: 20px;
+  /* Flat plate — no drop shadow (handoff is hairline border only). */
+  box-shadow: none;
   background-color: var(--lcs-color-surface);
   color: var(--lcs-color-ink);
   cursor: pointer;
@@ -37,6 +41,10 @@
 .tintEasy {
   position: absolute;
   inset: 0;
+  /* The card's own `overflow: hidden` clips these to its radius, but help
+   * open lifts that clip (see the desktop block below) — so the tints carry
+   * the radius themselves. */
+  border-radius: inherit;
   pointer-events: none;
 }
 
@@ -65,6 +73,17 @@
   cursor: default;
 }
 
+/* Stronger Dorado on the favourite star — muted token alone can read soft
+ * gray next to the blue audio tile on help chrome. */
+.favourite {
+  color: #6f6259;
+
+  svg {
+    color: #6f6259;
+    stroke: currentColor;
+  }
+}
+
 .content {
   display: flex;
   flex: 1;
@@ -84,11 +103,17 @@
 .face {
   /* Handoff wants 26px mobile / 36px desktop — outside the type scale
    * (body 16 / h3 18 / display-mobile 28 / display 40), so these are
-   * documented one-offs rather than snaps to the nearest step. */
+   * documented one-offs rather than snaps to the nearest step.
+   * Prompt/English stays regular 400 — never inherit parent bold. */
   font-size: 26px;
   font-weight: var(--lcs-weight-regular);
   line-height: 1.35;
   text-wrap: pretty;
+}
+
+/* Explicit regular on non-bold runs so they cannot inherit bold. */
+.regular {
+  font-weight: var(--lcs-weight-regular);
 }
 
 .bold {
@@ -100,6 +125,13 @@
   animation: helpContentIn var(--lcs-motion-panel) var(--lcs-ease-standard);
   cursor: default;
   text-align: left;
+}
+
+@media (max-width: 768px) {
+  .helpContent {
+    /* Floor under the in-flow navy panel so Hide help isn’t crowded. */
+    padding-bottom: var(--lcs-space-4);
+  }
 }
 
 .helpButtonRow {
@@ -132,6 +164,20 @@
 @media (min-width: 769px) {
   .root {
     padding: var(--lcs-space-8);
+  }
+
+  /* Desktop help: let the word panel spill past the card's bottom edge and
+   * overlay the dock rather than trapping it in the card's scroll region.
+   * The panel caps itself at 50vh and scrolls internally beyond that (see
+   * `WordPanel.module.scss`); the swipe tints keep the radius clip via their
+   * own `border-radius: inherit`. Mobile is untouched — its word details
+   * live in `WordPanelModal`, outside the card entirely. */
+  .root.helpOpen {
+    overflow: visible;
+  }
+
+  .content.helpOpen {
+    overflow-y: visible;
   }
 
   .face {

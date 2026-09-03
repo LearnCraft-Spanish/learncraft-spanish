@@ -7,3 +7,4 @@ export * from '@interface/components/textQuiz/TallyPill';
 export * from '@interface/components/textQuiz/TextQuizV2';
 export * from '@interface/components/textQuiz/WordChips';
 export * from '@interface/components/textQuiz/WordPanel';
+export * from '@interface/components/textQuiz/WordPanelModal';

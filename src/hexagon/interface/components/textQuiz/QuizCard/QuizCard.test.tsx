@@ -122,4 +122,16 @@ describe('quiz card', () => {
     expect(onGrade).not.toHaveBeenCalled();
     expect(onFlip).toHaveBeenCalledOnce();
   });
+
+  /* The `helpOpen` root class is what lifts the card's overflow clip on
+   * desktop so the word panel can spill past the card's bottom edge
+   * (see `QuizCard.module.scss`). */
+  it('carries the helpOpen class only while help is open', () => {
+    renderCard({ helpOpen: true, helpContent: <div>chips</div> });
+    expect(getCard().className).toContain('helpOpen');
+
+    cleanup();
+    renderCard({ helpOpen: false });
+    expect(getCard().className).not.toContain('helpOpen');
+  });
 });

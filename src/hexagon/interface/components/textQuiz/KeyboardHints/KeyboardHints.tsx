@@ -35,7 +35,13 @@ export function KeyboardHints({ srs }: KeyboardHintsProps): JSX.Element {
       {hints.map((hint, index) => (
         <span className={styles.item} key={hint.label}>
           {index > 0 && <span className={styles.sep}>·</span>}
-          <kbd className={styles.key}>{hint.key}</kbd>
+          <kbd className={styles.key}>
+            <span
+              className={hint.key === 'space' ? styles.strong : styles.muted}
+            >
+              {hint.key}
+            </span>
+          </kbd>
           <span>{hint.label}</span>
         </span>
       ))}
