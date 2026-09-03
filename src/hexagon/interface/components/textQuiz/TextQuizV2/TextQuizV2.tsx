@@ -11,7 +11,7 @@ import { WordChips } from '@interface/components/textQuiz/WordChips';
 import { WordPanel } from '@interface/components/textQuiz/WordPanel';
 import { WordPanelModal } from '@interface/components/textQuiz/WordPanelModal';
 import { useMediaQuery } from '@interface/hooks/useMediaQuery';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './TextQuizV2.module.scss';
 
 const INTERACTIVE_TAGS = new Set([
@@ -120,6 +120,23 @@ export function TextQuizV2({
     onGrade?.(difficulty);
   }
 
+  // Keep one stable document listener; read latest handlers from the ref so
+  // we do not tear down / re-add on every render.
+  const keyActionsRef = useRef({
+    srs,
+    handleFlip,
+    handleGrade,
+    handlePrevious,
+    handleNext,
+  });
+  keyActionsRef.current = {
+    srs,
+    handleFlip,
+    handleGrade,
+    handlePrevious,
+    handleNext,
+  };
+
   // The keyboard legend in `KeyboardHints` advertises these shortcuts, so
   // they are wired globally rather than only while the card has focus. Space
   // is suppressed when a control already owns it (buttons, the card, chips);
@@ -127,12 +144,13 @@ export function TextQuizV2({
   // caret — prev/next and SRS grading still work from the card or dock.
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent): void {
+      const actions = keyActionsRef.current;
       if (event.key === ' ') {
         if (isFocusOnInteractiveElement()) {
           return;
         }
         event.preventDefault();
-        handleFlip();
+        actions.handleFlip();
         return;
       }
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
@@ -141,25 +159,25 @@ export function TextQuizV2({
         }
       }
       if (event.key === 'ArrowLeft') {
-        if (srs) {
-          handleGrade('hard');
+        if (actions.srs) {
+          actions.handleGrade('hard');
         } else {
-          handlePrevious();
+          actions.handlePrevious();
         }
         return;
       }
       if (event.key === 'ArrowRight') {
-        if (srs) {
-          handleGrade('easy');
+        if (actions.srs) {
+          actions.handleGrade('easy');
         } else {
-          handleNext();
+          actions.handleNext();
         }
       }
     }
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [srs, handleFlip, handleGrade, handlePrevious, handleNext]);
+  }, []);
 
   if (!quizExample) {
     return (
@@ -182,15 +200,16 @@ export function TextQuizV2({
     ? { text: answer.text, spanish: answer.spanish }
     : { text: question.text, spanish: question.spanish };
   const spanishText = question.spanish ? question.text : answer.text;
-  const audioUrl = answerShowing
-    ? answer.hasAudio
+  // Same policy as legacy `FlashcardDisplay`: prefer the current face's
+  // clip, but if the answer face has none, fall back to the question clip
+  // (usually Spanish). Do not do the reverse on the prompt — we should not
+  // play answer-face audio before the student has flipped.
+  const audioUrl =
+    answerShowing && answer.hasAudio
       ? answer.audioUrl
       : question.hasAudio
         ? question.audioUrl
-        : null
-    : question.hasAudio
-      ? question.audioUrl
-      : null;
+        : null;
   const showHelpButton = answerShowing && answer.vocabComplete;
 
   const flipHint = isMobile ? 'Tap to flip' : 'Click to flip';
