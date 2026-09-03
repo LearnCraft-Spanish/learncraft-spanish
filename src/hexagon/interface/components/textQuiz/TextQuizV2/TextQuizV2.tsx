@@ -1,6 +1,7 @@
 import type { SrsDifficulty } from '@domain/srs';
 import type { TextQuizV2Props } from '@interface/components/textQuiz/TextQuizV2/TextQuizV2.types';
 import type { JSX } from 'react';
+import { orderVocabularyByAppearance } from '@domain/functions/orderVocabularyByAppearance';
 import { KeyboardHints } from '@interface/components/textQuiz/KeyboardHints';
 import { QuizCard } from '@interface/components/textQuiz/QuizCard';
 import { QuizDock } from '@interface/components/textQuiz/QuizDock';
@@ -180,6 +181,7 @@ export function TextQuizV2({
   const face = answerShowing
     ? { text: answer.text, spanish: answer.spanish }
     : { text: question.text, spanish: question.spanish };
+  const spanishText = question.spanish ? question.text : answer.text;
   const audioUrl = answerShowing
     ? answer.hasAudio
       ? answer.audioUrl
@@ -220,7 +222,7 @@ export function TextQuizV2({
 
   const helpContent = getHelpIsOpen ? (
     <WordChips
-      vocabulary={answer.vocabulary}
+      vocabulary={orderVocabularyByAppearance(spanishText, answer.vocabulary)}
       selectedId={selectedWordId}
       onSelect={handleSelectWord}
       panel={

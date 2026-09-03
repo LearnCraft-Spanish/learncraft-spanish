@@ -164,6 +164,31 @@ describe('text quiz v2 word details', () => {
 
     expect(screen.queryByText(/LearnCraft Spanish lesson 12/)).toBeNull();
   });
+
+  it('orders help chips by first appearance in the Spanish text', () => {
+    stubMobile(false);
+    renderQuizWithProps({
+      quizExample: {
+        ...QUIZ_EXAMPLE,
+        answer: {
+          ...QUIZ_EXAMPLE.answer,
+          text: 'El gato come pescado.',
+          vocabulary: [
+            { id: 3, word: 'pescado' },
+            { id: 1, word: 'el' },
+            { id: 2, word: 'come' },
+          ],
+        },
+      } as unknown as FlashcardForDisplay,
+    });
+
+    const chips = screen.getAllByRole('button', { pressed: false });
+    expect(chips.map((chip) => chip.textContent)).toEqual([
+      'el',
+      'come',
+      'pescado',
+    ]);
+  });
 });
 
 describe('text quiz v2 flip hint copy', () => {
