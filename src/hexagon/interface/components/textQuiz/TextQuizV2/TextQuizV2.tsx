@@ -21,6 +21,8 @@ const INTERACTIVE_TAGS = new Set([
   'SELECT',
 ]);
 
+const TEXT_ENTRY_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
+
 /** True while focus sits on a control that already owns its own key handling. */
 function isFocusOnInteractiveElement(): boolean {
   const active = document.activeElement;
@@ -31,6 +33,15 @@ function isFocusOnInteractiveElement(): boolean {
     INTERACTIVE_TAGS.has(active.tagName) ||
     active.getAttribute('role') === 'button'
   );
+}
+
+/** True while focus sits in a field where arrow keys move the caret. */
+function isFocusOnTextEntry(): boolean {
+  const active = document.activeElement;
+  if (!(active instanceof HTMLElement)) {
+    return false;
+  }
+  return TEXT_ENTRY_TAGS.has(active.tagName) || active.isContentEditable;
 }
 
 /**
@@ -57,6 +68,7 @@ export function TextQuizV2({
   onNext,
   onGrade,
   tallies,
+  onExit,
 }: TextQuizV2Props): JSX.Element {
   const [selectedWordId, setSelectedWordId] = useState<number | null>(null);
   /* Below the desktop breakpoint a selected word opens `WordPanelModal`
@@ -108,18 +120,24 @@ export function TextQuizV2({
   }
 
   // The keyboard legend in `KeyboardHints` advertises these shortcuts, so
-  // they are wired globally rather than only while the card has focus. Any
-  // control that already owns Space/Enter (the card itself, a chip, Get
-  // help, Previous/Next) is left alone so it is not double-handled.
+  // they are wired globally rather than only while the card has focus. Space
+  // is suppressed when a control already owns it (buttons, the card, chips);
+  // arrow keys are suppressed only in text-entry fields where they move the
+  // caret — prev/next and SRS grading still work from the card or dock.
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent): void {
-      if (isFocusOnInteractiveElement()) {
-        return;
-      }
       if (event.key === ' ') {
+        if (isFocusOnInteractiveElement()) {
+          return;
+        }
         event.preventDefault();
         handleFlip();
         return;
+      }
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        if (isFocusOnTextEntry()) {
+          return;
+        }
       }
       if (event.key === 'ArrowLeft') {
         if (srs) {
@@ -151,6 +169,7 @@ export function TextQuizV2({
           quizLength={quizLength}
           srs={srs}
           tallies={tallies}
+          onExit={onExit}
         />
         <p className={styles.empty}>No card to show.</p>
       </div>
@@ -172,13 +191,15 @@ export function TextQuizV2({
       : null;
   const showHelpButton = answerShowing && answer.vocabComplete;
 
+  const flipHint = isMobile ? 'Tap to flip' : 'Click to flip';
+
   const hintText = getHelpIsOpen
     ? 'Tap a word for its lesson'
     : !answerShowing
-      ? 'Tap to flip'
+      ? flipHint
       : srs
         ? 'Swipe to grade · left hard, right easy'
-        : 'Tap the card to see the prompt again';
+        : flipHint;
 
   const selectedVocab =
     selectedWordId !== null
@@ -223,6 +244,7 @@ export function TextQuizV2({
         quizLength={quizLength}
         srs={srs}
         tallies={tallies}
+        onExit={onExit}
       />
 
       <div className={styles.cardRow}>

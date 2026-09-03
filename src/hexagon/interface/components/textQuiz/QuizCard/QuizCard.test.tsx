@@ -134,4 +134,39 @@ describe('quiz card', () => {
     renderCard({ helpOpen: false });
     expect(getCard().className).not.toContain('helpOpen');
   });
+
+  it('renders no audio button when audioUrl is null', () => {
+    renderCard({ audioUrl: null });
+
+    expect(
+      screen.queryByRole('button', { name: 'Play sentence audio' }),
+    ).toBeNull();
+  });
+
+  it('renders an enabled audio button when audioUrl is present', () => {
+    renderCard({ audioUrl: 'https://example.com/audio.mp3' });
+
+    const audioButton = screen.getByRole('button', {
+      name: 'Play sentence audio',
+    });
+    expect(audioButton.hasAttribute('disabled')).toBe(false);
+  });
+
+  it('still renders the favourite control when audio is absent', () => {
+    renderCard({
+      audioUrl: null,
+      favourite: {
+        isFavourited: false,
+        isPending: false,
+        onToggle: vi.fn(),
+      },
+    });
+
+    expect(
+      screen.queryByRole('button', { name: 'Play sentence audio' }),
+    ).toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'Add to my flashcards' }),
+    ).toBeTruthy();
+  });
 });

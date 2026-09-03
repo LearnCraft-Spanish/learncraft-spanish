@@ -5,7 +5,8 @@ import {
   createMockTextQuizReturnWithExamples,
 } from '@application/units/useTextQuiz/useTextQuiz.mock';
 import { TextQuizV2Screen } from '@interface/components/Quizzing/TextQuiz/TextQuizV2Screen';
-import { cleanup, render, screen } from '@testing-library/react';
+import { setQuizActive, useQuizActive } from '@interface/hooks/useQuizChrome';
+import { cleanup, render, renderHook, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
@@ -29,6 +30,7 @@ describe('textQuizV2Screen', () => {
 
   afterEach(() => {
     cleanup();
+    setQuizActive(false);
   });
 
   it('shows the loading screen while examples load', () => {
@@ -207,6 +209,96 @@ describe('textQuizV2Screen', () => {
     expect(
       screen.getAllByRole('status', { name: '2 cards graded easy' }).length,
     ).toBeGreaterThan(0);
+  });
+
+  it('sets quiz active while an active card is showing', () => {
+    render(
+      <MockAllProviders>
+        <TextQuizV2Screen
+          useTextQuizReturn={createMockTextQuizReturnWithExamples(mockExamples)}
+        />
+      </MockAllProviders>,
+    );
+
+    const { result } = renderHook(() => useQuizActive());
+    expect(result.current).toBe(true);
+  });
+
+  it('does not set quiz active while loading', () => {
+    render(
+      <MockAllProviders>
+        <TextQuizV2Screen
+          useTextQuizReturn={createMockTextQuizReturn({
+            examplesAreLoading: true,
+          })}
+        />
+      </MockAllProviders>,
+    );
+
+    const { result } = renderHook(() => useQuizActive());
+    expect(result.current).toBe(false);
+  });
+
+  it('clears quiz active when the quiz completes', () => {
+    const { rerender } = render(
+      <MockAllProviders>
+        <TextQuizV2Screen
+          useTextQuizReturn={createMockTextQuizReturnWithExamples(mockExamples)}
+        />
+      </MockAllProviders>,
+    );
+
+    const { result } = renderHook(() => useQuizActive());
+    expect(result.current).toBe(true);
+
+    rerender(
+      <MockAllProviders>
+        <TextQuizV2Screen
+          useTextQuizReturn={createMockTextQuizReturn({
+            quizLength: 3,
+            isQuizComplete: true,
+          })}
+        />
+      </MockAllProviders>,
+    );
+
+    expect(result.current).toBe(false);
+  });
+
+  it('clears quiz active on unmount', () => {
+    const view = render(
+      <MockAllProviders>
+        <TextQuizV2Screen
+          useTextQuizReturn={createMockTextQuizReturnWithExamples(mockExamples)}
+        />
+      </MockAllProviders>,
+    );
+
+    const { result } = renderHook(() => useQuizActive());
+    expect(result.current).toBe(true);
+
+    view.unmount();
+    expect(result.current).toBe(false);
+  });
+
+  it('calls cleanupFunction when the back control is clicked', async () => {
+    const user = userEvent.setup();
+    const cleanupFunction = vi.fn();
+    const useTextQuizReturn =
+      createMockTextQuizReturnWithExamples(mockExamples);
+    useTextQuizReturn.cleanupFunction = cleanupFunction;
+
+    render(
+      <MockAllProviders>
+        <TextQuizV2Screen useTextQuizReturn={useTextQuizReturn} />
+      </MockAllProviders>,
+    );
+
+    await user.click(
+      screen.getAllByRole('button', { name: 'Back to quiz setup' })[0],
+    );
+
+    expect(cleanupFunction).toHaveBeenCalledOnce();
   });
 
   it('passes addPendingRemoveProps through to the favourite control', async () => {

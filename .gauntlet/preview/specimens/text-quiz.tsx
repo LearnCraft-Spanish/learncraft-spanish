@@ -162,6 +162,7 @@ export function TextQuizSpecimen(): JSX.Element {
     addPendingRemoveProps: ADD_PENDING_REMOVE_PROPS,
     onPrevious: noop,
     onNext: noop,
+    onExit: noop,
     ...(srs ? { onGrade: noop, tallies: TALLIES } : {}),
   };
 

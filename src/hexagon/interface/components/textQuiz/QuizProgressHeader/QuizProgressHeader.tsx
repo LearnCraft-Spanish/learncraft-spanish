@@ -2,6 +2,7 @@ import type { SrsTallies } from '@domain/functions/srsTallies';
 import type { JSX } from 'react';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { Icon } from '@interface/components/general/Icon/Icon';
+import { IconButton } from '@interface/components/general/IconButton/IconButton';
 import styles from './QuizProgressHeader.module.scss';
 
 interface QuizProgressHeaderProps {
@@ -11,12 +12,15 @@ interface QuizProgressHeaderProps {
   quizLength: number;
   srs: boolean;
   tallies?: SrsTallies;
+  /** Exits the quiz back to quiz setup. */
+  onExit: () => void;
 }
 
 /**
- * Position readout, progress track, the desktop context line, and the
- * mobile tally pills. The desktop tally pills flank the card itself — see
- * `TallyPill`.
+ * Position readout, progress track, the desktop context line with its back
+ * arrow (desktop-only — the mobile row drops it to keep the counter and
+ * tally pills balanced), and the mobile tally pills. The desktop tally
+ * pills flank the card itself — see `TallyPill`.
  */
 export function QuizProgressHeader({
   quizTitle,
@@ -24,14 +28,27 @@ export function QuizProgressHeader({
   quizLength,
   srs,
   tallies,
+  onExit,
 }: QuizProgressHeaderProps): JSX.Element {
   const percent =
     quizLength > 0 ? Math.min(100, (exampleNumber / quizLength) * 100) : 0;
   const position = `${exampleNumber} / ${quizLength}`;
   const showTallies = srs && tallies !== undefined;
 
+  const backButton = (
+    <IconButton
+      icon="arrowLeft"
+      label="Back to quiz setup"
+      onClick={onExit}
+      size="sm"
+    />
+  );
+
   return (
     <div className={styles.root}>
+      {/* No back arrow in the mobile row on purpose: it unbalanced the
+       * centered counter and tally pills. Mobile exit UI returns elsewhere
+       * later; desktop keeps the arrow in `.desktopRow` below. */}
       <div className={styles.mobileRow}>
         {showTallies && (
           <span
@@ -58,12 +75,15 @@ export function QuizProgressHeader({
       </div>
 
       <div className={styles.desktopRow}>
-        {quizTitle !== undefined && (
-          <div className={styles.context}>
-            <Eyebrow as="h2">Quizzing my flashcards</Eyebrow>
-            <p className={styles.title}>{quizTitle}</p>
-          </div>
-        )}
+        <div className={styles.leftGroup}>
+          {backButton}
+          {quizTitle !== undefined && (
+            <div className={styles.context}>
+              <Eyebrow as="h2">Quizzing my flashcards</Eyebrow>
+              <p className={styles.title}>{quizTitle}</p>
+            </div>
+          )}
+        </div>
         <span className={styles.positionDesktop}>{position}</span>
       </div>
 

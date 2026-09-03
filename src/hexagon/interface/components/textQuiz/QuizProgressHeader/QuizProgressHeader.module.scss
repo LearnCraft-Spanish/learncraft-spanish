@@ -70,6 +70,15 @@
   display: none;
 }
 
+.leftGroup {
+  display: flex;
+  /* Arrow pinned to the TOP of the row — bottom-aligned it read as hanging
+   * off the title's baseline. */
+  align-items: flex-start;
+  gap: var(--lcs-space-4);
+  min-width: 0;
+}
+
 .positionDesktop {
   color: var(--lcs-color-muted);
   font-size: var(--lcs-text-body);

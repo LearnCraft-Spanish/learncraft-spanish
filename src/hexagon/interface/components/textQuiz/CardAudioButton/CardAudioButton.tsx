@@ -4,21 +4,25 @@ import { useRef } from 'react';
 import styles from './CardAudioButton.module.scss';
 
 interface CardAudioButtonProps {
-  /** `null` disables the tile — the current face has no audio. */
+  /** `null` means the current face has no audio — nothing renders. */
   audioUrl: string | null;
   label: string;
 }
 
 /**
- * The 34×34 tinted tile that plays the current face's sentence audio. Never
- * flips the card, so its click handler stops propagation before the card's
- * own click handler ever sees it.
+ * The 34×34 tinted tile that plays the current face's sentence audio. Renders
+ * nothing when `audioUrl` is null. Never flips the card, so its click handler
+ * stops propagation before the card's own click handler ever sees it.
  */
 export function CardAudioButton({
   audioUrl,
   label,
-}: CardAudioButtonProps): JSX.Element {
+}: CardAudioButtonProps): JSX.Element | null {
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  if (audioUrl === null) {
+    return null;
+  }
 
   function handleClick(event: MouseEvent<HTMLButtonElement>): void {
     event.stopPropagation();
@@ -32,13 +36,12 @@ export function CardAudioButton({
       type="button"
       className={styles.root}
       onClick={handleClick}
-      disabled={audioUrl === null}
       aria-label={label}
     >
       {/* Inherit #449AC2 from the tile — `action` tone read washed in captures.
        * Handoff glyph is 18px (`md`); `sm` (16) read undersized in B-mobile. */}
       <Icon name="volume" size="md" tone="inherit" />
-      {audioUrl !== null && <audio ref={audioRef} src={audioUrl} />}
+      <audio ref={audioRef} src={audioUrl} />
     </button>
   );
 }

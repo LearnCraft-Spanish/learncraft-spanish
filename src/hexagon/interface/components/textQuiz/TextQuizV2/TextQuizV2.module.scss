@@ -1,11 +1,11 @@
 /*
  * No `PageShell` here on purpose: this is a feature component, not a page
- * (compare `customQuiz/CustomQuizSetup`, which is also unwrapped — the page
- * that renders it wraps it in `PageShell`). Wiring this screen into a route
- * is a later pass; that page will supply the parchment background, the
- * `--lcs-font-sans` font, and the 1240px outer column. This component only
- * owns its own 860px-max inner column, reusing the same page-padding tokens
- * `PageShell` itself switches on at the same breakpoint.
+ * (compare `customQuiz/CustomQuizSetup`, which is also unwrapped). It mounts
+ * inside legacy pages (`ReviewMyFlashcards`, `CombinedCustomQuiz`, `OfficialQuiz`)
+ * that do not wrap it in `PageShell`, so this component paints its own
+ * `--lcs-color-page` background instead of inheriting the old paper texture.
+ * The 860px-max inner column reuses the same page-padding tokens `PageShell`
+ * switches on at the same breakpoint.
  */
 .root {
   box-sizing: border-box;
@@ -16,7 +16,16 @@
   flex-direction: column;
   min-height: 0;
   margin: 0 auto;
-  padding: 0 var(--lcs-page-pad);
+  /* Full-bleed page color: the column is 860px wide but legacy wrappers leave
+   * the old parchment texture visible on the sides — box-shadow + clip-path
+   * paints `--lcs-color-page` across the full viewport width. */
+  background-color: var(--lcs-color-page);
+  box-shadow: 0 0 0 100vmax var(--lcs-color-page);
+  clip-path: inset(0 -100vmax);
+  /* Bottom padding matches the top: the keyboard legend (desktop) and the
+   * dock buttons (mobile) are the last elements, and neither should sit
+   * flush against the bottom edge of the page. */
+  padding: var(--lcs-space-9) var(--lcs-page-pad);
   gap: var(--lcs-space-9);
   /* Fill exactly the viewport the app chrome leaves behind. In the real
    * app the quiz is mounted inside legacy pages (`ReviewMyFlashcards`,
@@ -46,7 +55,7 @@
 
 @media (max-width: 768px) {
   .root {
-    padding: 0 var(--lcs-page-pad-narrow);
+    padding: var(--lcs-space-6) var(--lcs-page-pad-narrow);
     gap: var(--lcs-space-6);
     /* The fixed `PrimaryTabBar` covers the bottom edge on mobile; `App`
      * reserves exactly `--lcs-mobile-tabbar-offset` of room for it (0px

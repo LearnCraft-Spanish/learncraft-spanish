@@ -74,8 +74,11 @@
 }
 
 /* Stronger Dorado on the favourite star — muted token alone can read soft
- * gray next to the blue audio tile on help chrome. */
+ * gray next to the blue audio tile on help chrome. margin-inline-start: auto
+ * keeps the star on the right when the audio tile is absent (CardAudioButton
+ * renders nothing). */
 .favourite {
+  margin-inline-start: auto;
   color: #6f6259;
 
   svg {
@@ -116,7 +119,10 @@
   font-weight: var(--lcs-weight-regular);
 }
 
+/* Spanish runs in Spanglish faces (and markdown `**target**` words): bold
+ * AND italic, so Spanish reads as emphasis against the regular English. */
 .bold {
+  font-style: italic;
   font-weight: var(--lcs-weight-bold);
 }
 
@@ -183,6 +189,10 @@
   .face {
     font-size: 36px;
     line-height: 1.25;
+  }
+
+  .hint {
+    padding-bottom: var(--lcs-space-6);
   }
 }
 

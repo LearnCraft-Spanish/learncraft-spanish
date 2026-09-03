@@ -8,7 +8,8 @@ import PMFPopup from '@interface/components/PMFPopup';
 import TextQuizEnd from '@interface/components/Quizzing/general/TextQuizEnd';
 import NoDueFlashcards from '@interface/components/Quizzing/TextQuiz/NoDueFlashcards';
 import { TextQuizV2 } from '@interface/components/textQuiz/TextQuizV2';
-import { useCallback } from 'react';
+import { setQuizActive } from '@interface/hooks/useQuizChrome';
+import { useCallback, useEffect } from 'react';
 
 export interface TextQuizV2ScreenProps {
   quizTitle?: string;
@@ -46,6 +47,13 @@ export function TextQuizV2Screen({
     getHelpIsOpen,
     setGetHelpIsOpen,
   } = useTextQuizReturn;
+
+  const quizCardActive = !examplesAreLoading && !!quizLength && !isQuizComplete;
+
+  useEffect(() => {
+    setQuizActive(quizCardActive);
+    return () => setQuizActive(false);
+  }, [quizCardActive]);
 
   // Mirrors `SRSButtons.handleReviewAndIncrementExample`: grading and
   // advancing are one action in the v2 dock (button, swipe, or arrow key).
@@ -98,6 +106,7 @@ export function TextQuizV2Screen({
                 ? countSrsTallies(srsQuizProps.examplesReviewedResults)
                 : undefined
             }
+            onExit={cleanupFunction}
           />
         ))}
     </>

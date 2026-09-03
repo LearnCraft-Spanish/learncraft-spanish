@@ -34,4 +34,6 @@ export interface TextQuizV2Props {
   onGrade?: (difficulty: SrsDifficulty) => void;
   /** SRS only. Running counts of what has been graded this quiz. */
   tallies?: SrsTallies;
+  /** Exits the quiz back to quiz setup. */
+  onExit: () => void;
 }
