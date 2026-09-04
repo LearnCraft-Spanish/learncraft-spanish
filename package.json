@@ -100,6 +100,7 @@
     "@stryker-mutator/typescript-checker": "^8.7.1",
     "@stryker-mutator/vitest-runner": "^8.7.1",
     "@tanstack/eslint-plugin-query": "^5.66.1",
+    "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@types/eslint-config-prettier": "^6.11.3",
