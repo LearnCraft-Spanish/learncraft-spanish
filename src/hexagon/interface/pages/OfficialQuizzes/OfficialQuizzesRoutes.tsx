@@ -1,7 +1,9 @@
 import { useOfficialQuizzes } from '@application/useCases/useOfficialQuizzes/useOfficialQuizzes';
+import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
 import { Loading } from '@interface/components/Loading';
 import { OfficialQuiz } from '@interface/components/Quizzing/OfficialQuiz';
 import { OfficialQuizSetupMenu } from '@interface/pages/OfficialQuizzes/OfficialQuizSetupMenu';
+import { OfficialQuizSetupMenuV2 } from '@interface/pages/OfficialQuizzes/OfficialQuizSetupMenuV2';
 import React from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 
@@ -19,6 +21,7 @@ function LegacyQuizRedirect() {
 export default function OfficialQuizzesRoutes() {
   const { isLoading, error, quizGroups, quizSetupMenuProps, isLoggedIn } =
     useOfficialQuizzes();
+  const { version } = useStudentUiVersion('ui.student.officialquiz.v2');
 
   return (
     <Routes>
@@ -44,6 +47,8 @@ export default function OfficialQuizzesRoutes() {
             <Loading message="Loading Official Quizzes..." />
           ) : error ? (
             <h2>Error Loading Official Quizzes</h2>
+          ) : version === 'v2' ? (
+            <OfficialQuizSetupMenuV2 {...quizSetupMenuProps} />
           ) : (
             <OfficialQuizSetupMenu {...quizSetupMenuProps} />
           )

@@ -1,0 +1,127 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-7);
+}
+
+.title {
+  margin: 0;
+  color: var(--lcs-color-ink);
+  font-size: var(--lcs-text-h1);
+  font-weight: var(--lcs-weight-bold);
+  line-height: var(--lcs-line-body);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  padding: var(--lcs-space-8);
+  gap: var(--lcs-space-7);
+}
+
+/* The group row is deliberately quiet: plain text plus a small ghost
+ * button, so it reads as settled rather than as another choice to make
+ * every time — the quiz field below is where attention should go. */
+.groupRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lcs-space-5);
+}
+
+.groupInfo {
+  min-width: 0;
+}
+
+/*
+ * Shared by the static "Course" heading and the "Course" `<label>` shown
+ * while editing, so the caption never changes style when you tap "Change".
+ * Copies `Eyebrow`'s look rather than reusing it, because `Eyebrow` cannot
+ * render as a `<label for>`.
+ */
+.groupLabel {
+  display: block;
+  margin: 0;
+  color: var(--lcs-color-label);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-eyebrow);
+  font-weight: var(--lcs-weight-medium);
+  letter-spacing: var(--lcs-tracking-eyebrow);
+  line-height: var(--lcs-line-tight);
+  text-align: inherit;
+  text-transform: uppercase;
+}
+
+.groupName {
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--lcs-color-ink);
+  font-size: var(--lcs-text-body);
+  font-weight: var(--lcs-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.groupField {
+  min-width: 0;
+  flex: 1;
+}
+
+/*
+ * Keeps the selected course reading the same size and weight as the static
+ * `.groupName` text it replaces, not the smaller regular-weight control
+ * font every other `Select` uses. Targeting the element rather than a class
+ * from the `Select` module is deliberate: this is a features-layer override
+ * of a primitive, which the cascade layers are built to allow.
+ */
+.groupSelect {
+  margin-top: 2px;
+}
+
+.groupSelect select {
+  font-size: var(--lcs-text-body);
+  font-weight: var(--lcs-weight-bold);
+}
+
+/* Separates the settled group row from the field the learner actually
+ * changes on every visit. */
+.quizField {
+  padding-top: var(--lcs-space-6);
+  border-top: var(--lcs-border-hairline) solid var(--lcs-divider);
+}
+
+.cta {
+  display: flex;
+  justify-content: center;
+}
+
+.cta > button {
+  width: 100%;
+  max-width: 320px;
+}
+
+@media (min-width: 769px) {
+  /* A single setup card reads as swimming in whitespace at the full 1240px
+   * measure, so it keeps its own, narrower column on top of PageShell's. */
+  .column {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .body {
+    padding: var(--lcs-space-9);
+  }
+
+  .groupName {
+    font-size: var(--lcs-text-h3);
+  }
+
+  .groupSelect select {
+    font-size: var(--lcs-text-h3);
+  }
+
+  .cta > button {
+    width: auto;
+    min-width: 240px;
+  }
+}

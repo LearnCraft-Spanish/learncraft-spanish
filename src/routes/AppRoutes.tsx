@@ -94,7 +94,14 @@ export default function AppRoutes() {
             )
           }
         />
-        <Route path="/officialquizzes/*" element={<OfficialQuizzesRoutes />} />
+        <Route
+          path="/officialquizzes/*"
+          element={
+            <UiScope flag="ui.student.officialquiz.v2">
+              <OfficialQuizzesRoutes />
+            </UiScope>
+          }
+        />
         <Route
           path="/customquiz"
           element={
