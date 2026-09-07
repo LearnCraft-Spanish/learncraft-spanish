@@ -35,7 +35,9 @@ function RegularTextQuizV1({
   textQuizProps,
 }: RegularTextQuizProps): JSX.Element {
   const useTextQuizReturn = useTextQuiz(textQuizProps);
-  return <TextQuiz useTextQuizReturn={useTextQuizReturn} quizTitle={quizTitle} />;
+  return (
+    <TextQuiz useTextQuizReturn={useTextQuizReturn} quizTitle={quizTitle} />
+  );
 }
 
 function RegularTextQuizV2({

@@ -5,56 +5,28 @@ export interface QuizFaceRun {
   bold: boolean;
 }
 
-/** Markdown-style `**target**` on an otherwise plain Spanish sentence. */
+/** Markdown-style `**target**` marker, stripped without special-casing. */
 const MARKDOWN_BOLD = /\*\*([^*]+)\*\*/g;
 
 /**
- * Runs for a quiz card face.
+ * Runs for a quiz card face. Spanish always renders bold (+ italic, via the
+ * `.bold` CSS class) — plain Spanish, the Spanish stretch of a Spanglish
+ * sentence (`*english*`), and text that was previously wrapped in a
+ * markdown `**target**` marker all read identically now. Embedded English
+ * inside a Spanglish sentence is the only thing that stays regular.
  *
- * - Plain Spanish: regular weight (nothing to emphasize).
- * - Spanglish (`*english*`): Spanish stretches bold, embedded English regular.
- * - Pure Spanish with a markdown target (`**sabré**`): only the marked target
- *   is bold. Spanglish single-asterisk markup still wins when there is no
- *   `**…**` pair, so `Son de *wood.*` is unchanged.
+ * `**…**` markers are stripped up front so they never render literally, but
+ * no longer mark a distinct run — the sentence is bold either way.
  */
 export function quizFaceRuns(spanish: string): QuizFaceRun[] {
   if (spanish.length === 0) {
     return [];
   }
 
-  if (hasMarkdownBoldTarget(spanish)) {
-    return markdownBoldRuns(spanish);
-  }
+  const withoutMarkdownMarkers = spanish.replace(MARKDOWN_BOLD, '$1');
 
-  const runs = splitSpanishTextRuns(spanish);
-  const isSpanglish = runs.some((run) => run.english);
-
-  return runs.map((run) => ({
+  return splitSpanishTextRuns(withoutMarkdownMarkers).map((run) => ({
     text: run.text,
-    bold: isSpanglish && !run.english,
+    bold: !run.english,
   }));
-}
-
-function hasMarkdownBoldTarget(spanish: string): boolean {
-  return /\*\*[^*]+\*\*/.test(spanish);
-}
-
-function markdownBoldRuns(spanish: string): QuizFaceRun[] {
-  const runs: QuizFaceRun[] = [];
-  let lastIndex = 0;
-
-  for (const match of spanish.matchAll(MARKDOWN_BOLD)) {
-    const index = match.index ?? 0;
-    if (index > lastIndex) {
-      runs.push({ text: spanish.slice(lastIndex, index), bold: false });
-    }
-    runs.push({ text: match[1], bold: true });
-    lastIndex = index + match[0].length;
-  }
-
-  if (lastIndex < spanish.length) {
-    runs.push({ text: spanish.slice(lastIndex), bold: false });
-  }
-
-  return runs;
 }

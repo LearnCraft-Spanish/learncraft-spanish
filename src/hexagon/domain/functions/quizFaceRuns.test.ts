@@ -2,17 +2,15 @@ import { quizFaceRuns } from '@domain/functions/quizFaceRuns';
 import { describe, expect, it } from 'vitest';
 
 describe('quizFaceRuns', () => {
-  it('leaves an all-Spanish sentence at regular weight', () => {
+  it('bolds a plain Spanish sentence', () => {
     expect(quizFaceRuns('Lo sabré cuando ellos lo sepan.')).toEqual([
-      { text: 'Lo sabré cuando ellos lo sepan.', bold: false },
+      { text: 'Lo sabré cuando ellos lo sepan.', bold: true },
     ]);
   });
 
-  it('bolds a markdown **target** in an otherwise plain Spanish sentence', () => {
+  it('strips a markdown **target** marker and bolds the whole sentence', () => {
     expect(quizFaceRuns('Lo **sabré** cuando ellos lo sepan.')).toEqual([
-      { text: 'Lo ', bold: false },
-      { text: 'sabré', bold: true },
-      { text: ' cuando ellos lo sepan.', bold: false },
+      { text: 'Lo sabré cuando ellos lo sepan.', bold: true },
     ]);
   });
 

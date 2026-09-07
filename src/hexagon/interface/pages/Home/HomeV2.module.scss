@@ -4,6 +4,15 @@
   gap: var(--lcs-space-9);
 }
 
+/* Matches .column's own stacking rhythm (not a tighter one) — a visual
+ * gauntlet critic pass flagged an earlier, tighter gap here as an outlier
+ * against every other stacked gap on the page (entry cards, help row). */
+.ctaGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-9);
+}
+
 .desktopEntries {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -16,6 +25,10 @@
 
 @media (max-width: 768px) {
   .column {
+    gap: var(--lcs-space-7);
+  }
+
+  .ctaGroup {
     gap: var(--lcs-space-7);
   }
 

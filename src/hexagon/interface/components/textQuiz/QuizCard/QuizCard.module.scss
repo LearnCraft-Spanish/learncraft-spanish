@@ -119,8 +119,9 @@
   font-weight: var(--lcs-weight-regular);
 }
 
-/* Spanish runs in Spanglish faces (and markdown `**target**` words): bold
- * AND italic, so Spanish reads as emphasis against the regular English. */
+/* Every Spanish run, always — plain sentences, the Spanish stretch of a
+ * Spanglish sentence, everything: bold AND italic, so Spanish reads as
+ * emphasis against any regular (embedded English) text on the same face. */
 .bold {
   font-style: italic;
   font-weight: var(--lcs-weight-bold);

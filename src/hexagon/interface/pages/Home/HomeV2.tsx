@@ -1,4 +1,5 @@
 import type { JSX } from 'react';
+import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { EntryCard } from '@interface/components/home/EntryCard/EntryCard';
 import { HelpRow } from '@interface/components/home/HelpRow/HelpRow';
@@ -29,7 +30,10 @@ export function HomeV2(): JSX.Element {
   return (
     <PageShell>
       <div className={styles.column}>
-        <QuizCTA onGo={goToQuiz} />
+        <div className={styles.ctaGroup}>
+          <Eyebrow>Today's suggested tool</Eyebrow>
+          <QuizCTA onGo={goToQuiz} />
+        </div>
 
         <div className={styles.desktopEntries}>
           <EntryCard
