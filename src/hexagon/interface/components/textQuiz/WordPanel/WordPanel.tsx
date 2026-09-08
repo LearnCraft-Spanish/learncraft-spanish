@@ -1,7 +1,6 @@
 import type { VocabInfo } from '@application/units/useVocabInfo';
 import type { Vocabulary } from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
-import { sortLessonsByCurrentCourse } from '@domain/functions/sortLessonsByCurrentCourse';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { Icon } from '@interface/components/general/Icon/Icon';
 import { IconButton } from '@interface/components/general/IconButton/IconButton';
@@ -28,10 +27,10 @@ export function WordPanel({
   onClose,
 }: WordPanelProps): JSX.Element {
   const info = vocabInfoHook(vocabulary);
-  // No course context is available on this prop contract, so lessons sort
-  // alphabetically-then-by-number rather than surfacing the learner's course
-  // first. See the deviations note in the implementation report.
-  const lessons = sortLessonsByCurrentCourse(info.lessons ?? [], null);
+  // `vocabInfoHook` (`useVocabInfo` in production) already scopes and sorts
+  // this list with the student's active course pinned first, so this
+  // component renders it as given rather than re-sorting.
+  const lessons = info.lessons ?? [];
 
   return (
     <div className={styles.root}>

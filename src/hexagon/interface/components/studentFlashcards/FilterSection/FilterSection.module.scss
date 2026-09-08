@@ -18,8 +18,8 @@
 
 /*
  * Prototype keeps one 20px rail on every band, including at 768.
- * CardSection / CardFooterStrip collapse to 16px there; pin so header,
- * bodies, admin strip, and footer stay on the same inset.
+ * CardSection collapses to 16px there; pin so header, bodies, admin
+ * strip, and the options section stay on the same inset.
  */
 .root > :first-child > * {
   padding-left: var(--lcs-space-8);
@@ -33,15 +33,20 @@
   }
 
   .root > :first-child > *:has(.scopeGrid),
-  .root > :first-child > *:has(.tagsHeader) {
+  .root > :first-child > *:has(.tagsHeader),
+  .root > :first-child > *:has(.optionsHeader) {
     padding-top: var(--lcs-space-8);
     padding-bottom: var(--lcs-space-8);
   }
 }
 
+/*
+ * Card corners live here regardless of which section ends up last.
+ * Vertical padding is deliberately left to the section's own rules
+ * (CardSection default + the :has() pin above) so the last band reads
+ * like the ones above it, not like a separate parchment strip.
+ */
 .root > :first-child > :last-child {
-  padding-top: var(--lcs-space-7);
-  padding-bottom: var(--lcs-space-7);
   border-bottom-left-radius: var(--lcs-radius-xl);
   border-bottom-right-radius: var(--lcs-radius-xl);
 }
@@ -62,7 +67,7 @@
 }
 
 .adminStrip :global(label),
-.root > :first-child > :last-child :global(label) {
+.optionsRow :global(label) {
   font-size: var(--lcs-text-action);
   gap: var(--lcs-space-4);
 }
@@ -310,6 +315,39 @@
   margin: var(--lcs-space-6) 0 0;
   color: var(--lcs-color-muted);
   font-size: var(--lcs-text-caption);
+}
+
+/* Same shape as .tagsHeader: a plain label band above the section's
+ * controls, sized by CardSection's own padding rather than its own. */
+.optionsHeader {
+  display: flex;
+  margin-bottom: var(--lcs-space-5);
+}
+
+.optionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-5) var(--lcs-space-10);
+  align-items: center;
+}
+
+/*
+ * Below 768px there is no room for two toggles side by side. Stack them
+ * instead of leaving it to flex-wrap: a wrapped row-direction item only
+ * ever sizes to its own content, so two toggles with different label
+ * lengths land their switches at different horizontal offsets (exactly the
+ * bug this fixes). Switching to a column stretches each Toggle to the
+ * row's full width, and Toggle's own `justify-content: space-between`
+ * then lines up both switches on a shared right edge — same pattern
+ * `QuizOptionsCard`'s `.switches` already relies on.
+ */
+@media (max-width: 768px) {
+  .optionsRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--lcs-space-6);
+    margin-right: var(--lcs-space-8);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

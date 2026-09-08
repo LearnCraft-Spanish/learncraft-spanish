@@ -23,10 +23,11 @@ import styles from './ExampleRow.module.scss';
 export type PlayingClip = `${number}:es` | `${number}:en`;
 
 /**
- * `collect` is the finder: Add on a catalog example, Owned (hover → Remove)
- * once it is in the collection. `remove` is the manager, where every row is
- * already owned — always-visible Remove with a focus handoff before the row
- * unmounts. Visuals diverge on purpose; the mutation path does not.
+ * `collect` is the finder: Add on a catalog example, always-visible Owned
+ * (red-fill on hover/focus) once it is in the collection. `remove` is the
+ * manager, where every row is already owned — always-visible Remove with a
+ * focus handoff before the row unmounts. Visuals diverge on purpose; the
+ * mutation path does not.
  */
 export type ExampleRowAction = 'collect' | 'remove';
 
@@ -177,7 +178,7 @@ function OwnedActionButton({
   rowLabel,
   pending,
   removing,
-  /** Finder: Owned ↔ Remove swap. Manager: always-visible Remove. */
+  /** Finder: always-visible Owned (red-fill on hover/focus). Manager: always-visible Remove. */
   labelMode,
   handOffFocusOnRemove,
   onRemoveRequested,
@@ -223,19 +224,19 @@ function OwnedActionButton({
         ) : (
           <>
             <span className={styles.ownedA11yName}>{accessibleName}</span>
-            {isManagerRemove ? (
-              <span className={styles.actionVisibleLabel} aria-hidden="true">
-                Remove
-              </span>
-            ) : (
-              <span className={styles.ownedVisual} aria-hidden="true">
-                <span className={styles.ownedRestLabel}>Owned</span>
-                <span className={styles.ownedHoverLabel}>Remove</span>
-              </span>
-            )}
+            <span className={styles.actionVisibleLabel} aria-hidden="true">
+              {isManagerRemove ? 'Remove' : 'Owned'}
+            </span>
           </>
         )}
-        {/* Mobile-only glyph; desktop keeps the labeled button via CSS. */}
+        {/*
+         * Mobile-only glyph; desktop keeps the labeled button via CSS. Finder
+         * keeps the "check" (owned) glyph rather than switching to "x": the
+         * rest state is still Owned by decision, hover/focus is a CSS-only
+         * fill change with no matching glyph swap on either surface, and
+         * touch devices rarely sustain a hover state anyway. Manager rows
+         * are always-Remove, so "x" is correct there at every state.
+         */}
         <span className={styles.actionIcon} aria-hidden="true">
           <Icon name={isManagerRemove ? 'x' : 'check'} size="md" />
         </span>
@@ -457,10 +458,6 @@ export function ExampleExpandPanel({
   reviewSchedule,
   onToggleVocab,
 }: ExampleExpandPanelProps): JSX.Element {
-  const openVocab =
-    openVocabId === null
-      ? undefined
-      : example.vocabulary.find((item) => item.id === openVocabId);
   const isSpanglish = example.spanglish;
   const isAudio = example.spanishAudio.length > 0;
   const isCustom = studentFlashcards.isCustomFlashcard({
@@ -510,7 +507,12 @@ export function ExampleExpandPanel({
             ))}
           </div>
         )}
-        {openVocab === undefined && example.vocabulary.length > 0 && (
+        {/*
+         * Always rendered whenever the row has vocabulary — even while a tag
+         * popover is open — so the column never gains/loses this line and
+         * reflows the row underneath it.
+         */}
+        {example.vocabulary.length > 0 && (
           <p className={styles.hint}>Click a tag to see where it's taught.</p>
         )}
       </div>

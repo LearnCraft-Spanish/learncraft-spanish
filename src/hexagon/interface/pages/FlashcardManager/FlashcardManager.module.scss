@@ -27,18 +27,19 @@
   gap: 2px;
 }
 
-/* Filtering is optional here, so the toggle sits in the space `.titleRow`
- * already reserves opposite the heading. */
-.filterToggle {
-  display: flex;
-  align-items: center;
-  padding-bottom: var(--lcs-space-1);
+/*
+ * The toggle reads as the filter panel's own header rather than a stray
+ * switch next to the `<h1>`: same Card, same sectionHeader shape as
+ * `FilterSection`, so it sits directly above the panel it opens.
+ */
+.filterControl {
+  margin-bottom: var(--lcs-space-8);
 }
 
-@media (max-width: 480px) {
-  .filterToggle {
-    padding-bottom: 0;
-  }
+.filterControlActions {
+  display: flex;
+  align-items: center;
+  gap: var(--lcs-space-5);
 }
 
 .title {

@@ -77,7 +77,7 @@ The shared primitives those pages will compose are built ahead of the page work;
 
 **Below 768px the row reflows** rather than scrolling sideways: English stacks over Spanish while the checkbox and chevron stay in place, spanning both lines. `DataTable` takes this as a `mobileLayout` prop; the areas are named by the caller.
 
-**Per-row remove looks different on Manager vs Finder.** Finder collected rows keep Owned at rest and swap the visible label to a red Remove on hover. Manager rows always show Remove (red border/text at rest, red fill on hover) — every row is already owned, so there is no Owned state. Both branch off `rowAction` (`collect` / `remove`), keep the same delete mutation, and keep a stable accessible name `Remove <row> from your collection`.
+**Per-row remove looks different on Manager vs Finder only in color, never in text.** Finder collected rows keep the neutral bordered "Owned" label at rest, hover, _and_ focus — the visible text never swaps to "Remove"; Manager rows always show "Remove" (red border/text at rest) since every row is already owned and there is no Owned state. **Hover/focus color is identical on both**: red fill (`--lcs-color-error` background) with `--lcs-color-on-action` (white) text/label — on the Finder's row only the color changes, the label stays "Owned". Both branch off `rowAction` (`collect` / `remove`), keep the same delete mutation, and keep a stable accessible name `Remove <row> from your collection` — that name is unaffected by this: it always names the removal action regardless of what the visible label currently says. The mobile-only glyph still differs: Finder keeps "check" (rest is still Owned) and Manager keeps "x" (always Remove) — there is no separate glyph for the hover/focus state on either surface.
 
 ---
 
@@ -85,13 +85,13 @@ The shared primitives those pages will compose are built ahead of the page work;
 
 The UI looks similar; the data paths are different. Redesign must not merge them.
 
-|                    | Flashcard Finder                                    | Flashcard Manager                                                                           |
-| ------------------ | --------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Source             | Catalog examples via `useExampleQuery`              | Owned flashcards via `useStudentFlashcards`                                                 |
-| Filter application | Server query (coordinator → API)                    | Client `filterExamplesCombined` in `useFilterOwnedFlashcards`                               |
-| Pagination         | `useQueryPagination` — fetch 150, show 25, prefetch | `usePagination` — slice owned list, page size 25                                            |
-| Filter UI          | Always on (`FilterPanel`)                           | Optional (`CloseableFilterPanel` toggle)                                                    |
-| Row actions        | Add; collected → Owned (Remove on hover)            | Always Remove; bulk select + menus; copy; delete all owned Spanglish; quiz / find-more menu |
+|                    | Flashcard Finder                                                                                                            | Flashcard Manager                                                                                                                           |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Source             | Catalog examples via `useExampleQuery`                                                                                      | Owned flashcards via `useStudentFlashcards`                                                                                                 |
+| Filter application | Server query (coordinator → API)                                                                                            | Client `filterExamplesCombined` in `useFilterOwnedFlashcards`                                                                               |
+| Pagination         | `useQueryPagination` — fetch 150, show 25, prefetch                                                                         | `usePagination` — slice owned list, page size 25                                                                                            |
+| Filter UI          | Always on (`FilterPanel`)                                                                                                   | Optional (`CloseableFilterPanel` toggle)                                                                                                    |
+| Row actions        | Add; collected → "Owned" label always (never swaps text), red-fill on hover/focus (same color treatment as Manager's hover) | Always red-bordered Remove at rest, same red-fill hover/focus; bulk select + menus; copy; delete all owned Spanglish; quiz / find-more menu |
 
 Filter **state** is global: [`useExampleFilterCoordinator`](../../application/coordinators/hooks/useExampleFilterCoordinator.ts) plus course/lesson selection. That is why Finder → Manager and Manager → Review My Flashcards can reuse filters without copying URL state. **Do not replace the coordinator for the redesign.** New filter UI must read/write the same coordinator, preferably through the page use case rather than by calling it from the panel.
 
@@ -100,6 +100,8 @@ Filter **state** is global: [`useExampleFilterCoordinator`](../../application/co
 Finder fetch is gated: `useExampleQuery` only runs when a filter seed exists (lesson range, tags, exclude-Spanglish, or audio-only). An empty-looking Finder with no course/lesson selected is current behavior, not a loading bug. Preserve that unless product says otherwise.
 
 Tag suggestions in the v2 `FilterSection` keep a subdued echo of the v1 per-type palette (left rail + tint, not saturated cards). Vocabulary `frequency` ranks results but is never shown as a label or value. Selected tag chips surface the same descriptor the suggestion list uses (hover / keyboard focus).
+
+**`authAdapter.mock.ts` defaults `isAdmin: true`.** The mock's default fixture is a student-admin fake, so any component or page test that renders `FilterSection` or `CourseCard` without explicitly overriding `isAdmin` will see the "Admin only" unpublished-courses-and-lessons strip / toggle. That default already caused one false alarm (v2-redesign-fix-batch-1, item 8): the gate itself (`isAdmin === true` in both components) was correct, and the sighting was an account-role artifact — a harness or test rendering with the shared default rather than a real code leak. Any new filter-panel test that wants to assert student-facing behavior must override the mock (or pass `isAdmin: false` on the synthetic `exampleFilter` fixture, for presentational-component tests that don't go through the mock at all) so the next person does not mistake the harness default for a product bug. Regression coverage for the gate itself lives in `FilterSection.test.tsx` (shared by Finder and Manager) and `CourseCard.test.tsx` (Custom Quiz advanced panel); `FlashcardManager.test.tsx` additionally pins that the page threads `exampleFilter.isAdmin` through to `FilterSection` unmodified.
 
 ---
 

@@ -400,9 +400,11 @@ describe('results section', () => {
     expect(screen.getByText('Taught in')).toBeInTheDocument();
     expect(screen.getByText('Lesson 2')).toBeInTheDocument();
     expect(screen.getByText('Unit 1 · Demonstratives')).toBeInTheDocument();
+    // The hint stays mounted while a tag popover is open so the column never
+    // reflows — it used to unmount here.
     expect(
-      screen.queryByText("Click a tag to see where it's taught."),
-    ).not.toBeInTheDocument();
+      screen.getByText("Click a tag to see where it's taught."),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'eso' })).toHaveClass(
       chipStyles.selectedNavy,
     );
@@ -422,6 +424,30 @@ describe('results section', () => {
     expect(
       screen.getByText("Click a tag to see where it's taught."),
     ).toBeInTheDocument();
+  });
+
+  it('keeps the tag hint mounted across a tag open/close so the panel never reflows', async () => {
+    const user = userEvent.setup();
+    renderSection();
+
+    await user.click(screen.getByRole('button', { name: EXPAND_LABEL }));
+    const hintBeforeOpen = screen.getByText(
+      "Click a tag to see where it's taught.",
+    );
+
+    await user.click(screen.getByRole('button', { name: 'eso' }));
+
+    // Same DOM node, not unmounted-and-remounted — the height it occupies
+    // never changes while the popover opens.
+    expect(screen.getByText("Click a tag to see where it's taught.")).toBe(
+      hintBeforeOpen,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'eso' }));
+
+    expect(screen.getByText("Click a tag to see where it's taught.")).toBe(
+      hintBeforeOpen,
+    );
   });
 
   it('shows special tags and the empty special copy', async () => {
@@ -936,7 +962,7 @@ describe('results section', () => {
     // Would fail if the Finder were switched to always-visible Remove.
     expect(owned).toHaveTextContent('Owned');
     expect(
-      owned.querySelector(`.${rowStyles.ownedRestLabel}`),
+      owned.querySelector(`.${rowStyles.actionVisibleLabel}`),
     ).toHaveTextContent('Owned');
   });
 

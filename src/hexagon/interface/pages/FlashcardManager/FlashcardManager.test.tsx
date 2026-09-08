@@ -21,6 +21,7 @@ import {
 import FlashcardManager from '@interface/pages/FlashcardManager';
 import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createMockSkillTagList } from '@testing/factories/skillTagFactory';
 import { trackedRejection } from '@testing/utils/trackedRejection';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -113,8 +114,17 @@ vi.mock('@interface/components/Loading', () => ({
 }));
 
 vi.mock('@interface/components/studentFlashcards/FilterSection', () => ({
-  FilterSection: ({ onResetAll }: { onResetAll?: () => void }) => (
-    <div data-testid="filter-section">
+  FilterSection: ({
+    exampleFilter,
+    onResetAll,
+  }: {
+    exampleFilter: { isAdmin?: boolean };
+    onResetAll?: () => void;
+  }) => (
+    <div
+      data-testid="filter-section"
+      data-is-admin={String(exampleFilter.isAdmin)}
+    >
       <button type="button" onClick={onResetAll}>
         mock-reset
       </button>
@@ -584,7 +594,15 @@ describe('flashcard manager v2 filtering toggle', () => {
     expect(screen.queryByTestId('filter-section')).not.toBeInTheDocument();
   });
 
-  it('turns filtering on through the title-row toggle', async () => {
+  it("labels the filter control as the filter panel's own header", () => {
+    renderV2();
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Filter my flashcards' }),
+    ).toBeInTheDocument();
+  });
+
+  it('turns filtering on through the filter control toggle', async () => {
     const user = userEvent.setup();
     renderV2();
 
@@ -604,6 +622,77 @@ describe('flashcard manager v2 filtering toggle', () => {
     expect(
       screen.getByRole('switch', { name: 'Filter my flashcards' }),
     ).toBeChecked();
+  });
+
+  /**
+   * Regression coverage for item 8 (v2-redesign-fix-batch-1, Task 7): the
+   * page must thread `exampleFilter` — including `isAdmin` — to
+   * `FilterSection` untouched, since `FilterSection` (not this page) owns
+   * the "Admin only" unpublished-toggle gate (see `FilterSection.test.tsx`).
+   * A student-role account (`isAdmin: false`, the use-case mock's own
+   * default here) must not have the flag flipped on the way through.
+   */
+  it('passes a student-role exampleFilter to FilterSection untouched', () => {
+    overrideMockUseFlashcardManager({ filterOwnedFlashcards: true });
+
+    renderV2();
+
+    expect(screen.getByTestId('filter-section')).toHaveAttribute(
+      'data-is-admin',
+      'false',
+    );
+  });
+
+  it('passes an admin exampleFilter to FilterSection untouched', () => {
+    overrideMockUseFlashcardManager({
+      filterOwnedFlashcards: true,
+      exampleFilter: {
+        ...defaultMockUseFlashcardManager.exampleFilter,
+        isAdmin: true,
+      },
+    });
+
+    renderV2();
+
+    expect(screen.getByTestId('filter-section')).toHaveAttribute(
+      'data-is-admin',
+      'true',
+    );
+  });
+
+  it('shows no applied-filter count when no optional filters are set', () => {
+    renderV2();
+
+    expect(screen.queryByText(/filters? applied/i)).not.toBeInTheDocument();
+  });
+
+  it('counts selected tags and card-options toggles as applied filters', () => {
+    const [firstTag, secondTag] = createMockSkillTagList(2);
+    overrideMockUseFlashcardManager({
+      exampleFilter: {
+        ...defaultMockUseFlashcardManager.exampleFilter,
+        excludeSpanglish: true,
+        audioOnly: true,
+        selectedSkillTags: [firstTag, secondTag],
+      },
+    });
+
+    renderV2();
+
+    expect(screen.getByText('4 filters applied')).toBeInTheDocument();
+  });
+
+  it('does not count the admin-only unpublished toggle as an applied filter', () => {
+    overrideMockUseFlashcardManager({
+      exampleFilter: {
+        ...defaultMockUseFlashcardManager.exampleFilter,
+        includeUnpublished: true,
+      },
+    });
+
+    renderV2();
+
+    expect(screen.queryByText(/filters? applied/i)).not.toBeInTheDocument();
   });
 
   it('clears selection and notice when all filters are reset', async () => {

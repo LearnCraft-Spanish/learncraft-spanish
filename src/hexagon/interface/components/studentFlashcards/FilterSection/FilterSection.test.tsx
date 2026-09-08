@@ -176,11 +176,14 @@ describe('filter section', () => {
     cleanup();
   });
 
-  it('renders the scope header, real courses, and options footer', () => {
+  it('renders the scope header, real courses, and the card options section', () => {
     renderSection();
 
     expect(
       screen.getByRole('heading', { name: 'Scope · required' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Card options' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Reset all filters' }),
@@ -346,6 +349,18 @@ describe('filter section', () => {
     ).toBeInTheDocument();
   });
 
+  /**
+   * Regression coverage for item 8 (v2-redesign-fix-batch-1, Task 7). The
+   * gate (`isAdmin === true`) was already correct; a sighting of the toggle
+   * was traced to an account-role artifact (student-admin fixtures /
+   * `authAdapter.mock.ts` defaulting `isAdmin: true`), not a code leak.
+   * `FilterSection` is the shared component behind both the Flashcard Finder
+   * and the Flashcard Manager (see STUDENT_FLASHCARDS.md), so this one
+   * component-level test is the regression guard for both pages — see
+   * `FlashcardManager.test.tsx` for the integration-level check that the
+   * page threads `exampleFilter.isAdmin` through to this component
+   * unmodified. Do not change the gate to "fix" this test.
+   */
   it('hides the admin strip for non-admins', () => {
     renderSection();
 
@@ -745,7 +760,7 @@ describe('filter section', () => {
     const search = option?.closest(`.${styles.tagSearch}`);
     const panel = search?.querySelector(':scope > div > div:last-child');
     const tagsSection = search?.parentElement;
-    const footer = card?.querySelector(`.${cardStyles.footerStrip}`);
+    const optionsSection = card?.querySelector(`.${styles.optionsRow}`);
     expect(options).toHaveLength(6);
     expect(card).not.toBeNull();
     expect(card).toHaveClass(cardStyles.unclipped);
@@ -757,8 +772,8 @@ describe('filter section', () => {
     expect(panel).toHaveClass(popoverStyles.panel);
     expect(card?.getBoundingClientRect().height).toBe(closedHeight);
     expect(search).toHaveClass(styles.tagSearch);
-    expect(footer).not.toBeNull();
-    expect(card?.contains(footer ?? null)).toBe(true);
+    expect(optionsSection).not.toBeNull();
+    expect(card?.contains(optionsSection ?? null)).toBe(true);
   });
 
   it('labels suggestion categories for every skill type', () => {
@@ -1172,6 +1187,32 @@ describe('filter section', () => {
       screen.getByRole('switch', { name: 'Audio flashcards only' }),
     );
     expect(exampleFilter.updateAudioOnly).toHaveBeenCalledWith(true);
+  });
+
+  it('groups Spanglish and audio-only toggles under their own titled card options section', () => {
+    renderSection();
+
+    const heading = screen.getByRole('heading', { name: 'Card options' });
+    const section = heading.closest(`.${cardStyles.section}`);
+    expect(section).not.toBeNull();
+    expect(section).toHaveClass(cardStyles.divided);
+
+    const card = section?.closest(`.${cardStyles.card}`);
+    expect(card).not.toBeNull();
+    // The options section is the last band in the card, so it owns the
+    // rounded bottom corners (see FilterSection.module.scss `:last-child`).
+    expect(card?.lastElementChild).toBe(section);
+
+    const excludeSpanglish = screen.getByRole('switch', {
+      name: 'Exclude Spanglish',
+    });
+    const audioOnly = screen.getByRole('switch', {
+      name: 'Audio flashcards only',
+    });
+    expect(section?.contains(excludeSpanglish)).toBe(true);
+    expect(section?.contains(audioOnly)).toBe(true);
+    expect(excludeSpanglish.closest(`.${styles.optionsRow}`)).not.toBeNull();
+    expect(audioOnly.closest(`.${styles.optionsRow}`)).not.toBeNull();
   });
 
   it('forwards tag search keystrokes to the existing updater', async () => {

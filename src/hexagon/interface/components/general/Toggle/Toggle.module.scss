@@ -1,7 +1,8 @@
 .root {
-  display: inline-flex;
+  display: flex;
   gap: var(--lcs-space-3);
   align-items: center;
+  justify-content: space-between;
   cursor: pointer;
   font-family: var(--lcs-font-sans);
   font-size: var(--lcs-text-control);

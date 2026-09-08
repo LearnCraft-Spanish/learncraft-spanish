@@ -26,6 +26,16 @@ export function Toggle({
 
   return (
     <label className={styles.root} htmlFor={id}>
+      <span className={labelHidden ? styles.labelHidden : styles.label}>
+        {label}
+      </span>
+      {/*
+       * The input stays immediately before .track (not before the label)
+       * so the `.input:focus-visible + .track` sibling selector below
+       * keeps working. It's visually hidden and absolutely positioned,
+       * so it's removed from flex flow and its position here doesn't
+       * affect the visible label-then-switch order.
+       */}
       <input
         id={id}
         type="checkbox"
@@ -37,9 +47,6 @@ export function Toggle({
       />
       <span className={trackClassName} aria-hidden="true">
         <span className={styles.knob} />
-      </span>
-      <span className={labelHidden ? styles.labelHidden : styles.label}>
-        {label}
       </span>
     </label>
   );

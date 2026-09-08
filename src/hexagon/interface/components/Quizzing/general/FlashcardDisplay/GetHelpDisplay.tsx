@@ -7,7 +7,7 @@ import { useState } from 'react';
 export function GetHelpDisplay({ vocabulary }: { vocabulary: Vocabulary[] }) {
   const { contextual, closeContextual, openContextual } = useContextualMenu();
   const [vocabTagSelected, setVocabTagSelected] = useState<number | null>(null);
-  const { lessonPopup } = useLessonPopup();
+  const { lessonPopup } = useLessonPopup({ scopeToRelevantCourses: true });
   return (
     <div className="getHelpDisplay">
       {vocabulary.map((vocab) => (

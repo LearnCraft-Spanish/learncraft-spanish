@@ -688,14 +688,20 @@ describe('buildExampleRow', () => {
     expect(
       screen.queryByRole('button', { name: 'Remove' }),
     ).not.toBeInTheDocument();
-    // Finder keeps the Owned/Remove width-reservation stack; Manager does not.
-    // This fails if someone later made the Finder show "Remove" at rest.
+    // Finder's visible label always reads "Owned" — it never swaps to
+    // "Remove" text (only the hover/focus fill color changes). The button's
+    // full textContent also carries the visually-hidden accessible-name
+    // span ("Remove ... from your collection"), so scope this to the visible
+    // label span specifically rather than asserting on the whole button.
+    const ownedVisibleLabel = owned.querySelector(
+      `.${rowStyles.actionVisibleLabel}`,
+    );
+    expect(ownedVisibleLabel).toHaveTextContent('Owned');
+    expect(ownedVisibleLabel).not.toHaveTextContent('Remove');
+    // The stable accessible name lives only in its own hidden span.
     expect(
-      owned.querySelector(`.${rowStyles.ownedRestLabel}`),
-    ).toHaveTextContent('Owned');
-    expect(
-      owned.querySelector(`.${rowStyles.ownedHoverLabel}`),
-    ).toHaveTextContent('Remove');
+      owned.querySelector(`.${rowStyles.ownedA11yName}`),
+    ).toHaveTextContent(OWNED_REMOVE_NAME);
     expect(owned.parentElement).toHaveClass(rowStyles.ownedAction);
     expect(owned.parentElement).not.toHaveClass(rowStyles.removeAction);
   });
@@ -835,9 +841,6 @@ describe('buildExampleRow', () => {
     const remove = screen.getByRole('button', { name: OWNED_REMOVE_NAME });
     expect(remove.parentElement).toHaveClass(rowStyles.removeAction);
     expect(remove.parentElement).not.toHaveClass(rowStyles.ownedAction);
-    // Manager drops the Owned/Remove stack — visible label is Remove at rest.
-    expect(remove.querySelector(`.${rowStyles.ownedRestLabel}`)).toBeNull();
-    expect(remove.querySelector(`.${rowStyles.ownedHoverLabel}`)).toBeNull();
     expect(remove).toHaveTextContent('Remove');
     expect(remove).not.toHaveTextContent('Owned');
     expect(

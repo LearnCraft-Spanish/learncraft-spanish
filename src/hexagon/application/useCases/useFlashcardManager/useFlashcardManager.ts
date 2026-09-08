@@ -6,7 +6,6 @@ import type { FlashcardReviewDates } from '@domain/functions/formatFlashcardRevi
 import type { Flashcard } from '@learncraft-spanish/shared';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
-import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
 import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { useFilterOwnedFlashcards } from '@application/units/Filtering/useFilterOwnedFlashcards';
 import { usePagination } from '@application/units/Pagination/usePagination';
@@ -15,8 +14,6 @@ import {
   generateVirtualLessonId,
   getPrerequisitesForCourse,
 } from '@domain/coursePrerequisites';
-import { filterPublishedLessons } from '@domain/functions/filterPublishedLessons';
-import { sortLessonsByCurrentCourse } from '@domain/functions/sortLessonsByCurrentCourse';
 import { useCallback, useMemo, useState } from 'react';
 
 export interface UseFlashcardManagerReturn {
@@ -37,10 +34,11 @@ export interface UseFlashcardManagerReturn {
   exampleFilter: UseCombinedFiltersWithVocabularyReturnType;
   resetFilters: () => void;
   /**
-   * Built the same way the Finder builds it: published-lesson filtering,
-   * current-course-first ordering, and the selected course name the shared
-   * expand panel highlights. Enriching here keeps the two surfaces' rows
-   * identical instead of leaving the Manager on the raw popup.
+   * `useLessonPopup({ scopeToRelevantCourses: true })` -- the same opt-in the
+   * Finder uses, so both surfaces get published-lesson filtering,
+   * relevant-course scoping, current-course-first ordering, and the selected
+   * course name the shared expand panel highlights, instead of the Manager
+   * being left on the raw, unscoped popup.
    */
   lessonPopup: LessonPopup;
   flashcardsQuery: UseStudentFlashcardsReturn;
@@ -117,31 +115,7 @@ export default function useFlashcardManager({
   }, []);
 
   // For the vocabulary popover in an expanded row
-  const { lessonPopup: fetchedLessonPopup } = useLessonPopup();
-  const { data: publishedCourses, isLoading: publishedCoursesLoading } =
-    useCoursesWithLessons(false);
-
-  const currentCourseName = exampleFilter.course?.name ?? null;
-  const lessonPopup = useMemo((): LessonPopup => {
-    return {
-      lessonsByVocabulary: sortLessonsByCurrentCourse(
-        filterPublishedLessons(
-          fetchedLessonPopup.lessonsByVocabulary,
-          publishedCourses ?? [],
-        ),
-        currentCourseName,
-      ),
-      lessonsLoading:
-        fetchedLessonPopup.lessonsLoading || publishedCoursesLoading,
-      currentCourseName,
-    };
-  }, [
-    currentCourseName,
-    fetchedLessonPopup.lessonsByVocabulary,
-    fetchedLessonPopup.lessonsLoading,
-    publishedCourses,
-    publishedCoursesLoading,
-  ]);
+  const { lessonPopup } = useLessonPopup({ scopeToRelevantCourses: true });
 
   const resetFilters = useCallback((): void => {
     exampleFilter.bulkUpdateSkillTagKeys([]);

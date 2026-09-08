@@ -7,7 +7,6 @@ import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFl
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
-import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
 import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import { useQueryPagination } from '@application/units/Pagination/useQueryPagination';
@@ -18,8 +17,6 @@ import {
   generateVirtualLessonId,
   getPrerequisitesForCourse,
 } from '@domain/coursePrerequisites';
-import { filterPublishedLessons } from '@domain/functions/filterPublishedLessons';
-import { sortLessonsByCurrentCourse } from '@domain/functions/sortLessonsByCurrentCourse';
 import { useEffect, useMemo, useRef } from 'react';
 
 export interface UseFlashcardFinderReturnType {
@@ -42,9 +39,7 @@ export interface UseFlashcardFinderReturnType {
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   // isCoach or isAdmin
   const { isCoach, isAdmin } = useAuthAdapter();
-  const { lessonPopup: fetchedLessonPopup } = useLessonPopup();
-  const { data: publishedCourses, isLoading: publishedCoursesLoading } =
-    useCoursesWithLessons(false);
+  const { lessonPopup } = useLessonPopup({ scopeToRelevantCourses: true });
 
   const QUERY_PAGE_SIZE = 150;
   const PAGE_SIZE = 25;
@@ -68,27 +63,6 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     : null;
 
   const exampleFilter: UseCombinedFiltersReturnType = useCombinedFilters({});
-  const currentCourseName = exampleFilter.course?.name ?? null;
-  const lessonPopup = useMemo((): LessonPopup => {
-    return {
-      lessonsByVocabulary: sortLessonsByCurrentCourse(
-        filterPublishedLessons(
-          fetchedLessonPopup.lessonsByVocabulary,
-          publishedCourses ?? [],
-        ),
-        currentCourseName,
-      ),
-      lessonsLoading:
-        fetchedLessonPopup.lessonsLoading || publishedCoursesLoading,
-      currentCourseName,
-    };
-  }, [
-    currentCourseName,
-    fetchedLessonPopup.lessonsByVocabulary,
-    fetchedLessonPopup.lessonsLoading,
-    publishedCourses,
-    publishedCoursesLoading,
-  ]);
 
   // Track previous filter state to detect actual changes
   const previousFilterState = useRef<string | null>(null);

@@ -54,7 +54,7 @@
   border: var(--lcs-control-border) solid var(--lcs-border-control);
 }
 
-/* Visually-hidden stable name; Finder hover/focus swap only the aria-hidden stack. */
+/* Visually-hidden stable name; label text never changes with it. */
 .ownedA11yName {
   position: absolute;
   width: 1px;
@@ -65,35 +65,24 @@
   white-space: nowrap;
 }
 
-/* Finder collected: Owned at rest, red Remove on hover/focus. */
-.ownedVisual {
-  display: inline-grid;
-  justify-items: center;
-}
-
-.ownedRestLabel,
-.ownedHoverLabel {
-  grid-area: 1 / 1;
-}
-
-.ownedHoverLabel {
-  visibility: hidden;
+/*
+ * Finder collected: "Owned" text never changes. Hover/focus matches the
+ * Manager's red-fill Remove treatment exactly, including the fill
+ * transition, so the two surfaces feel like one control family — only the
+ * color shifts, not the label.
+ */
+.ownedAction button:not(:disabled) {
+  transition:
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    border-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    color var(--lcs-motion-micro) var(--lcs-ease-standard);
 }
 
 .ownedAction button:hover:not(:disabled),
 .ownedAction button:focus-visible:not(:disabled) {
+  background-color: var(--lcs-color-error);
   border-color: var(--lcs-color-error);
-  color: var(--lcs-color-error);
-}
-
-.ownedAction button:hover:not(:disabled) .ownedRestLabel,
-.ownedAction button:focus-visible:not(:disabled) .ownedRestLabel {
-  visibility: hidden;
-}
-
-.ownedAction button:hover:not(:disabled) .ownedHoverLabel,
-.ownedAction button:focus-visible:not(:disabled) .ownedHoverLabel {
-  visibility: visible;
+  color: var(--lcs-color-on-action);
 }
 
 /*
@@ -119,6 +108,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .ownedAction button:not(:disabled),
   .removeAction button:not(:disabled) {
     transition: none;
   }
@@ -161,8 +151,7 @@
     border-width: 1px;
   }
 
-  .actionVisibleLabel,
-  .ownedVisual {
+  .actionVisibleLabel {
     position: absolute;
     width: 1px;
     height: 1px;

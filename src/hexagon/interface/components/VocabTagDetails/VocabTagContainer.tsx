@@ -179,25 +179,19 @@ export default function VocabTagContainer({
             {lessonPopup.lessonsLoading ? (
               <InlineLoading message="Loading lessons..." white />
             ) : lessonPopup.lessonsByVocabulary.length > 0 ? (
-              lessonPopup.lessonsByVocabulary
-                .sort((a, b) => {
-                  if (a.courseName === course?.name) {
-                    return -1;
-                  } else if (b.courseName === course?.name) {
-                    return 1;
-                  }
-                  return 0;
-                })
-                .map((lesson) => (
-                  <div
-                    key={lesson.id}
-                    className={`lessonItem ${
-                      lesson.courseName === course?.name ? 'mainCourse' : ''
-                    }`}
-                  >
-                    {lesson.courseName} lesson {lesson.lessonNumber}
-                  </div>
-                ))
+              // Ordering (current course first) comes from the lessonPopup
+              // itself now -- see `useLessonPopup`'s `scopeToRelevantCourses`
+              // option -- so this no longer needs its own inline sort.
+              lessonPopup.lessonsByVocabulary.map((lesson) => (
+                <div
+                  key={lesson.id}
+                  className={`lessonItem ${
+                    lesson.courseName === course?.name ? 'mainCourse' : ''
+                  }`}
+                >
+                  {lesson.courseName} lesson {lesson.lessonNumber}
+                </div>
+              ))
             ) : (
               <div>No lessons found</div>
             )}

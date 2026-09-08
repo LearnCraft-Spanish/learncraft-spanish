@@ -8,11 +8,7 @@ import {
 } from '@domain/functions/lessonOptions';
 import { Badge } from '@interface/components/general/Badge/Badge';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
-import {
-  Card,
-  CardFooterStrip,
-  CardSection,
-} from '@interface/components/general/Card/Card';
+import { Card, CardSection } from '@interface/components/general/Card/Card';
 import { Chip } from '@interface/components/general/Chip/Chip';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { Field } from '@interface/components/general/Field/Field';
@@ -316,20 +312,25 @@ export function FilterSection({
           )}
         </CardSection>
 
-        <CardFooterStrip>
-          <Toggle
-            id="finder-exclude-spanglish"
-            checked={excludeSpanglish}
-            onChange={updateExcludeSpanglish}
-            label="Exclude Spanglish"
-          />
-          <Toggle
-            id="finder-audio-only"
-            checked={audioOnly}
-            onChange={updateAudioOnly}
-            label="Audio flashcards only"
-          />
-        </CardFooterStrip>
+        <CardSection divided>
+          <div className={styles.optionsHeader}>
+            <Eyebrow as="h2">Card options</Eyebrow>
+          </div>
+          <div className={styles.optionsRow}>
+            <Toggle
+              id="finder-exclude-spanglish"
+              checked={excludeSpanglish}
+              onChange={updateExcludeSpanglish}
+              label="Exclude Spanglish"
+            />
+            <Toggle
+              id="finder-audio-only"
+              checked={audioOnly}
+              onChange={updateAudioOnly}
+              label="Audio flashcards only"
+            />
+          </div>
+        </CardSection>
       </Card>
     </div>
   );

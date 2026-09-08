@@ -1,16 +1,12 @@
-import type { UseCoursesWithLessonsReturn } from '@application/queries/useCoursesWithLessons';
 import type { UseCombinedFiltersWithVocabularyReturnType } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
 import type { UseFilterOwnedFlashcardsReturn } from '@application/units/Filtering/useFilterOwnedFlashcards';
 import type {
   LessonPopup,
+  UseLessonPopupOptions,
   UseLessonPopupReturnType,
 } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
-import type {
-  CourseWithLessons,
-  Flashcard,
-  Lesson,
-} from '@learncraft-spanish/shared';
+import type { CourseWithLessons, Flashcard } from '@learncraft-spanish/shared';
 import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
 import { overrideMockActiveStudent } from '@application/coordinators/hooks/useActiveStudent.mock';
 import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
@@ -24,8 +20,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // Assigned in beforeEach; the mock factories below read them lazily at render time.
 let filterOwnedFlashcardsReturn: UseFilterOwnedFlashcardsReturn;
 let lessonPopupValue: LessonPopup;
-let publishedCoursesValue: UseCoursesWithLessonsReturn;
 const filterOwnedFlashcardsArgs: boolean[] = [];
+// Options useFlashcardManager called useLessonPopup with, one entry per call.
+const lessonPopupCallArgs: (UseLessonPopupOptions | undefined)[] = [];
 
 vi.mock('@application/units/Filtering/useFilterOwnedFlashcards', () => ({
   useFilterOwnedFlashcards: vi.fn<
@@ -36,42 +33,17 @@ vi.mock('@application/units/Filtering/useFilterOwnedFlashcards', () => ({
   }),
 }));
 
+// Course/publish scoping now lives inside useLessonPopup itself (see
+// useLessonPopup.test.ts), so this mock only needs to hand back a fixture and
+// record how it was called -- it does not need to fake the scoping logic.
 vi.mock('@application/units/useLessonPopup', () => ({
-  default: vi.fn<() => UseLessonPopupReturnType>(() => ({
-    lessonPopup: lessonPopupValue,
-  })),
+  default: vi.fn<(options?: UseLessonPopupOptions) => UseLessonPopupReturnType>(
+    (options) => {
+      lessonPopupCallArgs.push(options);
+      return { lessonPopup: lessonPopupValue };
+    },
+  ),
 }));
-
-vi.mock('@application/queries/useCoursesWithLessons', () => ({
-  useCoursesWithLessons: vi.fn<
-    (includeUnpublished?: boolean) => UseCoursesWithLessonsReturn
-  >(() => publishedCoursesValue),
-}));
-
-// Lesson ids are deliberately unlike their lesson numbers, and unlike the
-// course id, so an assertion on one cannot be satisfied by the other.
-const learncraftCourse: CourseWithLessons = {
-  id: 2,
-  name: 'LearnCraft Spanish',
-  published: true,
-  lessons: [
-    { id: 21, lessonNumber: 1, courseName: 'LearnCraft Spanish' },
-    { id: 22, lessonNumber: 2, courseName: 'LearnCraft Spanish' },
-  ],
-};
-
-const essentialCourse: CourseWithLessons = {
-  id: 3,
-  name: 'Essential Spanish',
-  published: true,
-  lessons: [{ id: 30, lessonNumber: 1, courseName: 'Essential Spanish' }],
-};
-
-const unpublishedLesson: Lesson = {
-  id: 99,
-  lessonNumber: 9,
-  courseName: 'Unreleased Course',
-};
 
 /**
  * A flashcard's own id and the id of the example it wraps are different numbers
@@ -149,13 +121,9 @@ const renderManagerWithProp = (enableFilteringByDefault: boolean) =>
 describe('useFlashcardManager', () => {
   beforeEach(() => {
     filterOwnedFlashcardsArgs.length = 0;
+    lessonPopupCallArgs.length = 0;
     filterOwnedFlashcardsReturn = createFilterOwnedFlashcardsReturn();
     lessonPopupValue = { lessonsByVocabulary: [], lessonsLoading: false };
-    publishedCoursesValue = {
-      data: [learncraftCourse, essentialCourse],
-      isLoading: false,
-      error: null,
-    };
   });
 
   describe('pagination', () => {
@@ -334,49 +302,40 @@ describe('useFlashcardManager', () => {
   });
 
   describe('lesson popup', () => {
-    it('drops unpublished lessons and lists the selected course first', () => {
-      lessonPopupValue = {
-        lessonsByVocabulary: [
-          essentialCourse.lessons[0]!,
-          unpublishedLesson,
-          learncraftCourse.lessons[1]!,
-          learncraftCourse.lessons[0]!,
-        ],
-        lessonsLoading: false,
+    /**
+     * Published-lesson filtering, relevant-course scoping, and current-course
+     * ordering now live inside `useLessonPopup` itself (see
+     * `useLessonPopup.test.ts`). The Manager's own job is just to forward
+     * that result untouched.
+     */
+    it('passes the lessonPopup from useLessonPopup straight through', () => {
+      const scopedLesson = {
+        id: 21,
+        lessonNumber: 1,
+        courseName: 'LearnCraft Spanish',
       };
-      filterOwnedFlashcardsReturn = createFilterOwnedFlashcardsReturn({
-        combinedFilters: createExampleFilter(learncraftCourse),
-      });
+      lessonPopupValue = {
+        lessonsByVocabulary: [scopedLesson],
+        lessonsLoading: false,
+        currentCourseName: 'LearnCraft Spanish',
+      };
 
       const { result } = renderManager();
 
-      expect(
-        result.current.lessonPopup.lessonsByVocabulary.map(
-          (lesson) => lesson.id,
-        ),
-      ).toEqual([21, 22, 30]);
-      expect(result.current.lessonPopup.currentCourseName).toBe(
-        'LearnCraft Spanish',
-      );
+      expect(result.current.lessonPopup).toBe(lessonPopupValue);
     });
 
-    it('has no current course name when no course is selected', () => {
-      lessonPopupValue = {
-        lessonsByVocabulary: [
-          essentialCourse.lessons[0]!,
-          learncraftCourse.lessons[0]!,
-        ],
-        lessonsLoading: false,
-      };
+    /**
+     * Regression guard: forgetting this flag would silently put the Manager
+     * back on the raw, unscoped lesson list (the v2-redesign-fix-batch-1
+     * regression this task exists to fix).
+     */
+    it('opts in to relevant-course scoping when calling useLessonPopup', () => {
+      renderManager();
 
-      const { result } = renderManager();
-
-      expect(result.current.lessonPopup.currentCourseName).toBeNull();
-      expect(
-        result.current.lessonPopup.lessonsByVocabulary.map(
-          (lesson) => lesson.id,
-        ),
-      ).toEqual([30, 21]);
+      expect(lessonPopupCallArgs.at(-1)).toEqual({
+        scopeToRelevantCourses: true,
+      });
     });
 
     it('is loading while the vocabulary lessons load', () => {
@@ -385,19 +344,6 @@ describe('useFlashcardManager', () => {
       const { result } = renderManager();
 
       expect(result.current.lessonPopup.lessonsLoading).toBe(true);
-    });
-
-    it('is loading while the published courses load', () => {
-      lessonPopupValue = {
-        lessonsByVocabulary: [learncraftCourse.lessons[0]!],
-        lessonsLoading: false,
-      };
-      publishedCoursesValue = { data: undefined, isLoading: true, error: null };
-
-      const { result } = renderManager();
-
-      expect(result.current.lessonPopup.lessonsLoading).toBe(true);
-      expect(result.current.lessonPopup.lessonsByVocabulary).toEqual([]);
     });
   });
 

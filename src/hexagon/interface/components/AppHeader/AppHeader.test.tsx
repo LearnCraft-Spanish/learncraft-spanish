@@ -5,7 +5,6 @@ import {
 } from '@application/useCases/AppHeader/useAppHeader.mock';
 import { AppHeader } from '@interface/components/AppHeader/AppHeader';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -41,28 +40,15 @@ describe('component AppHeader', () => {
     );
   });
 
-  it('shows exactly one header action when logged out', () => {
+  it('renders no header action when logged out (Log in lives on the LoggedOut screen)', () => {
     overrideMockUseAppHeader({ isAuthenticated: false, isLoading: false });
 
     renderHeader();
 
-    expect(screen.getAllByRole('button')).toHaveLength(1);
-    expect(screen.getByRole('button', { name: /Log in/ })).toBeInTheDocument();
-  });
-
-  it('calls login when the Log in button is clicked', async () => {
-    const user = userEvent.setup();
-    const login = vi.fn();
-    overrideMockUseAppHeader({
-      isAuthenticated: false,
-      isLoading: false,
-      login,
-    });
-
-    renderHeader();
-    await user.click(screen.getByRole('button', { name: /Log in/ }));
-
-    expect(login).toHaveBeenCalledOnce();
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
+    expect(
+      screen.queryByRole('button', { name: /Log in/ }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows the account trigger when logged in, and no Log in button', () => {

@@ -7,6 +7,11 @@ import type { IconName } from '@interface/components/general/Icon/Icon';
 import type { Flashcard } from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
 import useFlashcardManager from '@application/useCases/useFlashcardManager';
+import { Badge } from '@interface/components/general/Badge/Badge';
+import {
+  Card,
+  CardSectionHeader,
+} from '@interface/components/general/Card/Card';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { Toggle } from '@interface/components/general/Toggle/Toggle';
 import { FilterSection } from '@interface/components/studentFlashcards/FilterSection';
@@ -70,6 +75,25 @@ function spanglishConfirmBody(count: number): string {
   return `You have ${count} spanglish flashcard${
     count === 1 ? '' : 's'
   }. Are you sure you want to delete them?`;
+}
+
+/**
+ * "Applied" means narrowing the result set beyond the required course/lesson
+ * range: selected tags and the two Card-options toggles. `includeUnpublished`
+ * is excluded — it widens the admin's catalog rather than narrowing it, and
+ * already gets its own "Admin only" badge in `FilterSection`.
+ */
+function appliedFilterCount(
+  exampleFilter: UseCombinedFiltersWithVocabularyReturnType,
+): number {
+  const { selectedSkillTags, excludeSpanglish, audioOnly } = exampleFilter;
+  return (
+    selectedSkillTags.length + (excludeSpanglish ? 1 : 0) + (audioOnly ? 1 : 0)
+  );
+}
+
+function appliedFilterCountLabel(count: number): string {
+  return count === 1 ? '1 filter applied' : `${count} filters applied`;
 }
 
 function FlashcardManagerV2Loaded({
@@ -228,6 +252,7 @@ function FlashcardManagerV2Loaded({
     ? 'Try removing a tag or widening the lesson range.'
     : 'Use the Flashcard Finder to collect your first flashcards.';
   const emptyIcon: IconName = filterOwnedFlashcards ? 'searchOff' : 'search';
+  const filterCount = appliedFilterCount(exampleFilter);
 
   return (
     <PageShell reserveBottomBar flushHorizontal>
@@ -236,14 +261,29 @@ function FlashcardManagerV2Loaded({
           <div className={styles.titleGroup}>
             <h1 className={styles.title}>Flashcard Manager</h1>
           </div>
-          <div className={styles.filterToggle}>
-            <Toggle
-              id="manager-filter-owned"
-              checked={filterOwnedFlashcards}
-              onChange={setFilterOwnedFlashcards}
-              label="Filter my flashcards"
+        </div>
+        <div className={styles.filterControl}>
+          <Card>
+            <CardSectionHeader
+              eyebrow="Filter my flashcards"
+              action={
+                <div className={styles.filterControlActions}>
+                  {filterCount > 0 && (
+                    <Badge tone="action">
+                      {appliedFilterCountLabel(filterCount)}
+                    </Badge>
+                  )}
+                  <Toggle
+                    id="manager-filter-owned"
+                    checked={filterOwnedFlashcards}
+                    onChange={setFilterOwnedFlashcards}
+                    label="Filter my flashcards"
+                    labelHidden
+                  />
+                </div>
+              }
             />
-          </div>
+          </Card>
         </div>
         {filterOwnedFlashcards && (
           <FilterSection
