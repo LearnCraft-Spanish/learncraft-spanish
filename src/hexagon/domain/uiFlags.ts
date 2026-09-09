@@ -5,7 +5,8 @@ export type StudentUiFlag =
   | 'ui.student.home.v2'
   | 'ui.student.customquiz.v2'
   | 'ui.student.textquiz.v2'
-  | 'ui.student.officialquiz.v2';
+  | 'ui.student.officialquiz.v2'
+  | 'ui.student.audioquiz.v2';
 
 export type DevUiFlag = 'ui.dev.gallery';
 

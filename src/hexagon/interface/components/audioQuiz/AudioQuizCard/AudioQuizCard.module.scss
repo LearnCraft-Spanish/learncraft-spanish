@@ -1,0 +1,217 @@
+/* 20px is the handoff's literal frame radius — outside the token scale
+ * (sm/md/lg/xl/pill = 6/8/10/14/999), documented one-off (see `QuizCard`,
+ * which carries the same note). */
+.root {
+  display: flex;
+  position: relative;
+  box-sizing: border-box;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--lcs-space-7);
+  border: var(--lcs-border-hairline) solid var(--lcs-border-card);
+  border-radius: 20px;
+  box-shadow: none;
+  background-color: var(--lcs-color-surface);
+  color: var(--lcs-color-ink);
+  cursor: default;
+  gap: var(--lcs-space-5);
+  text-align: center;
+  user-select: none;
+}
+
+.tappable {
+  cursor: pointer;
+}
+
+.root:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+/* Autoplay-only step timer — left-to-right fill, left corners only (handoff). */
+.fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  background-color: var(--lcs-tint-action);
+  pointer-events: none;
+  transition: width var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}
+
+/* Reserved even when empty, so the Answer step's add-pill never shifts the
+ * card body. */
+.header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: none;
+  height: 36px;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: default;
+}
+
+.addPill {
+  display: flex;
+  align-items: center;
+  gap: var(--lcs-space-2);
+  padding: 7px 10px;
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+  border-radius: var(--lcs-radius-lg);
+  background-color: transparent;
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--lcs-text-chip);
+  font-weight: var(--lcs-weight-bold);
+  transition:
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    border-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.addPill:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.addPill.added {
+  border-color: var(--lcs-tint-action);
+  background-color: var(--lcs-tint-action);
+  color: var(--lcs-color-action);
+}
+
+.addPill:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  overflow-y: auto;
+  gap: var(--lcs-space-7);
+}
+
+/* Left-aligns once help content pushes the body taller than the card, so
+ * the sentence does not recenter as the panel grows. */
+.body.helpOpen {
+  justify-content: flex-start;
+}
+
+.sentence {
+  margin: 0;
+  /* Handoff: 26px mobile / 36px desktop — outside the type scale, so these
+   * are documented one-offs (see `QuizCard.face`, same note). */
+  font-size: 26px;
+  font-weight: var(--lcs-weight-regular);
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.regular {
+  font-weight: var(--lcs-weight-regular);
+}
+
+/* Target word only — bold, never italic (unlike text quiz's `QuizCard`,
+ * which bolds+italicizes every Spanish run). */
+.bold {
+  font-weight: var(--lcs-weight-bold);
+}
+
+.instruction {
+  margin: 0;
+  color: var(--lcs-color-muted);
+  /* Handoff: 20px mobile / 26px desktop — documented one-off, same reasoning
+   * as `.sentence`. */
+  font-size: 20px;
+  font-weight: var(--lcs-weight-bold);
+}
+
+.helpContent {
+  width: 100%;
+  animation: helpContentIn var(--lcs-motion-panel) var(--lcs-ease-standard);
+  cursor: default;
+  text-align: left;
+}
+
+@keyframes helpContentIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .helpContent {
+    animation: none;
+  }
+}
+
+.footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: none;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.playSlot {
+  position: absolute;
+  right: 0;
+}
+
+@media (min-width: 769px) {
+  .root {
+    padding: var(--lcs-space-8);
+  }
+
+  .header {
+    height: 40px;
+  }
+
+  .sentence {
+    font-size: 36px;
+    line-height: 1.25;
+  }
+
+  .instruction {
+    font-size: 26px;
+  }
+
+  /* Let the word panel spill past the card's bottom edge and overlay the
+   * dock, matching `QuizCard`'s desktop help behavior — mobile keeps its
+   * word details in `WordPanelModal`, outside the card entirely. */
+  .root.helpOpen {
+    overflow: visible;
+  }
+
+  .body.helpOpen {
+    overflow-y: visible;
+  }
+}

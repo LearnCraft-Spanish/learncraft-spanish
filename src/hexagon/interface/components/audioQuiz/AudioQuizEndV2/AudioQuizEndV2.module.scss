@@ -1,0 +1,170 @@
+/* Full-bleed parchment fill, same technique as `AudioQuizV2.module.scss` /
+ * `TextQuizV2.module.scss` — the legacy pages this mounts inside give no
+ * height of their own. */
+.root {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  max-width: 390px;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 auto;
+  background-color: var(--lcs-color-page);
+  box-shadow: 0 0 0 100vmax var(--lcs-color-page);
+  clip-path: inset(0 -100vmax);
+  padding: 20px 16px;
+  gap: 16px;
+  min-height: calc(100vh - var(--lcs-app-header-height));
+  min-height: calc(100dvh - var(--lcs-app-header-height));
+}
+
+.card,
+.navyCard,
+.whiteCard {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--lcs-radius-xl);
+  gap: 14px;
+}
+
+.card {
+  padding: 20px;
+  background-color: var(--lcs-color-surface);
+}
+
+.heading {
+  margin: 0;
+  color: var(--lcs-color-ink);
+  font-size: var(--lcs-text-h2);
+  font-weight: var(--lcs-weight-bold);
+  line-height: 1.25;
+}
+
+.body {
+  margin: 0;
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-control);
+  line-height: var(--lcs-line-body);
+  text-wrap: pretty;
+}
+
+.countdownSection {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--lcs-space-6);
+  border-top: var(--lcs-border-hairline) solid var(--lcs-border-card);
+  gap: var(--lcs-space-3);
+}
+
+.countdownRow {
+  display: flex;
+  align-items: center;
+  gap: var(--lcs-space-3);
+  color: var(--lcs-color-action);
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.countdownTrack {
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--lcs-radius-pill);
+  background-color: var(--lcs-border-card);
+}
+
+.countdownFill {
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--lcs-color-action);
+  /* Handoff: the countdown bar's own transition is linear (distinct from
+   * the deck bar's eased transition), since it ticks in fixed 1s steps. */
+  transition: width 320ms linear;
+}
+
+.primary,
+.secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--lcs-radius-lg);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: var(--lcs-weight-bold);
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.primary:focus-visible,
+.secondary:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.primary {
+  height: 52px;
+  border: none;
+  background-color: var(--lcs-color-action);
+  color: var(--lcs-color-on-action);
+  font-size: var(--lcs-text-body);
+}
+
+.primary:hover {
+  background-color: var(--lcs-color-action-hover);
+}
+
+.secondary {
+  height: 44px;
+  border: var(--lcs-control-border) solid var(--lcs-color-action);
+  background-color: transparent;
+  color: var(--lcs-color-action);
+  font-size: var(--lcs-text-control);
+}
+
+.secondary:hover {
+  background-color: var(--lcs-tint-hover);
+}
+
+.navyCard {
+  padding: var(--lcs-space-7);
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+  gap: var(--lcs-space-2);
+}
+
+.navyBody {
+  margin: 0;
+  color: var(--lcs-on-dark-85);
+  font-size: var(--lcs-text-caption);
+  line-height: var(--lcs-line-body);
+  text-wrap: pretty;
+}
+
+.whiteCard {
+  padding: var(--lcs-space-7);
+  background-color: var(--lcs-color-surface);
+  gap: var(--lcs-space-4);
+}
+
+.addedCount {
+  margin: 0;
+  color: var(--lcs-color-ink);
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.reviewRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lcs-space-3);
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-action);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdownFill,
+  .primary,
+  .secondary {
+    transition: none;
+  }
+}

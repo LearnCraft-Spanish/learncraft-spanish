@@ -1,0 +1,75 @@
+{
+  "states": [
+    {
+      "label": "Audio-mobile-speaking-auto-question",
+      "formFactor": "mobile",
+      "query": "specimen=audio-quiz&type=speaking&autoplay=1&step=question&playing=1&fill=0"
+    },
+    {
+      "label": "Audio-mobile-speaking-auto-guess",
+      "formFactor": "mobile",
+      "query": "specimen=audio-quiz&type=speaking&autoplay=1&step=guess&playing=1&fill=42"
+    },
+    {
+      "label": "Audio-mobile-speaking-auto-audio-answer",
+      "formFactor": "mobile",
+      "query": "specimen=audio-quiz&type=speaking&autoplay=1&step=hint&playing=1&fill=0"
+    },
+    {
+      "label": "Audio-mobile-speaking-auto-answer",
+      "formFactor": "mobile",
+      "query": "specimen=audio-quiz&type=speaking&autoplay=1&step=answer&playing=0&fill=0"
+    },
+    {
+      "label": "Audio-mobile-speaking-auto-answer-help",
+      "formFactor": "mobile",
+      "query": "specimen=audio-quiz&type=speaking&autoplay=1&step=answer&help=1&playing=0"
+    },
+    {
+      "label": "Audio-mobile-speaking-auto-answer-help-word",
+      "formFactor": "mobile",
+      "query": "specimen=audio-quiz&type=speaking&autoplay=1&step=answer&help=1&word=4&playing=0"
+    },
+    {
+      "label": "Audio-mobile-listening-manual-question",
+      "formFactor": "mobile",
+      "query": "specimen=audio-quiz&type=listening&autoplay=0&step=question&playing=1&fill=0"
+    },
+    {
+      "label": "Audio-mobile-listening-manual-answer-added",
+      "formFactor": "mobile",
+      "query": "specimen=audio-quiz&type=listening&autoplay=0&step=answer&added=1&playing=0"
+    },
+    {
+      "label": "Audio-desktop-listening-manual-answer-help-word",
+      "formFactor": "desktop",
+      "query": "specimen=audio-quiz&type=listening&autoplay=0&step=answer&help=1&word=4&added=1&playing=0"
+    },
+    {
+      "label": "Audio-desktop-speaking-auto-guess",
+      "formFactor": "desktop",
+      "query": "specimen=audio-quiz&type=speaking&autoplay=1&step=guess&playing=1&fill=42"
+    },
+    {
+      "label": "Audio-desktop-speaking-answer",
+      "formFactor": "desktop",
+      "query": "specimen=audio-quiz&type=speaking&autoplay=0&step=answer&playing=0"
+    },
+    {
+      "label": "Audio-desktop-listening-manual-question",
+      "formFactor": "desktop",
+      "query": "specimen=audio-quiz&type=listening&autoplay=0&step=question&playing=1"
+    },
+    {
+      "label": "Audio-complete-autoplay",
+      "formFactor": "mobile",
+      "query": "specimen=audio-quiz&screen=complete&type=speaking&autoplay=1&countdown=14&skipped=1&context=1"
+    },
+    {
+      "label": "Audio-complete-manual",
+      "formFactor": "mobile",
+      "query": "specimen=audio-quiz&screen=complete&type=listening&autoplay=0&addedCount=3"
+    }
+  ],
+  "barHint": ".gauntlet/bars/audio-quiz (generated from design_handoff_audio_quiz)"
+}

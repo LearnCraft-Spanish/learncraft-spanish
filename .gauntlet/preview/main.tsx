@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client';
 import { installNetworkGuard } from './networkGuard';
 
 import { PreviewProviders } from './PreviewProviders';
+import { AudioQuizSpecimen } from './specimens/audio-quiz';
 import { HomeSpecimen } from './specimens/home';
 import { SmokeSpecimen } from './specimens/smoke';
 import { TextQuizSpecimen } from './specimens/text-quiz';
@@ -22,7 +23,7 @@ const params = new URLSearchParams(window.location.search);
 const specimen = params.get('specimen') ?? 'smoke';
 
 /** Specimens that set `ready` themselves after async setup (e.g. chip click). */
-const DEFERS_READY = new Set(['text-quiz']);
+const DEFERS_READY = new Set(['text-quiz', 'audio-quiz']);
 
 function SpecimenRoot(): JSX.Element {
   switch (specimen) {
@@ -30,6 +31,8 @@ function SpecimenRoot(): JSX.Element {
       return <HomeSpecimen />;
     case 'text-quiz':
       return <TextQuizSpecimen />;
+    case 'audio-quiz':
+      return <AudioQuizSpecimen />;
     case 'smoke':
     default:
       return <SmokeSpecimen />;

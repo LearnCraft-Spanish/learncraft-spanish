@@ -1,0 +1,40 @@
+/* 44px is the handoff's literal circle size — also the minimum tap target,
+ * so it is not shrunk on mobile. */
+.root {
+  display: inline-flex;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--lcs-radius-pill);
+  background-color: var(--lcs-tint-action);
+  color: var(--lcs-color-action);
+  cursor: pointer;
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+
+  /* Force Tabler stroke to Celestial Blue — inherit alone can wash out at 2×. */
+  svg {
+    color: var(--lcs-color-action) !important;
+    stroke: var(--lcs-color-action) !important;
+    fill: none !important;
+  }
+}
+
+.root:hover {
+  background-color: var(--lcs-tint-hover);
+}
+
+.root:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+}
