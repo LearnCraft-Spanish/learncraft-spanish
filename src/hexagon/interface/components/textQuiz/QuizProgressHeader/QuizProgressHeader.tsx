@@ -6,8 +6,12 @@ import { IconButton } from '@interface/components/general/IconButton/IconButton'
 import styles from './QuizProgressHeader.module.scss';
 
 interface QuizProgressHeaderProps {
-  /** The desktop context line, e.g. "Lessons 1–111 · 249 due". */
-  quizTitle?: string;
+  /** Desktop context tier 1 — quiz category, e.g. "Custom Quiz" / "My
+   * Flashcards Quiz" / "Official Quizzes". */
+  eyebrow?: string;
+  /** Desktop context tier 2, e.g. "Text Quiz" or (Official) "LCSP - Lesson
+   * 5". The whole context block is gated on this being defined. */
+  subtitle?: string;
   exampleNumber: number;
   quizLength: number;
   srs: boolean;
@@ -23,7 +27,8 @@ interface QuizProgressHeaderProps {
  * pills flank the card itself — see `TallyPill`.
  */
 export function QuizProgressHeader({
-  quizTitle,
+  eyebrow,
+  subtitle,
   exampleNumber,
   quizLength,
   srs,
@@ -77,10 +82,10 @@ export function QuizProgressHeader({
       <div className={styles.desktopRow}>
         <div className={styles.leftGroup}>
           {backButton}
-          {quizTitle !== undefined && (
+          {subtitle !== undefined && (
             <div className={styles.context}>
-              <Eyebrow as="h2">Quizzing my flashcards</Eyebrow>
-              <p className={styles.title}>{quizTitle}</p>
+              <Eyebrow as="h2">{eyebrow}</Eyebrow>
+              <p className={styles.title}>{subtitle}</p>
             </div>
           )}
         </div>

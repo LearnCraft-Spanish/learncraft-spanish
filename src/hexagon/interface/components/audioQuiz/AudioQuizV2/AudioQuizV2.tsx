@@ -1,8 +1,9 @@
 import type { AudioQuizV2Props } from '@interface/components/audioQuiz/AudioQuizV2/AudioQuizV2.types';
 import type { JSX } from 'react';
-import { AudioQuizStep } from '@domain/audioQuizzing';
+import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import { audioQuizCopy } from '@domain/functions/audioQuizCopy';
 import { orderVocabularyByAppearance } from '@domain/functions/orderVocabularyByAppearance';
+import { audioQuizTitle } from '@domain/functions/quizTitle';
 import { AudioQuizCard } from '@interface/components/audioQuiz/AudioQuizCard';
 import { AudioQuizDock } from '@interface/components/audioQuiz/AudioQuizDock';
 import { AudioQuizProgressHeader } from '@interface/components/audioQuiz/AudioQuizProgressHeader';
@@ -59,6 +60,7 @@ function isFocusOnTextEntry(): boolean {
  */
 export function AudioQuizV2({
   audioQuizType,
+  quizCategory,
   autoplay,
   exampleNumber,
   quizLength,
@@ -192,6 +194,11 @@ export function AudioQuizV2({
     isSpanishStep: isSpanishText,
   });
 
+  const title = audioQuizTitle(
+    quizCategory,
+    audioQuizType === AudioQuizType.Speaking,
+  );
+
   const showHelpButton = isAnswerStep && vocabComplete;
 
   // `orderVocabularyByAppearance` needs the Spanish sentence to place chips
@@ -230,7 +237,8 @@ export function AudioQuizV2({
   return (
     <div className={styles.root}>
       <AudioQuizProgressHeader
-        quizName={copy.quizName}
+        eyebrow={title.eyebrow}
+        subtitle={title.subtitle}
         exampleNumber={exampleNumber}
         quizLength={quizLength}
       />

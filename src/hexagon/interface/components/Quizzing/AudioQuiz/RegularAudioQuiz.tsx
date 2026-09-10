@@ -13,6 +13,10 @@ interface RegularAudioQuizProps {
  * Gating the redesign here, rather than in each page, matches
  * `RegularTextQuiz`. Only `useStudentUiVersion` lives here — each version
  * branch owns its own `useAudioQuiz` call.
+ *
+ * Always the Custom Quiz audio path — `ReviewMyFlashcardsAudioQuiz` is the
+ * My Flashcards equivalent — so the v2 screen's `quizCategory` is fixed
+ * rather than threaded through as a prop.
  */
 export function RegularAudioQuiz({
   audioQuizProps,
@@ -37,5 +41,10 @@ function RegularAudioQuizV2({
   audioQuizProps,
 }: RegularAudioQuizProps): JSX.Element {
   const audioQuizReturn = useAudioQuiz(audioQuizProps);
-  return <AudioQuizV2Screen audioQuizReturn={audioQuizReturn} />;
+  return (
+    <AudioQuizV2Screen
+      audioQuizReturn={audioQuizReturn}
+      quizCategory="custom"
+    />
+  );
 }

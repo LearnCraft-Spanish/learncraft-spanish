@@ -72,6 +72,7 @@ function renderQuiz(overrides: AudioQuizV2TestProps = {}): {
 
   const defaultProps: AudioQuizV2Props = {
     audioQuizType: AudioQuizType.Speaking,
+    quizCategory: 'custom',
     autoplay: true,
     exampleNumber: 1,
     quizLength: 20,
@@ -142,15 +143,16 @@ describe('audioQuizV2 — smoke render', () => {
     expect(screen.getByText('Make a Guess!')).toBeTruthy();
   });
 
-  it('shows the deck position and quiz name in the header', () => {
+  it('shows the deck position and quiz title in the header', () => {
     stubMobile(false);
     renderQuiz({ exampleNumber: 12, quizLength: 20 });
 
     expect(screen.getByText('12 / 20')).toBeTruthy();
-    expect(screen.getByText('Speaking quiz · my flashcards')).toBeTruthy();
+    expect(screen.getByText('Custom Quiz')).toBeTruthy();
+    expect(screen.getByText('Speaking Quiz')).toBeTruthy();
   });
 
-  it('shows the listening quiz name for a listening quiz', () => {
+  it('shows the listening quiz subtitle for a listening quiz', () => {
     stubMobile(false);
     renderQuiz({
       audioQuizType: AudioQuizType.Listening,
@@ -159,7 +161,14 @@ describe('audioQuizV2 — smoke render', () => {
       isSpanishText: true,
     });
 
-    expect(screen.getByText('Listening quiz · my flashcards')).toBeTruthy();
+    expect(screen.getByText('Listening Quiz')).toBeTruthy();
+  });
+
+  it('shows the "My Flashcards Quiz" eyebrow for that category', () => {
+    stubMobile(false);
+    renderQuiz({ quizCategory: 'myFlashcards' });
+
+    expect(screen.getByText('My Flashcards Quiz')).toBeTruthy();
   });
 });
 

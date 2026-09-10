@@ -12,7 +12,12 @@ import { setQuizActive } from '@interface/hooks/useQuizChrome';
 import { useCallback, useEffect } from 'react';
 
 export interface TextQuizV2ScreenProps {
-  quizTitle?: string;
+  /** Desktop context tier 1, e.g. "Custom Quiz" / "My Flashcards Quiz" /
+   * "Official Quizzes" — see `domain/functions/quizTitle`. */
+  eyebrow?: string;
+  /** Desktop context tier 2, e.g. "Text Quiz" or (Official) the course +
+   * quiz number. */
+  subtitle?: string;
   useTextQuizReturn: TextQuizReturn;
   srsQuizProps?: UseStudentFlashcardUpdatesReturn;
 }
@@ -26,7 +31,8 @@ export interface TextQuizV2ScreenProps {
  */
 export function TextQuizV2Screen({
   useTextQuizReturn,
-  quizTitle,
+  eyebrow,
+  subtitle,
   srsQuizProps,
 }: TextQuizV2ScreenProps): JSX.Element {
   const {
@@ -88,7 +94,8 @@ export function TextQuizV2Screen({
         ) : (
           <TextQuizV2
             srs={!!srsQuizProps}
-            quizTitle={quizTitle}
+            eyebrow={eyebrow}
+            subtitle={subtitle}
             exampleNumber={exampleNumber}
             quizLength={quizLength}
             quizExample={quizExample}

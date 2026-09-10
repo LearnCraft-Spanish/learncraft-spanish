@@ -1,5 +1,6 @@
 import type { TextQuizV2Props } from '@interface/components/textQuiz/TextQuizV2/TextQuizV2.types';
 import type { JSX } from 'react';
+import { textQuizTitle } from '@domain/functions/quizTitle';
 import { TextQuizV2 } from '@interface/components/textQuiz/TextQuizV2';
 import { useEffect } from 'react';
 import {
@@ -8,8 +9,6 @@ import {
   EXTRA_VOCABULARY,
   QUIZ_EXAMPLE,
   QUIZ_LENGTH,
-  QUIZ_TITLE_PLAIN,
-  QUIZ_TITLE_SRS,
   TALLIES,
   VOCABULARY,
   WORD_TEXTS,
@@ -148,9 +147,12 @@ export function TextQuizSpecimen(): JSX.Element {
     return { ...info, lessons };
   }
 
+  const title = textQuizTitle('myFlashcards', srs);
+
   const props: TextQuizV2Props = {
     srs,
-    quizTitle: srs ? QUIZ_TITLE_SRS : QUIZ_TITLE_PLAIN,
+    eyebrow: title.eyebrow,
+    subtitle: title.subtitle,
     exampleNumber,
     quizLength: QUIZ_LENGTH,
     quizExample,

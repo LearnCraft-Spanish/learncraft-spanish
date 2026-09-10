@@ -60,7 +60,7 @@ describe('reviewMyFlashcardsTextQuiz', () => {
     expect(screen.getByText(/1 of 3/)).toBeInTheDocument();
   });
 
-  it('should pass quizTitle to TextQuiz', () => {
+  it('shows the fixed "Text Quiz" title on the legacy screen', () => {
     overrideMockUseReviewMyFlashcardsTextQuiz(
       createMockTextQuizReturn({
         quizLength: 3,
@@ -70,14 +70,11 @@ describe('reviewMyFlashcardsTextQuiz', () => {
 
     render(
       <MockAllProviders>
-        <ReviewMyFlashcardsTextQuiz
-          {...defaultProps}
-          quizTitle="Review My Flashcards"
-        />
+        <ReviewMyFlashcardsTextQuiz {...defaultProps} />
       </MockAllProviders>,
     );
 
-    expect(screen.getByText(/Review My Flashcards/)).toBeInTheDocument();
+    expect(screen.getByText(/Text Quiz/)).toBeInTheDocument();
   });
 
   it('renders the redesigned TextQuizV2Screen on v2', () => {
@@ -97,6 +94,8 @@ describe('reviewMyFlashcardsTextQuiz', () => {
 
     expect(screen.getAllByText('1 / 3').length).toBeGreaterThan(0);
     expect(screen.queryByText(/1 of 3/)).toBeNull();
+    expect(screen.getByText('My Flashcards Quiz')).toBeInTheDocument();
+    expect(screen.getByText('Text Quiz')).toBeInTheDocument();
   });
 
   it('falls back to the legacy TextQuiz on v1', () => {

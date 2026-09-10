@@ -24,7 +24,6 @@ export interface AudioQuizCopyResult {
   instructionTitle: string | null;
   primaryLabel: string;
   replayLabel: string;
-  quizName: string;
 }
 
 /**
@@ -32,6 +31,8 @@ export interface AudioQuizCopyResult {
  * from the handoff's step model (`Audio Quiz Redesign.dc.html`, `view()` /
  * `renderVals()`). Pure and stateless — `AudioQuizV2Screen` supplies the
  * inputs from `useAudioQuiz`'s `currentStep` / `currentStepValue.spanish`.
+ * The progress header's title is not step-dependent, so it is built
+ * separately by `domain/functions/quizTitle`'s `audioQuizTitle`.
  *
  * Step model (domain `AudioQuizStep`, 0-indexed in the handoff):
  * - Speaking: Question (English text+audio) → Guess → Hint (Spanish
@@ -93,11 +94,8 @@ export function audioQuizCopy({
   }
 
   const replayLabel = isSpeaking ? 'Replay English' : 'Replay Spanish';
-  const quizName = isSpeaking
-    ? 'Speaking quiz · my flashcards'
-    : 'Listening quiz · my flashcards';
 
-  return { bodyKind, instructionTitle, primaryLabel, replayLabel, quizName };
+  return { bodyKind, instructionTitle, primaryLabel, replayLabel };
 }
 
 export interface AudioQuizTextRun {

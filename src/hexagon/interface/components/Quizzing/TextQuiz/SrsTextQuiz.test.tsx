@@ -72,7 +72,7 @@ describe('srsTextQuiz', () => {
     expect(screen.getByText(/1 of 3/)).toBeInTheDocument();
   });
 
-  it('should pass quizTitle to TextQuiz', () => {
+  it('shows the fixed "SRS Quiz" title on the legacy screen', () => {
     overrideMockUseSrsTextQuiz({
       TextQuizReturn: createMockTextQuizReturn({
         quizLength: 4,
@@ -82,11 +82,11 @@ describe('srsTextQuiz', () => {
 
     render(
       <MockAllProviders>
-        <SrsTextQuiz {...defaultProps} quizTitle="SRS Review" />
+        <SrsTextQuiz {...defaultProps} />
       </MockAllProviders>,
     );
 
-    expect(screen.getByText(/SRS Review/)).toBeInTheDocument();
+    expect(screen.getByText(/SRS Quiz/)).toBeInTheDocument();
     expect(screen.getByText(/1 of 4/)).toBeInTheDocument();
   });
 
@@ -107,6 +107,8 @@ describe('srsTextQuiz', () => {
 
     expect(screen.getAllByText('1 / 3').length).toBeGreaterThan(0);
     expect(screen.queryByText(/1 of 3/)).toBeNull();
+    expect(screen.getByText('My Flashcards Quiz')).toBeInTheDocument();
+    expect(screen.getByText('SRS Quiz')).toBeInTheDocument();
   });
 
   it('falls back to the legacy TextQuiz on v1', () => {

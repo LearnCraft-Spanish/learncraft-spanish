@@ -55,7 +55,8 @@ function isFocusOnTextEntry(): boolean {
  */
 export function TextQuizV2({
   srs,
-  quizTitle,
+  eyebrow,
+  subtitle,
   exampleNumber,
   quizLength,
   quizExample,
@@ -183,7 +184,8 @@ export function TextQuizV2({
     return (
       <div className={styles.root}>
         <QuizProgressHeader
-          quizTitle={quizTitle}
+          eyebrow={eyebrow}
+          subtitle={subtitle}
           exampleNumber={exampleNumber}
           quizLength={quizLength}
           srs={srs}
@@ -260,7 +262,8 @@ export function TextQuizV2({
   return (
     <div className={styles.root}>
       <QuizProgressHeader
-        quizTitle={quizTitle}
+        eyebrow={eyebrow}
+        subtitle={subtitle}
         exampleNumber={exampleNumber}
         quizLength={quizLength}
         srs={srs}

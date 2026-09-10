@@ -86,7 +86,8 @@ function renderQuizWithProps(overrides: TextQuizV2TestProps = {}): {
   render(
     <TextQuizV2
       srs={false}
-      quizTitle="Lessons 1–111 · 249 cards"
+      eyebrow="My Flashcards Quiz"
+      subtitle="Lessons 1–111 · 249 cards"
       exampleNumber={1}
       quizLength={249}
       quizExample={QUIZ_EXAMPLE}
@@ -203,7 +204,8 @@ describe('text quiz v2 flip hint copy', () => {
     const { rerender } = render(
       <TextQuizV2
         srs={false}
-        quizTitle="Lessons 1–111 · 249 cards"
+        eyebrow="My Flashcards Quiz"
+        subtitle="Lessons 1–111 · 249 cards"
         exampleNumber={1}
         quizLength={249}
         quizExample={QUIZ_EXAMPLE}
@@ -224,7 +226,8 @@ describe('text quiz v2 flip hint copy', () => {
     rerender(
       <TextQuizV2
         srs={false}
-        quizTitle="Lessons 1–111 · 249 cards"
+        eyebrow="My Flashcards Quiz"
+        subtitle="Lessons 1–111 · 249 cards"
         exampleNumber={1}
         quizLength={249}
         quizExample={QUIZ_EXAMPLE}
@@ -249,7 +252,8 @@ describe('text quiz v2 flip hint copy', () => {
     const { rerender } = render(
       <TextQuizV2
         srs={false}
-        quizTitle="Lessons 1–111 · 249 cards"
+        eyebrow="My Flashcards Quiz"
+        subtitle="Lessons 1–111 · 249 cards"
         exampleNumber={1}
         quizLength={249}
         quizExample={QUIZ_EXAMPLE}
@@ -270,7 +274,8 @@ describe('text quiz v2 flip hint copy', () => {
     rerender(
       <TextQuizV2
         srs={false}
-        quizTitle="Lessons 1–111 · 249 cards"
+        eyebrow="My Flashcards Quiz"
+        subtitle="Lessons 1–111 · 249 cards"
         exampleNumber={1}
         quizLength={249}
         quizExample={QUIZ_EXAMPLE}
@@ -295,7 +300,8 @@ describe('text quiz v2 flip hint copy', () => {
     render(
       <TextQuizV2
         srs
-        quizTitle="Lessons 1–111 · 249 cards"
+        eyebrow="My Flashcards Quiz"
+        subtitle="Lessons 1–111 · 249 cards"
         exampleNumber={1}
         quizLength={249}
         quizExample={QUIZ_EXAMPLE}
@@ -324,7 +330,8 @@ describe('text quiz v2 flip hint copy', () => {
     render(
       <TextQuizV2
         srs={false}
-        quizTitle="Lessons 1–111 · 249 cards"
+        eyebrow="My Flashcards Quiz"
+        subtitle="Lessons 1–111 · 249 cards"
         exampleNumber={1}
         quizLength={249}
         quizExample={QUIZ_EXAMPLE}
@@ -415,7 +422,8 @@ describe('text quiz v2 keyboard navigation', () => {
         <input aria-label="Test input" />
         <TextQuizV2
           srs={false}
-          quizTitle="Lessons 1–111 · 249 cards"
+          eyebrow="My Flashcards Quiz"
+          subtitle="Lessons 1–111 · 249 cards"
           exampleNumber={2}
           quizLength={249}
           quizExample={QUIZ_EXAMPLE}

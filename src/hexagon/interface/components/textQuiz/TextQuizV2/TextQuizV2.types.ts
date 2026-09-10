@@ -13,8 +13,12 @@ import type { Vocabulary } from '@learncraft-spanish/shared';
 export interface TextQuizV2Props {
   /** `true` renders the grading dock, the tallies, and swipe. */
   srs: boolean;
-  /** Rendered as the desktop context line beside the position readout. */
-  quizTitle?: string;
+  /** Desktop context tier 1, e.g. "Custom Quiz" / "My Flashcards Quiz" /
+   * "Official Quizzes". */
+  eyebrow?: string;
+  /** Desktop context tier 2, e.g. "Text Quiz" or (Official) the course +
+   * quiz number. The context block is gated on this being defined. */
+  subtitle?: string;
   /** 1-based position in the deck. */
   exampleNumber: number;
   quizLength: number;

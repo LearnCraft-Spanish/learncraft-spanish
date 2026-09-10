@@ -95,12 +95,14 @@ describe('textQuizV2Screen', () => {
       <MockAllProviders>
         <TextQuizV2Screen
           useTextQuizReturn={createMockTextQuizReturnWithExamples(mockExamples)}
-          quizTitle="Lessons 1-5"
+          eyebrow="Custom Quiz"
+          subtitle="Lessons 1-5"
         />
       </MockAllProviders>,
     );
 
     expect(screen.getAllByText('1 / 3').length).toBeGreaterThan(0);
+    expect(screen.getByText('Custom Quiz')).toBeInTheDocument();
     expect(screen.getByText('Lessons 1-5')).toBeInTheDocument();
   });
 

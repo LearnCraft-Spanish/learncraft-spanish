@@ -2,10 +2,15 @@ import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { JSX } from 'react';
 import { useTextQuiz } from '@application/units/useTextQuiz';
 import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
+import { officialQuizTitle, textQuizTitle } from '@domain/functions/quizTitle';
 import { TextQuiz } from '@interface/components/Quizzing/TextQuiz/TextQuiz';
 import { TextQuizV2Screen } from '@interface/components/Quizzing/TextQuiz/TextQuizV2Screen';
 
 interface RegularTextQuizProps {
+  /** Set only by `OfficialQuiz` — the API's course + quiz number. Its
+   * presence is how this component tells an Official quiz apart from a
+   * Custom quiz, both of which mount it. Absent, this renders the Custom
+   * Quiz title instead. */
   quizTitle?: string;
   textQuizProps: UseTextQuizProps;
 }
@@ -35,8 +40,15 @@ function RegularTextQuizV1({
   textQuizProps,
 }: RegularTextQuizProps): JSX.Element {
   const useTextQuizReturn = useTextQuiz(textQuizProps);
+  const title =
+    quizTitle !== undefined
+      ? officialQuizTitle(quizTitle)
+      : textQuizTitle('custom', false);
   return (
-    <TextQuiz useTextQuizReturn={useTextQuizReturn} quizTitle={quizTitle} />
+    <TextQuiz
+      useTextQuizReturn={useTextQuizReturn}
+      quizTitle={title.subtitle}
+    />
   );
 }
 
@@ -45,10 +57,15 @@ function RegularTextQuizV2({
   textQuizProps,
 }: RegularTextQuizProps): JSX.Element {
   const useTextQuizReturn = useTextQuiz(textQuizProps);
+  const title =
+    quizTitle !== undefined
+      ? officialQuizTitle(quizTitle)
+      : textQuizTitle('custom', false);
   return (
     <TextQuizV2Screen
       useTextQuizReturn={useTextQuizReturn}
-      quizTitle={quizTitle}
+      eyebrow={title.eyebrow}
+      subtitle={title.subtitle}
     />
   );
 }

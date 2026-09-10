@@ -1,4 +1,5 @@
 import type { AudioQuizReturn } from '@application/units/AudioQuiz/useAudioQuiz';
+import type { QuizCategory } from '@domain/functions/quizTitle';
 import type { JSX } from 'react';
 import { useVocabInfo } from '@application/units/useVocabInfo';
 import { AudioQuizType } from '@domain/audioQuizzing';
@@ -9,6 +10,10 @@ import { useCallback } from 'react';
 
 export interface AudioQuizV2ScreenProps {
   audioQuizReturn: AudioQuizReturn;
+  /** "Custom Quiz" vs "My Flashcards Quiz" progress-header eyebrow — set
+   * by `RegularAudioQuiz` / `ReviewMyFlashcardsAudioQuiz`, the only layer
+   * that knows which page mounted this screen. */
+  quizCategory: QuizCategory;
 }
 
 /**
@@ -26,6 +31,7 @@ export interface AudioQuizV2ScreenProps {
  */
 export function AudioQuizV2Screen({
   audioQuizReturn,
+  quizCategory,
 }: AudioQuizV2ScreenProps): JSX.Element {
   const {
     autoplay,
@@ -86,6 +92,7 @@ export function AudioQuizV2Screen({
   return (
     <AudioQuizV2
       audioQuizType={audioQuizType}
+      quizCategory={quizCategory}
       autoplay={autoplay}
       exampleNumber={currentExampleNumber}
       quizLength={quizLength}

@@ -51,10 +51,12 @@ instructionTitle, primaryLabel, replayLabel, quizName) and
   buttons). Branching one component on quiz kind would have meant an
   `if (isAudioQuiz)` fork through most of the render, so two files instead.
 - **`AudioQuizProgressHeader`** instead of `QuizProgressHeader`. Text quiz's
-  header carries SRS tallies, a per-step rail (already removed there too,
-  historically), and a desktop back arrow + context line. The handoff
-  explicitly drops all of that for audio — eyebrow, `12 / 20`, deck bar, and
-  nothing else, identical on mobile and desktop.
+  header carries SRS tallies and a per-step rail (already removed there
+  too, historically) that audio has no equivalent of. The handoff drops
+  those for audio, but the two-tier quiz title (category eyebrow + form
+  subtitle, from `domain/functions/quizTitle`) is shared with text quiz —
+  see divergence #3 below, which updates the original handoff-only
+  single-tier eyebrow.
 - **`AudioKeyboardHints`** instead of `KeyboardHints`. Different shortcuts
   (space play/pause · ↑ next step · ← → card) with no SRS/flip branch, so a
   shared component would just be two unrelated hint lists behind one prop.
@@ -86,8 +88,8 @@ instructionTitle, primaryLabel, replayLabel, quizName) and
 3. **No back arrow in `AudioQuizProgressHeader`, on either breakpoint.** The
    handoff's mobile app header already carries a "Setup" back control
    outside this feature's scope (real app chrome, not part of this
-   redesign); the progress block itself is exactly eyebrow + counter + bar,
-   with no tallies and no arrow, on mobile _and_ desktop. Text quiz's
+   redesign); the progress block itself is eyebrow + subtitle + counter +
+   bar, with no tallies and no arrow, on mobile _and_ desktop. Text quiz's
    `QuizProgressHeader` still carries a desktop back arrow — audio's does
    not, on explicit instruction. `AudioQuizV2Props.onExit` is kept for
    parity with `TextQuizV2Props` (and so `AudioQuizV2Screen` has a natural
@@ -124,6 +126,18 @@ instructionTitle, primaryLabel, replayLabel, quizName) and
    callback either). Rendered as a static row with the chevron rather than
    inventing a navigation contract the brief did not ask for. **Open
    question** — flagged below.
+8. **Two-tier title added after the initial handoff.** The handoff's
+   `AudioQuizProgressHeader` was a single eyebrow line hardcoding
+   `"{Speaking|Listening} quiz · my flashcards"`, which was wrong for
+   Custom Quiz (never "my flashcards") and gave every audio quiz the same
+   category regardless of which page mounted it. It now takes the same
+   `eyebrow`/`subtitle` two-tier shape as `QuizProgressHeader` — the
+   category eyebrow ("Custom Quiz" / "My Flashcards Quiz") comes from a new
+   `quizCategory` prop set by the screen bridge (`RegularAudioQuiz` = fixed
+   `'custom'`, `ReviewMyFlashcardsAudioQuiz` = fixed `'myFlashcards'`); the
+   subtitle ("Speaking Quiz" / "Listening Quiz") is derived from
+   `audioQuizType`. Both go through `domain/functions/quizTitle`, shared
+   with the text quiz's title logic.
 
 ## Open questions for a follow-up
 

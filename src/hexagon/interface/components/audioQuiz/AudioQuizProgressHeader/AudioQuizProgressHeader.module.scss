@@ -7,9 +7,22 @@
 
 .row {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--lcs-space-7);
+}
+
+.context {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  margin: var(--lcs-space-1) 0 0;
+  color: var(--lcs-color-ink);
+  font-size: var(--lcs-text-h3);
+  font-weight: var(--lcs-weight-bold);
 }
 
 .position {

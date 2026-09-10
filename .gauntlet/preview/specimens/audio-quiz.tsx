@@ -1,4 +1,5 @@
 import type { AudioQuizV2Props } from '@interface/components/audioQuiz/AudioQuizV2/AudioQuizV2.types';
+import type { QuizCategory } from '@domain/functions/quizTitle';
 import type { JSX } from 'react';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import { AudioQuizEndV2 } from '@interface/components/audioQuiz/AudioQuizEndV2';
@@ -131,6 +132,8 @@ export function AudioQuizSpecimen(): JSX.Element {
     params.get('type') === 'listening'
       ? AudioQuizType.Listening
       : AudioQuizType.Speaking;
+  const category: QuizCategory =
+    params.get('category') === 'myFlashcards' ? 'myFlashcards' : 'custom';
   const autoplay = flag('autoplay', true);
   const step = parseStep(params.get('step'));
   const help = flag('help', false);
@@ -234,6 +237,7 @@ export function AudioQuizSpecimen(): JSX.Element {
 
   const props: AudioQuizV2Props = {
     audioQuizType: type,
+    quizCategory: category,
     autoplay,
     exampleNumber: EXAMPLE_NUMBER,
     quizLength: QUIZ_LENGTH,

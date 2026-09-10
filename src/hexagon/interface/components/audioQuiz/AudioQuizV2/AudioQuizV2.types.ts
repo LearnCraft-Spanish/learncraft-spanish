@@ -1,6 +1,7 @@
 import type { AddPendingRemoveProps } from '@application/units/useTextQuiz';
 import type { VocabInfo } from '@application/units/useVocabInfo';
 import type { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
+import type { QuizCategory } from '@domain/functions/quizTitle';
 import type { Vocabulary } from '@learncraft-spanish/shared';
 
 /**
@@ -11,6 +12,10 @@ import type { Vocabulary } from '@learncraft-spanish/shared';
  */
 export interface AudioQuizV2Props {
   audioQuizType: AudioQuizType;
+  /** "Custom Quiz" vs "My Flashcards Quiz" progress-header eyebrow — set
+   * by the screen bridge, the only layer that knows which page mounted
+   * it. See `domain/functions/quizTitle`. */
+  quizCategory: QuizCategory;
   autoplay: boolean;
   /** 1-based position in the deck. */
   exampleNumber: number;

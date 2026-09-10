@@ -296,17 +296,15 @@ describe('audioQuizCopy — primaryLabel (full matrix)', () => {
   );
 });
 
-describe('audioQuizCopy — replayLabel and quizName', () => {
-  it('speaking: "Replay English" and "Speaking quiz · my flashcards"', () => {
+describe('audioQuizCopy — replayLabel', () => {
+  it('speaking: "Replay English"', () => {
     const result = audioQuizCopy(input({ quizType: AudioQuizType.Speaking }));
     expect(result.replayLabel).toBe('Replay English');
-    expect(result.quizName).toBe('Speaking quiz · my flashcards');
   });
 
-  it('listening: "Replay Spanish" and "Listening quiz · my flashcards"', () => {
+  it('listening: "Replay Spanish"', () => {
     const result = audioQuizCopy(input({ quizType: AudioQuizType.Listening }));
     expect(result.replayLabel).toBe('Replay Spanish');
-    expect(result.quizName).toBe('Listening quiz · my flashcards');
   });
 });
 

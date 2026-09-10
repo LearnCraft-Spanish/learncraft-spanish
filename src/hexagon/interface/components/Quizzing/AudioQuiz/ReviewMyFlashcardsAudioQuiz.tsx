@@ -13,6 +13,9 @@ interface ReviewMyFlashcardsAudioQuizProps {
  * Gating the redesign here matches `RegularAudioQuiz` and `RegularTextQuiz`.
  * Only `useStudentUiVersion` lives here — each version branch owns its own
  * `useReviewMyFlashcardsAudioQuiz` call.
+ *
+ * Always the My Flashcards audio path, so the v2 screen's `quizCategory`
+ * is fixed rather than threaded through as a prop.
  */
 export function ReviewMyFlashcardsAudioQuiz({
   audioQuizProps,
@@ -37,5 +40,10 @@ function ReviewMyFlashcardsAudioQuizV2({
   audioQuizProps,
 }: ReviewMyFlashcardsAudioQuizProps): JSX.Element {
   const audioQuizReturn = useReviewMyFlashcardsAudioQuiz({ audioQuizProps });
-  return <AudioQuizV2Screen audioQuizReturn={audioQuizReturn} />;
+  return (
+    <AudioQuizV2Screen
+      audioQuizReturn={audioQuizReturn}
+      quizCategory="myFlashcards"
+    />
+  );
 }
