@@ -5,8 +5,8 @@ import type { JSX } from 'react';
 import { countSrsTallies } from '@domain/functions/srsTallies';
 import Loading from '@interface/components/Loading/Loading';
 import PMFPopup from '@interface/components/PMFPopup';
-import TextQuizEnd from '@interface/components/Quizzing/general/TextQuizEnd';
 import NoDueFlashcards from '@interface/components/Quizzing/TextQuiz/NoDueFlashcards';
+import { TextQuizEndV2 } from '@interface/components/textQuiz/TextQuizEndV2';
 import { TextQuizV2 } from '@interface/components/textQuiz/TextQuizV2';
 import { setQuizActive } from '@interface/hooks/useQuizChrome';
 import { useCallback, useEffect } from 'react';
@@ -21,8 +21,8 @@ export interface TextQuizV2ScreenProps {
  * Drop-in v2 replacement for `TextQuiz`, gated behind
  * `ui.student.textquiz.v2` in `RegularTextQuiz`, `SrsTextQuiz`, and
  * `ReviewMyFlashcardsTextQuiz`. Same props, same loading / no-due / complete
- * states as the legacy screen — only the active-card view is redesigned,
- * via `TextQuizV2`.
+ * states as the legacy screen — the active-card view is redesigned via
+ * `TextQuizV2`, and the complete state via `TextQuizEndV2`.
  */
 export function TextQuizV2Screen({
   useTextQuizReturn,
@@ -80,7 +80,7 @@ export function TextQuizV2Screen({
       {!quizLength && <NoDueFlashcards />}
       {!!quizLength &&
         (isQuizComplete ? (
-          <TextQuizEnd
+          <TextQuizEndV2
             isSrsQuiz={!!srsQuizProps}
             restartQuiz={restartQuiz}
             returnToQuizSetup={cleanupFunction}

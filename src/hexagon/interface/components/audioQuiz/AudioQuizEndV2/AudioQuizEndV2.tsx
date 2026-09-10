@@ -2,6 +2,7 @@ import type { JSX } from 'react';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { Icon } from '@interface/components/general/Icon/Icon';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './AudioQuizEndV2.module.scss';
 
 export interface AudioQuizEndV2Props {
@@ -14,14 +15,14 @@ export interface AudioQuizEndV2Props {
   skippedCount?: number;
   /** Autoplay-off only. Renders the "Added while quizzing" card when > 0. */
   addedCount?: number;
-  /** e.g. "lessons 1–111" — folded into the autoplay-on body copy. */
+  /** e.g. "lessons 1–111" — reserved for callers; not shown in legacy-matching copy. */
   contextLine?: string;
   /** Seconds the autoplay-on countdown starts from. Defaults to 20. */
   countdownSeconds?: number;
   /**
    * Controlled countdown value. When set, the internal timer never runs —
    * the display freezes at this number. Used by the visual-gauntlet
-   * specimen to capture a stable "Restarting in 14s" frame.
+   * specimen to capture a stable countdown frame.
    */
   countdown?: number;
 }
@@ -29,22 +30,19 @@ export interface AudioQuizEndV2Props {
 const DEFAULT_COUNTDOWN_SECONDS = 20;
 
 /**
- * Quiz-complete screen, redesigned per the handoff's two complete states.
- * Autoplay on: a countdown auto-restarts the deck; autoplay off: the
- * learner restarts manually. Distinct from the legacy `TextQuizEnd` /
- * `AudioQuizEnd` (untouched, still used by the v1 audio quiz) — this is
- * the v2 screen, gated behind `ui.student.audioquiz.v2` same as
- * `AudioQuizV2`.
+ * Quiz-complete screen for audio quizzes. V2 visual language (tokens, card
+ * layout, countdown bar) with copy matching the legacy `AudioQuizEnd`:
+ * "{Speaking|Listening} Quiz Complete!", congratulations body, autoplay
+ * countdown sentence, and the same button set (Restart Quiz Now only when
+ * autoplay is on; Return to Quiz Setup; Back to Home).
  */
 export function AudioQuizEndV2({
   speakingOrListening,
   isAutoplay,
-  quizLength,
   restartQuiz,
   returnToQuizSetup,
   skippedCount,
   addedCount,
-  contextLine,
   countdownSeconds = DEFAULT_COUNTDOWN_SECONDS,
   countdown: controlledCountdown,
 }: AudioQuizEndV2Props): JSX.Element {
@@ -75,8 +73,10 @@ export function AudioQuizEndV2({
       ? Math.round((displayedCountdown / countdownSeconds) * 100)
       : 0;
 
-  const quizLabel =
-    speakingOrListening === 'speaking' ? 'Speaking quiz' : 'Listening quiz';
+  const quizHeading =
+    speakingOrListening === 'speaking'
+      ? 'Speaking Quiz Complete!'
+      : 'Listening Quiz Complete!';
 
   const showSkippedCard =
     isAutoplay && skippedCount !== undefined && skippedCount > 0;
@@ -86,19 +86,24 @@ export function AudioQuizEndV2({
   return (
     <div className={styles.root}>
       <div className={styles.card}>
-        <Eyebrow as="h2">{quizLabel}</Eyebrow>
-        <p className={styles.heading}>{quizLength} cards drilled.</p>
+        <Eyebrow as="h2">
+          {speakingOrListening === 'speaking'
+            ? 'Speaking quiz'
+            : 'Listening quiz'}
+        </Eyebrow>
+        <p className={styles.heading}>{quizHeading}</p>
         <p className={styles.body}>
-          {isAutoplay
-            ? `${contextLine ? `You worked through ${contextLine}. ` : ''}Nothing is graded in an audio quiz — the deck stays as it was.`
-            : 'Autoplay was off, so nothing restarts on its own. Run the same deck again, or change the settings.'}
+          Congratulations! You've completed the quiz.
         </p>
 
         {isAutoplay && (
           <div className={styles.countdownSection}>
             <div className={styles.countdownRow}>
               <Icon name="clock" size="md" tone="action" />
-              <span>Restarting in {displayedCountdown}s</span>
+              <span>
+                The quiz will automatically restart in{' '}
+                <strong>{displayedCountdown}</strong> seconds.
+              </span>
             </div>
             <div className={styles.countdownTrack}>
               <div
@@ -109,16 +114,25 @@ export function AudioQuizEndV2({
           </div>
         )}
 
-        <button type="button" className={styles.primary} onClick={restartQuiz}>
-          {isAutoplay ? 'Restart now' : 'Run this deck again'}
-        </button>
+        {isAutoplay && (
+          <button
+            type="button"
+            className={styles.primary}
+            onClick={restartQuiz}
+          >
+            Restart Quiz Now
+          </button>
+        )}
         <button
           type="button"
-          className={styles.secondary}
+          className={isAutoplay ? styles.secondary : styles.primary}
           onClick={returnToQuizSetup}
         >
-          Return to quiz setup
+          Return to Quiz Setup
         </button>
+        <Link className={styles.homeLink} to="/">
+          Back to Home
+        </Link>
       </div>
 
       {showSkippedCard && (

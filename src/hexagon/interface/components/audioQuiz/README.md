@@ -59,11 +59,12 @@ instructionTitle, primaryLabel, replayLabel, quizName) and
   (space play/pause · ↑ next step · ← → card) with no SRS/flip branch, so a
   shared component would just be two unrelated hint lists behind one prop.
 - **`AudioQuizEndV2`** is new — the legacy `AudioQuizEnd` (untouched, still
-  used by the v1 audio quiz) is a plain unstyled screen; text quiz's v2
-  screen (`TextQuizV2Screen`) still reuses the _legacy_ `TextQuizEnd` for its
-  complete state (there is no `TextQuizEndV2`), so there was no existing v2
-  "quiz complete" component to extend for either quiz kind. Built to the
-  handoff's two complete states (autoplay on/off) directly.
+  used by the v1 audio quiz) is a plain unstyled screen. Text quiz now has a
+  parallel `TextQuizEndV2` (under `textQuiz/`, gated by
+  `ui.student.textquiz.v2` via `TextQuizV2Screen`); audio's complete screen
+  was built to the handoff's two complete states (autoplay on/off) directly
+  rather than extending the text-quiz end screen, because the two quiz kinds
+  diverge on countdown / skipped / added-card copy.
 
 ## Divergences from the handoff (intentional)
 
@@ -111,10 +112,12 @@ instructionTitle, primaryLabel, replayLabel, quizName) and
 6. **`AudioQuizEndV2`'s countdown accepts a controlled `countdown` prop.**
    Added on top of the handoff's spec (which only has an internal timer) so
    the visual-gauntlet specimen can freeze the capture at a stable
-   `Restarting in 14s` frame — the handoff's own interactive prototype
-   starts its demo at `countdown: 14` for the same reason. Uncontrolled
-   behavior (`countdownSeconds`, defaulting to 20) matches the handoff and
-   the legacy `AudioQuizEnd` exactly otherwise.
+   countdown frame — the handoff's own interactive prototype starts its
+   demo at `countdown: 14` for the same reason. Uncontrolled behavior
+   (`countdownSeconds`, defaulting to 20) matches the handoff and the
+   legacy `AudioQuizEnd` exactly otherwise. Primary copy matches legacy
+   (`"{Speaking|Listening} Quiz Complete!"`, congratulations body,
+   `"The quiz will automatically restart in N seconds."`, button labels).
 7. **"Review them in my flashcards" is presentational only.** The handoff's
    complete-screen prototype gives this row a pointer cursor but no real
    handler (`AudioQuizEndV2Props` in the task brief lists no navigation

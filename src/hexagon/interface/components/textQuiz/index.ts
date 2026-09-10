@@ -4,6 +4,7 @@ export * from '@interface/components/textQuiz/QuizCard';
 export * from '@interface/components/textQuiz/QuizDock';
 export * from '@interface/components/textQuiz/QuizProgressHeader';
 export * from '@interface/components/textQuiz/TallyPill';
+export * from '@interface/components/textQuiz/TextQuizEndV2';
 export * from '@interface/components/textQuiz/TextQuizV2';
 export * from '@interface/components/textQuiz/WordChips';
 export * from '@interface/components/textQuiz/WordPanel';
