@@ -100,9 +100,15 @@ export function AudioQuizEndV2({
           <div className={styles.countdownSection}>
             <div className={styles.countdownRow}>
               <Icon name="clock" size="md" tone="action" />
-              <span>
-                The quiz will automatically restart in{' '}
-                <strong>{displayedCountdown}</strong> seconds.
+              {/* Two fixed lines rather than one wrapping sentence — a
+               * single line reflows between one and two lines as the
+               * digit count changes (e.g. "14" → "9"), which shifts the
+               * card's height and jumps the buttons below it. */}
+              <span className={styles.countdownText}>
+                <span>The quiz will automatically restart in</span>
+                <span>
+                  <strong>{displayedCountdown}</strong> seconds
+                </span>
               </span>
             </div>
             <div className={styles.countdownTrack}>

@@ -59,11 +59,18 @@
 
 .countdownRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--lcs-space-3);
   color: var(--lcs-color-action);
   font-size: var(--lcs-text-control);
   font-weight: var(--lcs-weight-bold);
+}
+
+/* Two fixed lines instead of one wrapping sentence — keeps the card's
+ * height stable as the countdown's digit count changes. */
+.countdownText {
+  display: flex;
+  flex-direction: column;
 }
 
 .countdownTrack {
