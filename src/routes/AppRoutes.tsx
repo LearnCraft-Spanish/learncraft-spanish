@@ -85,7 +85,13 @@ export default function AppRoutes() {
         />
         <Route
           path="/myflashcards"
-          element={isAuthenticated && <ReviewMyFlashcards />}
+          element={
+            isAuthenticated && (
+              <UiScope flag="ui.student.myflashcards.v2">
+                <ReviewMyFlashcards />
+              </UiScope>
+            )
+          }
         />
         <Route
           path="/manage-flashcards"

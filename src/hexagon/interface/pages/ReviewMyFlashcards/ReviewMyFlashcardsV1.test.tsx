@@ -1,0 +1,107 @@
+import { mockAudioAdapter } from '@application/adapters/audioAdapter.mock';
+import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
+import { ReviewMyFlashcardsV1 } from '@interface/pages/ReviewMyFlashcards/ReviewMyFlashcardsV1';
+import { render, screen, waitFor } from '@testing-library/react';
+import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
+import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@application/adapters/audioAdapter', () => ({
+  useAudioAdapter: () => mockAudioAdapter,
+}));
+
+describe('menu for student flashcards (v1)', () => {
+  beforeEach(() => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: true,
+        isLimited: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+
+    overrideMockUseStudentFlashcards({
+      flashcards: createMockFlashcardList()(5, { custom: true }),
+      isLoading: false,
+      error: null,
+    });
+  });
+  it('shows three setting options', async () => {
+    render(
+      <MockAllProviders route="/myflashcards">
+        <ReviewMyFlashcardsV1 />
+      </MockAllProviders>,
+    );
+    // wait for the menu to load
+    await waitFor(() => {
+      expect(screen.getAllByText(/srs quiz/i).length).toBeGreaterThan(0);
+      expect(screen.getByText(/start with spanish/i)).toBeInTheDocument();
+      expect(screen.getByText(/custom flashcards/i)).toBeInTheDocument();
+      expect(screen.getByText(/quiz length/i)).toBeInTheDocument();
+    });
+  });
+  it('shows start quiz button', async () => {
+    render(
+      <MockAllProviders route="/myflashcards" childRoutes>
+        <ReviewMyFlashcardsV1 />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(screen.getByText(/start quiz/i)).toBeInTheDocument();
+    });
+  });
+  it('shows menu button', async () => {
+    render(
+      <MockAllProviders route="/myflashcards" childRoutes>
+        <ReviewMyFlashcardsV1 />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(screen.getByText(/back to home/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('no flashcards found', () => {
+    beforeEach(() => {
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-no-flashcards@fake.not')!,
+          isAuthenticated: true,
+          isAdmin: false,
+          isCoach: false,
+          isStudent: true,
+          isLimited: false,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
+
+      // Mock empty flashcards for the no-flashcards student
+      overrideMockUseStudentFlashcards({
+        flashcards: [],
+        isLoading: false,
+        error: null,
+      });
+    });
+    it('shows no flashcards found message', async () => {
+      render(
+        <MockAllProviders route="/myflashcards" childRoutes>
+          <ReviewMyFlashcardsV1 />
+        </MockAllProviders>,
+      );
+      await waitFor(() => {
+        expect(screen.getByText(/no flashcards found/i)).toBeInTheDocument();
+      });
+    });
+  });
+});

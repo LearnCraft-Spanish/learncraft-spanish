@@ -6,12 +6,21 @@ import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import { useAudioAdapter } from '@application/adapters/audioAdapter';
+import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { useCombinedFiltersWithVocabulary } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
 import { useFilterOwnedFlashcards } from '@application/units/Filtering/useFilterOwnedFlashcards';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
+import {
+  generateVirtualLessonId,
+  getPrerequisitesForCourse,
+} from '@domain/coursePrerequisites';
+import {
+  countLabel as buildCountLabel,
+  ctaLabel as buildCtaLabel,
+} from '@domain/functions/customQuizCopy';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import silence1s from 'src/assets/audio/1s.mp3';
@@ -36,13 +45,21 @@ export interface UseQuizMyFlashcardsReturn {
 
   filterOwnedFlashcards: boolean;
   setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
+  /** Clears tags/toggles/lesson-range the same way Flashcard Manager's does. */
+  resetFilters: () => void;
   quizType: MyFlashcardsQuizType;
   setQuizType: (quizType: MyFlashcardsQuizType) => void;
+  isAudioQuiz: boolean;
   quizReady: boolean;
   quizNotReady: boolean;
   readyQuiz: () => void;
   cleanupQuiz: () => void;
   noFlashcards: boolean;
+
+  /** `"N flashcards found"` / `"N audio examples found"`, per `quizType`. */
+  countLabel: string;
+  /** `"Quiz N flashcards"` — what the quiz will actually draw, not the total. */
+  ctaLabel: string;
 
   isLoading: boolean;
   error: Error | null;
@@ -82,6 +99,36 @@ export function useQuizMyFlashcards(
 
   const exampleFilter: UseCombinedFiltersWithVocabularyReturnType =
     useCombinedFiltersWithVocabulary();
+
+  // Mirrors useFlashcardManager's resetFilters: clears tags/toggles/preset,
+  // then snaps the lesson range back to the selected course's first lesson
+  // (or its prerequisite range, if it has one).
+  const resetFilters = useCallback((): void => {
+    exampleFilter.bulkUpdateSkillTagKeys([]);
+    exampleFilter.updateExcludeSpanglish(false);
+    exampleFilter.updateAudioOnly(false);
+    exampleFilter.updateIncludeUnpublished(false);
+    exampleFilter.setFilterPreset(PreSetQuizPreset.None);
+    exampleFilter.skillTagSearch.updateTagSearchTerm();
+
+    const selectedCourse = exampleFilter.course;
+    if (!selectedCourse) {
+      return;
+    }
+
+    const prerequisites = getPrerequisitesForCourse(selectedCourse.id);
+    if (prerequisites && prerequisites.prerequisites.length > 0) {
+      exampleFilter.updateFromLessonNumber(
+        generateVirtualLessonId(selectedCourse.id, 0),
+      );
+      return;
+    }
+
+    const firstLesson = selectedCourse.lessons[0];
+    if (firstLesson) {
+      exampleFilter.updateFromLessonNumber(firstLesson.lessonNumber);
+    }
+  }, [exampleFilter]);
 
   // Get the examples from the flashcards
   const filteredExamples = useMemo(
@@ -234,6 +281,13 @@ export function useQuizMyFlashcards(
     return 0;
   }, [quizType, textQuizSetup.totalCount, audioQuizSetup.totalExamples]);
 
+  const isAudioQuiz = quizType === MyFlashcardsQuizType.Audio;
+
+  const quizLength =
+    quizType === MyFlashcardsQuizType.Audio
+      ? audioQuizSetup.selectedQuizLength
+      : textQuizSetup.quizLength;
+
   // Return the hooks, props, and local state
   return {
     // Quiz Setup Hooks
@@ -248,13 +302,18 @@ export function useQuizMyFlashcards(
     // Local states and methods for top level
     filterOwnedFlashcards,
     setFilterOwnedFlashcards,
+    resetFilters,
     quizType,
     setQuizType,
+    isAudioQuiz,
     quizReady,
     quizNotReady,
     readyQuiz,
     cleanupQuiz,
     noFlashcards,
+
+    countLabel: buildCountLabel(totalCount ?? 0, isAudioQuiz),
+    ctaLabel: buildCtaLabel(totalCount ?? 0, quizLength, isAudioQuiz),
 
     // Loading and error states
     isLoading,

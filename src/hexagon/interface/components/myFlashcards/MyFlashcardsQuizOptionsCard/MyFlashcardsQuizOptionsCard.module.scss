@@ -1,0 +1,59 @@
+.root {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  padding: var(--lcs-space-7);
+  gap: var(--lcs-space-6);
+}
+
+.types {
+  display: flex;
+  gap: var(--lcs-space-3);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-6);
+}
+
+.switches {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-6);
+}
+
+/* Listening / speaking pair, sitting in the slot the toggles use otherwise. */
+.modes {
+  display: flex;
+  gap: var(--lcs-space-3);
+}
+
+.count {
+  margin: var(--lcs-space-2) 0 0;
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+}
+
+@media (min-width: 769px) {
+  .root {
+    padding: var(--lcs-space-8);
+    gap: var(--lcs-space-7);
+  }
+
+  .types {
+    gap: var(--lcs-space-4);
+  }
+
+  /* Switches take the free width; the length select keeps a fixed column. */
+  .options {
+    display: grid;
+    align-items: center;
+    gap: var(--lcs-space-9);
+    grid-template-columns: 1fr 200px;
+  }
+
+  .count {
+    margin-top: var(--lcs-space-2);
+  }
+}

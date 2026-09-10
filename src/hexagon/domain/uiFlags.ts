@@ -2,6 +2,7 @@ export type StudentUiFlag =
   | 'ui.student.help.v2'
   | 'ui.student.flashcards.finder.v2'
   | 'ui.student.flashcards.manager.v2'
+  | 'ui.student.myflashcards.v2'
   | 'ui.student.home.v2'
   | 'ui.student.customquiz.v2'
   | 'ui.student.textquiz.v2'

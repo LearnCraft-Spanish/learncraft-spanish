@@ -1,0 +1,107 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-4);
+  padding-bottom: var(--lcs-space-9);
+}
+
+/*
+ * The toggle reads as the filter panel's own header rather than a stray
+ * switch on the page: same Card, same sectionHeader shape as
+ * `FilterSection`, so it sits directly above the panel it opens — matching
+ * Flashcard Manager's `.filterControl`. First section under the header, so
+ * it carries the header-to-body gap the way `.optionsSlot` used to.
+ *
+ * Capped to the same measure as `.optionsSlot` and centered on desktop
+ * (below) — the toggle reads as part of that same narrow form, not the
+ * width of the full-bleed `FilterSection` it reveals.
+ */
+.filterControl {
+  margin-top: var(--lcs-space-7);
+}
+
+.filterControlActions {
+  display: flex;
+  align-items: center;
+  gap: var(--lcs-space-5);
+}
+
+/*
+ * Capped so a plain toggle/select stack doesn't stretch to the page's full
+ * 1240px column (unlike `FilterSection`, which keeps its multi-column scope
+ * grid at full width). `width: 100%` alongside the `max-width` matters: a
+ * flex item centered with auto margins alone resolves its "auto" width by
+ * shrinking to fit its content first, so this card would still shrink to
+ * whichever quiz type's switches are narrower instead of holding one fixed
+ * width for both. `width: 100%` gives it a definite size to clamp *before*
+ * the auto margins split the leftover space evenly.
+ */
+.optionsSlot {
+  display: flex;
+}
+
+.optionsSlot > * {
+  min-width: 0;
+  flex: 1;
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: var(--lcs-space-7);
+  gap: var(--lcs-space-3);
+}
+
+.actionCount {
+  margin: 0;
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+  text-align: center;
+}
+
+.cta {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .cta,
+  .cta > button {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .cta > button {
+    height: 48px;
+    font-size: var(--lcs-text-body);
+  }
+}
+
+@media (min-width: 769px) {
+  .page {
+    gap: var(--lcs-space-6);
+  }
+
+  .filterControl {
+    width: 100%;
+    max-width: 680px;
+    margin-top: var(--lcs-space-9);
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .optionsSlot {
+    width: 100%;
+    max-width: 680px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .cta > button {
+    min-width: 360px;
+    height: 56px;
+    font-size: var(--lcs-text-h3);
+  }
+}
