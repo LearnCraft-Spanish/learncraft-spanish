@@ -10,6 +10,7 @@ import { TextQuizEndV2 } from '@interface/components/textQuiz/TextQuizEndV2';
 import { TextQuizV2 } from '@interface/components/textQuiz/TextQuizV2';
 import { setQuizActive } from '@interface/hooks/useQuizChrome';
 import { useCallback, useEffect } from 'react';
+import styles from './TextQuizV2Screen.module.scss';
 
 export interface TextQuizV2ScreenProps {
   /** Desktop context tier 1, e.g. "Custom Quiz" / "My Flashcards Quiz" /
@@ -75,7 +76,11 @@ export function TextQuizV2Screen({
   );
 
   if (examplesAreLoading) {
-    return <Loading message="Setting up Quiz..." />;
+    return (
+      <div className={styles.loadingRoot}>
+        <Loading message="Setting up Quiz..." />
+      </div>
+    );
   }
 
   return (

@@ -1,5 +1,6 @@
 import { useOfficialQuizzes } from '@application/useCases/useOfficialQuizzes/useOfficialQuizzes';
 import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
+import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { Loading } from '@interface/components/Loading';
 import { OfficialQuiz } from '@interface/components/Quizzing/OfficialQuiz';
 import { OfficialQuizSetupMenu } from '@interface/pages/OfficialQuizzes/OfficialQuizSetupMenu';
@@ -44,7 +45,17 @@ export default function OfficialQuizzesRoutes() {
           !isLoggedIn ? (
             <h2>You must be logged in to use this app.</h2>
           ) : isLoading ? (
-            <Loading message="Loading Official Quizzes..." />
+            // `version` doesn't depend on this data fetch, so it's already
+            // known here — a v2-bound student shouldn't see the legacy
+            // paper texture behind the spinner before flipping to the v2
+            // setup menu below.
+            version === 'v2' ? (
+              <PageShell>
+                <Loading message="Loading Official Quizzes..." />
+              </PageShell>
+            ) : (
+              <Loading message="Loading Official Quizzes..." />
+            )
           ) : error ? (
             <h2>Error Loading Official Quizzes</h2>
           ) : version === 'v2' ? (

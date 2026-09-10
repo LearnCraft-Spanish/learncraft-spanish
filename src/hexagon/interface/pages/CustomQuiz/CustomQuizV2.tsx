@@ -20,7 +20,11 @@ export function CustomQuizV2(): JSX.Element {
   }
 
   if (quiz.isInitialLoading) {
-    return <Loading message="Loading quiz setup..." />;
+    return (
+      <PageShell>
+        <Loading message="Loading quiz setup..." />
+      </PageShell>
+    );
   }
 
   if (quiz.quizReady) {

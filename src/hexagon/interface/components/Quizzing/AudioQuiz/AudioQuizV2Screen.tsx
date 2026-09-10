@@ -7,6 +7,7 @@ import { AudioQuizEndV2 } from '@interface/components/audioQuiz/AudioQuizEndV2';
 import { AudioQuizV2 } from '@interface/components/audioQuiz/AudioQuizV2';
 import { Loading } from '@interface/components/Loading';
 import { useCallback } from 'react';
+import styles from './AudioQuizV2Screen.module.scss';
 
 export interface AudioQuizV2ScreenProps {
   audioQuizReturn: AudioQuizReturn;
@@ -86,7 +87,11 @@ export function AudioQuizV2Screen({
   // Mirrors the legacy `AudioQuiz`'s own guard, preventing a flash of an
   // incomplete card while the first step's audio is still parsing.
   if (currentExampleNumber <= 0 || !currentStepValue?.displayText) {
-    return <Loading message="Setting up Quiz..." />;
+    return (
+      <div className={styles.loadingRoot}>
+        <Loading message="Setting up Quiz..." />
+      </div>
+    );
   }
 
   return (

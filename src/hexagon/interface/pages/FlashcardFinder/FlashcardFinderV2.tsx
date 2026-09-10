@@ -187,7 +187,11 @@ export function FlashcardFinderV2(): JSX.Element {
   } = useFlashcardFinder();
 
   if (error) {
-    return <h2>Error Loading Flashcard Finder</h2>;
+    return (
+      <PageShell>
+        <h2>Error Loading Flashcard Finder</h2>
+      </PageShell>
+    );
   }
 
   return (

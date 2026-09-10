@@ -4,6 +4,7 @@ import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
 import { AppHeader } from '@interface/components/AppHeader';
 import { PrimaryNav } from '@interface/components/AppHeader/PrimaryNav';
 import { PrimaryTabBar } from '@interface/components/AppHeader/PrimaryTabBar';
+import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { Loading } from '@interface/components/Loading';
 import { LoggedOut } from '@interface/components/LoggedOut';
 import { SubHeaderComponent } from '@interface/components/SubHeader';
@@ -97,7 +98,13 @@ export const App: React.FC = () => {
         }
       >
         {isLoading && !isAuthenticated ? (
-          <Loading message="Logging in..." />
+          // Auth hasn't resolved yet, so v1 vs v2 isn't known either —
+          // `PageShell` paints the v2 page color instead of leaving the
+          // legacy paper texture (`.mainContent`, `App.module.scss`)
+          // visible behind the spinner. `LoggedOut` below does the same.
+          <PageShell>
+            <Loading message="Logging in..." />
+          </PageShell>
         ) : isAuthenticated ? (
           <AppRoutes />
         ) : (

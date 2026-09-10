@@ -1,5 +1,6 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
+import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { UiScope } from '@interface/components/general/UiScope/UiScope';
 import { Loading } from '@interface/components/Loading';
 import { lazy, Suspense } from 'react';
@@ -57,7 +58,18 @@ export default function AppRoutes() {
   const { version: quizzesVersion } = useStudentUiVersion('ui.student.home.v2');
 
   return (
-    <Suspense fallback={<Loading message="Loading..." />}>
+    <Suspense
+      fallback={
+        // One boundary covers every route, so it fires on any lazy chunk
+        // that isn't downloaded yet — including v2 destinations — with no
+        // way to know the target's version. `PageShell` paints the v2 page
+        // color instead of leaving the legacy paper texture (`.mainContent`,
+        // `App.module.scss`) visible behind the spinner during the swap.
+        <PageShell>
+          <Loading message="Loading..." />
+        </PageShell>
+      }
+    >
       <SentryRoutes>
         <Route
           path="/"

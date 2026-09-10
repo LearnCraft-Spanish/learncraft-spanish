@@ -1,0 +1,20 @@
+/*
+ * Full-bleed parchment fill for the loading state only, same technique as
+ * `AudioQuizV2.module.scss` (see that file's header comment for the full
+ * rationale). This screen mounts inside legacy pages that give no
+ * background of their own, so without this the `Loading` spinner would
+ * flash the old paper texture while the first step's audio is still
+ * parsing.
+ */
+.loadingRoot {
+  display: flex;
+  width: 100%;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--lcs-color-page);
+  box-shadow: 0 0 0 100vmax var(--lcs-color-page);
+  clip-path: inset(0 -100vmax);
+  min-height: calc(100vh - var(--lcs-app-header-height));
+  min-height: calc(100dvh - var(--lcs-app-header-height));
+}

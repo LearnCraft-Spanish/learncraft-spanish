@@ -1,3 +1,15 @@
+/* The old parchment texture, scoped here instead of `body` (`App.css`).
+ * Before a route is known (the pre-auth `Loading` screen, `LoggedOut`),
+ * the app shows the plain `--lcs-color-page` default set on `body` — see
+ * `App.css`. Once a route mounts, v1 pages rely on this texture showing
+ * through their transparent gaps exactly as before; v2 pages already
+ * paint their own opaque `--lcs-color-page` surface (`PageShell`, or the
+ * full-bleed fill in `TextQuizV2`/`AudioQuizV2` and siblings) over it, so
+ * they are unaffected. */
+.mainContent {
+  background-image: url('./assets/paper-small.jpeg');
+}
+
 /* Keeps the routed page scrollable past the fixed mobile `PrimaryTabBar`
  * instead of letting it cover the last row of content. The actual reserved
  * space comes from `--lcs-mobile-tabbar-offset`, set inline by `App.tsx`

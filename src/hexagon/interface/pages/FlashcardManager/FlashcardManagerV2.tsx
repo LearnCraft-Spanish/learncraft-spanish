@@ -371,7 +371,11 @@ export function FlashcardManagerV2(): JSX.Element {
   });
 
   if (error) {
-    return <h2>Error Loading Flashcard Manager</h2>;
+    return (
+      <PageShell>
+        <h2>Error Loading Flashcard Manager</h2>
+      </PageShell>
+    );
   }
 
   // The shell and title stay mounted while data loads; skeletons land with the
