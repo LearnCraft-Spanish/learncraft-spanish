@@ -12,6 +12,20 @@
   gap: var(--lcs-space-7);
 }
 
+.leftGroup {
+  display: flex;
+  /* Arrow pinned to the TOP of the row — bottom-aligned it read as hanging
+   * off the title's baseline. */
+  align-items: flex-start;
+  gap: var(--lcs-space-4);
+  min-width: 0;
+}
+
+.backButton {
+  display: none;
+  flex: none;
+}
+
 .context {
   display: flex;
   flex-direction: column;
@@ -47,6 +61,10 @@
 }
 
 @media (min-width: 769px) {
+  .backButton {
+    display: inline-flex;
+  }
+
   .position {
     font-size: var(--lcs-text-body);
   }

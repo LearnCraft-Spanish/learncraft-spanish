@@ -55,11 +55,17 @@ describe('setupHeader', () => {
     expect(onBack).toHaveBeenCalledOnce();
   });
 
+  it('omits the back affordance when leave props are not given', () => {
+    render(<SetupHeader eyebrow="Custom quiz" title="Set up your quiz" />);
+
+    expect(
+      screen.queryByRole('button', { name: /back/i }),
+    ).not.toBeInTheDocument();
+  });
+
   it('fills only the completed progress segments', () => {
     const { container } = render(
       <SetupHeader
-        backLabel="Back to home"
-        onBack={vi.fn()}
         eyebrow="Step 1 of 2"
         title="Set up your quiz"
         progress={{ total: 2, complete: 1 }}
@@ -74,12 +80,7 @@ describe('setupHeader', () => {
 
   it('omits the progress bar when no steps are given', () => {
     const { container } = render(
-      <SetupHeader
-        backLabel="Back to home"
-        onBack={vi.fn()}
-        eyebrow="Custom quiz"
-        title="Set up your quiz"
-      />,
+      <SetupHeader eyebrow="Custom quiz" title="Set up your quiz" />,
     );
 
     expect(container.querySelectorAll(`.${styles.segment}`)).toHaveLength(0);

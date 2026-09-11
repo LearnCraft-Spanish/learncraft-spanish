@@ -20,6 +20,9 @@ export interface CustomQuizSetupProps {
  * two-step flow and CSS hides the half the learner is not on, above it the
  * settings and tags sit side by side with a single action underneath.
  * Rendering both halves always keeps control ids unique.
+ *
+ * Leave-home sits under the primary CTA as a muted ghost (same pattern as
+ * My Flashcards / Official), not in the page header.
  */
 export function CustomQuizSetup({
   quiz,
@@ -27,21 +30,27 @@ export function CustomQuizSetup({
 }: CustomQuizSetupProps): JSX.Element {
   const [step, setStep] = useState<Step>(1);
 
+  function leaveHomeButton(): JSX.Element {
+    return (
+      <div className={styles.ctaSecondary}>
+        <Button variant="ghost" muted leadingIcon="arrowLeft" onClick={onLeave}>
+          Back to home
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page} data-step={step}>
       <div className={styles.mobileOnly}>
         {step === 1 ? (
           <SetupHeader
-            backLabel="Back to home"
-            onBack={onLeave}
             eyebrow="Step 1 of 2"
             title="Set up your quiz"
             progress={{ total: 2, complete: 1 }}
           />
         ) : (
           <SetupHeader
-            backLabel="Back to setup"
-            onBack={() => setStep(1)}
             eyebrow="Step 2 of 2"
             title="Choose tags"
             titleSuffix="(optional)"
@@ -52,12 +61,7 @@ export function CustomQuizSetup({
       </div>
 
       <div className={styles.desktopOnly}>
-        <SetupHeader
-          backLabel="Back to home"
-          onBack={onLeave}
-          eyebrow="Custom quiz"
-          title="Set up your quiz"
-        />
+        <SetupHeader eyebrow="Custom quiz" title="Set up your quiz" />
       </div>
 
       <div className={styles.columns}>
@@ -99,11 +103,14 @@ export function CustomQuizSetup({
         <div className={styles.footer}>
           <div className={styles.mobileOnly}>
             {step === 1 ? (
-              <div className={styles.cta}>
-                <Button trailingIcon="arrowRight" onClick={() => setStep(2)}>
-                  Continue
-                </Button>
-              </div>
+              <>
+                <div className={styles.cta}>
+                  <Button trailingIcon="arrowRight" onClick={() => setStep(2)}>
+                    Continue
+                  </Button>
+                </div>
+                {leaveHomeButton()}
+              </>
             ) : (
               <>
                 <div className={styles.cta}>
@@ -120,6 +127,7 @@ export function CustomQuizSetup({
                     Back to setup
                   </Button>
                 </div>
+                {leaveHomeButton()}
               </>
             )}
           </div>
@@ -130,6 +138,7 @@ export function CustomQuizSetup({
                 {quiz.ctaLabel}
               </Button>
             </div>
+            {leaveHomeButton()}
           </div>
         </div>
       </div>

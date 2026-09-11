@@ -196,4 +196,23 @@ describe('component OfficialQuizSetupMenuV2', () => {
       expect(startQuiz).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('leave home', () => {
+    it('calls onLeave from the back affordance under Begin quiz', () => {
+      const onLeave = vi.fn();
+      renderWithOverrides({ onLeave });
+
+      fireEvent.click(screen.getByRole('button', { name: /back to home/i }));
+
+      expect(onLeave).toHaveBeenCalledTimes(1);
+    });
+
+    it('omits the back affordance when onLeave is not provided', () => {
+      renderWithOverrides();
+
+      expect(
+        screen.queryByRole('button', { name: /back to home/i }),
+      ).not.toBeInTheDocument();
+    });
+  });
 });

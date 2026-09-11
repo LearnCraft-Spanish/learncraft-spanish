@@ -10,6 +10,8 @@ export interface OfficialQuizSetupMenuProps {
   quizOptions: OfficialQuizRecord[];
   quizGroups: QuizGroup[];
   startQuiz: () => void;
+  /** v2 setup only — leave back to home under the Begin CTA. */
+  onLeave?: () => void;
 }
 export function OfficialQuizSetupMenu({
   selectedQuizGroup,

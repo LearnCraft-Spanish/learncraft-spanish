@@ -65,9 +65,17 @@
   flex-direction: column;
 }
 
+.ctaSecondary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 @media (max-width: 768px) {
   .cta,
-  .cta > button {
+  .ctaSecondary,
+  .cta > button,
+  .ctaSecondary > button {
     width: 100%;
     min-width: 0;
     max-width: 100%;

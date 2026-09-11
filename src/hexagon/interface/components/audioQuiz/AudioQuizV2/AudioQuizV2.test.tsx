@@ -170,6 +170,17 @@ describe('audioQuizV2 — smoke render', () => {
 
     expect(screen.getByText('My Flashcards Quiz')).toBeTruthy();
   });
+
+  it('calls onExit when the desktop back arrow is clicked', async () => {
+    stubMobile(false);
+    const { onExit } = renderQuiz();
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Back to quiz setup' }),
+    );
+
+    expect(onExit).toHaveBeenCalledOnce();
+  });
 });
 
 describe('audioQuizV2 — primary / replay dock', () => {

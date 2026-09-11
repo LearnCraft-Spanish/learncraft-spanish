@@ -85,16 +85,12 @@ instructionTitle, primaryLabel, replayLabel, quizName) and
    The handoff paints selected chips `#449AC2`. `WordChips` (shared with
    text quiz) uses `--lcs-color-surface-dark` for the selected chip. We
    keep the shared component rather than forking chip colors per quiz.
-3. **No back arrow in `AudioQuizProgressHeader`, on either breakpoint.** The
-   handoff's mobile app header already carries a "Setup" back control
-   outside this feature's scope (real app chrome, not part of this
-   redesign); the progress block itself is eyebrow + subtitle + counter +
-   bar, with no tallies and no arrow, on mobile _and_ desktop. Text quiz's
-   `QuizProgressHeader` still carries a desktop back arrow — audio's does
-   not, on explicit instruction. `AudioQuizV2Props.onExit` is kept for
-   parity with `TextQuizV2Props` (and so `AudioQuizV2Screen` has a natural
-   place to pass `cleanupFunction`), but nothing in `AudioQuizV2` currently
-   renders a control bound to it. **Open question** — flagged below.
+3. **Desktop-only back arrow in `AudioQuizProgressHeader` (matches text).**
+   The handoff's mobile app header already carries a "Setup" back control
+   outside this feature's scope; the progress block itself still has no
+   mobile arrow so the counter stays balanced. Desktop now mirrors
+   `QuizProgressHeader`: an `arrowLeft` `IconButton` ("Back to quiz setup")
+   bound to `onExit` / `cleanupFunction`. Mobile keeps no in-header exit.
 4. **Vocabulary chip ordering only when the Answer-step text is Spanish.**
    `orderVocabularyByAppearance` needs the _Spanish_ sentence to place chips
    in reading order. `AudioQuizV2Props` only carries the current step's
@@ -141,9 +137,8 @@ instructionTitle, primaryLabel, replayLabel, quizName) and
 
 ## Open questions for a follow-up
 
-- Should `AudioQuizV2Props.onExit` end up wired to something (e.g. a mobile
-  "X" affordance, or a browser-back listener), or is it genuinely dead until
-  the app grows a shared in-quiz exit chrome? Currently accepted but unused.
+- Does mobile need an in-quiz exit affordance beyond app chrome (e.g. an
+  "X" or browser-back listener), or is desktop-only + mobile chrome enough?
 - Is the vocabulary-chip-ordering gap for listening's English Answer step
   worth closing by threading the Spanish sentence through as an additional
   prop, or is unordered-but-correct acceptable for that one step?

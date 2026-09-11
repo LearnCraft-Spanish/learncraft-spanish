@@ -118,13 +118,9 @@ describe('customQuizSetup', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /continue/i }));
 
-    // The header and the footer both offer the way back on step two.
-    const backControls = screen.getAllByRole('button', {
-      name: /back to setup/i,
-    });
-    expect(backControls).toHaveLength(2);
-
-    await userEvent.click(backControls[0]);
+    await userEvent.click(
+      screen.getByRole('button', { name: /back to setup/i }),
+    );
 
     expect(screen.getByText('Step 1 of 2')).toBeInTheDocument();
   });

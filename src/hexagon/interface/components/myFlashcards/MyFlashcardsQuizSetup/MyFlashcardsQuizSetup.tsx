@@ -40,12 +40,8 @@ function appliedFilterCountLabel(count: number): string {
  * The setup surface for "Quiz my flashcards". A `customQuiz`-style header,
  * then the same filter-reveal chrome Flashcard Manager uses — a `Card` +
  * `CardSectionHeader` with a trailing, label-hidden `Toggle` — instead of the
- * legacy `CloseableFilterPanel`, and finally the quiz options card. There is
- * no separate tags step: toggling "Filter my flashcards" on reveals the full
- * `FilterSection` (course, lesson range, tags, card options) in place above
- * the options card, since that toggle is this page's whole
- * advanced-filtering affordance and narrows what the quiz options below draw
- * from.
+ * legacy `CloseableFilterPanel`, and finally the quiz options card. Leave-home
+ * sits under the primary CTA as a muted ghost, matching Custom / Official.
  *
  * Only the options card is measure-capped on desktop (`.optionsSlot`) — it
  * is a short toggle/select stack with nothing to gain from the page's full
@@ -62,12 +58,7 @@ export function MyFlashcardsQuizSetup({
 
   return (
     <div className={styles.page}>
-      <SetupHeader
-        backLabel="Back to home"
-        onBack={onLeave}
-        eyebrow="Quiz my flashcards"
-        title="Set up your quiz"
-      />
+      <SetupHeader eyebrow="Quiz my flashcards" title="Set up your quiz" />
 
       <div className={styles.filterControl}>
         <Card>
@@ -116,6 +107,16 @@ export function MyFlashcardsQuizSetup({
         <div className={styles.cta}>
           <Button disabled={quiz.quizNotReady} onClick={quiz.readyQuiz}>
             {quiz.ctaLabel}
+          </Button>
+        </div>
+        <div className={styles.ctaSecondary}>
+          <Button
+            variant="ghost"
+            muted
+            leadingIcon="arrowLeft"
+            onClick={onLeave}
+          >
+            Back to home
           </Button>
         </div>
       </div>

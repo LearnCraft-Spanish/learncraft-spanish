@@ -4,8 +4,9 @@ import { Icon } from '@interface/components/general/Icon/Icon';
 import styles from './SetupHeader.module.scss';
 
 export interface SetupHeaderProps {
-  backLabel: string;
-  onBack: () => void;
+  /** When both are set, a leave/step-back control renders above the eyebrow. */
+  backLabel?: string;
+  onBack?: () => void;
   eyebrow: string;
   title: string;
   /** Rendered after the title in regular weight, e.g. "(optional)". */
@@ -24,12 +25,16 @@ export function SetupHeader({
   caption,
   progress,
 }: SetupHeaderProps): JSX.Element {
+  const showBack = backLabel !== undefined && onBack !== undefined;
+
   return (
     <div className={styles.root}>
-      <button type="button" className={styles.back} onClick={onBack}>
-        <Icon name="arrowLeft" />
-        {backLabel}
-      </button>
+      {showBack && (
+        <button type="button" className={styles.back} onClick={onBack}>
+          <Icon name="arrowLeft" />
+          {backLabel}
+        </button>
+      )}
       <Eyebrow>{eyebrow}</Eyebrow>
       <h1 className={styles.title}>
         {title}

@@ -54,9 +54,8 @@ function isFocusOnTextEntry(): boolean {
  * Owns which vocabulary chip is selected, same rationale as `TextQuizV2`:
  * local visual state, not business state.
  *
- * `onExit` is accepted (parity with `TextQuizV2Props`) but intentionally
- * unused here — the handoff has no in-card exit control for the audio
- * quiz (see the divergence ledger in this feature's `README.md`).
+ * `onExit` drives the desktop-only back arrow in `AudioQuizProgressHeader`
+ * (parity with `QuizProgressHeader` / text quiz).
  */
 export function AudioQuizV2({
   audioQuizType,
@@ -75,6 +74,7 @@ export function AudioQuizV2({
   onReplay,
   onPrevious,
   onNext,
+  onExit,
   getHelpIsOpen,
   setGetHelpIsOpen,
   vocabulary,
@@ -241,6 +241,7 @@ export function AudioQuizV2({
         subtitle={title.subtitle}
         exampleNumber={exampleNumber}
         quizLength={quizLength}
+        onExit={onExit}
       />
 
       <div className={styles.cardRow}>

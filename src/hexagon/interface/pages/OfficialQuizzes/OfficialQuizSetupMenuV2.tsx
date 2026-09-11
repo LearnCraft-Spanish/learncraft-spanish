@@ -29,6 +29,7 @@ export function OfficialQuizSetupMenuV2({
   quizOptions,
   quizGroups,
   startQuiz,
+  onLeave,
 }: OfficialQuizSetupMenuProps): JSX.Element {
   const [isEditingGroup, setIsEditingGroup] = useState(false);
 
@@ -127,10 +128,24 @@ export function OfficialQuizSetupMenuV2({
           </div>
         </Card>
 
-        <div className={styles.cta}>
-          <Button disabled={!quizIsSelectable} onClick={startQuiz}>
-            Begin quiz
-          </Button>
+        <div className={styles.actions}>
+          <div className={styles.cta}>
+            <Button disabled={!quizIsSelectable} onClick={startQuiz}>
+              Begin quiz
+            </Button>
+          </div>
+          {onLeave !== undefined && (
+            <div className={styles.ctaSecondary}>
+              <Button
+                variant="ghost"
+                muted
+                leadingIcon="arrowLeft"
+                onClick={onLeave}
+              >
+                Back to home
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </PageShell>
