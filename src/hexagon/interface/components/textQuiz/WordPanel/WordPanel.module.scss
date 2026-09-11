@@ -56,13 +56,9 @@
 }
 
 .lessonRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding: var(--lcs-space-2) 0;
   color: var(--lcs-on-dark-85);
   font-size: var(--lcs-text-caption);
-  gap: var(--lcs-space-4);
 }
 
 @media (min-width: 769px) {

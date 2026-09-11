@@ -213,5 +213,10 @@
 
   .body.helpOpen {
     overflow-y: visible;
+    /* Header / body / footer each use `z-index: 1` so they paint above the
+     * autoplay fill. Equal sibling stacking contexts mean later siblings
+     * win — so without this bump the footer (Get help / play) paints over
+     * the absolute `WordPanel` that lives inside `.body`. */
+    z-index: 2;
   }
 }

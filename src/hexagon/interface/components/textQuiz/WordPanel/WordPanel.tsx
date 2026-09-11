@@ -2,7 +2,6 @@ import type { VocabInfo } from '@application/units/useVocabInfo';
 import type { Vocabulary } from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
-import { Icon } from '@interface/components/general/Icon/Icon';
 import { IconButton } from '@interface/components/general/IconButton/IconButton';
 import styles from './WordPanel.module.scss';
 
@@ -65,10 +64,7 @@ export function WordPanel({
         <ul className={styles.lessons}>
           {lessons.map((lesson) => (
             <li className={styles.lessonRow} key={lesson.id}>
-              <span>
-                {lesson.courseName} lesson {lesson.lessonNumber}
-              </span>
-              <Icon name="chevronRight" tone="onDark" />
+              {lesson.courseName} lesson {lesson.lessonNumber}
             </li>
           ))}
         </ul>
