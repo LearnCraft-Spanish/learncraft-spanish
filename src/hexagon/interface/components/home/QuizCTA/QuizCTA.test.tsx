@@ -8,9 +8,10 @@ describe('quiz cta', () => {
     cleanup();
   });
 
-  it('renders the headline as the only text, with no metadata line', () => {
+  it('renders the suggested-tool eyebrow and headline, with no metadata line', () => {
     render(<QuizCTA onGo={vi.fn()} />);
 
+    expect(screen.getByText("Today's suggested tool")).toBeInTheDocument();
     expect(screen.getByText('Quiz my flashcards')).toBeInTheDocument();
     expect(screen.queryByText(/due/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/minute/i)).not.toBeInTheDocument();

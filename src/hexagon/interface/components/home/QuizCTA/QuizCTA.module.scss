@@ -27,14 +27,40 @@
   outline-offset: var(--lcs-focus-offset);
 }
 
-.headline {
+.copy {
   position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--lcs-space-3);
+  text-align: left;
+}
+
+.headline {
+  margin: 0;
+  padding: 0;
   color: var(--lcs-color-on-surface-dark);
   font-family: var(--lcs-font-sans);
   font-size: var(--lcs-text-display);
   font-weight: var(--lcs-weight-bold);
   letter-spacing: -0.01em;
   line-height: var(--lcs-line-display);
+}
+
+/* Caption size, medium weight. Drop Eyebrow's 0.08em tracking here — with
+ * the headline's slight negative tracking it pulls the first glyph left of
+ * the "Quiz" edge; zeroing keeps both lines on the same left margin. */
+.eyebrow {
+  /* Optical nudge: a true left-edge match reads left of the heavy "Q"
+   * sidebearing, so inset the smaller caps a hair. */
+  margin: 0;
+  padding: 0 0 0 var(--lcs-space-1);
+}
+
+.eyebrow > * {
+  color: var(--lcs-color-on-surface-dark);
+  font-size: var(--lcs-text-caption);
 }
 
 /* The wheel is centered ON the arrow, not on the card; the card's own
