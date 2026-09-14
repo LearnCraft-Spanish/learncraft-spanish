@@ -21,9 +21,10 @@ export interface VocabInfo {
   /**
    * Published lessons from the always-relevant courses (see
    * `ALWAYS_RELEVANT_COURSE_IDS`) plus the student's active course, ordered
-   * with the active course first. `useVocabInfo` has exactly one production
-   * caller (`useTextQuiz`), so unlike `useLessonPopup` this scoping is
-   * unconditional -- no opt-out flag is needed.
+   * with the active course first. Production callers are the quiz screens
+   * (`useTextQuiz` / audio quiz) and vocab lookup (`useVocabLookup`); unlike
+   * `useLessonPopup` this scoping is unconditional -- no opt-out flag is
+   * needed.
    */
   lessons: Lesson[] | null;
   lessonsLoading: boolean;

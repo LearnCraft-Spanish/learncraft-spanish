@@ -14,6 +14,8 @@ interface TextInputProps {
   describedBy?: string;
   disabled?: boolean;
   type?: 'text' | 'search';
+  /** Fires when the field gains focus (e.g. clicking back into a search bar). */
+  onFocus?: () => void;
 }
 
 export function TextInput({
@@ -26,6 +28,7 @@ export function TextInput({
   describedBy,
   disabled = false,
   type = 'text',
+  onFocus,
 }: TextInputProps): JSX.Element {
   const className = [
     styles.input,
@@ -52,6 +55,7 @@ export function TextInput({
         aria-invalid={invalid || undefined}
         aria-describedby={describedBy}
         onChange={(event) => onChange(event.target.value)}
+        onFocus={onFocus}
       />
     </span>
   );

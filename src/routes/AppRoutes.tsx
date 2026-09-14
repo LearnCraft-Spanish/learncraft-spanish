@@ -28,7 +28,8 @@ const LimitedCustomQuiz = lazy(
 const FlashcardFinderPage = lazy(
   () => import('@interface/pages/FlashcardFinder'),
 );
-const GetHelpPage = lazy(() => import('@interface/pages/GetHelpPage'));
+const GetHelpHub = lazy(() => import('@interface/pages/GetHelp'));
+const GetHelpVocab = lazy(() => import('@interface/pages/GetHelp/VocabLookup'));
 
 // Development-only, gated inside the page by the `ui.dev.gallery` flag
 const UiGallery = lazy(() => import('@interface/pages/UiGallery'));
@@ -149,7 +150,23 @@ export default function AppRoutes() {
         />
         <Route
           path="/get-help"
-          element={(isStudent || isCoach || isAdmin) && <GetHelpPage />}
+          element={
+            (isStudent || isCoach || isAdmin) && (
+              <UiScope flag="ui.student.help.v2">
+                <GetHelpHub />
+              </UiScope>
+            )
+          }
+        />
+        <Route
+          path="/get-help/vocab"
+          element={
+            (isStudent || isCoach || isAdmin) && (
+              <UiScope flag="ui.student.help.v2">
+                <GetHelpVocab />
+              </UiScope>
+            )
+          }
         />
         <Route
           path="/weeklyrecords"

@@ -61,7 +61,7 @@ The design specified Avenir, but Avenir is not licensed for the web and only res
 
 Do not wrap student routes until that surface is being redesigned.
 
-The first major student surface is Flashcard Finder (`ui.student.flashcards.finder.v2`). Architecture, isolation rules, and the start sequence live in [`pages/STUDENT_FLASHCARDS.md`](../pages/STUDENT_FLASHCARDS.md). `ui.student.help.v2` is the documented example flag only — Get Help is not wrapped and is not that phase.
+The first major student surface is Flashcard Finder (`ui.student.flashcards.finder.v2`). Architecture, isolation rules, and the start sequence live in [`pages/STUDENT_FLASHCARDS.md`](../pages/STUDENT_FLASHCARDS.md). Get Help uses `ui.student.help.v2` for the help hub at `/get-help` (vocab lookup + video walkthroughs); the vocab search itself remains at `/get-help/vocab`.
 
 ## Flags that gate a whole surface
 

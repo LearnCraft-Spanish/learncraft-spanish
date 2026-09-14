@@ -1,0 +1,51 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-5);
+}
+
+/* Flush with PageShell's full 1240 column -- deliberately *not* inside
+ * `.measure` so it doesn't shrink or shift when the tool below is centered. */
+.back {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  background: none;
+  color: var(--lcs-color-action);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--lcs-text-caption);
+  font-weight: var(--lcs-weight-bold);
+  gap: var(--lcs-space-2);
+}
+
+.back:hover {
+  color: var(--lcs-color-action-hover);
+}
+
+.back:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+/* The tool reads too wide at PageShell's full 1240 measure -- cap it near
+ * the search card's natural content width (520px field + card padding) and
+ * center that narrower block on the page. Text inside stays left aligned
+ * against this block's own edge, not the page's. */
+.measure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-8);
+  max-width: 40rem;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.error {
+  margin: 0;
+  color: var(--lcs-color-error);
+  font-size: var(--lcs-text-caption);
+}

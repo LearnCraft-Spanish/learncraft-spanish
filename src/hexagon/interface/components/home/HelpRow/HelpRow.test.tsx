@@ -12,7 +12,9 @@ describe('help row', () => {
     render(<HelpRow onGo={vi.fn()} />);
 
     expect(screen.getByText('Help & walkthroughs')).toBeInTheDocument();
-    expect(screen.getByText('FAQ and short video guides')).toBeInTheDocument();
+    expect(
+      screen.getByText('short video guides & vocab lookup'),
+    ).toBeInTheDocument();
   });
 
   it('calls onGo when chosen', async () => {

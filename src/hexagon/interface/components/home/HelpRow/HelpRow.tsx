@@ -7,16 +7,16 @@ interface HelpRowProps {
 }
 
 /**
- * Low-emphasis entry to the FAQ / video walkthroughs page. Deliberately not
- * a card — it should read as a footer-level link, findable but out of the
- * way, below the entry cards.
+ * Low-emphasis entry to the help hub (video walkthroughs and vocab lookup).
+ * Deliberately not a card — it should read as a footer-level link, findable
+ * but out of the way, below the entry cards.
  */
 export function HelpRow({ onGo }: HelpRowProps): JSX.Element {
   return (
     <button type="button" className={styles.root} onClick={onGo}>
       <Icon name="book" size="sm" tone="muted" />
       <span className={styles.label}>Help &amp; walkthroughs</span>
-      <span className={styles.hint}>FAQ and short video guides</span>
+      <span className={styles.hint}>short video guides &amp; vocab lookup</span>
       <Icon name="chevronRight" size="sm" tone="muted" />
     </button>
   );

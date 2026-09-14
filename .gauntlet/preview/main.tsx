@@ -6,9 +6,11 @@ import { installNetworkGuard } from './networkGuard';
 
 import { PreviewProviders } from './PreviewProviders';
 import { AudioQuizSpecimen } from './specimens/audio-quiz';
+import { GetHelpSpecimen } from './specimens/get-help';
 import { HomeSpecimen } from './specimens/home';
 import { SmokeSpecimen } from './specimens/smoke';
 import { TextQuizSpecimen } from './specimens/text-quiz';
+import { VocabLookupSpecimen } from './specimens/vocab-lookup';
 import '@interface/styles/tokens.css';
 
 declare global {
@@ -29,6 +31,10 @@ function SpecimenRoot(): JSX.Element {
   switch (specimen) {
     case 'home':
       return <HomeSpecimen />;
+    case 'get-help':
+      return <GetHelpSpecimen />;
+    case 'vocab-lookup':
+      return <VocabLookupSpecimen />;
     case 'text-quiz':
       return <TextQuizSpecimen />;
     case 'audio-quiz':

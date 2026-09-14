@@ -1,0 +1,14 @@
+{
+  "states": [
+    {
+      "label": "hub-mobile",
+      "formFactor": "mobile",
+      "query": "specimen=get-help"
+    },
+    {
+      "label": "hub-desktop",
+      "formFactor": "desktop",
+      "query": "specimen=get-help"
+    }
+  ]
+}

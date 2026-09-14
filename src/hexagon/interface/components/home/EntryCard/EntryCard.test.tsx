@@ -38,4 +38,22 @@ describe('entry card', () => {
 
     expect(onGo).toHaveBeenCalledOnce();
   });
+
+  it('renders an external link when href is provided', () => {
+    render(
+      <EntryCard
+        icon="playerPlay"
+        title="Getting started with the app"
+        meta="Short video guide"
+        href="https://www.google.com"
+      />,
+    );
+
+    const link = screen.getByRole('link', {
+      name: /Getting started with the app/,
+    });
+    expect(link).toHaveAttribute('href', 'https://www.google.com');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
 });
