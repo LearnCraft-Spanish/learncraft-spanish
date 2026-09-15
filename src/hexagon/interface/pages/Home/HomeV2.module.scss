@@ -4,14 +4,10 @@
   gap: var(--lcs-space-9);
 }
 
-.desktopEntries {
+.entries {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--lcs-space-9);
-}
-
-.mobileEntries {
-  display: none;
 }
 
 @media (max-width: 768px) {
@@ -19,11 +15,7 @@
     gap: var(--lcs-space-7);
   }
 
-  .desktopEntries {
-    display: none;
-  }
-
-  .mobileEntries {
+  .entries {
     display: flex;
     flex-direction: column;
     gap: var(--lcs-space-7);

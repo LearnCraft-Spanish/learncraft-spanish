@@ -293,7 +293,9 @@ describe('app', () => {
     const { getByRole, queryByText } = renderAppAtRoute('/get-help');
 
     await waitFor(() => {
-      expect(getByRole('heading', { name: 'Get Help' })).toBeInTheDocument();
+      expect(
+        getByRole('heading', { name: 'Help & walkthroughs' }),
+      ).toBeInTheDocument();
     });
     expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
     expect(queryByText(/using as/i)).not.toBeInTheDocument();
