@@ -1,20 +1,36 @@
+import type { JSX, ReactNode } from 'react';
+import {
+  overrideMockFeatureFlagAdapter,
+  resetMockFeatureFlagAdapter,
+} from '@application/adapters/featureFlagAdapter.mock';
 import {
   mockUseAppHeader,
   overrideMockUseAppHeader,
   resetMockUseAppHeader,
 } from '@application/useCases/AppHeader/useAppHeader.mock';
 import { AppHeader } from '@interface/components/AppHeader/AppHeader';
+import { setMobileStackOverride } from '@interface/hooks/useMobileStackChrome';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, useLocation } from 'react-router-dom';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@application/useCases/AppHeader', () => ({
   useAppHeader: () => mockUseAppHeader,
 }));
 
-function renderHeader(children?: React.ReactNode) {
+function stubMobile(matches: boolean): void {
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: matches && query.includes('max-width: 768px'),
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  }));
+}
+
+function renderHeader(children?: ReactNode, path = '/') {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[path]}>
       <AppHeader>{children}</AppHeader>
     </MemoryRouter>,
   );
@@ -23,6 +39,12 @@ function renderHeader(children?: React.ReactNode) {
 describe('component AppHeader', () => {
   beforeEach(() => {
     resetMockUseAppHeader();
+  });
+
+  afterEach(() => {
+    setMobileStackOverride(null);
+    resetMockFeatureFlagAdapter();
+    vi.unstubAllGlobals();
   });
 
   it('renders the wordmark', () => {
@@ -97,5 +119,70 @@ describe('component AppHeader', () => {
     expect(
       screen.getByRole('link', { name: 'Flashcard Finder' }),
     ).toBeInTheDocument();
+  });
+
+  it('shows back and the page title on a mobile stack screen, without the account menu', async () => {
+    stubMobile(true);
+    overrideMockFeatureFlagAdapter({
+      isEnabled: (flag) => flag === 'ui.student.home.v2',
+    });
+    overrideMockUseAppHeader({
+      isAuthenticated: true,
+      isLoading: false,
+      studentName: 'Maria Silva',
+      studentEmail: 'maria@example.com',
+    });
+
+    renderHeader(undefined, '/quizzes');
+
+    expect(
+      screen.getByRole('heading', { name: 'Quizzes' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Account' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('calls an in-page override when the stack back button is pressed', async () => {
+    stubMobile(true);
+    overrideMockFeatureFlagAdapter({
+      isEnabled: (flag) => flag === 'ui.student.home.v2',
+    });
+    overrideMockUseAppHeader({ isAuthenticated: true, isLoading: false });
+    const onBack = vi.fn();
+    setMobileStackOverride({ title: 'Choose tags', onBack });
+
+    renderHeader(undefined, '/customquiz');
+
+    expect(
+      screen.getByRole('heading', { name: 'Choose tags' }),
+    ).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(onBack).toHaveBeenCalledOnce();
+  });
+
+  it('navigates to the parent path when stack back is pressed', async () => {
+    stubMobile(true);
+    overrideMockFeatureFlagAdapter({
+      isEnabled: (flag) => flag === 'ui.student.home.v2',
+    });
+    overrideMockUseAppHeader({ isAuthenticated: true, isLoading: false });
+
+    function PathReadout(): JSX.Element {
+      const { pathname } = useLocation();
+      return <div data-testid="path">{pathname}</div>;
+    }
+
+    render(
+      <MemoryRouter initialEntries={['/quizzes']}>
+        <AppHeader />
+        <PathReadout />
+      </MemoryRouter>,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(screen.getByTestId('path')).toHaveTextContent('/');
   });
 });

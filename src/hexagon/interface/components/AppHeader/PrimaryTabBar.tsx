@@ -17,8 +17,8 @@ interface TabLink {
 const LINKS: TabLink[] = [
   { id: 'home', to: '/', icon: 'home', label: 'Home', end: true },
   { id: 'search', to: '/flashcardfinder', icon: 'search', label: 'Finder' },
-  { id: 'quiz', to: '/quizzes', icon: 'checklist', label: 'Quiz' },
   { id: 'cards', to: '/manage-flashcards', icon: 'cards', label: 'Cards' },
+  { id: 'quiz', to: '/quizzes', icon: 'checklist', label: 'Quiz' },
 ];
 
 function isLinkActive(pathname: string, to: string, end?: boolean): boolean {
@@ -29,12 +29,10 @@ function isLinkActive(pathname: string, to: string, end?: boolean): boolean {
 }
 
 /**
- * The persistent mobile bottom nav, mounted once in `App.tsx` — same four
- * destinations as the desktop `PrimaryNav`, but always on screen below
- * 768px instead of living inside `AppHeader`, and with the active tab
- * derived from the route rather than a per-page prop. Previously each page
- * that wanted the bar built its own `TabBarItem[]` and had to hardcode which
- * tab was active; that only ever worked for Home.
+ * The persistent mobile bottom nav, mounted from `HomeV2` — same four
+ * destinations as the desktop `PrimaryNav`. Hidden at 769px and up. Only
+ * Home shows this bar; other student v2 screens use the stack header back
+ * arrow instead.
  */
 export function PrimaryTabBar(): JSX.Element {
   const { pathname } = useLocation();

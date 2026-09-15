@@ -72,18 +72,20 @@
 }
 
 @media (max-width: 768px) {
-  .cta,
-  .ctaSecondary,
-  .cta > button,
-  .ctaSecondary > button {
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
+  /* Same as Official quiz setup: centered primary CTA under the settings,
+   * not a full-bleed button that reads as a docked bar. */
+  .cta {
+    flex-direction: row;
+    justify-content: center;
   }
 
   .cta > button {
-    height: 48px;
-    font-size: var(--lcs-text-body);
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .ctaSecondary {
+    display: none;
   }
 }
 

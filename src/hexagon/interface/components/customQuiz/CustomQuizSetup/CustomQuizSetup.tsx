@@ -5,7 +5,8 @@ import { QuizOptionsCard } from '@interface/components/customQuiz/QuizOptionsCar
 import { SetupHeader } from '@interface/components/customQuiz/SetupHeader';
 import { TagsCard } from '@interface/components/customQuiz/TagsCard';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
-import { useState } from 'react';
+import { setMobileStackOverride } from '@interface/hooks/useMobileStackChrome';
+import { useEffect, useState } from 'react';
 import styles from './CustomQuizSetup.module.scss';
 
 type Step = 1 | 2;
@@ -21,8 +22,9 @@ export interface CustomQuizSetupProps {
  * settings and tags sit side by side with a single action underneath.
  * Rendering both halves always keeps control ids unique.
  *
- * Leave-home sits under the primary CTA as a muted ghost (same pattern as
- * My Flashcards / Official), not in the page header.
+ * Leave sits under the primary CTA as a muted ghost (same pattern as
+ * My Flashcards / Official), not in the page header. On mobile the header
+ * back arrow replaces those ghost buttons.
  */
 export function CustomQuizSetup({
   quiz,
@@ -30,11 +32,22 @@ export function CustomQuizSetup({
 }: CustomQuizSetupProps): JSX.Element {
   const [step, setStep] = useState<Step>(1);
 
+  useEffect(() => {
+    if (step !== 2) {
+      return undefined;
+    }
+    setMobileStackOverride({
+      title: 'Choose tags',
+      onBack: () => setStep(1),
+    });
+    return () => setMobileStackOverride(null);
+  }, [step]);
+
   function leaveHomeButton(): JSX.Element {
     return (
       <div className={styles.ctaSecondary}>
         <Button variant="ghost" muted leadingIcon="arrowLeft" onClick={onLeave}>
-          Back to home
+          Back to quizzes
         </Button>
       </div>
     );
@@ -100,7 +113,7 @@ export function CustomQuizSetup({
       <div className={styles.action}>
         <p className={styles.actionCount}>{quiz.countLabel}</p>
 
-        <div className={styles.footer}>
+        <div className={styles.actions}>
           <div className={styles.mobileOnly}>
             {step === 1 ? (
               <>

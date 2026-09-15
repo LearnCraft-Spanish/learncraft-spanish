@@ -93,6 +93,9 @@ describe('home v2', () => {
     expect(
       screen.queryByRole('button', { name: /Official Quiz/ }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('navigation', { name: 'Primary' }),
+    ).toBeInTheDocument();
   });
 
   it('renders the CTA from the resolved preset', () => {
@@ -103,6 +106,9 @@ describe('home v2', () => {
       screen.getByRole('button', { name: /Official Quiz/ }),
     ).toBeInTheDocument();
     expect(screen.getByText("Today's suggested tool")).toBeInTheDocument();
+    expect(
+      screen.getByRole('navigation', { name: 'Primary' }),
+    ).toBeInTheDocument();
   });
 
   it('renders the preset entries in order', () => {

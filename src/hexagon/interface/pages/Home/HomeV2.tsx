@@ -2,6 +2,7 @@ import type { HomePresetCta, HomePresetEntry } from '@domain/homePresets/types';
 import type { IconName } from '@interface/components/general/Icon/Icon';
 import type { JSX } from 'react';
 import { useHomeScreen } from '@application/useCases/useHomeScreen';
+import { PrimaryTabBar } from '@interface/components/AppHeader/PrimaryTabBar';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { EntryCard } from '@interface/components/home/EntryCard/EntryCard';
 import { HelpRow } from '@interface/components/home/HelpRow/HelpRow';
@@ -56,20 +57,22 @@ export function HomeV2Loaded({ cta, entries }: HomeV2LoadedProps): JSX.Element {
  * and a fixed help row. Which CTA and entries appear is resolved by
  * `useHomeScreen` from the student's course and lesson.
  *
- * The mobile tab bar is not rendered here — it is global chrome mounted
- * once in `App.tsx` (`AppHeader/PrimaryTabBar`) so it persists across every
- * route instead of disappearing once the student leaves Home.
+ * The mobile tab bar lives here (not in `App.tsx`) so it only exists on
+ * Home and rides out with this page during stack transitions.
  */
 export function HomeV2(): JSX.Element {
   const { cta, entries, isLoading } = useHomeScreen();
 
-  if (isLoading) {
-    return (
-      <PageShell>
-        <Loading message="Loading home..." />
-      </PageShell>
-    );
-  }
-
-  return <HomeV2Loaded cta={cta} entries={entries} />;
+  return (
+    <div className={styles.homeShell}>
+      {isLoading ? (
+        <PageShell>
+          <Loading message="Loading home..." />
+        </PageShell>
+      ) : (
+        <HomeV2Loaded cta={cta} entries={entries} />
+      )}
+      <PrimaryTabBar />
+    </div>
+  );
 }

@@ -23,6 +23,7 @@
   justify-self: start;
   color: var(--lcs-color-on-action);
   text-decoration: none;
+  transition: opacity var(--lcs-motion-panel) var(--lcs-ease-standard);
 }
 
 .brand:focus-visible {
@@ -62,6 +63,23 @@
   display: flex;
   grid-column: 3;
   justify-self: end;
+  transition: opacity var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+.stack {
+  display: none;
+}
+
+.stackTitle {
+  overflow: hidden;
+  margin: 0;
+  color: var(--lcs-color-on-action);
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+  letter-spacing: var(--lcs-tracking-wordmark);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 768px) {
@@ -77,11 +95,34 @@
   .account {
     grid-column: 2;
   }
+
+  .stackMode .brand,
+  .stackMode .account {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .stack {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    padding: var(--lcs-space-4) var(--lcs-space-7);
+    gap: var(--lcs-space-4);
+    min-width: 0;
+  }
+
+  /* IconButton `onDark` is for navy surfaces; the bar is celestial blue. */
+  .stack svg {
+    color: var(--lcs-color-on-action);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .brand svg,
-  .wordmark {
+  .wordmark,
+  .brand,
+  .account {
     transition: none;
   }
 }

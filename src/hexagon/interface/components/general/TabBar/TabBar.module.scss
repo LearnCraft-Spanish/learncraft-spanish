@@ -10,10 +10,9 @@
     left: 0;
     z-index: var(--lcs-z-bottom-bar);
     display: flex;
-    /* Stated rather than left to the icon and label, because every page
-     * reserves exactly this much room through `--lcs-mobile-tabbar-offset`.
-     * Letting the content decide made the bar shorter than the strip held
-     * for it, and the page showed through in the difference. */
+    /* Stated rather than left to the icon and label, because Home
+     * reserves exactly this much room on `.homeShell`. Letting the
+     * content decide made the bar shorter than the strip held for it. */
     min-height: calc(
       var(--lcs-tab-bar-height) + env(safe-area-inset-bottom, 0)
     );

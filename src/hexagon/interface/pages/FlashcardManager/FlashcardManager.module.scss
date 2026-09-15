@@ -51,3 +51,9 @@
   text-align: left;
   text-wrap: balance;
 }
+
+@media (max-width: 768px) {
+  .titleRow {
+    display: none;
+  }
+}

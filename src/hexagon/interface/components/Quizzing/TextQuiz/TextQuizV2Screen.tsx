@@ -8,7 +8,7 @@ import PMFPopup from '@interface/components/PMFPopup';
 import NoDueFlashcards from '@interface/components/Quizzing/TextQuiz/NoDueFlashcards';
 import { TextQuizEndV2 } from '@interface/components/textQuiz/TextQuizEndV2';
 import { TextQuizV2 } from '@interface/components/textQuiz/TextQuizV2';
-import { setQuizActive } from '@interface/hooks/useQuizChrome';
+import { setMobileStackOverride } from '@interface/hooks/useMobileStackChrome';
 import { useCallback, useEffect } from 'react';
 import styles from './TextQuizV2Screen.module.scss';
 
@@ -55,12 +55,13 @@ export function TextQuizV2Screen({
     setGetHelpIsOpen,
   } = useTextQuizReturn;
 
-  const quizCardActive = !examplesAreLoading && !!quizLength && !isQuizComplete;
-
   useEffect(() => {
-    setQuizActive(quizCardActive);
-    return () => setQuizActive(false);
-  }, [quizCardActive]);
+    if (subtitle === undefined) {
+      return undefined;
+    }
+    setMobileStackOverride({ title: subtitle, onBack: cleanupFunction });
+    return () => setMobileStackOverride(null);
+  }, [subtitle, cleanupFunction]);
 
   // Mirrors `SRSButtons.handleReviewAndIncrementExample`: grading and
   // advancing are one action in the v2 dock (button, swipe, or arrow key).

@@ -3,9 +3,13 @@ import { CustomQuizType } from '@application/useCases/useCustomQuizV2';
 import { defaultMockUseCustomQuizV2 } from '@application/useCases/useCustomQuizV2/useCustomQuizV2.mock';
 import { AudioQuizType } from '@domain/audioQuizzing';
 import { CustomQuizSetup } from '@interface/components/customQuiz/CustomQuizSetup/CustomQuizSetup';
-import { render, screen } from '@testing-library/react';
+import {
+  setMobileStackOverride,
+  useMobileStackOverride,
+} from '@interface/hooks/useMobileStackChrome';
+import { act, render, renderHook, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 function renderSetup(
   overrides: Partial<UseCustomQuizV2Return> = {},
@@ -17,6 +21,10 @@ function renderSetup(
 }
 
 describe('customQuizSetup', () => {
+  afterEach(() => {
+    setMobileStackOverride(null);
+  });
+
   it('shows the course, its lesson range, and the match count', () => {
     renderSetup();
 
@@ -40,7 +48,7 @@ describe('customQuizSetup', () => {
     renderSetup({}, onLeave);
 
     await userEvent.click(
-      screen.getAllByRole('button', { name: /back to home/i })[0],
+      screen.getAllByRole('button', { name: /back to quizzes/i })[0],
     );
 
     expect(onLeave).toHaveBeenCalled();
@@ -121,6 +129,20 @@ describe('customQuizSetup', () => {
     await userEvent.click(
       screen.getByRole('button', { name: /back to setup/i }),
     );
+
+    expect(screen.getByText('Step 1 of 2')).toBeInTheDocument();
+  });
+
+  it('publishes Choose tags to the stack header on step two', async () => {
+    renderSetup();
+
+    await userEvent.click(screen.getByRole('button', { name: /continue/i }));
+
+    const { result } = renderHook(() => useMobileStackOverride());
+    expect(result.current?.title).toBe('Choose tags');
+    act(() => {
+      result.current?.onBack();
+    });
 
     expect(screen.getByText('Step 1 of 2')).toBeInTheDocument();
   });

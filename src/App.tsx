@@ -3,12 +3,11 @@ import { useFlushFlashcardUpdatesOnLoad } from '@application/units/flushFlashcar
 import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
 import { AppHeader } from '@interface/components/AppHeader';
 import { PrimaryNav } from '@interface/components/AppHeader/PrimaryNav';
-import { PrimaryTabBar } from '@interface/components/AppHeader/PrimaryTabBar';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { Loading } from '@interface/components/Loading';
 import { LoggedOut } from '@interface/components/LoggedOut';
+import { PageTransition } from '@interface/components/PageTransition/PageTransition';
 import { SubHeaderComponent } from '@interface/components/SubHeader';
-import { useQuizActive } from '@interface/hooks/useQuizChrome';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
@@ -61,13 +60,6 @@ export const App: React.FC = () => {
     location.pathname === '/manage-flashcards' &&
     flashcardManagerVersion === 'v2';
 
-  // Mobile chrome mirrors the desktop `PrimaryNav`: same gate
-  // (`isAuthenticated`, no role check), just also requiring the home v2
-  // flag, since the bar's four destinations are the v2 student surfaces.
-  const quizActive = useQuizActive();
-  const showMobileTabBar =
-    isAuthenticated && studentHomeVersion === 'v2' && !quizActive;
-
   return (
     <div className="App">
       <ExtraCoachingCTA />
@@ -87,16 +79,7 @@ export const App: React.FC = () => {
           <SubHeaderComponent />
         )}
 
-      <div
-        className={styles.mainContent}
-        style={
-          {
-            '--lcs-mobile-tabbar-offset': showMobileTabBar
-              ? 'calc(var(--lcs-tab-bar-height) + env(safe-area-inset-bottom, 0px))'
-              : '0px',
-          } as React.CSSProperties
-        }
-      >
+      <div className={styles.mainContent}>
         {isLoading && !isAuthenticated ? (
           // Auth hasn't resolved yet, so v1 vs v2 isn't known either —
           // `PageShell` paints the v2 page color instead of leaving the
@@ -106,13 +89,13 @@ export const App: React.FC = () => {
             <Loading message="Logging in..." />
           </PageShell>
         ) : isAuthenticated ? (
-          <AppRoutes />
+          <PageTransition>
+            <AppRoutes />
+          </PageTransition>
         ) : (
           <LoggedOut onLogIn={login} />
         )}
       </div>
-
-      {showMobileTabBar && <PrimaryTabBar />}
 
       <ToastContainer
         theme="colored"

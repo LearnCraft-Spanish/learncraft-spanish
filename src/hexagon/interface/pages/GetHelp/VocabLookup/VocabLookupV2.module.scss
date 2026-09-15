@@ -31,6 +31,12 @@
   outline-offset: var(--lcs-focus-offset);
 }
 
+@media (max-width: 768px) {
+  .back {
+    display: none;
+  }
+}
+
 /* The tool reads too wide at PageShell's full 1240 measure -- cap it near
  * the search card's natural content width (520px field + card padding) and
  * center that narrower block on the page. Text inside stays left aligned

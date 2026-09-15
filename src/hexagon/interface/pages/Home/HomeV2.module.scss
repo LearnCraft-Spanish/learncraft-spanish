@@ -4,6 +4,10 @@
   gap: var(--lcs-space-9);
 }
 
+.homeShell {
+  min-width: 0;
+}
+
 .entries {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -13,6 +17,12 @@
 @media (max-width: 768px) {
   .column {
     gap: var(--lcs-space-7);
+  }
+
+  .homeShell {
+    padding-bottom: calc(
+      var(--lcs-tab-bar-height) + env(safe-area-inset-bottom, 0px)
+    );
   }
 
   .entries {

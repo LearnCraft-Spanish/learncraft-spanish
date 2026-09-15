@@ -37,7 +37,7 @@ export function CustomQuizV2(): JSX.Element {
 
   return (
     <PageShell>
-      <CustomQuizSetup quiz={quiz} onLeave={() => navigate('/')} />
+      <CustomQuizSetup quiz={quiz} onLeave={() => navigate('/quizzes')} />
     </PageShell>
   );
 }

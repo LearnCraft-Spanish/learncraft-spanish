@@ -113,6 +113,16 @@
   max-width: 320px;
 }
 
+@media (max-width: 768px) {
+  .title {
+    display: none;
+  }
+
+  .ctaSecondary {
+    display: none;
+  }
+}
+
 @media (min-width: 769px) {
   /* A single setup card reads as swimming in whitespace at the full 1240px
    * measure, so it keeps its own, narrower column on top of PageShell's. */

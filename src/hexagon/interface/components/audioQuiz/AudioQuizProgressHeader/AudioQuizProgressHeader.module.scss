@@ -32,6 +32,12 @@
   min-width: 0;
 }
 
+@media (max-width: 768px) {
+  .context {
+    display: none;
+  }
+}
+
 .title {
   margin: var(--lcs-space-1) 0 0;
   color: var(--lcs-color-ink);

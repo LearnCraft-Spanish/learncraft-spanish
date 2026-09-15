@@ -21,6 +21,10 @@
       100dvh - 2 * var(--lcs-space-7) - var(--lcs-mobile-tabbar-offset)
     );
   }
+
+  .title {
+    display: none;
+  }
 }
 
 .title {

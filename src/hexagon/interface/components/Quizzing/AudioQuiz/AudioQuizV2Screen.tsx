@@ -3,10 +3,12 @@ import type { QuizCategory } from '@domain/functions/quizTitle';
 import type { JSX } from 'react';
 import { useVocabInfo } from '@application/units/useVocabInfo';
 import { AudioQuizType } from '@domain/audioQuizzing';
+import { audioQuizTitle } from '@domain/functions/quizTitle';
 import { AudioQuizEndV2 } from '@interface/components/audioQuiz/AudioQuizEndV2';
 import { AudioQuizV2 } from '@interface/components/audioQuiz/AudioQuizV2';
 import { Loading } from '@interface/components/Loading';
-import { useCallback } from 'react';
+import { setMobileStackOverride } from '@interface/hooks/useMobileStackChrome';
+import { useCallback, useEffect } from 'react';
 import styles from './AudioQuizV2Screen.module.scss';
 
 export interface AudioQuizV2ScreenProps {
@@ -58,6 +60,15 @@ export function AudioQuizV2Screen({
     vocabulary,
     addPendingRemoveProps,
   } = audioQuizReturn;
+
+  useEffect(() => {
+    const { subtitle } = audioQuizTitle(
+      quizCategory,
+      audioQuizType === AudioQuizType.Speaking,
+    );
+    setMobileStackOverride({ title: subtitle, onBack: cleanupFunction });
+    return () => setMobileStackOverride(null);
+  }, [quizCategory, audioQuizType, cleanupFunction]);
 
   const handlePlay = useCallback((): void => {
     play().catch(() => {

@@ -50,6 +50,13 @@
   font-size: var(--lcs-text-caption);
 }
 
+@media (max-width: 768px) {
+  .back,
+  .title {
+    display: none;
+  }
+}
+
 .progress {
   display: flex;
   margin-top: var(--lcs-space-5);

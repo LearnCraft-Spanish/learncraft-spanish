@@ -5,7 +5,10 @@ import {
   createMockTextQuizReturnWithExamples,
 } from '@application/units/useTextQuiz/useTextQuiz.mock';
 import { TextQuizV2Screen } from '@interface/components/Quizzing/TextQuiz/TextQuizV2Screen';
-import { setQuizActive, useQuizActive } from '@interface/hooks/useQuizChrome';
+import {
+  setMobileStackOverride,
+  useMobileStackOverride,
+} from '@interface/hooks/useMobileStackChrome';
 import { cleanup, render, renderHook, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
@@ -30,7 +33,7 @@ describe('textQuizV2Screen', () => {
 
   afterEach(() => {
     cleanup();
-    setQuizActive(false);
+    setMobileStackOverride(null);
   });
 
   it('shows the loading screen while examples load', () => {
@@ -213,20 +216,28 @@ describe('textQuizV2Screen', () => {
     ).toBeGreaterThan(0);
   });
 
-  it('sets quiz active while an active card is showing', () => {
+  it('publishes the subtitle and exit handler to the mobile stack header', () => {
+    const cleanupFunction = vi.fn();
+    const useTextQuizReturn =
+      createMockTextQuizReturnWithExamples(mockExamples);
+    useTextQuizReturn.cleanupFunction = cleanupFunction;
+
     render(
       <MockAllProviders>
         <TextQuizV2Screen
-          useTextQuizReturn={createMockTextQuizReturnWithExamples(mockExamples)}
+          useTextQuizReturn={useTextQuizReturn}
+          subtitle="Text Quiz"
         />
       </MockAllProviders>,
     );
 
-    const { result } = renderHook(() => useQuizActive());
-    expect(result.current).toBe(true);
+    const { result } = renderHook(() => useMobileStackOverride());
+    expect(result.current?.title).toBe('Text Quiz');
+    result.current?.onBack();
+    expect(cleanupFunction).toHaveBeenCalledOnce();
   });
 
-  it('does not set quiz active while loading', () => {
+  it('does not publish a stack override while the subtitle is missing', () => {
     render(
       <MockAllProviders>
         <TextQuizV2Screen
@@ -237,50 +248,42 @@ describe('textQuizV2Screen', () => {
       </MockAllProviders>,
     );
 
-    const { result } = renderHook(() => useQuizActive());
-    expect(result.current).toBe(false);
+    const { result } = renderHook(() => useMobileStackOverride());
+    expect(result.current).toBeNull();
   });
 
-  it('clears quiz active when the quiz completes', () => {
-    const { rerender } = render(
-      <MockAllProviders>
-        <TextQuizV2Screen
-          useTextQuizReturn={createMockTextQuizReturnWithExamples(mockExamples)}
-        />
-      </MockAllProviders>,
-    );
-
-    const { result } = renderHook(() => useQuizActive());
-    expect(result.current).toBe(true);
-
-    rerender(
+  it('keeps the stack override on the complete screen', () => {
+    render(
       <MockAllProviders>
         <TextQuizV2Screen
           useTextQuizReturn={createMockTextQuizReturn({
             quizLength: 3,
             isQuizComplete: true,
           })}
+          subtitle="Text Quiz"
         />
       </MockAllProviders>,
     );
 
-    expect(result.current).toBe(false);
+    const { result } = renderHook(() => useMobileStackOverride());
+    expect(result.current?.title).toBe('Text Quiz');
   });
 
-  it('clears quiz active on unmount', () => {
+  it('clears the stack override on unmount', () => {
     const view = render(
       <MockAllProviders>
         <TextQuizV2Screen
           useTextQuizReturn={createMockTextQuizReturnWithExamples(mockExamples)}
+          subtitle="Text Quiz"
         />
       </MockAllProviders>,
     );
 
-    const { result } = renderHook(() => useQuizActive());
-    expect(result.current).toBe(true);
+    const { result } = renderHook(() => useMobileStackOverride());
+    expect(result.current?.title).toBe('Text Quiz');
 
     view.unmount();
-    expect(result.current).toBe(false);
+    expect(result.current).toBeNull();
   });
 
   it('calls cleanupFunction when the back control is clicked', async () => {

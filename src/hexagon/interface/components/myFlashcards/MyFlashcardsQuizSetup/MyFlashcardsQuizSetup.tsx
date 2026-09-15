@@ -116,7 +116,7 @@ export function MyFlashcardsQuizSetup({
             leadingIcon="arrowLeft"
             onClick={onLeave}
           >
-            Back to home
+            Back to quizzes
           </Button>
         </div>
       </div>

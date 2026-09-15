@@ -202,6 +202,30 @@ describe('app', () => {
     expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
   });
 
+  it('does not mount the primary tab bar off Home when student home v2 is on', async () => {
+    overrideMockFeatureFlagAdapter({
+      isEnabled: (flag) => flag === 'ui.student.home.v2',
+    });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByRole, queryByRole } = renderAppAtRoute('/quizzes');
+
+    await waitFor(() => {
+      expect(getByRole('heading', { name: 'Quizzes' })).toBeInTheDocument();
+    });
+    expect(
+      queryByRole('navigation', { name: 'Primary' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('hides the sub-header on the v2 flashcard finder screen', async () => {
     overrideMockFeatureFlagAdapter({
       isEnabled: (flag) => flag === 'ui.student.flashcards.finder.v2',
