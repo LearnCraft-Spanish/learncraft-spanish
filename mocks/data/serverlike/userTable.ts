@@ -39,6 +39,7 @@ export const appUserTable: TestAppUsers[] = [
     studentRole: 'none',
     courseId: 2,
     lessonNumber: 20,
+    betaTester: false,
   },
   {
     recordId: 2,
@@ -47,6 +48,7 @@ export const appUserTable: TestAppUsers[] = [
     courseId: 2,
     lessonNumber: 5,
     studentRole: 'none',
+    betaTester: false,
   },
   {
     recordId: 3,
@@ -55,6 +57,7 @@ export const appUserTable: TestAppUsers[] = [
     courseId: 2,
     lessonNumber: 40,
     studentRole: 'none',
+    betaTester: false,
   },
   {
     recordId: 4,
@@ -63,6 +66,7 @@ export const appUserTable: TestAppUsers[] = [
     courseId: 2,
     lessonNumber: 15,
     studentRole: 'limited',
+    betaTester: false,
   },
   {
     recordId: 5,
@@ -71,6 +75,7 @@ export const appUserTable: TestAppUsers[] = [
     courseId: 3,
     lessonNumber: 20,
     studentRole: 'student',
+    betaTester: false,
   },
   {
     recordId: 6,
@@ -79,6 +84,7 @@ export const appUserTable: TestAppUsers[] = [
     courseId: 2,
     lessonNumber: 77,
     studentRole: 'student',
+    betaTester: false,
   },
   {
     recordId: 7,
@@ -87,6 +93,7 @@ export const appUserTable: TestAppUsers[] = [
     courseId: 5,
     lessonNumber: 3,
     studentRole: 'student',
+    betaTester: false,
   },
   {
     recordId: 8,
@@ -95,6 +102,7 @@ export const appUserTable: TestAppUsers[] = [
     courseId: 2,
     lessonNumber: 10,
     studentRole: 'student',
+    betaTester: false,
   },
 ];
 
