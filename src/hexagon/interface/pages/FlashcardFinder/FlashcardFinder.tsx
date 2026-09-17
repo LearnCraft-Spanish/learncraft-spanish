@@ -4,7 +4,7 @@ import { FlashcardFinderV1 } from '@interface/pages/FlashcardFinder/FlashcardFin
 import { FlashcardFinderV2 } from '@interface/pages/FlashcardFinder/FlashcardFinderV2';
 
 export default function FlashcardFinder(): JSX.Element {
-  const { version } = useStudentUiVersion('ui.student.flashcards.finder.v2');
+  const { version } = useStudentUiVersion();
 
   return version === 'v2' ? <FlashcardFinderV2 /> : <FlashcardFinderV1 />;
 }

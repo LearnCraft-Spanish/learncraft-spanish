@@ -65,11 +65,11 @@ flowchart TB
 
 **Treat Manager and Finder as one redesign surface.** Students move between them (`Find More Matching Flashcards`, `Use these filters on my flashcards` via `?enableFiltering=true`). They share filter chrome and list-item chrome.
 
-**Superseded, 2026-08: the two routes ship behind separate flags.** The design handoff covers the Finder only, so `ui.student.flashcards.finder.v2` gates `/flashcardfinder` and the Manager gets its own flag when its design lands. A shared flag would have put a half-redesigned Manager in front of anyone who turned the Finder on. Everything else on this page still holds — the two pages remain one redesign _surface_, they share the same primitives and the same filter coordinator, and the Manager's rewrite should reuse whatever the Finder builds.
+**v2 vs v1 is per-user, not per-surface.** A beta-tester student (`studentRole === 'student'` and `betaTester === true` on their own record) gets v2 on every student surface. Everyone else gets v1. The two pages remain one redesign _surface_ — they share the same primitives and the same filter coordinator.
 
-Do not wrap Custom Quiz or Review My Flashcards under either flag.
+Do not wrap Custom Quiz or Review My Flashcards under a separate version gate; they follow the same per-user rule.
 
-The shared primitives those pages will compose are built ahead of the page work; see [`components/general/README.md`](../components/general/README.md) for the primitive contract and `/ui-gallery` (`VITE_UI_FLAGS=ui.dev.gallery`) to view them.
+The shared primitives those pages will compose are built ahead of the page work; see [`components/general/README.md`](../components/general/README.md) for the primitive contract and `/ui-gallery` (non-production only) to view them.
 
 ### Two constraints on the results table
 
@@ -111,7 +111,7 @@ CSS foundation (already shipped). See [`styles/README.md`](../styles/README.md).
 
 - Layers: `legacy` < `tokens` < `primitives` < `features`
 - New student UI: CSS Modules + tokens (`var(--color-*)`, `var(--space-*)`, …)
-- Opt-in: `StudentUiFlag` + [`UiScope`](../components/general/UiScope/UiScope.tsx) (`display: contents`, `data-ui="v1"` or `data-ui="v2"`)
+- Opt-in: [`useStudentUiVersion`](../../application/useCases/useStudentUiVersion.ts) + [`UiScope`](../components/general/UiScope/UiScope.tsx) (`display: contents`, `data-ui="v1"` or `data-ui="v2"`)
 - Do not edit `App.css` or shared global classes for a single surface ([`DECISIONS.md`](../DECISIONS.md))
 
 **Unsafe to restyle in place** (other live surfaces depend on the same global classes):
@@ -136,12 +136,11 @@ Dead leftover: [`Filters/FlashcardFinder.scss`](../components/Filters/FlashcardF
 
 Follow the CSS README recipe, scoped to this surface:
 
-1. Add `ui.student.flashcards.v2` to [`uiFlags.ts`](../../domain/uiFlags.ts). Enable locally with `VITE_UI_FLAGS`. Leave unset in production until the surface is ready.
-2. Wrap **both** route elements in [`AppRoutes.tsx`](../../../routes/AppRoutes.tsx) with `<UiScope flag="ui.student.flashcards.v2">`. Do not wrap Custom Quiz, Review My Flashcards, or Get Help.
-3. Do **not** restyle existing FilterPanel / ExampleListItem / App.css. Build new feature CSS Modules that only mount under these pages.
-4. Keep [`useFlashcardFinder`](../../application/useCases/useFlashcardFinder/useFlashcardFinder.ts) and [`useFlashcardManager`](../../application/useCases/useFlashcardManager/useFlashcardManager.ts). This is an interface redesign, not new application behavior.
-5. New v2 filter section is **presentational**: props from the page use case (Finder already has the data; Manager should expose the same filter fields when the toggle is on). Old `FilterPanel` stays for quiz/review.
-6. New v2 table + row live as feature components shared by the two pages, not as edits to admin `ExampleListItem`. Existing comment on [`FlashcardFinderExampleListItem.tsx`](../components/ExampleListItem/FlashcardFinderExampleListItem.tsx) already wants finder rows colocated with Finder.
+1. Wrap **both** route elements in [`AppRoutes.tsx`](../../../routes/AppRoutes.tsx) with `<UiScope>`.
+2. Do **not** restyle existing FilterPanel / ExampleListItem / App.css. Build new feature CSS Modules that only mount under these pages.
+3. Keep [`useFlashcardFinder`](../../application/useCases/useFlashcardFinder/useFlashcardFinder.ts) and [`useFlashcardManager`](../../application/useCases/useFlashcardManager/useFlashcardManager.ts). This is an interface redesign, not new application behavior.
+4. New v2 filter section is **presentational**: props from the page use case (Finder already has the data; Manager should expose the same filter fields when the toggle is on). Old `FilterPanel` stays for quiz/review.
+5. New v2 table + row live as feature components shared by the two pages, not as edits to admin `ExampleListItem`. Existing comment on [`FlashcardFinderExampleListItem.tsx`](../components/ExampleListItem/FlashcardFinderExampleListItem.tsx) already wants finder rows colocated with Finder.
 
 Suggested layout when implementation starts (not this writeup):
 
@@ -166,19 +165,19 @@ Breakpoints stay **480px** and **768px** (not CSS variables).
 
 ## Boundary debt to fix only when touching that UI
 
-Do not boil the ocean in a writeup or flag-wrap PR. Record these so the first implementation PR can clean the seam it rewrites:
+Do not boil the ocean in a writeup or v1/v2 wrap PR. Record these so the first implementation PR can clean the seam it rewrites:
 
 - `FilterPanel` and `LessonRangeSelector` call application hooks directly (one-hook-per-component / presentational-components rule). New v2 filter should receive props from the page use case.
 - `FlashcardTable` calls a second use case (`useFlashcardTable` — selection + delete). Fold that into `useFlashcardManager` or keep it as the table’s single hook, but the page should not grow a third orchestration path.
 - `ExampleTable` calls `useAuthAdapter` for an admin clipboard item. Push that flag through the Finder use case if the v2 table still needs it.
-- `enableFiltering` is parsed with `useLocation` / `useNavigate` beside the use case. The Finder does **not** parse it — it only navigates _to_ `?enableFiltering=true`. Manager v2 now uses the visual-only `useEnableFilteringParam` wrapper; `FlashcardManagerV1` (dies with the flag) and `ReviewMyFlashcards` still hand-roll it. Point Review My Flashcards at the same hook when that page is touched.
+- `enableFiltering` is parsed with `useLocation` / `useNavigate` beside the use case. The Finder does **not** parse it — it only navigates _to_ `?enableFiltering=true`. Manager v2 now uses the visual-only `useEnableFilteringParam` wrapper; `FlashcardManagerV1` (dies with v1) and `ReviewMyFlashcards` still hand-roll it. Point Review My Flashcards at the same hook when that page is touched.
 - Finder use case has no tests; neither page has tests. Add them when the v2 page/components land ([`TESTING_STANDARDS.md`](../../../../documentation/TESTING_STANDARDS.md), 100% interface).
 - `onGoingToQuiz` on Manager sets local filter state then navigates away; Review My Flashcards actually keys off the URL param. Revisit that when wiring the ellipsis menu.
 - Manager table options include `DeleteAllOwnedSpanglish` (extra application hooks in a leaf). Keep the action in the v2 menu; move the mutation through the page/table hook.
 - `/manage-flashcards` is ungated in [`AppRoutes.tsx`](../../../routes/AppRoutes.tsx); Finder requires student/coach/admin. Out of scope for restyling, but do not silently copy the ungated route if we touch routing.
 - `includeUnpublished` is collected in filter state and passed through the query hook, but infrastructure `getFilteredExamples` does not put it on the POST body. Product/API bug, not a CSS task — do not “fix” it as a side effect of restyling.
 
-Out of scope for this surface: Custom Quiz, Review My Flashcards (shares `CloseableFilterPanel` **and** `useFilterOwnedFlashcards`), admin Example Manager, Get Help (`ui.student.help.v2` exists but that page is not wrapped and is not this phase).
+Out of scope for this surface: Custom Quiz, Review My Flashcards (shares `CloseableFilterPanel` **and** `useFilterOwnedFlashcards`), admin Example Manager, Get Help.
 
 ---
 
@@ -186,11 +185,11 @@ Out of scope for this surface: Custom Quiz, Review My Flashcards (shares `Closea
 
 When the visual design exists, ship small PRs in this order:
 
-1. Flag + `UiScope` wrap on both routes (no visual change while the flag is off).
+1. `UiScope` wrap on both routes (no visual change for v1 students).
 2. Page shell modules (heading, layout) using tokens; children still v1.
 3. v2 `FilterSection` presentational, wired through existing use cases / coordinator.
 4. v2 `ResultsTable` + `ExampleRow` (Finder add/remove, Manager bulk remove + menus).
 5. Replace Pagination/Toggle/Tag chips with primitives only as those land in the new tree.
 6. Remove the old table/filter imports from these two pages only. Leave global SCSS for quiz/admin.
 
-Each PR stays flag-gated. Production stays v1 until the surface is complete.
+Each PR stays version-gated by the logged-in user's beta-tester status. Non-beta students stay on v1 until the surface is complete.

@@ -14,7 +14,7 @@ export interface TextQuizEndV2Props {
  * Quiz-complete screen for text quizzes, redesigned to match the v2 visual
  * language (`AudioQuizEndV2` / `TextQuizV2` tokens). Distinct from the legacy
  * `TextQuizEnd` (untouched, still used by the v1 text quiz) — this is the v2
- * screen, gated behind `ui.student.textquiz.v2` same as `TextQuizV2`.
+ * screen, gated behind the student UI version same as `TextQuizV2`.
  *
  * Behavior matches legacy `TextQuizEnd`: SRS quizzes hide restart and show
  * due-for-review copy; non-SRS quizzes offer restart + return to setup.

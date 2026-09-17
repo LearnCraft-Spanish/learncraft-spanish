@@ -20,7 +20,7 @@ interface ReviewMyFlashcardsAudioQuizProps {
 export function ReviewMyFlashcardsAudioQuiz({
   audioQuizProps,
 }: ReviewMyFlashcardsAudioQuizProps): JSX.Element {
-  const { version } = useStudentUiVersion('ui.student.audioquiz.v2');
+  const { version } = useStudentUiVersion();
 
   return version === 'v2' ? (
     <ReviewMyFlashcardsAudioQuizV2 audioQuizProps={audioQuizProps} />

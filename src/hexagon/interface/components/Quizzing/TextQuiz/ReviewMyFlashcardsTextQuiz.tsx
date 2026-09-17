@@ -20,7 +20,7 @@ interface ReviewMyFlashcardsTextQuizProps {
 export function ReviewMyFlashcardsTextQuiz({
   textQuizProps,
 }: ReviewMyFlashcardsTextQuizProps): JSX.Element {
-  const { version } = useStudentUiVersion('ui.student.textquiz.v2');
+  const { version } = useStudentUiVersion();
 
   return version === 'v2' ? (
     <ReviewMyFlashcardsTextQuizV2 textQuizProps={textQuizProps} />

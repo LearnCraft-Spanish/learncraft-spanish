@@ -30,7 +30,7 @@ describe('vocab lookup switch', () => {
     cleanup();
   });
 
-  it('renders VocabLookupV2 when the flag is on', () => {
+  it('renders VocabLookupV2 when the student UI is v2', () => {
     overrideMockUseStudentUiVersion({ version: 'v2' });
 
     render(
@@ -42,7 +42,7 @@ describe('vocab lookup switch', () => {
     expect(screen.getByText('VocabLookupV2')).toBeInTheDocument();
   });
 
-  it('renders the legacy page when the flag is off', () => {
+  it('renders the legacy page when the student UI is v1', () => {
     overrideMockUseStudentUiVersion({ version: 'v1' });
 
     render(

@@ -1,13 +1,14 @@
 import type { ReactNode } from 'react';
 import {
-  overrideMockFeatureFlagAdapter,
-  resetMockFeatureFlagAdapter,
-} from '@application/adapters/featureFlagAdapter.mock';
-import {
   mockUseAppHeader,
   overrideMockUseAppHeader,
   resetMockUseAppHeader,
 } from '@application/useCases/AppHeader/useAppHeader.mock';
+import {
+  mockUseStudentUiVersion,
+  overrideMockUseStudentUiVersion,
+  resetMockUseStudentUiVersion,
+} from '@application/useCases/useStudentUiVersion.mock';
 import { useAppHeaderView } from '@interface/components/AppHeader/useAppHeaderView';
 import { setMobileStackOverride } from '@interface/hooks/useMobileStackChrome';
 import { renderHook } from '@testing-library/react';
@@ -16,6 +17,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@application/useCases/AppHeader', () => ({
   useAppHeader: () => mockUseAppHeader,
+}));
+
+vi.mock('@application/useCases/useStudentUiVersion', () => ({
+  useStudentUiVersion: mockUseStudentUiVersion,
 }));
 
 function stubMobile(matches: boolean): void {
@@ -41,15 +46,13 @@ describe('useAppHeaderView', () => {
 
   afterEach(() => {
     setMobileStackOverride(null);
-    resetMockFeatureFlagAdapter();
+    resetMockUseStudentUiVersion();
     vi.unstubAllGlobals();
   });
 
   it('does not expose stack chrome on desktop', () => {
     stubMobile(false);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
 
     const { result } = renderHook(() => useAppHeaderView(), {
       wrapper: wrapperFor('/quizzes'),
@@ -60,9 +63,7 @@ describe('useAppHeaderView', () => {
 
   it('does not expose stack chrome on mobile Home', () => {
     stubMobile(true);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
 
     const { result } = renderHook(() => useAppHeaderView(), {
       wrapper: wrapperFor('/'),
@@ -73,9 +74,7 @@ describe('useAppHeaderView', () => {
 
   it('exposes the path-map title and parent back on a mobile stack screen', () => {
     stubMobile(true);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
 
     const { result } = renderHook(() => useAppHeaderView(), {
       wrapper: wrapperFor('/quizzes'),
@@ -87,9 +86,7 @@ describe('useAppHeaderView', () => {
 
   it('lets an in-page override replace the title and back handler', () => {
     stubMobile(true);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     const onBack = vi.fn();
     setMobileStackOverride({ title: 'Text Quiz', onBack });
 

@@ -1,7 +1,7 @@
 # Audio Quiz v2 — reuse + divergence ledger
 
-Implements `design_handoff_audio_quiz/README.md` ("Audio Quiz Redesign") behind
-the `ui.student.audioquiz.v2` flag. Mirrors the `textQuiz/` v2 pattern:
+Implements `design_handoff_audio_quiz/README.md` ("Audio Quiz Redesign") for
+beta-tester students. Mirrors the `textQuiz/` v2 pattern:
 props-only presentational components, one domain function for step-dependent
 copy, a thin screen bridge from `useAudioQuiz` to the presentational tree.
 
@@ -64,8 +64,8 @@ markdown into bold/regular runs). Speaking's answer step labels replay
   shared component would just be two unrelated hint lists behind one prop.
 - **`AudioQuizEndV2`** is new — the legacy `AudioQuizEnd` (untouched, still
   used by the v1 audio quiz) is a plain unstyled screen. Text quiz now has a
-  parallel `TextQuizEndV2` (under `textQuiz/`, gated by
-  `ui.student.textquiz.v2` via `TextQuizV2Screen`); audio's complete screen
+  parallel `TextQuizEndV2` (under `textQuiz/`, gated by the student UI
+  version via `TextQuizV2Screen`); audio's complete screen
   was built to the handoff's two complete states (autoplay on/off) directly
   rather than extending the text-quiz end screen, because the two quiz kinds
   diverge on countdown / skipped / added-card copy.
@@ -157,5 +157,5 @@ markdown into bold/regular runs). Speaking's answer step labels replay
 
 `AudioQuiz.tsx` and `AudioBasedReview.css` (the v1 screen) are unmodified —
 `RegularAudioQuiz` / `ReviewMyFlashcardsAudioQuiz` branch on
-`useStudentUiVersion('ui.student.audioquiz.v2')` before ever calling either
+`useStudentUiVersion()` before ever calling either
 version's code, same shape as `RegularTextQuiz`.

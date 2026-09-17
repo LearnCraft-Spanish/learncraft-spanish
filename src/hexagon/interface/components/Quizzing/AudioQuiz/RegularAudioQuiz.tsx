@@ -21,7 +21,7 @@ interface RegularAudioQuizProps {
 export function RegularAudioQuiz({
   audioQuizProps,
 }: RegularAudioQuizProps): JSX.Element {
-  const { version } = useStudentUiVersion('ui.student.audioquiz.v2');
+  const { version } = useStudentUiVersion();
 
   return version === 'v2' ? (
     <RegularAudioQuizV2 audioQuizProps={audioQuizProps} />

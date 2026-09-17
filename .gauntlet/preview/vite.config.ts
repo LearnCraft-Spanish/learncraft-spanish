@@ -31,9 +31,9 @@ export default defineConfig({
         PREVIEW,
         'adapters/authPort.ts',
       ),
-      '@application/adapters/featureFlagAdapter': path.resolve(
+      '@application/queries/useMyData': path.resolve(
         PREVIEW,
-        'adapters/featureFlagPort.ts',
+        'adapters/myDataQuery.ts',
       ),
     },
   },
@@ -49,7 +49,6 @@ export default defineConfig({
     'import.meta.env.VITE_LOCAL_DOMAIN': JSON.stringify(
       'http://localhost:5273/',
     ),
-    'import.meta.env.VITE_UI_FLAGS': JSON.stringify('ui.student.help.v2'),
     'import.meta.env.VITE_PORT': JSON.stringify('5273'),
   },
   css: {

@@ -20,11 +20,11 @@ export interface AudioQuizV2ScreenProps {
 }
 
 /**
- * Drop-in v2 replacement for `AudioQuiz`, gated behind
- * `ui.student.audioquiz.v2` in `RegularAudioQuiz` and
- * `ReviewMyFlashcardsAudioQuiz`. Same loading / complete states as the
- * legacy screen — only the active-card view (`AudioQuizV2`) and the
- * complete screen (`AudioQuizEndV2`) are redesigned.
+ * Drop-in v2 replacement for `AudioQuiz`, gated behind the student UI
+ * version in `RegularAudioQuiz` and `ReviewMyFlashcardsAudioQuiz`. Same
+ * loading / complete states as the legacy screen — only the active-card
+ * view (`AudioQuizV2`) and the complete screen (`AudioQuizEndV2`) are
+ * redesigned.
  *
  * `vocabInfoHook` is sourced the same way `useTextQuiz` sources it for
  * `TextQuizV2Screen` (`const vocabInfoHook = useVocabInfo;`) — `useAudioQuiz`

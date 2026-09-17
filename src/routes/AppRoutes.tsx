@@ -1,5 +1,6 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
+import { config } from '@config';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { UiScope } from '@interface/components/general/UiScope/UiScope';
 import { Loading } from '@interface/components/Loading';
@@ -31,7 +32,7 @@ const FlashcardFinderPage = lazy(
 const GetHelpHub = lazy(() => import('@interface/pages/GetHelp'));
 const GetHelpVocab = lazy(() => import('@interface/pages/GetHelp/VocabLookup'));
 
-// Development-only, gated inside the page by the `ui.dev.gallery` flag
+// Development-only, gated by environment so it never registers in production
 const UiGallery = lazy(() => import('@interface/pages/UiGallery'));
 
 // Coach / Admin pages
@@ -56,7 +57,7 @@ const ExampleManagerRouter = lazy(
 export default function AppRoutes() {
   const { isAdmin, isCoach, isStudent, isLimited, isAuthenticated } =
     useAuthAdapter();
-  const { version: quizzesVersion } = useStudentUiVersion('ui.student.home.v2');
+  const { version } = useStudentUiVersion();
 
   return (
     <Suspense
@@ -76,7 +77,7 @@ export default function AppRoutes() {
           path="/"
           element={
             isStudent ? (
-              <UiScope flag="ui.student.home.v2">
+              <UiScope>
                 <HomePage />
               </UiScope>
             ) : (
@@ -88,7 +89,7 @@ export default function AppRoutes() {
           path="/myflashcards"
           element={
             isAuthenticated && (
-              <UiScope flag="ui.student.myflashcards.v2">
+              <UiScope>
                 <ReviewMyFlashcards />
               </UiScope>
             )
@@ -97,7 +98,7 @@ export default function AppRoutes() {
         <Route
           path="/manage-flashcards"
           element={
-            <UiScope flag="ui.student.flashcards.manager.v2">
+            <UiScope>
               <FlashcardManager />
             </UiScope>
           }
@@ -106,8 +107,8 @@ export default function AppRoutes() {
           path="/quizzes"
           element={
             isAuthenticated &&
-            quizzesVersion === 'v2' && (
-              <UiScope flag="ui.student.home.v2">
+            version === 'v2' && (
+              <UiScope>
                 <QuizzesPage />
               </UiScope>
             )
@@ -116,7 +117,7 @@ export default function AppRoutes() {
         <Route
           path="/officialquizzes/*"
           element={
-            <UiScope flag="ui.student.officialquiz.v2">
+            <UiScope>
               <OfficialQuizzesRoutes />
             </UiScope>
           }
@@ -128,7 +129,7 @@ export default function AppRoutes() {
             (isLimited ? (
               <LimitedCustomQuiz />
             ) : (
-              <UiScope flag="ui.student.customquiz.v2">
+              <UiScope>
                 <CustomQuiz />
               </UiScope>
             ))
@@ -138,7 +139,7 @@ export default function AppRoutes() {
           path="/flashcardfinder"
           element={
             (isStudent || isAdmin || isCoach) && (
-              <UiScope flag="ui.student.flashcards.finder.v2">
+              <UiScope>
                 <FlashcardFinderPage />
               </UiScope>
             )
@@ -152,7 +153,7 @@ export default function AppRoutes() {
           path="/get-help"
           element={
             (isStudent || isCoach || isAdmin) && (
-              <UiScope flag="ui.student.help.v2">
+              <UiScope>
                 <GetHelpHub />
               </UiScope>
             )
@@ -162,7 +163,7 @@ export default function AppRoutes() {
           path="/get-help/vocab"
           element={
             (isStudent || isCoach || isAdmin) && (
-              <UiScope flag="ui.student.help.v2">
+              <UiScope>
                 <GetHelpVocab />
               </UiScope>
             )
@@ -185,7 +186,9 @@ export default function AppRoutes() {
           element={isAdmin && <DatabaseTables />}
         />
         <Route path="/example-manager/*" element={<ExampleManagerRouter />} />
-        <Route path="/ui-gallery" element={<UiGallery />} />
+        {config.environment !== 'production' && (
+          <Route path="/ui-gallery" element={<UiGallery />} />
+        )}
         <Route path="/*" element={<NotFoundPage />} />
         <Route
           path="/admin-dashboard"

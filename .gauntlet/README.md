@@ -50,7 +50,7 @@ real presentational tree + local fixtures. Update
 | Path                              | Role                                                      |
 | --------------------------------- | --------------------------------------------------------- |
 | `preview/`                        | Vite specimen app (port **5273**, `strictPort`)           |
-| `preview/adapters/`               | AuthPort + feature flags (no Vitest `vi`)                 |
+| `preview/adapters/`               | AuthPort + useMyData (no Vitest `vi`)                     |
 | `preview/specimens/*.tsx`         | Surfaces under redesign                                   |
 | `preview/specimens/*.states.json` | Capture matrix (label, formFactor, query)                 |
 | `bars/smoke/`                     | Committed tiny bar for tooling self-test                  |
@@ -70,7 +70,7 @@ real presentational tree + local fixtures. Update
 
 ## Isolation details
 
-- Vite aliases `@application/adapters/authAdapter` and `featureFlagAdapter` to preview stubs.
+- Vite aliases `@application/adapters/authAdapter` and `useMyData` to preview stubs.
 - `VITE_BACKEND_DOMAIN` is forced to `http://gauntlet.invalid/`.
 - `networkGuard.ts` throws on non-allowlisted `fetch` / XHR.
 - `capture-app.mjs` aborts any request whose origin is not the specimen.

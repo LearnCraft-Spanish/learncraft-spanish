@@ -1,15 +1,5 @@
 const viteConsts = import.meta.env;
 
-export function parseUiFlags(raw: string | undefined): string[] {
-  if (!raw) {
-    return [];
-  }
-  return raw
-    .split(',')
-    .map((flag) => flag.trim())
-    .filter((flag) => flag.length > 0);
-}
-
 interface Config {
   apiAudience: string;
   auth0ClientId: string;
@@ -17,7 +7,6 @@ interface Config {
   backendDomain: string;
   environment: string;
   localDomain: string;
-  uiFlags: string[];
 }
 
 export const config: Config = {
@@ -27,5 +16,4 @@ export const config: Config = {
   backendDomain: viteConsts.VITE_BACKEND_DOMAIN,
   environment: viteConsts.VITE_ENVIRONMENT,
   localDomain: viteConsts.VITE_LOCAL_DOMAIN,
-  uiFlags: parseUiFlags(viteConsts.VITE_UI_FLAGS),
 };

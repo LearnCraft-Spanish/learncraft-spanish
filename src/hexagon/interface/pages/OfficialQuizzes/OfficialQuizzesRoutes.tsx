@@ -29,7 +29,7 @@ export default function OfficialQuizzesRoutes(): JSX.Element {
   const navigate = useNavigate();
   const { isLoading, error, quizGroups, quizSetupMenuProps, isLoggedIn } =
     useOfficialQuizzes();
-  const { version } = useStudentUiVersion('ui.student.officialquiz.v2');
+  const { version } = useStudentUiVersion();
 
   return (
     <Routes>

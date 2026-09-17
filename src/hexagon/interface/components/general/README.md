@@ -52,4 +52,4 @@ Versioning beside a legacy component, rather than editing it, is deliberate. The
 
 ## Reviewing them
 
-`/ui-gallery` renders every primitive with each variant and state. Enable it with `VITE_UI_FLAGS=ui.dev.gallery`. Add a section there in the same PR that adds a primitive.
+`/ui-gallery` renders every primitive with each variant and state. The route is registered only when `config.environment !== 'production'`. Add a section there in the same PR that adds a primitive.

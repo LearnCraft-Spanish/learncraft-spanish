@@ -45,7 +45,7 @@ describe('component OfficialQuiz', () => {
     cleanup();
   });
 
-  it('covers loading with PageShell when the official quiz v2 flag is on', () => {
+  it('covers loading with PageShell when the student UI is v2', () => {
     overrideMockUseStudentUiVersion({ version: 'v2' });
     mockUseOfficialQuizPage.mockReturnValue({
       quizExamples: undefined,

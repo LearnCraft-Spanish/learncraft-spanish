@@ -1,13 +1,14 @@
 import type { JSX, ReactNode } from 'react';
 import {
-  overrideMockFeatureFlagAdapter,
-  resetMockFeatureFlagAdapter,
-} from '@application/adapters/featureFlagAdapter.mock';
-import {
   mockUseAppHeader,
   overrideMockUseAppHeader,
   resetMockUseAppHeader,
 } from '@application/useCases/AppHeader/useAppHeader.mock';
+import {
+  mockUseStudentUiVersion,
+  overrideMockUseStudentUiVersion,
+  resetMockUseStudentUiVersion,
+} from '@application/useCases/useStudentUiVersion.mock';
 import { AppHeader } from '@interface/components/AppHeader/AppHeader';
 import { setMobileStackOverride } from '@interface/hooks/useMobileStackChrome';
 import { render, screen } from '@testing-library/react';
@@ -17,6 +18,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@application/useCases/AppHeader', () => ({
   useAppHeader: () => mockUseAppHeader,
+}));
+
+vi.mock('@application/useCases/useStudentUiVersion', () => ({
+  useStudentUiVersion: mockUseStudentUiVersion,
 }));
 
 function stubMobile(matches: boolean): void {
@@ -43,7 +48,7 @@ describe('component AppHeader', () => {
 
   afterEach(() => {
     setMobileStackOverride(null);
-    resetMockFeatureFlagAdapter();
+    resetMockUseStudentUiVersion();
     vi.unstubAllGlobals();
   });
 
@@ -123,9 +128,7 @@ describe('component AppHeader', () => {
 
   it('shows back and the page title on a mobile stack screen, without the account menu', async () => {
     stubMobile(true);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     overrideMockUseAppHeader({
       isAuthenticated: true,
       isLoading: false,
@@ -146,9 +149,7 @@ describe('component AppHeader', () => {
 
   it('calls an in-page override when the stack back button is pressed', async () => {
     stubMobile(true);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     overrideMockUseAppHeader({ isAuthenticated: true, isLoading: false });
     const onBack = vi.fn();
     setMobileStackOverride({ title: 'Choose tags', onBack });
@@ -165,9 +166,7 @@ describe('component AppHeader', () => {
 
   it('navigates to the parent path when stack back is pressed', async () => {
     stubMobile(true);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     overrideMockUseAppHeader({ isAuthenticated: true, isLoading: false });
 
     function PathReadout(): JSX.Element {

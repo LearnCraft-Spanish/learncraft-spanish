@@ -25,14 +25,14 @@ describe('home page', () => {
     cleanup();
   });
 
-  it('renders the legacy Menu when the flag is off', () => {
+  it('renders the legacy Menu when the student UI is v1', () => {
     render(<Home />);
 
     expect(screen.getByTestId('legacy-menu')).toBeInTheDocument();
     expect(screen.queryByTestId('home-v2')).not.toBeInTheDocument();
   });
 
-  it('renders HomeV2 when ui.student.home.v2 is on', () => {
+  it('renders HomeV2 for a v2 student', () => {
     overrideMockUseStudentUiVersion({ version: 'v2' });
 
     render(<Home />);

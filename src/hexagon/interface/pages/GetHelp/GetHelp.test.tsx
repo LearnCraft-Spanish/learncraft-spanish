@@ -30,7 +30,7 @@ describe('get help switch', () => {
     cleanup();
   });
 
-  it('renders the v2 hub when the flag is on', () => {
+  it('renders the v2 hub when the student UI is v2', () => {
     overrideMockUseStudentUiVersion({ version: 'v2' });
 
     render(
@@ -42,7 +42,7 @@ describe('get help switch', () => {
     expect(screen.getByText('GetHelpV2')).toBeInTheDocument();
   });
 
-  it('renders the legacy page when the flag is off', () => {
+  it('renders the legacy page when the student UI is v1', () => {
     overrideMockUseStudentUiVersion({ version: 'v1' });
 
     render(

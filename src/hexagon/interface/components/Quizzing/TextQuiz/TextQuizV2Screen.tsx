@@ -24,8 +24,8 @@ export interface TextQuizV2ScreenProps {
 }
 
 /**
- * Drop-in v2 replacement for `TextQuiz`, gated behind
- * `ui.student.textquiz.v2` in `RegularTextQuiz`, `SrsTextQuiz`, and
+ * Drop-in v2 replacement for `TextQuiz`, gated behind the student UI
+ * version in `RegularTextQuiz`, `SrsTextQuiz`, and
  * `ReviewMyFlashcardsTextQuiz`. Same props, same loading / no-due / complete
  * states as the legacy screen — the active-card view is redesigned via
  * `TextQuizV2`, and the complete state via `TextQuizEndV2`.

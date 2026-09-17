@@ -20,7 +20,7 @@ interface SrsTextQuizProps {
  * `useSrsTextQuiz`, matching Home / CustomQuiz / FlashcardFinder.
  */
 export function SrsTextQuiz({ textQuizProps }: SrsTextQuizProps): JSX.Element {
-  const { version } = useStudentUiVersion('ui.student.textquiz.v2');
+  const { version } = useStudentUiVersion();
 
   return version === 'v2' ? (
     <SrsTextQuizV2 textQuizProps={textQuizProps} />

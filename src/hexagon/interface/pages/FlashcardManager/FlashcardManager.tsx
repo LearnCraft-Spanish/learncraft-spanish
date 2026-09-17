@@ -4,7 +4,7 @@ import { FlashcardManagerV1 } from '@interface/pages/FlashcardManager/FlashcardM
 import { FlashcardManagerV2 } from '@interface/pages/FlashcardManager/FlashcardManagerV2';
 
 export default function FlashcardManager(): JSX.Element {
-  const { version } = useStudentUiVersion('ui.student.flashcards.manager.v2');
+  const { version } = useStudentUiVersion();
 
   return version === 'v2' ? <FlashcardManagerV2 /> : <FlashcardManagerV1 />;
 }

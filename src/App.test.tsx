@@ -12,10 +12,18 @@ import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
-import { overrideMockFeatureFlagAdapter } from 'src/hexagon/application/adapters/featureFlagAdapter.mock';
+import {
+  mockUseStudentUiVersion,
+  overrideMockUseStudentUiVersion,
+  resetMockUseStudentUiVersion,
+} from 'src/hexagon/application/useCases/useStudentUiVersion.mock';
 import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
+
+vi.mock('@application/useCases/useStudentUiVersion', () => ({
+  useStudentUiVersion: mockUseStudentUiVersion,
+}));
 
 // `MockAllProviders`'s `route` prop wraps `children` in its own extra
 // `<Routes>` when `route !== '/'`. That's fine for a single leaf page, but
@@ -49,6 +57,9 @@ function renderAppAtRoute(route: string) {
 
 // Waiting for userData context to be finished
 describe('app', () => {
+  afterEach(() => {
+    resetMockUseStudentUiVersion();
+  });
   it('renders without crashing', () => {
     render(
       <MockAllProviders>
@@ -123,8 +134,21 @@ describe('app', () => {
     expect(queryByText(/welcome/i)).not.toBeInTheDocument();
   });
 
+  it('shows a loading spinner while the student UI version is resolving', async () => {
+    overrideMockUseStudentUiVersion({ isLoading: true, version: 'v1' });
+    const { getByAltText, queryByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByAltText('loading-spinner')).toBeInTheDocument();
+    });
+    expect(queryByText(/official quizzes/i)).not.toBeInTheDocument();
+  });
+
   it('shows a loading spinner when logging in', async () => {
-    overrideMockAuthAdapter({ isLoading: true });
+    overrideMockAuthAdapter({ isLoading: true, isAuthenticated: false });
     const { getByAltText } = render(
       <MockAllProviders>
         <App />
@@ -177,9 +201,7 @@ describe('app', () => {
   });
 
   it('hides the sub-header on the v2 student home screen', async () => {
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
@@ -203,9 +225,7 @@ describe('app', () => {
   });
 
   it('does not mount the primary tab bar off Home when student home v2 is on', async () => {
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
@@ -227,9 +247,7 @@ describe('app', () => {
   });
 
   it('hides the sub-header on the v2 flashcard finder screen', async () => {
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.flashcards.finder.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
@@ -240,35 +258,18 @@ describe('app', () => {
         isOwnUser: true,
       },
     );
-    const user = userEvent.setup();
-    const { getByRole, queryByText } = render(
-      <MockAllProviders>
-        <App />
-      </MockAllProviders>,
-    );
+    const { getByRole, queryByText } = renderAppAtRoute('/flashcardfinder');
 
     await waitFor(() => {
       expect(
-        getByRole('link', { name: 'Flashcard Finder' }),
+        getByRole('heading', { name: 'Flashcard Finder' }),
       ).toBeInTheDocument();
     });
-    await user.click(getByRole('link', { name: 'Flashcard Finder' }));
-
-    await waitFor(
-      () => {
-        expect(
-          getByRole('heading', { name: 'Flashcard Finder' }),
-        ).toBeInTheDocument();
-      },
-      { timeout: 5000 },
-    );
     expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
   });
 
   it('hides the sub-header on the v2 flashcard manager screen', async () => {
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.flashcards.manager.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
@@ -279,26 +280,13 @@ describe('app', () => {
         isOwnUser: true,
       },
     );
-    const user = userEvent.setup();
-    const { getByRole, queryByText } = render(
-      <MockAllProviders>
-        <App />
-      </MockAllProviders>,
-    );
+    const { getByRole, queryByText } = renderAppAtRoute('/manage-flashcards');
 
     await waitFor(() => {
-      expect(getByRole('link', { name: 'My flashcards' })).toBeInTheDocument();
+      expect(
+        getByRole('heading', { name: 'Flashcard Manager' }),
+      ).toBeInTheDocument();
     });
-    await user.click(getByRole('link', { name: 'My flashcards' }));
-
-    await waitFor(
-      () => {
-        expect(
-          getByRole('heading', { name: 'Flashcard Manager' }),
-        ).toBeInTheDocument();
-      },
-      { timeout: 5000 },
-    );
     expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
   });
 
@@ -317,20 +305,17 @@ describe('app', () => {
     const { getByRole, queryByText } = renderAppAtRoute('/get-help');
 
     await waitFor(() => {
-      expect(
-        getByRole('heading', { name: 'Help & walkthroughs' }),
-      ).toBeInTheDocument();
+      expect(getByRole('heading', { name: /help/i })).toBeInTheDocument();
     });
     expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
     expect(queryByText(/using as/i)).not.toBeInTheDocument();
   });
 
-  it('never shows the sub header for a student, even on a route with no v2 flag enabled', async () => {
+  it('never shows the sub header for a student, even on a v1 route', async () => {
     // Regression: before the role gate, this route's sub header was hidden
-    // only by the `isFlashcardFinderV2` flag check, so a student without
-    // the flag enabled would still fall through to the legacy sub header
-    // here. The role gate must hide it unconditionally for students,
-    // regardless of route or flag state.
+    // only by a v2-flag check, so a student on v1 would still fall through
+    // to the legacy sub header here. The role gate must hide it
+    // unconditionally for students, regardless of route or UI version.
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
@@ -346,7 +331,7 @@ describe('app', () => {
 
     await waitFor(() => {
       expect(
-        getByRole('heading', { name: 'Flashcard Finder' }),
+        getByRole('heading', { name: /flashcard finder/i }),
       ).toBeInTheDocument();
     });
     expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
@@ -378,7 +363,7 @@ describe('app', () => {
     // Watch out: gate on `isCoach || isAdmin`, not `!isStudent` — a
     // coach/admin who also has the Student role must still get the
     // selector, not the student "Welcome back" message. Rendered on a
-    // coach/admin-only route with no v2-flag exclusion of its own (unlike
+    // coach/admin-only route with no v2 exclusion of its own (unlike
     // `/`, `/flashcardfinder`, `/manage-flashcards`), so this isolates the
     // role check itself.
     overrideMockAuthAdapter({

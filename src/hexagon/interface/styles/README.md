@@ -52,19 +52,12 @@ The two scales are independent and intentionally different:
 
 The design specified Avenir, but Avenir is not licensed for the web and only resolves as a system font on macOS and iOS. Listing it ahead of Nunito Sans meant Mac and iPhone users saw a different typeface from everyone else, so it was removed. v2 is Nunito Sans on every platform, loaded from the Google Fonts link in `index.html`.
 
-## Adding a flagged student surface
+## Student v1 vs v2
 
-1. Add a flag id to `src/hexagon/domain/uiFlags.ts`.
-2. Enable it locally with `VITE_UI_FLAGS=ui.student.help.v2` (comma-separated). Leave unset in production.
-3. Wrap the route element in `<UiScope flag="ui.student.help.v2">`. The wrapper uses `display: contents` and sets `data-ui="v1"` or `data-ui="v2"`.
-4. Author v2 styles as a `*.module.scss` file. Target `[data-ui='v2']` only when a v1/v2 split exists in the same tree.
+v2 is shown when the logged-in user's own record has `studentRole === 'student'` and `betaTester === true`. Everyone else gets v1. `UiScope` wraps each student route, uses `display: contents`, and sets `data-ui="v1"` or `data-ui="v2"`. Author v2 styles as a `*.module.scss` file. Target `[data-ui='v2']` only when a v1/v2 split exists in the same tree.
 
-Do not wrap student routes until that surface is being redesigned.
+The first major student surface is Flashcard Finder. Architecture, isolation rules, and the start sequence live in [`pages/STUDENT_FLASHCARDS.md`](../pages/STUDENT_FLASHCARDS.md). Get Help is the help hub at `/get-help` (vocab lookup + video walkthroughs); the vocab search itself remains at `/get-help/vocab`.
 
-The first major student surface is Flashcard Finder (`ui.student.flashcards.finder.v2`). Architecture, isolation rules, and the start sequence live in [`pages/STUDENT_FLASHCARDS.md`](../pages/STUDENT_FLASHCARDS.md). Get Help uses `ui.student.help.v2` for the help hub at `/get-help` (vocab lookup + video walkthroughs); the vocab search itself remains at `/get-help/vocab`.
+## Development-only gallery
 
-## Flags that gate a whole surface
-
-`UiScope` + `useStudentUiVersion` handle a v1/v2 split on a route that already exists. For a route that is entirely new or development-only, use `useUiFlag` inside the page instead — it returns `{ enabled }`, the page returns `null` when the flag is off, and the route needs no extra hook.
-
-`ui.dev.gallery` works this way. It serves `/ui-gallery`, a specimen page for every v2 primitive and token. Enable it with `VITE_UI_FLAGS=ui.dev.gallery`. The page is lazy-loaded, so it never enters the main bundle.
+`/ui-gallery` is a specimen page for every v2 primitive and token. The route is registered only when `config.environment !== 'production'`. The page is lazy-loaded, so it never enters the main bundle.

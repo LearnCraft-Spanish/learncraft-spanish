@@ -26,7 +26,7 @@ export function RegularTextQuiz({
   quizTitle,
   textQuizProps,
 }: RegularTextQuizProps): JSX.Element {
-  const { version } = useStudentUiVersion('ui.student.textquiz.v2');
+  const { version } = useStudentUiVersion();
 
   return version === 'v2' ? (
     <RegularTextQuizV2 quizTitle={quizTitle} textQuizProps={textQuizProps} />

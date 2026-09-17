@@ -17,19 +17,14 @@ import AppRoutes from './routes/AppRoutes';
 import './App.css';
 import './contextual.scss';
 
+const V2_NO_SUBHEADER_PATHS = ['/', '/flashcardfinder', '/manage-flashcards'];
+
 export const App: React.FC = () => {
   // React Router hooks
   const location = useLocation();
-  const { isAuthenticated, isLoading, isAdmin, isCoach, isStudent, login } =
+  const { isAuthenticated, isLoading, isCoach, isAdmin, login } =
     useAuthAdapter();
-  const { version: studentHomeVersion } =
-    useStudentUiVersion('ui.student.home.v2');
-  const { version: flashcardFinderVersion } = useStudentUiVersion(
-    'ui.student.flashcards.finder.v2',
-  );
-  const { version: flashcardManagerVersion } = useStudentUiVersion(
-    'ui.student.flashcards.manager.v2',
-  );
+  const { version, isLoading: versionLoading } = useStudentUiVersion();
 
   // Auto-flush any pending SRS updates from localStorage on app load
   useFlushFlashcardUpdatesOnLoad();
@@ -42,33 +37,25 @@ export const App: React.FC = () => {
   // must still get the selector, so this is `isCoach || isAdmin`, not
   // `!isStudent`.
   //
-  // The three v2-flag checks below stay relevant even under a role gate:
-  // a coach/admin can land on these same v2 student surfaces (`/`,
+  // A beta-tester student can land on these same v2 student surfaces (`/`,
   // `/flashcardfinder`, `/manage-flashcards`), and each surface still has
   // no sub header in its own v2 design, falling back to the legacy
-  // sub-header only when its flag is off (since the v1 sibling on that
+  // sub-header only when the viewer is on v1 (since the v1 sibling on that
   // same route still relies on it).
+  const showSpinner =
+    (isLoading && !isAuthenticated) || (isAuthenticated && versionLoading);
   const isCoachOrAdmin = isCoach || isAdmin;
-  const isStudentHomeV2 =
-    location.pathname === '/' &&
-    isAuthenticated &&
-    isStudent &&
-    studentHomeVersion === 'v2';
-  const isFlashcardFinderV2 =
-    location.pathname === '/flashcardfinder' && flashcardFinderVersion === 'v2';
-  const isFlashcardManagerV2 =
-    location.pathname === '/manage-flashcards' &&
-    flashcardManagerVersion === 'v2';
+  const isStudentV2Surface =
+    version === 'v2' && V2_NO_SUBHEADER_PATHS.includes(location.pathname);
 
   return (
     <div className="App">
       <ExtraCoachingCTA />
       <AppHeader>{isAuthenticated && <PrimaryNav />}</AppHeader>
       {isAuthenticated &&
+        !showSpinner &&
         isCoachOrAdmin &&
-        !isStudentHomeV2 &&
-        !isFlashcardFinderV2 &&
-        !isFlashcardManagerV2 &&
+        !isStudentV2Surface &&
         location.pathname !== '/student-drill-down' &&
         location.pathname !== '/customquiz' &&
         location.pathname !== '/myflashcards' &&
@@ -80,13 +67,16 @@ export const App: React.FC = () => {
         )}
 
       <div className={styles.mainContent}>
-        {isLoading && !isAuthenticated ? (
-          // Auth hasn't resolved yet, so v1 vs v2 isn't known either —
-          // `PageShell` paints the v2 page color instead of leaving the
-          // legacy paper texture (`.mainContent`, `App.module.scss`)
-          // visible behind the spinner. `LoggedOut` below does the same.
+        {showSpinner ? (
+          // Auth hasn't resolved yet, or myData hasn't landed so v1 vs v2
+          // isn't known — `PageShell` paints the v2 page color instead of
+          // leaving the legacy paper texture (`.mainContent`,
+          // `App.module.scss`) visible behind the spinner. `LoggedOut`
+          // below does the same.
           <PageShell>
-            <Loading message="Logging in..." />
+            <Loading
+              message={isAuthenticated ? 'Loading...' : 'Logging in...'}
+            />
           </PageShell>
         ) : isAuthenticated ? (
           <PageTransition>

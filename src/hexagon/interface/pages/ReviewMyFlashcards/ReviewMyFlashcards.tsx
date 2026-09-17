@@ -5,10 +5,10 @@ import { ReviewMyFlashcardsV2 } from '@interface/pages/ReviewMyFlashcards/Review
 
 /**
  * Route entry for `/myflashcards`. The legacy setup menu stays the fallback
- * until `ui.student.myflashcards.v2` is on everywhere.
+ * for students who are not beta testers.
  */
 export default function ReviewMyFlashcards(): JSX.Element {
-  const { version } = useStudentUiVersion('ui.student.myflashcards.v2');
+  const { version } = useStudentUiVersion();
 
   return version === 'v2' ? <ReviewMyFlashcardsV2 /> : <ReviewMyFlashcardsV1 />;
 }

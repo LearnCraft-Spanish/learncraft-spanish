@@ -40,7 +40,7 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const { version } = useStudentUiVersion('ui.student.home.v2');
+  const { version } = useStudentUiVersion();
   const override = useMobileStackOverride();
 
   const showStack =

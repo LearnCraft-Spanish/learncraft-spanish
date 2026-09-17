@@ -1,31 +1,13 @@
-import {
-  mockUseUiFlag,
-  overrideMockUseUiFlag,
-  resetMockUseUiFlag,
-} from '@application/useCases/useUiFlag.mock';
 import UiGallery from '@interface/pages/UiGallery/UiGallery';
 import { cleanup, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@application/useCases/useUiFlag', () => ({
-  useUiFlag: mockUseUiFlag,
-}));
+import { afterEach, describe, expect, it } from 'vitest';
 
 describe('ui gallery', () => {
   afterEach(() => {
-    resetMockUseUiFlag();
     cleanup();
   });
 
-  it('renders nothing when the gallery flag is off', () => {
-    const { container } = render(<UiGallery />);
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders the gallery when the flag is on', () => {
-    overrideMockUseUiFlag({ enabled: true });
-
+  it('renders the gallery', () => {
     render(<UiGallery />);
 
     expect(
@@ -34,8 +16,6 @@ describe('ui gallery', () => {
   });
 
   it('lists the token sections', () => {
-    overrideMockUseUiFlag({ enabled: true });
-
     render(<UiGallery />);
 
     expect(screen.getByRole('heading', { name: 'Color' })).toBeInTheDocument();
@@ -44,8 +24,6 @@ describe('ui gallery', () => {
   });
 
   it('has a section for each family of primitives', () => {
-    overrideMockUseUiFlag({ enabled: true });
-
     render(<UiGallery />);
 
     for (const title of [
@@ -74,8 +52,6 @@ describe('ui gallery', () => {
   });
 
   it('composes live primitives, not just headings', () => {
-    overrideMockUseUiFlag({ enabled: true });
-
     render(<UiGallery />);
 
     expect(

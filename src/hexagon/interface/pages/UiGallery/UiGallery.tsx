@@ -1,5 +1,4 @@
 import type { JSX } from 'react';
-import { useUiFlag } from '@application/useCases/useUiFlag';
 import { PageShell } from '@interface/components/general/PageShell';
 import { DataSection } from '@interface/pages/UiGallery/DataSection';
 import { FormsSection } from '@interface/pages/UiGallery/FormsSection';
@@ -10,16 +9,10 @@ import { TokensSection } from '@interface/pages/UiGallery/TokensSection';
 import styles from './UiGallery.module.scss';
 
 /**
- * Development-only gallery of the v2 design primitives. Gated behind
- * `ui.dev.gallery`; enable with `VITE_UI_FLAGS=ui.dev.gallery`.
+ * Development-only gallery of the v2 design primitives. The `/ui-gallery`
+ * route is registered only when `config.environment !== 'production'`.
  */
-export default function UiGallery(): JSX.Element | null {
-  const { enabled } = useUiFlag('ui.dev.gallery');
-
-  if (!enabled) {
-    return null;
-  }
-
+export default function UiGallery(): JSX.Element {
   return (
     <PageShell>
       <h1 className={styles.title}>Design system v2</h1>

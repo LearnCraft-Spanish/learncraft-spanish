@@ -1,16 +1,22 @@
-import type { StudentUiFlag, UiVersion } from '@domain/uiFlags';
-import { useFeatureFlagAdapter } from '@application/adapters/featureFlagAdapter';
+import type { UiVersion } from '@domain/uiVersion';
+import { useMyData } from '@application/queries/useMyData';
+import { resolveStudentUiVersion } from '@domain/uiVersion';
 
 export interface StudentUiVersionResult {
   version: UiVersion;
+  isLoading: boolean;
 }
 
-export function useStudentUiVersion(
-  flagId: StudentUiFlag,
-): StudentUiVersionResult {
-  const { isEnabled } = useFeatureFlagAdapter();
+/**
+ * Student v1 vs v2 from the logged-in user's own record.
+ * Composes `useMyData` plus a domain resolver. Kept in `useCases/`
+ * (rather than `units/`) because interface tests mock this module path.
+ */
+export function useStudentUiVersion(): StudentUiVersionResult {
+  const { myData, isLoading } = useMyData();
 
   return {
-    version: isEnabled(flagId) ? 'v2' : 'v1',
+    version: resolveStudentUiVersion(myData),
+    isLoading,
   };
 }

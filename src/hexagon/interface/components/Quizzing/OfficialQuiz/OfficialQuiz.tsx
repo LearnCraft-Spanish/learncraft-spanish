@@ -14,7 +14,7 @@ import NotFoundPage from 'src/NotFoundPage';
  * setup menu.
  */
 export function OfficialQuiz(): JSX.Element {
-  const { version } = useStudentUiVersion('ui.student.officialquiz.v2');
+  const { version } = useStudentUiVersion();
   return <OfficialQuizContent v2={version === 'v2'} />;
 }
 

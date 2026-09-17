@@ -30,7 +30,7 @@ export function usePageTransition(): UsePageTransitionResult {
   const prefersReducedMotion = useMediaQuery(
     '(prefers-reduced-motion: reduce)',
   );
-  const { version } = useStudentUiVersion('ui.student.home.v2');
+  const { version } = useStudentUiVersion();
   const enabled = isMobile && version === 'v2' && !prefersReducedMotion;
 
   const [ghost, setGhost] = useState<PageTransitionGhost | null>(null);

@@ -1,13 +1,18 @@
 import type { JSX } from 'react';
 import {
-  overrideMockFeatureFlagAdapter,
-  resetMockFeatureFlagAdapter,
-} from '@application/adapters/featureFlagAdapter.mock';
+  mockUseStudentUiVersion,
+  overrideMockUseStudentUiVersion,
+  resetMockUseStudentUiVersion,
+} from '@application/useCases/useStudentUiVersion.mock';
 import { PageTransition } from '@interface/components/PageTransition/PageTransition';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@application/useCases/useStudentUiVersion', () => ({
+  useStudentUiVersion: mockUseStudentUiVersion,
+}));
 
 function stubMedia(mobile: boolean, reducedMotion: boolean): void {
   vi.stubGlobal('matchMedia', (query: string) => ({
@@ -62,15 +67,13 @@ function renderTransition(initialPath = '/'): ReturnType<typeof render> {
 describe('pageTransition', () => {
   afterEach(() => {
     cleanup();
-    resetMockFeatureFlagAdapter();
+    resetMockUseStudentUiVersion();
     vi.unstubAllGlobals();
   });
 
   it('does not clone the outgoing page on desktop', async () => {
     stubMedia(false, false);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     const user = userEvent.setup();
     renderTransition();
 
@@ -83,9 +86,7 @@ describe('pageTransition', () => {
 
   it('clones the outgoing page and marks a forward slide', async () => {
     stubMedia(true, false);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     const user = userEvent.setup();
     renderTransition();
 
@@ -99,9 +100,7 @@ describe('pageTransition', () => {
 
   it('clones the outgoing page and marks a back slide', async () => {
     stubMedia(true, false);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     const user = userEvent.setup();
     renderTransition('/quizzes');
 
@@ -115,9 +114,7 @@ describe('pageTransition', () => {
 
   it('skips the clone when reduced motion is requested', async () => {
     stubMedia(true, true);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     const user = userEvent.setup();
     renderTransition();
 
@@ -129,9 +126,7 @@ describe('pageTransition', () => {
 
   it('clears the ghost when the outgoing animation ends', async () => {
     stubMedia(true, false);
-    overrideMockFeatureFlagAdapter({
-      isEnabled: (flag) => flag === 'ui.student.home.v2',
-    });
+    overrideMockUseStudentUiVersion({ version: 'v2' });
     const user = userEvent.setup();
     renderTransition();
 

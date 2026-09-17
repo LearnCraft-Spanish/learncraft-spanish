@@ -74,7 +74,7 @@ describe('component OfficialQuizzesRoutes', () => {
     cleanup();
   });
 
-  it('renders the legacy setup menu when the v2 flag is off', () => {
+  it('renders the legacy setup menu when the student UI is v1', () => {
     overrideMockUseStudentUiVersion({ version: 'v1' });
     setUseOfficialQuizzes();
 
@@ -86,7 +86,7 @@ describe('component OfficialQuizzesRoutes', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the v2 setup menu when the v2 flag is on', () => {
+  it('renders the v2 setup menu when the student UI is v2', () => {
     overrideMockUseStudentUiVersion({ version: 'v2' });
     setUseOfficialQuizzes();
 

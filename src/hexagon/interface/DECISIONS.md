@@ -18,6 +18,6 @@
 - New student UI uses CSS Modules so class names cannot collide with the global namespace.
 - `@layer primitives` / `@layer features` sit above `legacy`, so new module classes win against `App.css` without `!important`.
 - Design tokens live in `tokens.css` (`@layer tokens`, above `legacy`) so new UI references semantic variables. The original `--brand` / `--theme` names are kept so existing `var(--…)` call sites do not change.
-- UI version is an application flag (`useStudentUiVersion`) plus `UiScope` (`data-ui`), not a CSS `@if`. Do not set `data-ui=v2` on `html` until chrome is redesigned.
+- UI version is `useStudentUiVersion` (from the logged-in user's `studentRole` + `betaTester`) plus `UiScope` (`data-ui`), not a CSS `@if`. Do not set `data-ui=v2` on `html` until chrome is redesigned.
 
 **Consequences**: A PR that restyles one student surface must not edit `App.css` or shared global classes. Shared chrome (`QuizSetupMenu`, `ExampleListItem`, Nav) is versioned as a unit when it is redesigned, not restyled from a page stylesheet.

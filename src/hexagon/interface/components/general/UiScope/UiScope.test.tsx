@@ -17,9 +17,9 @@ describe('ui scope', () => {
     cleanup();
   });
 
-  it('sets data-ui to v1 when the flag is off', () => {
+  it('sets data-ui to v1 when the student UI is v1', () => {
     render(
-      <UiScope flag="ui.student.help.v2">
+      <UiScope>
         <span>child</span>
       </UiScope>,
     );
@@ -30,11 +30,11 @@ describe('ui scope', () => {
     );
   });
 
-  it('sets data-ui to v2 when the flag is on', () => {
+  it('sets data-ui to v2 when the student UI is v2', () => {
     overrideMockUseStudentUiVersion({ version: 'v2' });
 
     render(
-      <UiScope flag="ui.student.help.v2">
+      <UiScope>
         <span>child</span>
       </UiScope>,
     );
