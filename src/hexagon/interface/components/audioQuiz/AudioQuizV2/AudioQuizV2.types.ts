@@ -32,7 +32,7 @@ export interface AudioQuizV2Props {
   pause: () => void;
   /** Advances the quiz — `nextStep` from `useAudioQuiz`. */
   onPrimary: () => void;
-  /** Restarts the current step's audio — `restartCurrentStep`. */
+  /** Replays the source clip for this step — `replay` from `useAudioQuiz`. */
   onReplay: () => void;
   onPrevious: () => void;
   onNext: () => void;

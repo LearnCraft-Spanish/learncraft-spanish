@@ -3,6 +3,7 @@ import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { createMockStepValue } from '@application/units/AudioQuiz/useAudioQuiz.mock';
 import { AudioEngineProvider } from '@composition/providers/AudioProvider';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
+import { audioQuizReplayTarget } from '@domain/functions/audioQuizCopy';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
@@ -80,6 +81,20 @@ function MockAudioQuizWrapper({
     setIsPlaying(false);
   };
 
+  const replay = () => {
+    const target = audioQuizReplayTarget({
+      quizType: audioQuizType,
+      step: currentStep,
+    });
+    if (target === 'question') {
+      goToQuestion();
+    } else if (target === 'hint') {
+      goToHint();
+    } else {
+      restartCurrentStep();
+    }
+  };
+
   const play = () => Promise.resolve(setIsPlaying(true));
   const pause = () => Promise.resolve(setIsPlaying(false));
 
@@ -117,6 +132,7 @@ function MockAudioQuizWrapper({
     goToHint,
     goToAnswer,
     restartCurrentStep,
+    replay,
     nextExample,
     previousExample,
     quizLength,

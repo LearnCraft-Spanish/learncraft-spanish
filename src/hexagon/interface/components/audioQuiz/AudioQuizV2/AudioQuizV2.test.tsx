@@ -231,6 +231,17 @@ describe('audioQuizV2 — primary / replay dock', () => {
     expect(onReplay).toHaveBeenCalledOnce();
   });
 
+  it('labels speaking answer replay as Replay Spanish', () => {
+    stubMobile(false);
+    renderQuiz({
+      currentStep: AudioQuizStep.Answer,
+      displayText: 'Lo sabré.',
+      isSpanishText: true,
+    });
+
+    expect(screen.getByRole('button', { name: /Replay Spanish/ })).toBeTruthy();
+  });
+
   it('disables "Previous card" on the first card', () => {
     stubMobile(false);
     renderQuiz({ exampleNumber: 1 });

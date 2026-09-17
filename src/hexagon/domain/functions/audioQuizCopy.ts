@@ -18,12 +18,65 @@ export interface AudioQuizCopyInput {
   isSpanishStep: boolean;
 }
 
+/**
+ * Where the replay dock button should send the quiz:
+ * - `current` — restart this step's audio in place.
+ * - `question` — return to the first step (English for speaking, Spanish
+ *   for listening).
+ * - `hint` — return to the Spanish-audio step (speaking answer, or
+ *   listening answer).
+ */
+export type AudioQuizReplayTarget = 'current' | 'question' | 'hint';
+
 export interface AudioQuizCopyResult {
   bodyKind: AudioQuizBodyKind;
   /** `null` on a `sentence` step — the sentence itself is the body. */
   instructionTitle: string | null;
   primaryLabel: string;
   replayLabel: string;
+}
+
+export interface AudioQuizReplayInput {
+  quizType: AudioQuizType;
+  step: AudioQuizStep;
+}
+
+/**
+ * Replay always returns to the clip the student is trying to produce or
+ * identify — not whatever is currently playing:
+ * - Speaking question: restart English.
+ * - Speaking guess/hint: back to the English question.
+ * - Speaking answer: back to the Spanish hint (the answer step itself
+ *   shows Spanish text, so the button becomes "Replay Spanish").
+ * - Listening question/hint: restart Spanish.
+ * - Listening guess: back to the Spanish question.
+ * - Listening answer: back to the Spanish hint.
+ */
+export function audioQuizReplayTarget({
+  quizType,
+  step,
+}: AudioQuizReplayInput): AudioQuizReplayTarget {
+  if (step === AudioQuizStep.Answer) {
+    return 'hint';
+  }
+  if (step === AudioQuizStep.Guess) {
+    return 'question';
+  }
+  if (quizType === AudioQuizType.Speaking && step === AudioQuizStep.Hint) {
+    return 'question';
+  }
+  return 'current';
+}
+
+export function audioQuizReplayLabel({
+  quizType,
+  step,
+}: AudioQuizReplayInput): string {
+  const isSpeaking = quizType === AudioQuizType.Speaking;
+  if (isSpeaking && step !== AudioQuizStep.Answer) {
+    return 'Replay English';
+  }
+  return 'Replay Spanish';
 }
 
 /**
@@ -93,7 +146,7 @@ export function audioQuizCopy({
       break;
   }
 
-  const replayLabel = isSpeaking ? 'Replay English' : 'Replay Spanish';
+  const replayLabel = audioQuizReplayLabel({ quizType, step });
 
   return { bodyKind, instructionTitle, primaryLabel, replayLabel };
 }

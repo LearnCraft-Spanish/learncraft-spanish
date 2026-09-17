@@ -139,7 +139,7 @@ function view(opts) {
     addBg: opts.added ? 'rgba(68,154,194,0.12)' : 'transparent',
     addBd: opts.added ? 'rgba(68,154,194,0.12)' : 'rgba(60,60,60,0.25)',
     addFg: opts.added ? '#449AC2' : '#3C3C3C',
-    replayLabel: sp ? 'Replay English' : 'Replay Spanish',
+    replayLabel: sp && opts.step !== 3 ? 'Replay English' : 'Replay Spanish',
     word: opts.word,
     auto: opts.auto,
     playing: opts.playing,

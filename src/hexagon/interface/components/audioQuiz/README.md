@@ -20,8 +20,10 @@ AudioQuizV2Screen (Quizzing/AudioQuiz/)     — bridges AudioQuizReturn → prop
 ```
 
 Domain: `domain/functions/audioQuizCopy.ts` — `audioQuizCopy()` (bodyKind,
-instructionTitle, primaryLabel, replayLabel, quizName) and
-`audioQuizTextRuns()` (splits `**target**` markdown into bold/regular runs).
+instructionTitle, primaryLabel, replayLabel) plus `audioQuizReplayTarget()`
+(which step replay returns to) and `audioQuizTextRuns()` (splits `**target**`
+markdown into bold/regular runs). Speaking's answer step labels replay
+"Replay Spanish" and returns to the hint; guess/hint return to the question.
 
 ## Reused as-is (non-negotiable, per task brief)
 

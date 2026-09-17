@@ -1,7 +1,11 @@
-import type { AudioQuizCopyInput } from '@domain/functions/audioQuizCopy';
+import type {
+  AudioQuizCopyInput,
+  AudioQuizReplayTarget,
+} from '@domain/functions/audioQuizCopy';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import {
   audioQuizCopy,
+  audioQuizReplayTarget,
   audioQuizTextRuns,
 } from '@domain/functions/audioQuizCopy';
 import { describe, expect, it } from 'vitest';
@@ -297,15 +301,117 @@ describe('audioQuizCopy — primaryLabel (full matrix)', () => {
 });
 
 describe('audioQuizCopy — replayLabel', () => {
-  it('speaking: "Replay English"', () => {
-    const result = audioQuizCopy(input({ quizType: AudioQuizType.Speaking }));
-    expect(result.replayLabel).toBe('Replay English');
-  });
+  const cases: Array<{
+    quizType: AudioQuizType;
+    step: AudioQuizStep;
+    expected: string;
+  }> = [
+    {
+      quizType: AudioQuizType.Speaking,
+      step: AudioQuizStep.Question,
+      expected: 'Replay English',
+    },
+    {
+      quizType: AudioQuizType.Speaking,
+      step: AudioQuizStep.Guess,
+      expected: 'Replay English',
+    },
+    {
+      quizType: AudioQuizType.Speaking,
+      step: AudioQuizStep.Hint,
+      expected: 'Replay English',
+    },
+    {
+      quizType: AudioQuizType.Speaking,
+      step: AudioQuizStep.Answer,
+      expected: 'Replay Spanish',
+    },
+    {
+      quizType: AudioQuizType.Listening,
+      step: AudioQuizStep.Question,
+      expected: 'Replay Spanish',
+    },
+    {
+      quizType: AudioQuizType.Listening,
+      step: AudioQuizStep.Guess,
+      expected: 'Replay Spanish',
+    },
+    {
+      quizType: AudioQuizType.Listening,
+      step: AudioQuizStep.Hint,
+      expected: 'Replay Spanish',
+    },
+    {
+      quizType: AudioQuizType.Listening,
+      step: AudioQuizStep.Answer,
+      expected: 'Replay Spanish',
+    },
+  ];
 
-  it('listening: "Replay Spanish"', () => {
-    const result = audioQuizCopy(input({ quizType: AudioQuizType.Listening }));
-    expect(result.replayLabel).toBe('Replay Spanish');
-  });
+  it.each(cases)(
+    '$quizType / $step → $expected',
+    ({ quizType, step, expected }) => {
+      expect(audioQuizCopy(input({ quizType, step })).replayLabel).toBe(
+        expected,
+      );
+    },
+  );
+});
+
+describe('audioQuizReplayTarget', () => {
+  const cases: Array<{
+    quizType: AudioQuizType;
+    step: AudioQuizStep;
+    expected: AudioQuizReplayTarget;
+  }> = [
+    {
+      quizType: AudioQuizType.Speaking,
+      step: AudioQuizStep.Question,
+      expected: 'current',
+    },
+    {
+      quizType: AudioQuizType.Speaking,
+      step: AudioQuizStep.Guess,
+      expected: 'question',
+    },
+    {
+      quizType: AudioQuizType.Speaking,
+      step: AudioQuizStep.Hint,
+      expected: 'question',
+    },
+    {
+      quizType: AudioQuizType.Speaking,
+      step: AudioQuizStep.Answer,
+      expected: 'hint',
+    },
+    {
+      quizType: AudioQuizType.Listening,
+      step: AudioQuizStep.Question,
+      expected: 'current',
+    },
+    {
+      quizType: AudioQuizType.Listening,
+      step: AudioQuizStep.Guess,
+      expected: 'question',
+    },
+    {
+      quizType: AudioQuizType.Listening,
+      step: AudioQuizStep.Hint,
+      expected: 'current',
+    },
+    {
+      quizType: AudioQuizType.Listening,
+      step: AudioQuizStep.Answer,
+      expected: 'hint',
+    },
+  ];
+
+  it.each(cases)(
+    '$quizType / $step → $expected',
+    ({ quizType, step, expected }) => {
+      expect(audioQuizReplayTarget({ quizType, step })).toBe(expected);
+    },
+  );
 });
 
 describe('audioQuizTextRuns', () => {

@@ -47,7 +47,7 @@ export function AudioQuizV2Screen({
     pause,
     play,
     nextStep,
-    restartCurrentStep,
+    replay,
     nextExample,
     previousExample,
     quizLength,
@@ -120,7 +120,7 @@ export function AudioQuizV2Screen({
       play={handlePlay}
       pause={handlePause}
       onPrimary={nextStep}
-      onReplay={restartCurrentStep}
+      onReplay={replay}
       onPrevious={previousExample}
       onNext={nextExample}
       onExit={cleanupFunction}
