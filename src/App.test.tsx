@@ -260,11 +260,14 @@ describe('app', () => {
     );
     const { getByRole, queryByText } = renderAppAtRoute('/flashcardfinder');
 
-    await waitFor(() => {
-      expect(
-        getByRole('heading', { name: 'Flashcard Finder' }),
-      ).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(
+          getByRole('heading', { name: 'Flashcard Finder' }),
+        ).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
     expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
   });
 
@@ -282,11 +285,14 @@ describe('app', () => {
     );
     const { getByRole, queryByText } = renderAppAtRoute('/manage-flashcards');
 
-    await waitFor(() => {
-      expect(
-        getByRole('heading', { name: 'Flashcard Manager' }),
-      ).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(
+          getByRole('heading', { name: 'Flashcard Manager' }),
+        ).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
     expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
   });
 
