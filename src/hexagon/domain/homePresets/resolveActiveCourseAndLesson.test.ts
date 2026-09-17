@@ -13,6 +13,7 @@ function makeAppUser(overrides: Partial<AppUser> = {}): AppUser {
     courseId: 2,
     lessonNumber: 10,
     studentRole: 'student',
+    betaTester: false,
     ...overrides,
   };
 }
