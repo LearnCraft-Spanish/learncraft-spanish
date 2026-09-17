@@ -6,6 +6,10 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { createMockAppUser } from '@testing/factories/appUserFactories';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
+import {
+  resetTestQueryClient,
+  testQueryClient,
+} from '@testing/utils/testQueryClient';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -23,6 +27,7 @@ function renderUseMyData() {
 
 describe('useMyData', () => {
   beforeEach(() => {
+    resetTestQueryClient();
     mockGetMyData.mockReset();
     vi.mocked(useAppUserAdapter).mockReturnValue({
       getMyData: mockGetMyData,
@@ -75,6 +80,33 @@ describe('useMyData', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.isBetaTester).toBe(false);
     expect(result.current.myData?.betaTester).toBe(false);
+  });
+
+  it('uses a myData query key that does not collide with useActiveStudent', async () => {
+    overrideAuthAndAppUser({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isStudent: true,
+      isCoach: false,
+      isAdmin: false,
+      isLimited: false,
+    });
+    mockGetMyData.mockResolvedValue(
+      createMockAppUser({
+        emailAddress: 'student-lcsp@fake.not',
+        betaTester: true,
+      }),
+    );
+
+    const { result } = renderUseMyData();
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    const keys = testQueryClient
+      .getQueryCache()
+      .getAll()
+      .map((query) => query.queryKey);
+    expect(keys).toContainEqual(['myData', 'student-lcsp@fake.not']);
+    expect(keys.some((key) => key[0] === 'appUser')).toBe(false);
   });
 
   it('returns isBetaTester false when no user is logged in', () => {

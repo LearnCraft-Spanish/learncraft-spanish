@@ -15,12 +15,9 @@ export function useMyData(): UseMyDataReturn {
   const { getMyData } = useAppUserAdapter();
   const { authUser } = useAuthAdapter();
 
-  const {
-    data,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['appUser', authUser?.email],
+  const { data, isLoading, error } = useQuery({
+    // Not ['appUser', email]: useActiveStudent uses that key with a different queryFn.
+    queryKey: ['myData', authUser?.email],
     queryFn: getMyData,
     enabled: !!authUser?.email,
   });
