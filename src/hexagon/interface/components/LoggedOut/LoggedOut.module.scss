@@ -5,6 +5,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--lcs-space-8);
+  padding: var(--lcs-space-9) var(--lcs-page-pad);
   text-align: center;
 }
 
@@ -50,8 +51,16 @@
 }
 
 @media (max-width: 768px) {
+  /* The prompt was painting into the bezel: no page gutters, and the
+   * CTA stretched edge-to-edge. Inset the whole stack from the screen
+   * and cap the button so it reads as a control, not a docked bar. */
+  .column {
+    padding: var(--lcs-space-11);
+  }
+
   .logInButton {
     width: 100%;
+    max-width: 320px;
     height: 56px;
     padding: 0 var(--lcs-space-9);
   }
