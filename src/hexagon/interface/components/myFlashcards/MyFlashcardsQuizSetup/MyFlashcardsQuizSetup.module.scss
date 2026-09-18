@@ -20,6 +20,16 @@
   margin-top: var(--lcs-space-7);
 }
 
+/*
+ * The default eyebrow is Green Smoke — a section kicker, not a control
+ * name. Next to the switch that text *is* the toggle's label, so ink
+ * matches the other quiz-option toggles instead of reading as leftover
+ * header chrome.
+ */
+.filterControl h2 {
+  color: var(--lcs-color-ink);
+}
+
 .filterControlActions {
   display: flex;
   align-items: center;
