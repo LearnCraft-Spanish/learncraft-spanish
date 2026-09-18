@@ -33,8 +33,18 @@
   text-decoration: none;
 }
 
-.feedbackLink:hover {
+.feedbackLabel {
   text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.feedbackLink svg {
+  transition: transform var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.feedbackLink:hover svg,
+.feedbackLink:focus-visible svg {
+  transform: translateX(var(--lcs-space-3));
 }
 
 .feedbackLink:focus-visible {
@@ -62,5 +72,16 @@
   .feedbackLink {
     padding: 0 var(--lcs-space-1);
     font-size: var(--lcs-text-body);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feedbackLink svg {
+    transition: none;
+  }
+
+  .feedbackLink:hover svg,
+  .feedbackLink:focus-visible svg {
+    transform: none;
   }
 }
