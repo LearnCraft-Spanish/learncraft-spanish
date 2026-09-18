@@ -202,7 +202,7 @@ describe('component OfficialQuizSetupMenuV2', () => {
       const onLeave = vi.fn();
       renderWithOverrides({ onLeave });
 
-      fireEvent.click(screen.getByRole('button', { name: /back to quizzes/i }));
+      fireEvent.click(screen.getByRole('button', { name: /back to home/i }));
 
       expect(onLeave).toHaveBeenCalledTimes(1);
     });
@@ -211,7 +211,7 @@ describe('component OfficialQuizSetupMenuV2', () => {
       renderWithOverrides();
 
       expect(
-        screen.queryByRole('button', { name: /back to quizzes/i }),
+        screen.queryByRole('button', { name: /back to home/i }),
       ).not.toBeInTheDocument();
     });
   });

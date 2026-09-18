@@ -48,7 +48,7 @@ describe('customQuizSetup', () => {
     renderSetup({}, onLeave);
 
     await userEvent.click(
-      screen.getAllByRole('button', { name: /back to quizzes/i })[0],
+      screen.getAllByRole('button', { name: /back to home/i })[0],
     );
 
     expect(onLeave).toHaveBeenCalled();

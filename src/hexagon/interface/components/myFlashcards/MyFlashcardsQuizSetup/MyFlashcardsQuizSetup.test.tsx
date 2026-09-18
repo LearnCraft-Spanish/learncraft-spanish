@@ -53,7 +53,7 @@ describe('myFlashcardsQuizSetup', () => {
     renderSetup({}, onLeave);
 
     await userEvent.click(
-      screen.getByRole('button', { name: /back to quizzes/i }),
+      screen.getByRole('button', { name: /back to home/i }),
     );
 
     expect(onLeave).toHaveBeenCalled();

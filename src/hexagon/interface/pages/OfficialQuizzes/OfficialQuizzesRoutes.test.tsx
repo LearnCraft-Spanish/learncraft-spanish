@@ -6,10 +6,17 @@ import {
   resetMockUseStudentUiVersion,
 } from '@application/useCases/useStudentUiVersion.mock';
 import OfficialQuizzesRoutes from '@interface/pages/OfficialQuizzes/OfficialQuizzesRoutes';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { createMockQuizGroup } from '@testing/factories/quizFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+const mockNavigate = vi.fn<(to: string) => void>();
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return { ...actual, useNavigate: () => mockNavigate };
+});
 
 interface MockUseOfficialQuizzesReturn {
   isLoading: boolean;
@@ -96,6 +103,17 @@ describe('component OfficialQuizzesRoutes', () => {
     expect(
       screen.getByRole('button', { name: 'Begin quiz' }),
     ).toBeInTheDocument();
+  });
+
+  it('the back affordance leaves for home', () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    setUseOfficialQuizzes();
+
+    renderRoutes();
+
+    fireEvent.click(screen.getByRole('button', { name: /back to home/i }));
+
+    expect(mockNavigate).toHaveBeenCalledWith('/');
   });
 
   it('shows a login message when the user is not logged in', () => {

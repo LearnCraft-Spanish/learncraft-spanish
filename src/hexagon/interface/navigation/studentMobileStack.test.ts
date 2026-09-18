@@ -44,9 +44,9 @@ describe('studentMobileStack', () => {
     expect(stackParentPath('/quizzes')).toBe('/');
     expect(stackParentPath('/get-help')).toBe('/');
     expect(stackParentPath('/get-help/vocab')).toBe('/get-help');
-    expect(stackParentPath('/customquiz')).toBe('/quizzes');
-    expect(stackParentPath('/myflashcards')).toBe('/quizzes');
-    expect(stackParentPath('/officialquizzes')).toBe('/quizzes');
+    expect(stackParentPath('/customquiz')).toBe('/');
+    expect(stackParentPath('/myflashcards')).toBe('/');
+    expect(stackParentPath('/officialquizzes')).toBe('/');
     expect(stackParentPath('/officialquizzes/lcsp/5')).toBe('/officialquizzes');
     expect(stackParentPath('/frequensay')).toBeNull();
   });
@@ -70,14 +70,15 @@ describe('studentMobileStack', () => {
     expect(isStackBack('/officialquizzes/lcsp/5', '/officialquizzes')).toBe(
       true,
     );
-    expect(isStackBack('/officialquizzes/lcsp/5', '/quizzes')).toBe(true);
     expect(isStackBack('/officialquizzes/lcsp/5', '/')).toBe(true);
-    expect(isStackBack('/customquiz', '/quizzes')).toBe(true);
+    expect(isStackBack('/customquiz', '/')).toBe(true);
   });
 
   it('treats a move to a descendant or sibling as forward', () => {
     expect(isStackBack('/', '/quizzes')).toBe(false);
     expect(isStackBack('/quizzes', '/customquiz')).toBe(false);
+    expect(isStackBack('/customquiz', '/quizzes')).toBe(false);
+    expect(isStackBack('/officialquizzes/lcsp/5', '/quizzes')).toBe(false);
     expect(isStackBack('/flashcardfinder', '/quizzes')).toBe(false);
     expect(isStackBack('/quizzes', '/flashcardfinder')).toBe(false);
     expect(isStackBack('/get-help', '/get-help/vocab')).toBe(false);

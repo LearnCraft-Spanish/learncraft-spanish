@@ -47,7 +47,7 @@ export function CustomQuizSetup({
     return (
       <div className={styles.ctaSecondary}>
         <Button variant="ghost" muted leadingIcon="arrowLeft" onClick={onLeave}>
-          Back to quizzes
+          Back to home
         </Button>
       </div>
     );

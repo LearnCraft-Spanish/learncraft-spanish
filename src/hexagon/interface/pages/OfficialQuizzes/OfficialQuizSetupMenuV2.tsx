@@ -142,7 +142,7 @@ export function OfficialQuizSetupMenuV2({
                 leadingIcon="arrowLeft"
                 onClick={onLeave}
               >
-                Back to quizzes
+                Back to home
               </Button>
             </div>
           )}

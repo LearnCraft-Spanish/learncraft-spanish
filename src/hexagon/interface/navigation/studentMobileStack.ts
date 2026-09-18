@@ -11,9 +11,9 @@ const PARENT_BY_PATH: Record<string, string> = {
   '/quizzes': '/',
   '/get-help': '/',
   '/get-help/vocab': '/get-help',
-  '/customquiz': '/quizzes',
-  '/myflashcards': '/quizzes',
-  '/officialquizzes': '/quizzes',
+  '/customquiz': '/',
+  '/myflashcards': '/',
+  '/officialquizzes': '/',
 };
 
 const TITLE_BY_PATH: Record<string, string> = {

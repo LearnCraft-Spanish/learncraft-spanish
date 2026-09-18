@@ -137,13 +137,13 @@ describe('custom quiz page', () => {
     expect(readyQuiz).toHaveBeenCalled();
   });
 
-  it('the back affordance leaves for quizzes', async () => {
+  it('the back affordance leaves for home', async () => {
     renderV2();
 
     await userEvent.click(
-      screen.getAllByRole('button', { name: /back to quizzes/i })[0],
+      screen.getAllByRole('button', { name: /back to home/i })[0],
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith('/quizzes');
+    expect(mockNavigate).toHaveBeenCalledWith('/');
   });
 });

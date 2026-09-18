@@ -68,7 +68,7 @@ export default function OfficialQuizzesRoutes(): JSX.Element {
           ) : version === 'v2' ? (
             <OfficialQuizSetupMenuV2
               {...quizSetupMenuProps}
-              onLeave={() => navigate('/quizzes')}
+              onLeave={() => navigate('/')}
             />
           ) : (
             <OfficialQuizSetupMenu {...quizSetupMenuProps} />

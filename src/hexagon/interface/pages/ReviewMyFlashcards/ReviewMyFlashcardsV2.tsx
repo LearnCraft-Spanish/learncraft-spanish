@@ -96,7 +96,7 @@ export function ReviewMyFlashcardsV2(): JSX.Element {
 
   return (
     <PageShell>
-      <MyFlashcardsQuizSetup quiz={quiz} onLeave={() => navigate('/quizzes')} />
+      <MyFlashcardsQuizSetup quiz={quiz} onLeave={() => navigate('/')} />
     </PageShell>
   );
 }
