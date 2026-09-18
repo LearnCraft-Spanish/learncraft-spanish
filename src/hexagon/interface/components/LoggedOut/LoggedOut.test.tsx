@@ -12,7 +12,10 @@ describe('logged out screen', () => {
     render(<LoggedOut onLogIn={vi.fn()} />);
 
     expect(
-      screen.getByText('Please log in to use this app'),
+      screen.getByText('Please log in to access the LCS App'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Sign in to access your materials'),
     ).toBeInTheDocument();
   });
 

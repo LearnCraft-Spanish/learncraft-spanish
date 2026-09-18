@@ -12,17 +12,12 @@ interface AppHeaderProps {
 }
 
 /**
- * The Celestial Blue app bar mounted once in `App.tsx`, above every route.
- * v2.2: the right slot is the account only — no lesson number, no card
- * count, no due count. Those belong on the page, on cards.
+ * The Celestial Blue app bar. `App` mounts this only for v2 (beta-tester
+ * student) sessions. v2.2: the right slot is the account only — no lesson
+ * number, no card count, no due count. Those belong on the page, on cards.
  *
  * On mobile student-v2 stack screens (every student surface except Home)
  * the brand and account swap for a back arrow and the page title.
- *
- * Logged-out visitors get no header action here: the sole "Log in"
- * affordance lives on the `LoggedOut` screen. The `.account` slot still
- * renders (empty) in that state so the grid's flanking 1fr columns stay
- * balanced and the brand doesn't shift.
  */
 export function AppHeader({ children }: AppHeaderProps): JSX.Element {
   const {

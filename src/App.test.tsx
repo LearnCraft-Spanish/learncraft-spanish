@@ -68,8 +68,30 @@ describe('app', () => {
     );
   });
 
-  it('shows a log out option in the account menu when logged in', async () => {
+  it('shows a log out button when logged in on v1', async () => {
+    const { getByRole } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByRole('button', { name: /log out/i })).toBeInTheDocument();
+    });
+  });
+
+  it('shows a log out option in the account menu when logged in on v2', async () => {
     const user = userEvent.setup();
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
     const { getByRole } = render(
       <MockAllProviders>
         <App />
@@ -103,40 +125,36 @@ describe('app', () => {
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(getByText('Please log in to use this app')).toBeInTheDocument();
+      expect(
+        getByText('Please log in to access the LCS App'),
+      ).toBeInTheDocument();
     });
     expect(
       queryByText('You must be logged in to use this app.'),
     ).not.toBeInTheDocument();
   });
 
-  it('hides the sub-header welcome message for a free/limited user', async () => {
-    // Regression: the sub header used to greet free/limited users with a
-    // "Welcome back!" message (its `freeUser` state). It's now role-gated
-    // to coach/admin only, so a limited user should never see it — nothing
-    // else in the app renders "welcome" text.
-    overrideMockAuthAdapter({
-      authUser: getAuthUserFromEmail('limited@fake.not')!,
-      isAuthenticated: true,
-      isAdmin: false,
-      isCoach: false,
-      isStudent: false,
-      isLimited: true,
-    });
-    const { getByText, queryByText } = render(
+  it('renders no nav, header, or banner chrome when logged out', async () => {
+    overrideMockAuthAdapter({ isAuthenticated: false });
+    const { getAllByRole, queryByAltText, queryByRole, queryByText } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(getByText(/official quizzes/i)).toBeInTheDocument();
+      expect(getAllByRole('button', { name: /log in/i })).toHaveLength(1);
     });
-    expect(queryByText(/welcome/i)).not.toBeInTheDocument();
+    expect(queryByAltText('Learncraft Spanish Logo')).not.toBeInTheDocument();
+    expect(queryByText('LEARNCRAFT')).not.toBeInTheDocument();
+    expect(
+      queryByRole('navigation', { name: 'Primary' }),
+    ).not.toBeInTheDocument();
+    expect(queryByText(/make faster progress/i)).not.toBeInTheDocument();
   });
 
   it('shows a loading spinner while the student UI version is resolving', async () => {
     overrideMockUseStudentUiVersion({ isLoading: true, version: 'v1' });
-    const { getByAltText, queryByText } = render(
+    const { getByAltText, queryByAltText, queryByRole, queryByText } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
@@ -145,6 +163,12 @@ describe('app', () => {
       expect(getByAltText('loading-spinner')).toBeInTheDocument();
     });
     expect(queryByText(/official quizzes/i)).not.toBeInTheDocument();
+    expect(queryByAltText('Learncraft Spanish Logo')).not.toBeInTheDocument();
+    expect(
+      queryByRole('navigation', { name: 'Primary' }),
+    ).not.toBeInTheDocument();
+    expect(queryByText(/welcome/i)).not.toBeInTheDocument();
+    expect(queryByText(/make faster progress/i)).not.toBeInTheDocument();
   });
 
   it('shows a loading spinner when logging in', async () => {
@@ -156,6 +180,61 @@ describe('app', () => {
     );
     await waitFor(() => {
       expect(getByAltText('loading-spinner')).toBeInTheDocument();
+    });
+  });
+
+  it('uses the legacy nav and not the v2 header for a v1 viewer', async () => {
+    const { getByAltText, queryByRole, queryByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByAltText('Learncraft Spanish Logo')).toBeInTheDocument();
+    });
+    expect(
+      queryByRole('navigation', { name: 'Primary' }),
+    ).not.toBeInTheDocument();
+    expect(queryByText('LEARNCRAFT')).not.toBeInTheDocument();
+  });
+
+  it('uses the v2 header and not the legacy nav for a beta-tester student', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByRole, queryByAltText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
+    });
+    expect(queryByAltText('Learncraft Spanish Logo')).not.toBeInTheDocument();
+  });
+
+  it('redirects a v1 viewer from /quizzes to the legacy home menu', async () => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByText } = renderAppAtRoute('/quizzes');
+    await waitFor(() => {
+      expect(getByText(/quiz my flashcards/i)).toBeInTheDocument();
     });
   });
 
@@ -296,7 +375,7 @@ describe('app', () => {
     expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
   });
 
-  it('hides the sub header for a student on the /get-help page', async () => {
+  it('shows the sub header for a student on the /get-help page', async () => {
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
@@ -308,20 +387,16 @@ describe('app', () => {
         isOwnUser: true,
       },
     );
-    const { getByRole, queryByText } = renderAppAtRoute('/get-help');
+    const { getByRole, getByText, queryByText } = renderAppAtRoute('/get-help');
 
     await waitFor(() => {
       expect(getByRole('heading', { name: /help/i })).toBeInTheDocument();
     });
-    expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
+    expect(getByText(/welcome back/i)).toBeInTheDocument();
     expect(queryByText(/using as/i)).not.toBeInTheDocument();
   });
 
-  it('never shows the sub header for a student, even on a v1 route', async () => {
-    // Regression: before the role gate, this route's sub header was hidden
-    // only by a v2-flag check, so a student on v1 would still fall through
-    // to the legacy sub header here. The role gate must hide it
-    // unconditionally for students, regardless of route or UI version.
+  it('shows the sub header for a student on a v1 route', async () => {
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
@@ -333,14 +408,15 @@ describe('app', () => {
         isOwnUser: true,
       },
     );
-    const { getByRole, queryByText } = renderAppAtRoute('/flashcardfinder');
+    const { getByRole, getByText, queryByText } =
+      renderAppAtRoute('/flashcardfinder');
 
     await waitFor(() => {
       expect(
         getByRole('heading', { name: /flashcard finder/i }),
       ).toBeInTheDocument();
     });
-    expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
+    expect(getByText(/welcome back/i)).toBeInTheDocument();
     expect(queryByText(/using as/i)).not.toBeInTheDocument();
   });
 

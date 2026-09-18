@@ -29,40 +29,6 @@ describe('component SubHeaderComponent', () => {
     resetMockUseStudentSearch();
   });
 
-  describe('not logged in state', () => {
-    it('should show "You must be logged in" message when not logged in', () => {
-      overrideMockUseSubHeader({
-        notLoggedIn: true,
-      });
-
-      render(
-        <MockAllProviders>
-          <SubHeaderComponent />
-        </MockAllProviders>,
-      );
-
-      expect(
-        screen.getByText('You must be logged in to use this app.'),
-      ).toBeInTheDocument();
-    });
-  });
-
-  describe('logging in state', () => {
-    it('should show "Logging In..." message when logging in', () => {
-      overrideMockUseSubHeader({
-        loggingIn: true,
-      });
-
-      render(
-        <MockAllProviders>
-          <SubHeaderComponent />
-        </MockAllProviders>,
-      );
-
-      expect(screen.getByText('Logging In...')).toBeInTheDocument();
-    });
-  });
-
   describe('loading user data state', () => {
     it('should show "Loading user data..." when authenticated and loading student', () => {
       overrideMockUseSubHeader({

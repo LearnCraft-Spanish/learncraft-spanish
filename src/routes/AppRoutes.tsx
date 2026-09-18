@@ -5,7 +5,7 @@ import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { UiScope } from '@interface/components/general/UiScope/UiScope';
 import { Loading } from '@interface/components/Loading';
 import { lazy, Suspense } from 'react';
-import { Route } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 import NotFoundPage from '../NotFoundPage';
 import Menu from '../sections/Menu';
 import SentryRoutes from './SentryRoutes';
@@ -106,11 +106,12 @@ export default function AppRoutes() {
         <Route
           path="/quizzes"
           element={
-            isAuthenticated &&
-            version === 'v2' && (
+            !isAuthenticated ? null : version === 'v2' ? (
               <UiScope>
                 <QuizzesPage />
               </UiScope>
+            ) : (
+              <Navigate to="/" replace />
             )
           }
         />
