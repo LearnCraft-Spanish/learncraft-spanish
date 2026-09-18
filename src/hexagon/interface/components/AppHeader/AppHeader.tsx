@@ -1,9 +1,9 @@
 import type { JSX, ReactNode } from 'react';
 import { AccountMenu } from '@interface/components/AppHeader/AccountMenu';
 import { useAppHeaderView } from '@interface/components/AppHeader/useAppHeaderView';
-import { BrandMark } from '@interface/components/general/BrandMark/BrandMark';
 import { IconButton } from '@interface/components/general/IconButton/IconButton';
 import { Link } from 'react-router-dom';
+import iconWhite from 'src/assets/Icon_White.svg';
 import styles from './AppHeader.module.scss';
 
 interface AppHeaderProps {
@@ -41,7 +41,15 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
         tabIndex={isStack ? -1 : undefined}
         aria-hidden={isStack}
       >
-        <BrandMark size={22} color="var(--lcs-color-on-action)" />
+        <img
+          className={styles.logo}
+          src={iconWhite}
+          width={22}
+          height={22}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+        />
         <span className={styles.wordmark}>LEARNCRAFT</span>
       </Link>
 

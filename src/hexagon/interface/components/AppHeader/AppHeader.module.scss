@@ -31,15 +31,10 @@
   outline-offset: var(--lcs-focus-offset);
 }
 
-.brand svg {
-  transition: transform var(--lcs-motion-panel) var(--lcs-ease-standard);
-}
-
-.brand:hover svg {
-  /* The mark has 4-fold symmetry (spokes every 45deg), so a multiple of
-   * 45 would settle back into a shape that looks unrotated — this lands
-   * off-axis so the turn is still visible once hover settles. */
-  transform: rotate(75deg);
+.logo {
+  display: block;
+  flex: none;
+  pointer-events: none;
 }
 
 .wordmark {
@@ -119,7 +114,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .brand svg,
   .wordmark,
   .brand,
   .account {

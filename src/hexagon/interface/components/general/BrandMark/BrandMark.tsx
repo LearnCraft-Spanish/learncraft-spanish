@@ -10,9 +10,8 @@ interface BrandMarkProps {
 
 /**
  * The wheel mark: a hub and rim with eight spokes that run past the rim.
- * Purely decorative — always hidden from assistive technology. Used small
- * beside the wordmark in `AppHeader` and large as a clipped watermark
- * behind the arrow in `QuizCTA`.
+ * Purely decorative — always hidden from assistive technology. Used large
+ * as a clipped watermark behind the arrow in `QuizCTA`.
  */
 export function BrandMark({ size, color }: BrandMarkProps): JSX.Element {
   return (

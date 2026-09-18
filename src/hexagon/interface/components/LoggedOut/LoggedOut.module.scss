@@ -9,6 +9,12 @@
   text-align: center;
 }
 
+.logo {
+  display: block;
+  flex: none;
+  pointer-events: none;
+}
+
 .title {
   margin: 0;
   color: var(--lcs-color-ink);

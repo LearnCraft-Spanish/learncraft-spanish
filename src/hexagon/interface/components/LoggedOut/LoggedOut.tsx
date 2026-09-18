@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { BrandMark } from '@interface/components/general/BrandMark/BrandMark';
+import iconBlue from 'src/assets/Icon_Blue.svg';
 import styles from './LoggedOut.module.scss';
 
 interface LoggedOutProps {
@@ -14,7 +14,15 @@ interface LoggedOutProps {
 export function LoggedOut({ onLogIn }: LoggedOutProps): JSX.Element {
   return (
     <div className={styles.column}>
-      <BrandMark size={96} color="var(--lcs-color-action)" />
+      <img
+        className={styles.logo}
+        src={iconBlue}
+        width={96}
+        height={96}
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+      />
       <h1 className={styles.title}>Please log in to access the LCS App</h1>
       <p className={styles.guidance}>Sign in to access your materials</p>
       <button type="button" className={styles.logInButton} onClick={onLogIn}>
