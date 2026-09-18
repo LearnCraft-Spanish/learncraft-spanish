@@ -127,6 +127,30 @@ describe('home v2', () => {
     expect(screen.getByText('Help & walkthroughs')).toBeInTheDocument();
   });
 
+  it('opens a mailto to info@learncraftspanish.com from the feedback link', () => {
+    overrideMockUseHomeScreen(readyPreset);
+    renderHome();
+
+    expect(
+      screen.getByRole('link', { name: 'give feedback/report a bug' }),
+    ).toHaveAttribute('href', 'mailto:info@learncraftspanish.com');
+  });
+
+  it('does not show the feedback link while the home screen is loading', () => {
+    overrideMockUseHomeScreen({
+      cta: DEFAULT_HOME_PRESET.cta,
+      entries: DEFAULT_HOME_PRESET.entries,
+      isLoading: true,
+      error: null,
+    });
+
+    renderHome();
+
+    expect(
+      screen.queryByRole('link', { name: 'give feedback/report a bug' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('navigates to the CTA path when the CTA is chosen', async () => {
     const user = userEvent.setup();
     overrideMockUseHomeScreen(readyPreset);

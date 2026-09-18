@@ -3,6 +3,7 @@ import type { IconName } from '@interface/components/general/Icon/Icon';
 import type { JSX } from 'react';
 import { useHomeScreen } from '@application/useCases/useHomeScreen';
 import { PrimaryTabBar } from '@interface/components/AppHeader/PrimaryTabBar';
+import { Icon } from '@interface/components/general/Icon/Icon';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { EntryCard } from '@interface/components/home/EntryCard/EntryCard';
 import { HelpRow } from '@interface/components/home/HelpRow/HelpRow';
@@ -45,7 +46,16 @@ export function HomeV2Loaded({ cta, entries }: HomeV2LoadedProps): JSX.Element {
           ))}
         </div>
 
-        <HelpRow onGo={() => navigate('/get-help')} />
+        <div className={styles.footer}>
+          <HelpRow onGo={() => navigate('/get-help')} />
+          <a
+            className={styles.feedbackLink}
+            href="mailto:info@learncraftspanish.com"
+          >
+            give feedback/report a bug
+            <Icon name="chevronRight" size="inline" tone="inherit" />
+          </a>
+        </div>
       </div>
     </PageShell>
   );
@@ -54,8 +64,9 @@ export function HomeV2Loaded({ cta, entries }: HomeV2LoadedProps): JSX.Element {
 /**
  * The student v2 home screen. One responsive tree: the CTA is always the
  * first child of the scrolling column, followed by the preset's entry list
- * and a fixed help row. Which CTA and entries appear is resolved by
- * `useHomeScreen` from the student's course and lesson.
+ * and a footer with help plus a beta-tester feedback mailto. Which CTA and
+ * entries appear is resolved by `useHomeScreen` from the student's course
+ * and lesson.
  *
  * The mobile tab bar lives here (not in `App.tsx`) so it only exists on
  * Home and rides out with this page during stack transitions.
