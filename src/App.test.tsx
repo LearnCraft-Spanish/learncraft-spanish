@@ -183,6 +183,56 @@ describe('app', () => {
     });
   });
 
+  it('paints the paper shell for a v1 viewer', async () => {
+    const { container, getByAltText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByAltText('Learncraft Spanish Logo')).toBeInTheDocument();
+    });
+    expect(container.querySelector('.App')).toHaveClass('paperShell');
+  });
+
+  it('does not paint the paper shell for a v2 viewer', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { container, getByRole } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
+    });
+    expect(container.querySelector('.App')).not.toHaveClass('paperShell');
+  });
+
+  it('does not paint the paper shell when logged out', async () => {
+    overrideMockAuthAdapter({ isAuthenticated: false });
+    const { container, getByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(
+        getByText('Please log in to access the LCS App'),
+      ).toBeInTheDocument();
+    });
+    expect(container.querySelector('.App')).not.toHaveClass('paperShell');
+  });
+
   it('uses the legacy nav and not the v2 header for a v1 viewer', async () => {
     const { getByAltText, queryByRole, queryByText } = render(
       <MockAllProviders>

@@ -3,8 +3,7 @@ import { useFlushFlashcardUpdatesOnLoad } from '@application/units/flushFlashcar
 import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
 import { AppHeader } from '@interface/components/AppHeader';
 import { PrimaryNav } from '@interface/components/AppHeader/PrimaryNav';
-import { PageShell } from '@interface/components/general/PageShell/PageShell';
-import { Loading } from '@interface/components/Loading';
+import { LoadingScreen } from '@interface/components/Loading';
 import { LoggedOut } from '@interface/components/LoggedOut';
 import Nav from '@interface/components/Nav';
 import { PageTransition } from '@interface/components/PageTransition/PageTransition';
@@ -42,6 +41,7 @@ export const App: React.FC = () => {
       ? 'ready'
       : 'loggedOut';
   const isV2 = version === 'v2';
+  const showPaperBackground = phase !== 'loggedOut' && !isV2;
   const showSubHeader =
     phase === 'ready' &&
     !isV2 &&
@@ -49,7 +49,7 @@ export const App: React.FC = () => {
     !V1_NO_SUBHEADER_SEGMENTS.includes(location.pathname.split('/')[1]);
 
   return (
-    <div className="App">
+    <div className={showPaperBackground ? `App ${styles.paperShell}` : 'App'}>
       {phase === 'ready' && (
         <>
           <ExtraCoachingCTA />
@@ -66,11 +66,9 @@ export const App: React.FC = () => {
 
       <div className={styles.mainContent}>
         {phase === 'loading' ? (
-          <PageShell>
-            <Loading
-              message={isAuthenticated ? 'Loading...' : 'Logging in...'}
-            />
-          </PageShell>
+          <LoadingScreen
+            message={isAuthenticated ? 'Loading...' : 'Logging in...'}
+          />
         ) : phase === 'ready' ? (
           <PageTransition>
             <AppRoutes />

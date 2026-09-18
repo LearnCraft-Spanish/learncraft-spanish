@@ -136,6 +136,17 @@ describe('component OfficialQuizzesRoutes', () => {
     expect(screen.getByText('Loading Official Quizzes...')).toBeInTheDocument();
   });
 
+  it('does not wrap the v1 official-quiz loader in a page shell', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
+    setUseOfficialQuizzes({ isLoading: true });
+
+    renderRoutes();
+
+    expect(
+      screen.getByText('Loading Official Quizzes...').closest('.column'),
+    ).toBeNull();
+  });
+
   it('shows an error message when loading fails', () => {
     overrideMockUseStudentUiVersion({ version: 'v2' });
     setUseOfficialQuizzes({ error: new Error('boom') });

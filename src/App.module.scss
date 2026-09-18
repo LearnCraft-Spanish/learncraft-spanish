@@ -1,11 +1,19 @@
-/* The old parchment texture, scoped here instead of `body` (`App.css`).
- * Before a route is known (the pre-auth `Loading` screen, `LoggedOut`),
- * the app shows the plain `--lcs-color-page` default set on `body` — see
- * `App.css`. Once a route mounts, v1 pages rely on this texture showing
- * through their transparent gaps exactly as before; v2 pages already
- * paint their own opaque `--lcs-color-page` surface (`PageShell`, or the
- * full-bleed fill in `TextQuizV2`/`AudioQuizV2` and siblings) over it, so
- * they are unaffected. */
+/* Parchment for v1. `.paperShell` is on `.App` so the texture fills the
+ * viewport even when the route is shorter than the window. `.mainContent`
+ * keeps the same image so transparent v1 page gaps still show paper.
+ * `App` only applies `.paperShell` for v1 (and the pre-version loader);
+ * v2 and `LoggedOut` leave `body`'s `--lcs-color-page` as the canvas. */
+.paperShell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  background-image: url('./assets/paper-small.jpeg');
+}
+
+.paperShell .mainContent {
+  flex: 1;
+}
+
 .mainContent {
   background-image: url('./assets/paper-small.jpeg');
 }

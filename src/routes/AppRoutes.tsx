@@ -1,9 +1,8 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
 import { config } from '@config';
-import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { UiScope } from '@interface/components/general/UiScope/UiScope';
-import { Loading } from '@interface/components/Loading';
+import { LoadingScreen } from '@interface/components/Loading';
 import { lazy, Suspense } from 'react';
 import { Navigate, Route } from 'react-router-dom';
 import NotFoundPage from '../NotFoundPage';
@@ -62,14 +61,10 @@ export default function AppRoutes() {
   return (
     <Suspense
       fallback={
-        // One boundary covers every route, so it fires on any lazy chunk
-        // that isn't downloaded yet — including v2 destinations — with no
-        // way to know the target's version. `PageShell` paints the v2 page
-        // color instead of leaving the legacy paper texture (`.mainContent`,
-        // `App.module.scss`) visible behind the spinner during the swap.
-        <PageShell>
-          <Loading message="Loading..." />
-        </PageShell>
+        // The bound version is already known here (`useStudentUiVersion`
+        // resolved before `App` mounted this tree). v1 keeps the paper
+        // canvas; v2 still gets `PageShell` via `LoadingScreen`.
+        <LoadingScreen message="Loading..." />
       }
     >
       <SentryRoutes>

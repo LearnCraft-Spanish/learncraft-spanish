@@ -6,12 +6,10 @@
   box-sizing: border-box;
 }
 
-/* Default background before we know whether a route is v1 or v2 — the
- * initial pre-auth loading screen (`App.tsx`) and any other unrouted
- * moment. The old paper texture is reapplied by `.mainContent`
- * (`App.module.scss`) once we're inside an actual routed page, so v1
- * pages keep their parchment look untouched; v2 pages already paint
- * their own `--lcs-color-page` surface over whatever is behind them. */
+/* Canvas behind v2 surfaces and the logged-out screen. v1 paints the
+ * parchment on `.App.paperShell` / `.mainContent` (`App.module.scss`)
+ * so it fills the viewport; this color must not leak around short v1
+ * pages. */
 body {
   background-color: var(--lcs-color-page);
 }
