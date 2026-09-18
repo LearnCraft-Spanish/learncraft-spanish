@@ -28,13 +28,14 @@ describe('component Nav', () => {
     expect(screen.getByText(/log out/i)).toBeInTheDocument();
   });
 
-  it('hides logout button when user is not logged in', () => {
+  it('shows login button when user is not logged in', () => {
     overrideMockAuthAdapter({ isAuthenticated: false });
     render(
       <MockAllProviders>
         <Nav />
       </MockAllProviders>,
     );
+    expect(screen.getByText(/log in\/register/i)).toBeInTheDocument();
     expect(screen.queryByText(/log out/i)).not.toBeInTheDocument();
   });
 });

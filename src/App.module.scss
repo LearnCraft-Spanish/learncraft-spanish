@@ -1,8 +1,8 @@
 /* Parchment for v1. `.paperShell` is on `.App` so the texture fills the
  * viewport even when the route is shorter than the window. `.mainContent`
  * keeps the same image so transparent v1 page gaps still show paper.
- * `App` only applies `.paperShell` for v1 (and the pre-version loader);
- * v2 and `LoggedOut` leave `body`'s `--lcs-color-page` as the canvas. */
+ * `App` applies `.paperShell` until a beta-tester student session is
+ * confirmed; only then does `body`'s `--lcs-color-page` become the canvas. */
 .paperShell {
   display: flex;
   min-height: 100vh;

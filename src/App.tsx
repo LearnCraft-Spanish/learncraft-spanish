@@ -40,26 +40,26 @@ export const App: React.FC = () => {
     : isAuthenticated
       ? 'ready'
       : 'loggedOut';
-  const isV2 = version === 'v2';
-  const showPaperBackground = phase !== 'loggedOut' && !isV2;
+  const isV2 = phase === 'ready' && version === 'v2';
+  const showPaperBackground = !isV2;
   const showSubHeader =
-    phase === 'ready' &&
     !isV2 &&
     !V1_NO_SUBHEADER_PATHS.includes(location.pathname) &&
     !V1_NO_SUBHEADER_SEGMENTS.includes(location.pathname.split('/')[1]);
 
   return (
     <div className={showPaperBackground ? `App ${styles.paperShell}` : 'App'}>
-      {phase === 'ready' && (
+      {isV2 ? (
         <>
           <ExtraCoachingCTA />
-          {isV2 ? (
-            <AppHeader>
-              <PrimaryNav />
-            </AppHeader>
-          ) : (
-            <Nav />
-          )}
+          <AppHeader>
+            <PrimaryNav />
+          </AppHeader>
+        </>
+      ) : (
+        <>
+          {phase === 'ready' && <ExtraCoachingCTA />}
+          <Nav />
           {showSubHeader && <SubHeaderComponent />}
         </>
       )}

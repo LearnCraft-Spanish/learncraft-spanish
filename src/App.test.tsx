@@ -105,21 +105,27 @@ describe('app', () => {
     expect(getByRole('menuitem', { name: /log out/i })).toBeInTheDocument();
   });
 
-  it('shows exactly one log in button when logged out', async () => {
+  it('shows the legacy nav login and the logged-out screen button', async () => {
     overrideMockAuthAdapter({ isAuthenticated: false });
-    const { getAllByRole } = render(
+    const { getByRole, getByText } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(getAllByRole('button', { name: /log in/i })).toHaveLength(1);
+      expect(
+        getByRole('button', { name: /log in\/register/i }),
+      ).toBeInTheDocument();
     });
+    expect(getByRole('button', { name: 'Log in' })).toBeInTheDocument();
+    expect(
+      getByText('Please log in to access the LCS App'),
+    ).toBeInTheDocument();
   });
 
-  it('shows the logged-out screen instead of the app when not logged in', async () => {
+  it('shows the logged-out screen under the v1 nav and sub header', async () => {
     overrideMockAuthAdapter({ isAuthenticated: false });
-    const { getByText, queryByText } = render(
+    const { getByAltText, getByText, queryByRole, queryByText } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
@@ -129,22 +135,10 @@ describe('app', () => {
         getByText('Please log in to access the LCS App'),
       ).toBeInTheDocument();
     });
+    expect(getByAltText('Learncraft Spanish Logo')).toBeInTheDocument();
     expect(
-      queryByText('You must be logged in to use this app.'),
-    ).not.toBeInTheDocument();
-  });
-
-  it('renders no nav, header, or banner chrome when logged out', async () => {
-    overrideMockAuthAdapter({ isAuthenticated: false });
-    const { getAllByRole, queryByAltText, queryByRole, queryByText } = render(
-      <MockAllProviders>
-        <App />
-      </MockAllProviders>,
-    );
-    await waitFor(() => {
-      expect(getAllByRole('button', { name: /log in/i })).toHaveLength(1);
-    });
-    expect(queryByAltText('Learncraft Spanish Logo')).not.toBeInTheDocument();
+      getByText('You must be logged in to use this app.'),
+    ).toBeInTheDocument();
     expect(queryByText('LEARNCRAFT')).not.toBeInTheDocument();
     expect(
       queryByRole('navigation', { name: 'Primary' }),
@@ -154,7 +148,7 @@ describe('app', () => {
 
   it('shows a loading spinner while the student UI version is resolving', async () => {
     overrideMockUseStudentUiVersion({ isLoading: true, version: 'v1' });
-    const { getByAltText, queryByAltText, queryByRole, queryByText } = render(
+    const { getByAltText, queryByRole, queryByText } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
@@ -163,11 +157,10 @@ describe('app', () => {
       expect(getByAltText('loading-spinner')).toBeInTheDocument();
     });
     expect(queryByText(/official quizzes/i)).not.toBeInTheDocument();
-    expect(queryByAltText('Learncraft Spanish Logo')).not.toBeInTheDocument();
+    expect(getByAltText('Learncraft Spanish Logo')).toBeInTheDocument();
     expect(
       queryByRole('navigation', { name: 'Primary' }),
     ).not.toBeInTheDocument();
-    expect(queryByText(/welcome/i)).not.toBeInTheDocument();
     expect(queryByText(/make faster progress/i)).not.toBeInTheDocument();
   });
 
@@ -218,7 +211,7 @@ describe('app', () => {
     expect(container.querySelector('.App')).not.toHaveClass('paperShell');
   });
 
-  it('does not paint the paper shell when logged out', async () => {
+  it('paints the paper shell when logged out', async () => {
     overrideMockAuthAdapter({ isAuthenticated: false });
     const { container, getByText } = render(
       <MockAllProviders>
@@ -230,7 +223,7 @@ describe('app', () => {
         getByText('Please log in to access the LCS App'),
       ).toBeInTheDocument();
     });
-    expect(container.querySelector('.App')).not.toHaveClass('paperShell');
+    expect(container.querySelector('.App')).toHaveClass('paperShell');
   });
 
   it('uses the legacy nav and not the v2 header for a v1 viewer', async () => {

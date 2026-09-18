@@ -10,6 +10,8 @@ export default function SubHeader() {
     setStudentSelectorOpen,
     clearSelection,
 
+    notLoggedIn,
+    loggingIn,
     freeUser,
     studentUser,
     isCoachOrAdmin,
@@ -17,6 +19,10 @@ export default function SubHeader() {
 
   return (
     <div className="div-user-subheader">
+      {/* Not Logged In */}
+      {notLoggedIn && <p>You must be logged in to use this app.</p>}
+      {/* Logging In */}
+      {loggingIn && <p>Logging In...</p>}
       {/* Loading User Data */}
       {isAuthenticated && activeStudentLoading && <p>Loading user data...</p>}
       {/* Free User */}
