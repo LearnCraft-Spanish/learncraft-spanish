@@ -132,7 +132,7 @@ describe('home v2', () => {
     renderHome();
 
     expect(
-      screen.getByRole('link', { name: 'give feedback/report a bug' }),
+      screen.getByRole('link', { name: 'give feedback / report a bug' }),
     ).toHaveAttribute('href', 'mailto:info@learncraftspanish.com');
   });
 

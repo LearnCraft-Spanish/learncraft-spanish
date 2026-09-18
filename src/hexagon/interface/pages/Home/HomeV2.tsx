@@ -52,7 +52,7 @@ export function HomeV2Loaded({ cta, entries }: HomeV2LoadedProps): JSX.Element {
             className={styles.feedbackLink}
             href="mailto:info@learncraftspanish.com"
           >
-            give feedback/report a bug
+            give feedback / report a bug
             <Icon name="chevronRight" size="inline" tone="inherit" />
           </a>
         </div>

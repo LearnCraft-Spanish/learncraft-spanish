@@ -8,6 +8,7 @@
     --dark: #3c3c3c;
     --error-bg: darkred;
     --error-text: red;
+    --terracotta: #c8623f;
 
     /* Semantic aliases for new student UI */
     --color-action: var(--brand);
