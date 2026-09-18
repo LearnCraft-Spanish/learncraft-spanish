@@ -19,6 +19,8 @@ For the full documentation hierarchy (architecture, patterns, standards, etc.), 
 
 ## Operating Modes
 
+
+
 ### PR Review
 
 Follow `documentation/PR_STANDARDS.md` checklist + `documentation/PR_REVIEW_GUIDE.md` steps. Verify architecture against `BOUNDARIES.md` files in each layer touched — linter is NOT authoritative.
@@ -49,6 +51,66 @@ Answer questions here about:
 ### Technical Architecture Review
 
 Reference `documentation/ENGINEERING_DOCTRINE.md` and `src/hexagon/ARCHITECTURE.md` for architectural decisions and stability assessment.
+
+---
+## Cursor Cloud specific instructions
+
+Guidance for Cloud Agents setting up and running this repo in a fresh VM.
+
+### Required secret
+
+- **`GH_PACKAGE_KEY`** — a GitHub token with `read:packages` for the `LearnCraft-Spanish` org. Every install path fetches the private `@learncraft-spanish/shared` package from GitHub Packages (`npm.pkg.github.com`), so installs fail without it (anonymous → 401; a repo-scoped token → 403). `.npmrc` already references `${GH_PACKAGE_KEY}`; just export it in the environment. This is the same secret CI uses.
+- Optional (only for a real authenticated login flow): `VITE_AUTH0_DOMAIN`, `VITE_AUTH0_CLIENTID`, `VITE_API_AUDIENCE`, `VITE_BACKEND_DOMAIN`. Without them the dev server, build, and hexagon tests still work, and the app renders its public login screen with placeholder values.
+
+### Node version (important)
+
+`package.json` requires `engines.node: 24.x` with `engine-strict=true`, but the Cloud Agent daemon puts a Node 22 binary (`/exec-daemon/node`) ahead of nvm on `PATH`. Any `node`/`pnpm` command will silently use Node 22 and fail `engine-strict` unless you force Node 24 first, in every shell:
+
+```bash
+export NVM_DIR="$HOME/.nvm"
+. "$NVM_DIR/nvm.sh"
+nvm install 24            # or: nvm use 24, if already installed
+export PATH="$(dirname "$(nvm which 24)"):$PATH"
+hash -r
+node -v                   # must print v24.x
+corepack enable
+corepack prepare pnpm@9.7.1 --activate
+```
+
+### Install
+
+```bash
+pnpm install:ci           # frozen install from lockfiles/ci; needs GH_PACKAGE_KEY
+```
+
+### Run the app
+
+Create `.env` (placeholders are fine for a non-authenticated demo), then start Vite:
+
+```bash
+cat > .env <<'EOF'
+VITE_API_AUDIENCE=https://api.learncraftspanish.com
+VITE_AUTH0_DOMAIN=dev-placeholder.us.auth0.com
+VITE_AUTH0_CLIENTID=placeholderClientId
+VITE_LOCAL_DOMAIN=http://localhost:5173
+VITE_BACKEND_DOMAIN=http://localhost:3000
+REACT_APP_BACKEND_URL=http://localhost:3000
+VITE_ENVIRONMENT=development
+VITE_PORT=5173
+EOF
+pnpm start -- --host 0.0.0.0 --port 5173   # http://localhost:5173
+```
+
+The app is login-gated: with placeholder Auth0 values it renders the public "You must be logged in to use this app." landing screen (no real login completes).
+
+### Verify
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm test:hexagon:ai      # mocked (MSW); no backend needed
+pnpm build
+```
 
 ---
 
