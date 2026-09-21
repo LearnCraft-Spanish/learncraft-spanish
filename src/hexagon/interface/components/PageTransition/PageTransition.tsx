@@ -106,6 +106,9 @@ export function PageTransition({ children }: PageTransitionProps): JSX.Element {
           }`}
           aria-hidden
           onAnimationEnd={handleAnimationEnd}
+          // Our own previous screen, snapshotted in getSnapshotBeforeUpdate.
+          // Not markup from the network. The clone has to outlive the route
+          // commit so the outgoing page can slide away.
           dangerouslySetInnerHTML={{ __html: ghost.html }}
         />
       )}

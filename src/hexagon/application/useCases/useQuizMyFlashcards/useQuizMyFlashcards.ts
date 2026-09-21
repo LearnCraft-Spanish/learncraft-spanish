@@ -13,10 +13,7 @@ import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
-import {
-  generateVirtualLessonId,
-  getPrerequisitesForCourse,
-} from '@domain/coursePrerequisites';
+import { lessonNumberAfterFilterReset } from '@domain/coursePrerequisites';
 import {
   countLabel as buildCountLabel,
   ctaLabel as buildCtaLabel,
@@ -111,22 +108,9 @@ export function useQuizMyFlashcards(
     exampleFilter.setFilterPreset(PreSetQuizPreset.None);
     exampleFilter.skillTagSearch.updateTagSearchTerm();
 
-    const selectedCourse = exampleFilter.course;
-    if (!selectedCourse) {
-      return;
-    }
-
-    const prerequisites = getPrerequisitesForCourse(selectedCourse.id);
-    if (prerequisites && prerequisites.prerequisites.length > 0) {
-      exampleFilter.updateFromLessonNumber(
-        generateVirtualLessonId(selectedCourse.id, 0),
-      );
-      return;
-    }
-
-    const firstLesson = selectedCourse.lessons[0];
-    if (firstLesson) {
-      exampleFilter.updateFromLessonNumber(firstLesson.lessonNumber);
+    const lessonNumber = lessonNumberAfterFilterReset(exampleFilter.course);
+    if (lessonNumber !== null) {
+      exampleFilter.updateFromLessonNumber(lessonNumber);
     }
   }, [exampleFilter]);
 

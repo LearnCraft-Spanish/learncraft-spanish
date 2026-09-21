@@ -10,10 +10,7 @@ import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/pre
 import { useFilterOwnedFlashcards } from '@application/units/Filtering/useFilterOwnedFlashcards';
 import { usePagination } from '@application/units/Pagination/usePagination';
 import useLessonPopup from '@application/units/useLessonPopup';
-import {
-  generateVirtualLessonId,
-  getPrerequisitesForCourse,
-} from '@domain/coursePrerequisites';
+import { lessonNumberAfterFilterReset } from '@domain/coursePrerequisites';
 import { useCallback, useMemo, useState } from 'react';
 
 export interface UseFlashcardManagerReturn {
@@ -125,22 +122,9 @@ export default function useFlashcardManager({
     exampleFilter.setFilterPreset(PreSetQuizPreset.None);
     exampleFilter.skillTagSearch.updateTagSearchTerm();
 
-    const selectedCourse = exampleFilter.course;
-    if (!selectedCourse) {
-      return;
-    }
-
-    const prerequisites = getPrerequisitesForCourse(selectedCourse.id);
-    if (prerequisites && prerequisites.prerequisites.length > 0) {
-      exampleFilter.updateFromLessonNumber(
-        generateVirtualLessonId(selectedCourse.id, 0),
-      );
-      return;
-    }
-
-    const firstLesson = selectedCourse.lessons[0];
-    if (firstLesson) {
-      exampleFilter.updateFromLessonNumber(firstLesson.lessonNumber);
+    const lessonNumber = lessonNumberAfterFilterReset(exampleFilter.course);
+    if (lessonNumber !== null) {
+      exampleFilter.updateFromLessonNumber(lessonNumber);
     }
   }, [exampleFilter]);
 
