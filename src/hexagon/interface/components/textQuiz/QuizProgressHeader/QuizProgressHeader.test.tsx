@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-describe('QuizProgressHeader', () => {
+describe('quizProgressHeader', () => {
   it('shows the position and leaves the quiz when back is pressed', async () => {
     const user = userEvent.setup();
     const onExit = vi.fn();

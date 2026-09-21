@@ -16,19 +16,19 @@ a commit.
 
 ## What is committed vs local
 
-| Path | In git? | Role |
-| --- | --- | --- |
-| `preview/` shell (`vite.config.ts`, `index.html`, `main.tsx`, `PreviewProviders.tsx`, `networkGuard.ts`) | Yes | Vite app that mounts specimens |
-| `preview/adapters/` | Yes | AuthPort + useMyData stubs (no Vitest `vi`) |
-| `preview/specimens/smoke.tsx` + `smoke.states.json` | Yes | Self-test that proves preview + capture |
-| `bars/smoke/` | Yes | Tiny bar for the smoke self-test |
-| `capture/` | Yes | `capture-bar.mjs`, `capture-app.mjs` |
-| `package.json` + `pnpm-lock.yaml` | Yes | Playwright for capture |
-| Root `gauntlet:*` scripts | Yes | Install, preview, capture |
-| `preview/specimens/<name>.*` other than smoke | No | Review specimen (gitignored) |
-| `bars/<name>/` other than smoke | No | Review bar (gitignored); prefer `--bar` to an external handoff |
-| `out/` | No | Generated screenshots + `crop-manifest.json` |
-| `browsers/`, `node_modules/`, `.vite-cache/` | No | Installed harness (leave on disk) |
+| Path                                                                                                     | In git? | Role                                                           |
+| -------------------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------- |
+| `preview/` shell (`vite.config.ts`, `index.html`, `main.tsx`, `PreviewProviders.tsx`, `networkGuard.ts`) | Yes     | Vite app that mounts specimens                                 |
+| `preview/adapters/`                                                                                      | Yes     | AuthPort + useMyData stubs (no Vitest `vi`)                    |
+| `preview/specimens/smoke.tsx` + `smoke.states.json`                                                      | Yes     | Self-test that proves preview + capture                        |
+| `bars/smoke/`                                                                                            | Yes     | Tiny bar for the smoke self-test                               |
+| `capture/`                                                                                               | Yes     | `capture-bar.mjs`, `capture-app.mjs`                           |
+| `package.json` + `pnpm-lock.yaml`                                                                        | Yes     | Playwright for capture                                         |
+| Root `gauntlet:*` scripts                                                                                | Yes     | Install, preview, capture                                      |
+| `preview/specimens/<name>.*` other than smoke                                                            | No      | Review specimen (gitignored)                                   |
+| `bars/<name>/` other than smoke                                                                          | No      | Review bar (gitignored); prefer `--bar` to an external handoff |
+| `out/`                                                                                                   | No      | Generated screenshots + `crop-manifest.json`                   |
+| `browsers/`, `node_modules/`, `.vite-cache/`                                                             | No      | Installed harness (leave on disk)                              |
 
 Do not commit specimens, bars other than smoke, or anything under `out/`.
 A new file under `preview/adapters/` or a new Vite alias is shell: commit it

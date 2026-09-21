@@ -27,7 +27,7 @@ vi.mock('@application/useCases/useStudentUiVersion', () => ({
 const examples: ExampleWithVocabulary[] =
   createMockExampleWithVocabularyList(3);
 
-describe('RegularAudioQuiz', () => {
+describe('regularAudioQuiz', () => {
   const audioQuizProps = {
     examplesToQuiz: examples,
     audioQuizType: AudioQuizType.Speaking,

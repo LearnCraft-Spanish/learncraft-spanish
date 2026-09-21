@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-describe('AudioQuizV2Screen', () => {
+describe('audioQuizV2Screen', () => {
   afterEach(() => {
     cleanup();
     setMobileStackOverride(null);

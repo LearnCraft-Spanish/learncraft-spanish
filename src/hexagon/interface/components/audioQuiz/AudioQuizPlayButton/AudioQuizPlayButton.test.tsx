@@ -24,7 +24,7 @@ function renderButton(
   return { parentClick };
 }
 
-describe('AudioQuizPlayButton', () => {
+describe('audioQuizPlayButton', () => {
   it('plays when the audio is paused and does not advance the card', () => {
     const onPlay = vi.fn();
     const { parentClick } = renderButton(false, onPlay);

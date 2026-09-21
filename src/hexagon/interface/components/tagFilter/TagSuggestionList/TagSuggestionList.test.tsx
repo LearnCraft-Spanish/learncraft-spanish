@@ -62,7 +62,7 @@ describe('tag suggestion copy', () => {
   });
 });
 
-describe('TagSuggestionList', () => {
+describe('tagSuggestionList', () => {
   it('says when nothing matches', () => {
     render(<TagSuggestionList suggestions={[]} onSelect={vi.fn()} />);
 

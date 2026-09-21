@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-describe('AudioQuizProgressHeader', () => {
+describe('audioQuizProgressHeader', () => {
   it('shows the category, the form, and the position', () => {
     render(
       <AudioQuizProgressHeader

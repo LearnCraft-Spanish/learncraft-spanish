@@ -2,7 +2,7 @@ import { AudioKeyboardHints } from '@interface/components/audioQuiz/AudioKeyboar
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-describe('AudioKeyboardHints', () => {
+describe('audioKeyboardHints', () => {
   it('lists the audio quiz shortcuts', () => {
     render(<AudioKeyboardHints />);
 

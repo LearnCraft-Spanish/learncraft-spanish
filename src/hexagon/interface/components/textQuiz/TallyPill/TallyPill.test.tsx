@@ -2,7 +2,7 @@ import { TallyPill } from '@interface/components/textQuiz/TallyPill/TallyPill';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-describe('TallyPill', () => {
+describe('tallyPill', () => {
   it('exposes the count under the accessible tally name', () => {
     render(
       <TallyPill
