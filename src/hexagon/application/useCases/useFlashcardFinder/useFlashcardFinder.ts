@@ -6,6 +6,7 @@ import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTag
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useExampleAdapter } from '@application/adapters/exampleAdapter';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
@@ -13,11 +14,9 @@ import { useQueryPagination } from '@application/units/Pagination/useQueryPagina
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import {
-  generateVirtualLessonId,
-  getPrerequisitesForCourse,
-} from '@domain/coursePrerequisites';
-import { useEffect, useMemo, useRef } from 'react';
+import { lessonNumberAfterFilterReset } from '@domain/coursePrerequisites';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface UseFlashcardFinderReturnType {
   pagination: QueryPaginationState;
@@ -29,6 +28,13 @@ export interface UseFlashcardFinderReturnType {
   lessonPopup: LessonPopup;
   skillTagSearch: UseSkillTagSearchReturnType;
   resetFilters: () => void;
+  /** Every example matching the current filters, for the copy-all action. */
+  copyAllMatchingExamples: () => Promise<ExampleWithVocabulary[]>;
+  selectedIds: ReadonlySet<number>;
+  changeSelection: (next: ReadonlySet<number>) => void;
+  clearSelection: () => void;
+  /** Creates flashcards for the selection, skipping ones the student already owns. */
+  collectSelected: () => Promise<void>;
 
   // Loading states similar to FlashcardManager
   filteredExamplesLoading: boolean;
@@ -63,6 +69,25 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     : null;
 
   const exampleFilter: UseCombinedFiltersReturnType = useCombinedFilters({});
+  const exampleAdapter = useExampleAdapter();
+
+  const copyAllMatchingExamples = async (): Promise<
+    ExampleWithVocabulary[]
+  > => {
+    const { filterState } = exampleFilter;
+    const { examples } = await exampleAdapter.getFilteredExamples({
+      skillTags: filterState.skillTags,
+      lessonRanges: filterState.lessonRanges,
+      excludeSpanglish: filterState.excludeSpanglish,
+      audioOnly: filterState.audioOnly,
+      page: 1,
+      limit: 1_000_000,
+      seed: uuidv4(),
+      disableCache: true,
+      includeUnpublished: filterState.includeUnpublished,
+    });
+    return examples;
+  };
 
   // Track previous filter state to detect actual changes
   const previousFilterState = useRef<string | null>(null);
@@ -124,6 +149,54 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
 
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
 
+  const [selectedIds, setSelectedIds] = useState<ReadonlySet<number>>(
+    () => new Set(),
+  );
+  const selectedExamplesRef = useRef<Map<number, ExampleWithVocabulary>>(
+    new Map(),
+  );
+
+  const changeSelection = useCallback(
+    (next: ReadonlySet<number>): void => {
+      for (const id of [...selectedExamplesRef.current.keys()]) {
+        if (!next.has(id)) {
+          selectedExamplesRef.current.delete(id);
+        }
+      }
+      for (const example of displayExamples) {
+        if (next.has(example.id)) {
+          selectedExamplesRef.current.set(example.id, example);
+        }
+      }
+      setSelectedIds(next);
+    },
+    [displayExamples],
+  );
+
+  const clearSelection = useCallback((): void => {
+    selectedExamplesRef.current.clear();
+    setSelectedIds(new Set());
+  }, []);
+
+  const collectSelected = useCallback(async (): Promise<void> => {
+    const toCollect = [...selectedIds]
+      .map((id) => selectedExamplesRef.current.get(id))
+      .filter(
+        (example): example is ExampleWithVocabulary => example !== undefined,
+      )
+      .filter(
+        (example) =>
+          !flashcardsQuery.isExampleCollected({ exampleId: example.id }),
+      );
+
+    if (toCollect.length > 0) {
+      await flashcardsQuery.createFlashcards(toCollect);
+    }
+
+    selectedExamplesRef.current.clear();
+    setSelectedIds(new Set());
+  }, [flashcardsQuery, selectedIds]);
+
   const resetFilters = (): void => {
     exampleFilter.bulkUpdateSkillTagKeys([]);
     exampleFilter.updateExcludeSpanglish(false);
@@ -132,22 +205,9 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     exampleFilter.setFilterPreset(PreSetQuizPreset.None);
     exampleFilter.skillTagSearch.updateTagSearchTerm();
 
-    const selectedCourse = exampleFilter.course;
-    if (!selectedCourse) {
-      return;
-    }
-
-    const prerequisites = getPrerequisitesForCourse(selectedCourse.id);
-    if (prerequisites && prerequisites.prerequisites.length > 0) {
-      exampleFilter.updateFromLessonNumber(
-        generateVirtualLessonId(selectedCourse.id, 0),
-      );
-      return;
-    }
-
-    const firstLesson = selectedCourse.lessons[0];
-    if (firstLesson) {
-      exampleFilter.updateFromLessonNumber(firstLesson.lessonNumber);
+    const lessonNumber = lessonNumberAfterFilterReset(exampleFilter.course);
+    if (lessonNumber !== null) {
+      exampleFilter.updateFromLessonNumber(lessonNumber);
     }
   };
 
@@ -161,6 +221,11 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     lessonPopup,
     skillTagSearch,
     resetFilters,
+    copyAllMatchingExamples,
+    selectedIds,
+    changeSelection,
+    clearSelection,
+    collectSelected,
 
     // Loading states similar to FlashcardManager
     initialLoading:

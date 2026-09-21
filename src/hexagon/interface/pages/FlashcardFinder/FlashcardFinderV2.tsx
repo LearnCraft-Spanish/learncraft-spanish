@@ -5,15 +5,13 @@ import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
-import { useExampleAdapter } from '@application/adapters/exampleAdapter';
 import useFlashcardFinder from '@application/useCases/useFlashcardFinder';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { FilterSection } from '@interface/components/studentFlashcards/FilterSection';
 import { FinderBottomBar } from '@interface/components/studentFlashcards/FinderBottomBar';
 import { ResultsSection } from '@interface/components/studentFlashcards/ResultsSection';
-import { copyAllExamplesToClipboard } from '@interface/components/Tables/units/CopyAllExamplesToClipboard';
 import { copyTableToClipboard } from '@interface/components/Tables/units/functions';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './FlashcardFinder.module.scss';
 
@@ -28,6 +26,11 @@ interface FlashcardFinderV2LoadedProps {
   initialLoading: boolean;
   exampleFilter: UseCombinedFiltersReturnType;
   resetFilters: () => void;
+  copyAllMatchingExamples: () => Promise<ExampleWithVocabulary[]>;
+  selectedIds: ReadonlySet<number>;
+  changeSelection: (next: ReadonlySet<number>) => void;
+  clearSelection: () => void;
+  collectSelected: () => Promise<void>;
 }
 
 function copyPageExamples(examples: ExampleWithVocabulary[]): void {
@@ -49,58 +52,21 @@ function FlashcardFinderV2Loaded({
   initialLoading,
   exampleFilter,
   resetFilters,
+  copyAllMatchingExamples,
+  selectedIds,
+  changeSelection,
+  clearSelection,
+  collectSelected,
 }: FlashcardFinderV2LoadedProps): JSX.Element {
+  // Notice text and the filter-reset counter are visual. Navigation is an
+  // interface concern. Collection lives on the use case.
   const navigate = useNavigate();
-  const exampleAdapter = useExampleAdapter();
   const [notice, setNotice] = useState<string | null>(null);
-  const [selectedIds, setSelectedIds] = useState<ReadonlySet<number>>(
-    () => new Set(),
-  );
   const [resetEpoch, setResetEpoch] = useState(0);
-  const selectedExamplesRef = useRef<Map<number, ExampleWithVocabulary>>(
-    new Map(),
-  );
-
-  const handleSelectionChange = (next: ReadonlySet<number>): void => {
-    for (const id of [...selectedExamplesRef.current.keys()]) {
-      if (!next.has(id)) {
-        selectedExamplesRef.current.delete(id);
-      }
-    }
-    for (const example of displayExamples) {
-      if (next.has(example.id)) {
-        selectedExamplesRef.current.set(example.id, example);
-      }
-    }
-    setSelectedIds(next);
-  };
-
-  const handleClearSelection = (): void => {
-    selectedExamplesRef.current.clear();
-    setSelectedIds(new Set());
-  };
-
-  const handleCollect = (): void => {
-    const toCollect = [...selectedIds]
-      .map((id) => selectedExamplesRef.current.get(id))
-      .filter(
-        (example): example is ExampleWithVocabulary => example !== undefined,
-      )
-      .filter(
-        (example) =>
-          !flashcardsQuery.isExampleCollected({ exampleId: example.id }),
-      );
-
-    handleClearSelection();
-
-    if (toCollect.length > 0) {
-      void flashcardsQuery.createFlashcards(toCollect);
-    }
-  };
 
   const handleResetAll = (): void => {
     resetFilters();
-    handleClearSelection();
+    clearSelection();
     setNotice(null);
     setResetEpoch((current) => current + 1);
   };
@@ -113,12 +79,28 @@ function FlashcardFinderV2Loaded({
     navigate('/customquiz');
   };
 
+  const handleCollect = (): void => {
+    void collectSelected().catch(() => {
+      setNotice('Could not add those flashcards.');
+    });
+  };
+
   const handleCopyPage = (): void => {
     copyPageExamples(displayExamples);
   };
 
   const handleCopyAll = (): void => {
-    void copyAllExamplesToClipboard(exampleAdapter, exampleFilter.filterState);
+    void copyAllMatchingExamples()
+      .then((examples) => {
+        copyTableToClipboard({
+          displayOrder: examples.map((example) => ({ recordId: example.id })),
+          getExampleOrFlashcardById: (id) =>
+            examples.find((example) => example.id === id) ?? null,
+        });
+      })
+      .catch(() => {
+        setNotice('Could not copy examples.');
+      });
   };
 
   return (
@@ -149,7 +131,7 @@ function FlashcardFinderV2Loaded({
           newPageLoading={exampleQuery.isLoading && exampleQuery.page > 1}
           isAdmin={exampleFilter.isAdmin === true}
           selectedIds={selectedIds}
-          onSelectionChange={handleSelectionChange}
+          onSelectionChange={changeSelection}
           onNotice={setNotice}
           onApplyFilters={handleApplyFilters}
           onCreateQuiz={handleCreateQuiz}
@@ -163,7 +145,7 @@ function FlashcardFinderV2Loaded({
             setNotice(null);
           }}
           selectedCount={selectedIds.size}
-          onClearSelection={handleClearSelection}
+          onClearSelection={clearSelection}
           onCollect={handleCollect}
         />
       </div>
@@ -184,6 +166,11 @@ export function FlashcardFinderV2(): JSX.Element {
     error,
     exampleFilter,
     resetFilters,
+    copyAllMatchingExamples,
+    selectedIds,
+    changeSelection,
+    clearSelection,
+    collectSelected,
   } = useFlashcardFinder();
 
   if (error) {
@@ -206,6 +193,11 @@ export function FlashcardFinderV2(): JSX.Element {
       initialLoading={initialLoading}
       exampleFilter={exampleFilter}
       resetFilters={resetFilters}
+      copyAllMatchingExamples={copyAllMatchingExamples}
+      selectedIds={selectedIds}
+      changeSelection={changeSelection}
+      clearSelection={clearSelection}
+      collectSelected={collectSelected}
     />
   );
 }

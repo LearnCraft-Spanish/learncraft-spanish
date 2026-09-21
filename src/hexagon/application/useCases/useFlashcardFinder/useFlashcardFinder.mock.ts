@@ -108,6 +108,13 @@ export const defaultMockUseFlashcardFinder: UseFlashcardFinderReturnType = {
   lessonPopup: defaultLessonPopup,
   skillTagSearch: defaultSkillTagSearch,
   resetFilters: vi.fn<() => void>(),
+  copyAllMatchingExamples: vi.fn<() => Promise<ExampleWithVocabulary[]>>(
+    async () => [],
+  ),
+  selectedIds: new Set<number>(),
+  changeSelection: vi.fn<(next: ReadonlySet<number>) => void>(),
+  clearSelection: vi.fn<() => void>(),
+  collectSelected: vi.fn<() => Promise<void>>(async () => {}),
   filteredExamplesLoading: false,
   initialLoading: false,
   error: null,

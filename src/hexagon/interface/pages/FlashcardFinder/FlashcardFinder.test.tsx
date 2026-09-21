@@ -10,7 +10,7 @@ import {
   resetMockUseStudentUiVersion,
 } from '@application/useCases/useStudentUiVersion.mock';
 import FlashcardFinder from '@interface/pages/FlashcardFinder';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { MemoryRouter } from 'react-router-dom';
@@ -18,7 +18,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const mockNavigate = vi.fn<(to: string) => void>();
 const mockCopyTableToClipboard = vi.fn();
-const mockCopyAllExamplesToClipboard = vi.fn();
 
 vi.mock('@application/useCases/useFlashcardFinder', () => ({
   default: mockUseFlashcardFinder,
@@ -40,14 +39,6 @@ vi.mock('@interface/components/Tables/units/functions', () => ({
   copyTableToClipboard: (...args: unknown[]) =>
     mockCopyTableToClipboard(...args),
 }));
-
-vi.mock(
-  '@interface/components/Tables/units/CopyAllExamplesToClipboard',
-  () => ({
-    copyAllExamplesToClipboard: (...args: unknown[]) =>
-      mockCopyAllExamplesToClipboard(...args),
-  }),
-);
 
 vi.mock('@interface/components/Filters', () => ({
   FilterPanel: ({
@@ -200,7 +191,6 @@ describe('flashcard finder page', () => {
     resetMockUseStudentUiVersion();
     mockNavigate.mockReset();
     mockCopyTableToClipboard.mockReset();
-    mockCopyAllExamplesToClipboard.mockReset();
     cleanup();
   });
 
@@ -385,7 +375,6 @@ describe('flashcard finder v2 interactions', () => {
     resetMockUseStudentUiVersion();
     mockNavigate.mockReset();
     mockCopyTableToClipboard.mockReset();
-    mockCopyAllExamplesToClipboard.mockReset();
     cleanup();
   });
 
@@ -430,77 +419,64 @@ describe('flashcard finder v2 interactions', () => {
     });
   });
 
-  it('copies all matches through CopyAllExamplesToClipboard', async () => {
+  it('copies every match the use case loads', async () => {
     const user = userEvent.setup();
+    const examples = createMockExampleWithVocabularyList(2);
+    const copyAllMatchingExamples = vi.fn(async () => examples);
+    overrideMockUseFlashcardFinder({ copyAllMatchingExamples });
     renderV2();
 
     await user.click(screen.getByRole('button', { name: 'mock-copy-all' }));
 
-    expect(mockCopyAllExamplesToClipboard).toHaveBeenCalledOnce();
+    expect(copyAllMatchingExamples).toHaveBeenCalledOnce();
+    await waitFor(() => {
+      expect(mockCopyTableToClipboard).toHaveBeenCalledWith({
+        displayOrder: examples.map((example) => ({ recordId: example.id })),
+        getExampleOrFlashcardById: expect.any(Function),
+      });
+    });
   });
 
-  it('lifts selection into the bottom bar and collects the flashcards', async () => {
+  it('shows the use case selection and forwards selection changes', async () => {
     const user = userEvent.setup();
-    const examples = [
-      { ...createMockExampleWithVocabularyList(1)[0], id: 11 },
-      { ...createMockExampleWithVocabularyList(1)[0], id: 12 },
-    ];
-    const createFlashcards = vi.fn(async () => []);
+    const examples = createMockExampleWithVocabularyList(2);
+    const changeSelection = vi.fn();
     overrideMockUseFlashcardFinder({
       displayExamples: examples,
-      flashcardsQuery: {
-        ...mockUseFlashcardFinder().flashcardsQuery,
-        createFlashcards,
-        isExampleCollected: vi.fn(() => false),
-      },
+      selectedIds: new Set(examples.map((example) => example.id)),
+      changeSelection,
     });
     renderV2();
-
-    await user.click(screen.getByRole('button', { name: 'mock-select' }));
 
     expect(screen.getByTestId('selected-count')).toHaveTextContent('2');
 
-    await user.click(screen.getByRole('button', { name: 'mock-collect' }));
+    await user.click(screen.getByRole('button', { name: 'mock-select' }));
 
-    expect(createFlashcards).toHaveBeenCalledWith(examples);
-    expect(screen.getByTestId('selected-count')).toHaveTextContent('0');
+    expect(changeSelection).toHaveBeenCalledWith(
+      new Set(examples.map((example) => example.id)),
+    );
   });
 
-  it('skips examples that are already owned', async () => {
+  it('collects through the use case', async () => {
     const user = userEvent.setup();
-    const examples = [
-      { ...createMockExampleWithVocabularyList(1)[0], id: 11 },
-      { ...createMockExampleWithVocabularyList(1)[0], id: 12 },
-    ];
-    const createFlashcards = vi.fn(async () => []);
-    overrideMockUseFlashcardFinder({
-      displayExamples: examples,
-      flashcardsQuery: {
-        ...mockUseFlashcardFinder().flashcardsQuery,
-        createFlashcards,
-        isExampleCollected: vi.fn(
-          ({ exampleId }: { exampleId: number }) => exampleId === 11,
-        ),
-      },
-    });
+    const collectSelected = vi.fn(async () => {});
+    overrideMockUseFlashcardFinder({ collectSelected });
     renderV2();
 
-    await user.click(screen.getByRole('button', { name: 'mock-select' }));
     await user.click(screen.getByRole('button', { name: 'mock-collect' }));
 
-    expect(createFlashcards).toHaveBeenCalledWith([examples[1]]);
+    expect(collectSelected).toHaveBeenCalledOnce();
   });
 
-  it('clears selection from the bottom bar', async () => {
+  it('clears selection through the use case', async () => {
     const user = userEvent.setup();
-    const examples = createMockExampleWithVocabularyList(2);
-    overrideMockUseFlashcardFinder({ displayExamples: examples });
+    const clearSelection = vi.fn();
+    overrideMockUseFlashcardFinder({ clearSelection });
     renderV2();
 
-    await user.click(screen.getByRole('button', { name: 'mock-select' }));
     await user.click(screen.getByRole('button', { name: 'mock-clear' }));
 
-    expect(screen.getByTestId('selected-count')).toHaveTextContent('0');
+    expect(clearSelection).toHaveBeenCalledOnce();
   });
 
   it('replaces notices rather than stacking them', async () => {
@@ -537,18 +513,51 @@ describe('flashcard finder v2 interactions', () => {
     const user = userEvent.setup();
     const examples = createMockExampleWithVocabularyList(2);
     const resetFilters = vi.fn();
+    const clearSelection = vi.fn();
     overrideMockUseFlashcardFinder({
       displayExamples: examples,
       resetFilters,
+      clearSelection,
     });
     renderV2();
 
-    await user.click(screen.getByRole('button', { name: 'mock-select' }));
     await user.click(screen.getByRole('button', { name: 'mock-notice' }));
     await user.click(screen.getByRole('button', { name: 'mock-reset' }));
 
     expect(resetFilters).toHaveBeenCalledOnce();
-    expect(screen.getByTestId('selected-count')).toHaveTextContent('0');
+    expect(clearSelection).toHaveBeenCalledOnce();
     expect(screen.queryByTestId('notice')).not.toBeInTheDocument();
+  });
+
+  it('shows a notice when collecting the selection fails', async () => {
+    const user = userEvent.setup();
+    overrideMockUseFlashcardFinder({
+      collectSelected: vi.fn(async () => {
+        throw new Error('save failed');
+      }),
+    });
+    renderV2();
+
+    await user.click(screen.getByRole('button', { name: 'mock-collect' }));
+
+    expect(await screen.findByTestId('notice')).toHaveTextContent(
+      'Could not add those flashcards.',
+    );
+  });
+
+  it('shows a notice when copying every match fails', async () => {
+    const user = userEvent.setup();
+    overrideMockUseFlashcardFinder({
+      copyAllMatchingExamples: vi.fn(async () => {
+        throw new Error('catalog down');
+      }),
+    });
+    renderV2();
+
+    await user.click(screen.getByRole('button', { name: 'mock-copy-all' }));
+
+    expect(await screen.findByTestId('notice')).toHaveTextContent(
+      'Could not copy examples.',
+    );
   });
 });
