@@ -1,27 +1,129 @@
 .root {
   display: inline-flex;
+  box-sizing: border-box;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  margin: 0;
-  padding: var(--space-2) var(--space-5);
+  gap: var(--lcs-space-3);
   border: none;
-  border-radius: var(--radius-sm);
-  background-color: var(--color-action);
-  color: var(--color-on-action);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 600;
+  margin: 0;
+  background: none;
+  color: inherit;
   cursor: pointer;
+  font-family: var(--lcs-font-sans);
+  font-weight: var(--lcs-weight-bold);
+  line-height: 1;
+  text-align: center;
+  transition:
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    border-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    color var(--lcs-motion-micro) var(--lcs-ease-standard);
 }
 
-.root:hover:not(:disabled) {
-  background-color: var(--color-action-hover);
-  color: var(--color-on-action);
+.root:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
 }
 
 .root:disabled {
-  background-color: var(--color-disabled);
-  color: var(--color-on-action);
   cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* Sizes — min-height rather than height so a wrapped label still fits. */
+.md {
+  min-height: var(--lcs-control-height);
+  padding: var(--lcs-space-5) var(--lcs-space-7);
+  border-radius: var(--lcs-radius-lg);
+  font-size: var(--lcs-text-control);
+}
+
+.sm {
+  min-height: var(--lcs-control-height-sm);
+  padding: var(--lcs-space-4) var(--lcs-space-7);
+  border-radius: var(--lcs-radius-lg);
+  font-size: var(--lcs-text-action);
+}
+
+.inline {
+  padding: 0;
+  border-radius: var(--lcs-radius-sm);
+  font-size: var(--lcs-text-control);
+}
+
+/* Primary */
+.primary {
+  background-color: var(--lcs-color-action);
+  color: var(--lcs-color-on-action);
+}
+
+.primary:hover:not(:disabled) {
+  background-color: var(--lcs-color-action-hover);
+}
+
+/* Secondary */
+.secondary {
+  border: var(--lcs-control-border) solid var(--lcs-color-action);
+  color: var(--lcs-color-action);
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: var(--lcs-tint-hover);
+}
+
+/* Ghost */
+.ghost {
+  color: var(--lcs-color-action);
+}
+
+.ghost:hover:not(:disabled) {
+  color: var(--lcs-color-action-hover);
+}
+
+.ghost.muted {
+  color: var(--lcs-color-muted);
+}
+
+.ghost.muted:hover:not(:disabled) {
+  color: var(--lcs-color-ink);
+}
+
+/* Destructive */
+.destructive {
+  background-color: var(--lcs-color-error);
+  color: var(--lcs-color-on-action);
+}
+
+.destructive:hover:not(:disabled) {
+  filter: brightness(0.9);
+}
+
+/* On a Deep Navy surface */
+.onDark.primary {
+  background-color: var(--lcs-color-action);
+  color: var(--lcs-color-on-action);
+}
+
+.onDark.secondary {
+  border-color: var(--lcs-on-dark-45);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+.onDark.secondary:hover:not(:disabled) {
+  background-color: var(--lcs-on-dark-12);
+}
+
+.onDark.ghost,
+.onDark.ghost.muted {
+  color: var(--lcs-on-dark-85);
+}
+
+.onDark.ghost:hover:not(:disabled),
+.onDark.ghost.muted:hover:not(:disabled) {
+  color: var(--lcs-color-on-surface-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
 }

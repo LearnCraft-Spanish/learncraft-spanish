@@ -10,6 +10,7 @@ export interface QueryPaginationState {
   maxPageName: string;
   nextPage: () => void;
   previousPage: () => void;
+  goToPage: (page: number) => void;
   resetPagination: () => void;
 }
 
@@ -39,21 +40,27 @@ export function useQueryPagination({
   const maxPageName: string =
     maxPageNumber === 0 ? 'many' : maxPageNumber.toString();
 
+  const goToPage = useCallback(
+    (nextPageNumber: number): void => {
+      if (nextPageNumber < 1 || nextPageNumber === page) {
+        return;
+      }
+      if (maxPageNumber > 0 && nextPageNumber > maxPageNumber) {
+        return;
+      }
+      setPage(nextPageNumber);
+      changeQueryPage(Math.ceil(nextPageNumber / pagesPerQuery));
+    },
+    [page, maxPageNumber, changeQueryPage, pagesPerQuery],
+  );
+
   const nextPage = useCallback(() => {
-    if (page === maxPageNumber) {
-      return;
-    }
-    setPage(page + 1);
-    changeQueryPage(Math.ceil((page + 1) / pagesPerQuery));
-  }, [page, maxPageNumber, changeQueryPage, pagesPerQuery]);
+    goToPage(page + 1);
+  }, [goToPage, page]);
 
   const previousPage = useCallback(() => {
-    if (page <= 1) {
-      return;
-    }
-    setPage(page - 1);
-    changeQueryPage(Math.ceil((page - 1) / pagesPerQuery));
-  }, [page, changeQueryPage, pagesPerQuery]);
+    goToPage(page - 1);
+  }, [goToPage, page]);
 
   const resetPagination = useCallback(() => {
     setPage(1);
@@ -70,6 +77,7 @@ export function useQueryPagination({
     maxPageName,
     nextPage,
     previousPage,
+    goToPage,
     resetPagination,
   };
 }

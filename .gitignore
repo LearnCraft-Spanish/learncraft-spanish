@@ -55,5 +55,12 @@ src/mocks/data/serverlike/actualServerData.json
 .gauntlet/node_modules/
 .gauntlet/**/crop-manifest.json
 
+# Review artifacts — only smoke is committed. See .gauntlet/README.md.
+.gauntlet/preview/specimens/*
+!.gauntlet/preview/specimens/smoke.tsx
+!.gauntlet/preview/specimens/smoke.states.json
+.gauntlet/bars/*
+!.gauntlet/bars/smoke/
+
 # Accidental local pnpm store
 .pnpm-store/

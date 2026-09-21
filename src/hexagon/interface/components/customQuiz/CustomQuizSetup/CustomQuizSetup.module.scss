@@ -1,0 +1,134 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--lcs-space-9);
+}
+
+.columns {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--lcs-space-7);
+  gap: var(--lcs-space-4);
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-4);
+}
+
+/* The options card takes whatever height the settings column has left. */
+.optionsSlot {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+}
+
+.optionsSlot > * {
+  min-width: 0;
+  flex: 1;
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--lcs-space-9);
+  gap: var(--lcs-space-3);
+}
+
+.actionCount {
+  margin: 0;
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lcs-space-3);
+}
+
+.cta,
+.ctaSecondary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.desktopOnly {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* One tree, two steps: the step chrome hides the half you are not on. */
+  .page[data-step='1'] .tagsSlot,
+  .page[data-step='2'] .settings {
+    display: none;
+  }
+
+  /* Step 1 has no count above the action; it already sits under the
+   * length select, and repeating it there reads as a second answer. */
+  .page[data-step='1'] .actionCount {
+    display: none;
+  }
+
+  /* Same as Official quiz setup: the primary CTA sits under the settings
+   * rather than docking to the viewport on a white bar. */
+  .action {
+    margin-top: var(--lcs-space-7);
+  }
+
+  .cta {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .cta > button {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .ctaSecondary {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobileOnly {
+    display: none;
+  }
+
+  .desktopOnly {
+    display: block;
+  }
+
+  .columns {
+    display: grid;
+    align-items: stretch;
+    margin-top: var(--lcs-space-9);
+    gap: var(--lcs-space-9);
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Keeps both columns ending flush no matter which card is taller. */
+  .settings {
+    min-height: 440px;
+  }
+
+  .tagsSlot {
+    display: flex;
+  }
+
+  .tagsSlot > * {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .cta > button {
+    min-width: 360px;
+    height: 56px;
+    font-size: var(--lcs-text-h3);
+  }
+}

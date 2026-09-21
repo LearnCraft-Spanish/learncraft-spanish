@@ -34,10 +34,6 @@ import {
   resetMockExampleAdapter,
 } from '@application/adapters/exampleAdapter.mock';
 import {
-  mockFeatureFlagAdapter,
-  resetMockFeatureFlagAdapter,
-} from '@application/adapters/featureFlagAdapter.mock';
-import {
   mockFlashcardAdapter,
   resetMockFlashcardAdapter,
 } from '@application/adapters/flashcardAdapter.mock';
@@ -114,11 +110,22 @@ import {
   mockUseStudentFlashcards,
   resetMockUseStudentFlashcards,
 } from '@application/units/useStudentFlashcards.mock';
+import { configure } from '@testing-library/dom';
 import { cleanup } from '@testing-library/react';
 import { resetTestQueryClient } from '@testing/utils/testQueryClient';
 
 import { afterEach, vi } from 'vitest';
 import '@testing-library/jest-dom';
+
+/**
+ * `waitFor`/`findBy*` default to a 1000ms poll window. That's tight enough
+ * that async hooks (react-query resolving through a mocked adapter, etc.)
+ * intermittently miss it under CPU contention when the full suite runs in
+ * parallel, even though the work itself finishes in a few ms in isolation —
+ * see `useCustomQuizV2.test.ts`, which only ever failed in the full run.
+ * Vitest's own per-test `testTimeout` (10s) still bounds a truly hung test.
+ */
+configure({ asyncUtilTimeout: 5000 });
 
 // Replace real adapter implementations with mocks for all tests
 vi.mock('@application/adapters/courseAdapter', () => ({
@@ -139,10 +146,6 @@ vi.mock('@application/adapters/subcategoryAdapter', () => ({
 
 vi.mock('@application/adapters/exampleAdapter', () => ({
   useExampleAdapter: vi.fn(() => mockExampleAdapter),
-}));
-
-vi.mock('@application/adapters/featureFlagAdapter', () => ({
-  useFeatureFlagAdapter: vi.fn(() => mockFeatureFlagAdapter),
 }));
 
 vi.mock('@application/adapters/flashcardAdapter', () => ({
@@ -238,7 +241,6 @@ const resetGlobalMocks = () => {
   resetMockVocabularyAdapter();
   resetMockSubcategoryAdapter();
   resetMockExampleAdapter();
-  resetMockFeatureFlagAdapter();
   resetMockActiveStudent();
   resetMockCourseAdapter();
   resetMockFlashcardAdapter();

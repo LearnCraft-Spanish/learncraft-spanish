@@ -38,4 +38,23 @@ describe('button', () => {
 
     expect(onClick).not.toHaveBeenCalled();
   });
+
+  it('renders leading and trailing icons as decoration', () => {
+    const { container } = render(
+      <Button leadingIcon="bolt" trailingIcon="chevronDown">
+        Do more with these
+      </Button>,
+    );
+
+    const glyphs = container.querySelectorAll('svg');
+
+    expect(glyphs).toHaveLength(2);
+    expect(glyphs[0]).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('keeps the label as the accessible name when it has icons', () => {
+    render(<Button leadingIcon="bookmark">Verbs</Button>);
+
+    expect(screen.getByRole('button', { name: 'Verbs' })).toBeInTheDocument();
+  });
 });

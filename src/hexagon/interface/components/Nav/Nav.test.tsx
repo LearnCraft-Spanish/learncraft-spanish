@@ -19,6 +19,15 @@ describe('component Nav', () => {
     expect(screen.getByAltText('Learncraft Spanish Logo')).toBeInTheDocument();
   });
 
+  it('shows logout button when user is logged in', () => {
+    render(
+      <MockAllProviders>
+        <Nav />
+      </MockAllProviders>,
+    );
+    expect(screen.getByText(/log out/i)).toBeInTheDocument();
+  });
+
   it('shows login button when user is not logged in', () => {
     overrideMockAuthAdapter({ isAuthenticated: false });
     render(
@@ -27,14 +36,6 @@ describe('component Nav', () => {
       </MockAllProviders>,
     );
     expect(screen.getByText(/log in\/register/i)).toBeInTheDocument();
-  });
-
-  it('shows logout button when user is logged in', () => {
-    render(
-      <MockAllProviders>
-        <Nav />
-      </MockAllProviders>,
-    );
-    expect(screen.getByText(/log out/i)).toBeInTheDocument();
+    expect(screen.queryByText(/log out/i)).not.toBeInTheDocument();
   });
 });

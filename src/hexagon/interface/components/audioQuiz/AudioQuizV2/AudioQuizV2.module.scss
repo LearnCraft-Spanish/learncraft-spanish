@@ -1,0 +1,50 @@
+/*
+ * Mirrors `TextQuizV2.module.scss` — see that file's header comment for the
+ * full rationale (no `PageShell`, full-bleed parchment fill, and a
+ * definite height so the card's `flex: 1` has something to stretch into).
+ */
+.root {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  max-width: 860px;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0 auto;
+  background-color: var(--lcs-color-page);
+  box-shadow: 0 0 0 100vmax var(--lcs-color-page);
+  clip-path: inset(0 -100vmax);
+  padding: var(--lcs-space-9) var(--lcs-page-pad);
+  gap: var(--lcs-space-9);
+  height: calc(100vh - var(--lcs-app-header-height));
+  height: calc(100dvh - var(--lcs-app-header-height));
+}
+
+.cardRow {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .root {
+    /* Handoff: 14px top on progress, 12px/16px on dock — keep 16px page pad
+     * and a tighter 10px stack gap so the dock sits closer to the card. */
+    padding: 14px var(--lcs-page-pad-narrow) 16px;
+    gap: 10px;
+    height: calc(
+      100vh - var(--lcs-app-header-height) - var(
+          --lcs-mobile-tabbar-offset,
+          0px
+        )
+    );
+    height: calc(
+      100dvh - var(--lcs-app-header-height) - var(
+          --lcs-mobile-tabbar-offset,
+          0px
+        )
+    );
+  }
+}

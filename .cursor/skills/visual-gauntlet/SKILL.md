@@ -9,7 +9,7 @@ description: >-
 
 # Visual Gauntlet
 
-Harness docs: `.gauntlet/README.md`. Orchestration below is mandatory for agent loops.
+Harness docs: `.gauntlet/README.md` (commit rules, adding a specimen, teardown). Orchestration below is mandatory for agent loops.
 
 ## Non-negotiables
 
@@ -90,7 +90,11 @@ Main strips labels before the critic runs:
 4. Main fans out the **critic** with blind paths only.
 5. If ours loses, main sends the gap to the builder; repeat from 2.
 6. Stop only when the critic picks ours blind (or the user stops).
+7. When the review is done, tear down per `.gauntlet/README.md`. Do not commit the specimen, its bar, or `out/`.
 
-## Home redesign bar
+## Design bar
 
-Default external handoff: `~/Downloads/handoff/` (`index.html` with `data-screen-label` frames). Capture specialist: `--bar ~/Downloads/handoff`.
+Handoffs stay outside the repo. Pass `--bar` to a folder with `index.html`
+(or to an `*.html` file), e.g. `--bar ~/Downloads/handoff`. Capture frames
+use `[data-screen-label]`. Do not commit bars other than smoke; see
+`.gauntlet/README.md`.

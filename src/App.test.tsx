@@ -1,14 +1,65 @@
+import { ActiveStudentProvider } from '@application/coordinators/providers/ActiveStudentProvider';
+import { IsFlushingStudentFlashcardUpdatesProvider } from '@application/coordinators/providers/IsFlushingStudentFlashcardUpdatesProvider';
+import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
+import { SelectedExamplesProvider } from '@application/coordinators/providers/SelectedExamplesProvider';
+import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
+import { ModalProvider } from '@composition/providers/ModalProvider';
 import { render, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import {
+  mockUseStudentUiVersion,
+  overrideMockUseStudentUiVersion,
+  resetMockUseStudentUiVersion,
+} from 'src/hexagon/application/useCases/useStudentUiVersion.mock';
 import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
+
+vi.mock('@application/useCases/useStudentUiVersion', () => ({
+  useStudentUiVersion: mockUseStudentUiVersion,
+}));
+
+// `MockAllProviders`'s `route` prop wraps `children` in its own extra
+// `<Routes>` when `route !== '/'`. That's fine for a single leaf page, but
+// `<App>` mounts `AppRoutes` (its own full `<Routes>` tree) internally, and
+// nesting two absolute-path `<Routes>` trees means the inner one matches
+// against whatever path is *left over* after the outer exact match — which
+// is always empty, so it always resolves back to `/`. To land `<App>` on a
+// non-root route in tests, mirror `MockAllProviders`'s provider stack under
+// a single `MemoryRouter` instead, with no extra wrapping `<Routes>`.
+function renderAppAtRoute(route: string) {
+  return render(
+    <MemoryRouter initialEntries={[route]}>
+      <ContextualMenuProvider>
+        <ModalProvider>
+          <MockQueryClientProvider>
+            <ActiveStudentProvider>
+              <SelectedCourseAndLessonsProvider>
+                <IsFlushingStudentFlashcardUpdatesProvider>
+                  <SelectedExamplesProvider>
+                    <App />
+                  </SelectedExamplesProvider>
+                </IsFlushingStudentFlashcardUpdatesProvider>
+              </SelectedCourseAndLessonsProvider>
+            </ActiveStudentProvider>
+          </MockQueryClientProvider>
+        </ModalProvider>
+      </ContextualMenuProvider>
+    </MemoryRouter>,
+  );
+}
 
 // Waiting for userData context to be finished
 describe('app', () => {
+  afterEach(() => {
+    resetMockUseStudentUiVersion();
+  });
   it('renders without crashing', () => {
     render(
       <MockAllProviders>
@@ -17,65 +68,104 @@ describe('app', () => {
     );
   });
 
-  it('shows a log out button when logged in', async () => {
-    const { getByText } = render(
+  it('shows a log out button when logged in on v1', async () => {
+    const { getByRole } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(getByText(/log out/i)).toBeInTheDocument();
+      expect(getByRole('button', { name: /log out/i })).toBeInTheDocument();
     });
   });
 
-  it('shows a log in button when logged out', async () => {
-    overrideMockAuthAdapter({ isAuthenticated: false });
-    const { getByText } = render(
+  it('shows a log out option in the account menu when logged in on v2', async () => {
+    const user = userEvent.setup();
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByRole } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
     );
-    await waitFor(() => {
-      expect(getByText(/log in/i)).toBeInTheDocument();
-    });
+    const accountTrigger = await waitFor(() =>
+      getByRole('button', { name: 'Account' }),
+    );
+    await user.click(accountTrigger);
+
+    expect(getByRole('menuitem', { name: /log out/i })).toBeInTheDocument();
   });
 
-  it("says it won't do anything if not logged in", async () => {
+  it('shows the legacy nav login and the logged-out screen button', async () => {
     overrideMockAuthAdapter({ isAuthenticated: false });
-    const { getByText } = render(
+    const { getByRole, getByText } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
     );
     await waitFor(() => {
       expect(
-        getByText('You must be logged in to use this app.'),
+        getByRole('button', { name: /log in\/register/i }),
       ).toBeInTheDocument();
     });
+    expect(getByRole('button', { name: 'Log in' })).toBeInTheDocument();
+    expect(
+      getByText('Please log in to access the LCS App'),
+    ).toBeInTheDocument();
   });
 
-  it('shows welcome message', async () => {
-    // const mockLimitedStudent = createMockAuth({ userName: "limited" });
-    overrideMockAuthAdapter({
-      authUser: getAuthUserFromEmail('limited@fake.not')!,
-      isAuthenticated: true,
-      isAdmin: false,
-      isCoach: false,
-      isStudent: false,
-      isLimited: true,
-    });
-    const { getByText } = render(
+  it('shows the logged-out screen under the v1 nav and sub header', async () => {
+    overrideMockAuthAdapter({ isAuthenticated: false });
+    const { getByAltText, getByText, queryByRole, queryByText } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(getByText(/welcome/i)).toBeInTheDocument();
+      expect(
+        getByText('Please log in to access the LCS App'),
+      ).toBeInTheDocument();
     });
+    expect(getByAltText('Learncraft Spanish Logo')).toBeInTheDocument();
+    expect(
+      getByText('You must be logged in to use this app.'),
+    ).toBeInTheDocument();
+    expect(queryByText('LEARNCRAFT')).not.toBeInTheDocument();
+    expect(
+      queryByRole('navigation', { name: 'Primary' }),
+    ).not.toBeInTheDocument();
+    expect(queryByText(/make faster progress/i)).not.toBeInTheDocument();
+  });
+
+  it('shows a loading spinner while the student UI version is resolving', async () => {
+    overrideMockUseStudentUiVersion({ isLoading: true, version: 'v1' });
+    const { getByAltText, queryByRole, queryByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByAltText('loading-spinner')).toBeInTheDocument();
+    });
+    expect(queryByText(/official quizzes/i)).not.toBeInTheDocument();
+    expect(getByAltText('Learncraft Spanish Logo')).toBeInTheDocument();
+    expect(
+      queryByRole('navigation', { name: 'Primary' }),
+    ).not.toBeInTheDocument();
+    expect(queryByText(/make faster progress/i)).not.toBeInTheDocument();
   });
 
   it('shows a loading spinner when logging in', async () => {
-    overrideMockAuthAdapter({ isLoading: true });
+    overrideMockAuthAdapter({ isLoading: true, isAuthenticated: false });
     const { getByAltText } = render(
       <MockAllProviders>
         <App />
@@ -83,6 +173,111 @@ describe('app', () => {
     );
     await waitFor(() => {
       expect(getByAltText('loading-spinner')).toBeInTheDocument();
+    });
+  });
+
+  it('paints the paper shell for a v1 viewer', async () => {
+    const { container, getByAltText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByAltText('Learncraft Spanish Logo')).toBeInTheDocument();
+    });
+    expect(container.querySelector('.App')).toHaveClass('paperShell');
+  });
+
+  it('does not paint the paper shell for a v2 viewer', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { container, getByRole } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
+    });
+    expect(container.querySelector('.App')).not.toHaveClass('paperShell');
+  });
+
+  it('paints the paper shell when logged out', async () => {
+    overrideMockAuthAdapter({ isAuthenticated: false });
+    const { container, getByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(
+        getByText('Please log in to access the LCS App'),
+      ).toBeInTheDocument();
+    });
+    expect(container.querySelector('.App')).toHaveClass('paperShell');
+  });
+
+  it('uses the legacy nav and not the v2 header for a v1 viewer', async () => {
+    const { getByAltText, queryByRole, queryByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByAltText('Learncraft Spanish Logo')).toBeInTheDocument();
+    });
+    expect(
+      queryByRole('navigation', { name: 'Primary' }),
+    ).not.toBeInTheDocument();
+    expect(queryByText('LEARNCRAFT')).not.toBeInTheDocument();
+  });
+
+  it('uses the v2 header and not the legacy nav for a beta-tester student', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByRole, queryByAltText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
+    });
+    expect(queryByAltText('Learncraft Spanish Logo')).not.toBeInTheDocument();
+  });
+
+  it('redirects a v1 viewer from /quizzes to the legacy home menu', async () => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByText } = renderAppAtRoute('/quizzes');
+    await waitFor(() => {
+      expect(getByText(/quiz my flashcards/i)).toBeInTheDocument();
     });
   });
 
@@ -125,6 +320,191 @@ describe('app', () => {
     await waitFor(() => {
       expect(getByText(/quiz my flashcards/i)).toBeInTheDocument();
     });
+  });
+
+  it('hides the sub-header on the v2 student home screen', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByRole, queryByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+
+    await waitFor(() => {
+      expect(getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
+    });
+    expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
+  });
+
+  it('does not mount the primary tab bar off Home when student home v2 is on', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByRole, queryByRole } = renderAppAtRoute('/quizzes');
+
+    await waitFor(() => {
+      expect(getByRole('heading', { name: 'Quizzes' })).toBeInTheDocument();
+    });
+    expect(
+      queryByRole('navigation', { name: 'Primary' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides the sub-header on the v2 flashcard finder screen', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByRole, queryByText } = renderAppAtRoute('/flashcardfinder');
+
+    await waitFor(
+      () => {
+        expect(
+          getByRole('heading', { name: 'Flashcard Finder' }),
+        ).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
+    expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
+  });
+
+  it('hides the sub-header on the v2 flashcard manager screen', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByRole, queryByText } = renderAppAtRoute('/manage-flashcards');
+
+    await waitFor(
+      () => {
+        expect(
+          getByRole('heading', { name: 'Flashcard Manager' }),
+        ).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
+    expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
+  });
+
+  it('shows the sub header for a student on the /get-help page', async () => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByRole, getByText, queryByText } = renderAppAtRoute('/get-help');
+
+    await waitFor(() => {
+      expect(getByRole('heading', { name: /help/i })).toBeInTheDocument();
+    });
+    expect(getByText(/welcome back/i)).toBeInTheDocument();
+    expect(queryByText(/using as/i)).not.toBeInTheDocument();
+  });
+
+  it('shows the sub header for a student on a v1 route', async () => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+    const { getByRole, getByText, queryByText } =
+      renderAppAtRoute('/flashcardfinder');
+
+    await waitFor(() => {
+      expect(
+        getByRole('heading', { name: /flashcard finder/i }),
+      ).toBeInTheDocument();
+    });
+    expect(getByText(/welcome back/i)).toBeInTheDocument();
+    expect(queryByText(/using as/i)).not.toBeInTheDocument();
+  });
+
+  it('still shows the coach/admin student selector for a coach with no student role', async () => {
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
+      isAuthenticated: true,
+      isLoading: false,
+      isAdmin: false,
+      isCoach: true,
+      isStudent: false,
+      isLimited: false,
+    });
+    const { getByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByText('No student Selected')).toBeInTheDocument();
+    });
+    expect(getByText('Change')).toBeInTheDocument();
+  });
+
+  it('still shows the coach/admin student selector when the coach also holds the Student role', async () => {
+    // Watch out: gate on `isCoach || isAdmin`, not `!isStudent` — a
+    // coach/admin who also has the Student role must still get the
+    // selector, not the student "Welcome back" message. Rendered on a
+    // coach/admin-only route with no v2 exclusion of its own (unlike
+    // `/`, `/flashcardfinder`, `/manage-flashcards`), so this isolates the
+    // role check itself.
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+      isAuthenticated: true,
+      isLoading: false,
+      isAdmin: false,
+      isCoach: true,
+      isStudent: true,
+      isLimited: false,
+    });
+    const { getByText, queryByText } = renderAppAtRoute('/frequensay');
+    await waitFor(() => {
+      expect(getByText('No student Selected')).toBeInTheDocument();
+    });
+    expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
   });
 
   it('displays example manager if admin', async () => {

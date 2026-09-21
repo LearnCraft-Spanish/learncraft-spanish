@@ -1,0 +1,46 @@
+/* 34×34 is the handoff's literal one-off tile size, not a scale step.
+ * Radius is forced to 8px (md) with overflow clip so Icon SVG chrome cannot
+ * read the tinted tile as a circle. */
+.root {
+  display: inline-flex;
+  box-sizing: border-box;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  /* 1px plate edge so the 34×34 / r8 tile reads as a square, not a circle. */
+  border: 1px solid rgba(68, 154, 194, 0.35);
+  border-radius: 8px;
+  overflow: hidden;
+  /* Stronger literal tint so the filled square reads vs parchment; icon stays
+   * Celestial Blue (never white / on-action). */
+  background-color: rgba(68, 154, 194, 0.2);
+  color: #449ac2;
+  cursor: pointer;
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+
+  svg {
+    color: #449ac2;
+    stroke: #449ac2;
+    fill: none;
+    opacity: 1;
+    stroke-width: 2.25;
+  }
+}
+
+.root:hover:not(:disabled) {
+  background-color: var(--lcs-tint-hover);
+}
+
+.root:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+}

@@ -1,0 +1,76 @@
+.root {
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  padding: var(--lcs-space-2) var(--lcs-space-5);
+  border: none;
+  gap: var(--lcs-space-2);
+  border-radius: var(--lcs-radius-pill);
+  background-color: var(--lcs-tint-label-subtle);
+  color: var(--lcs-color-on-label);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-chip);
+  line-height: var(--lcs-line-tight);
+  transition:
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.selectable {
+  cursor: pointer;
+}
+
+.selectable:hover {
+  background-color: var(--lcs-tint-label);
+}
+
+.selectable:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.selected {
+  background-color: var(--lcs-color-action);
+  color: var(--lcs-color-on-action);
+}
+
+.selected:hover {
+  background-color: var(--lcs-color-action-hover);
+}
+
+.selectedNavy,
+.selectedNavy:hover {
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+.action {
+  background-color: var(--lcs-tint-action);
+  color: var(--lcs-color-action-hover);
+}
+
+.warning {
+  background-color: var(--lcs-tint-warning);
+  color: var(--lcs-color-warning-ink);
+}
+
+.remove {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  margin-right: calc(var(--lcs-space-1) * -1);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.remove:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+}

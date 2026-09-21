@@ -1,0 +1,144 @@
+.suggestions {
+  /*
+   * Per-type accents echo the v1 TagFilter palette (App.css *Card rules:
+   * Vocabulary→brand, Idiom→accent, Subcategory→theme, Verb→dark+accent).
+   * Hues come from existing tokens; tints for subcategory/verb are local
+   * because tokens.css has no muted/ink surface tints.
+   */
+  --suggestion-subcategory-tint: rgba(111, 98, 89, 0.1);
+  --suggestion-verb-tint: rgba(60, 60, 60, 0.06);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestion {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--lcs-space-5);
+  /* Prototype 11px 16px. 11px is one-off; scale jumps 10 → 12. */
+  padding: 11px var(--lcs-space-7);
+  border: none;
+  border-bottom: var(--lcs-border-hairline) solid var(--lcs-divider);
+  border-left: 3px solid transparent;
+  background: none;
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--lcs-text-control);
+  line-height: var(--lcs-line-body);
+  text-align: left;
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.suggestion:last-child {
+  border-bottom: none;
+}
+
+.suggestion:hover {
+  background-color: var(--lcs-color-page);
+}
+
+.suggestion:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.suggestionBody {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--lcs-space-1);
+}
+
+.suggestionName {
+  color: var(--lcs-color-ink);
+}
+
+.suggestionDescriptor {
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+  line-height: var(--lcs-line-tight);
+}
+
+.suggestionMeta {
+  flex-shrink: 0;
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-eyebrow);
+}
+
+/* Subtle type cues: left rail + low-alpha tint + meta hue. Not full cards. */
+.suggestionVocabulary {
+  border-left-color: var(--lcs-color-action);
+  background-color: var(--lcs-tint-row-selected);
+}
+
+.suggestionVocabulary:hover {
+  background-color: var(--lcs-tint-hover);
+}
+
+.suggestionVocabulary .suggestionMeta {
+  color: var(--lcs-color-action);
+}
+
+.suggestionIdiom {
+  border-left-color: var(--lcs-color-label);
+  background-color: var(--lcs-tint-label-subtle);
+}
+
+.suggestionIdiom:hover {
+  background-color: var(--lcs-tint-label);
+}
+
+.suggestionIdiom .suggestionMeta {
+  color: var(--lcs-color-on-label);
+}
+
+.suggestionSubcategory {
+  border-left-color: var(--lcs-color-muted);
+  background-color: var(--suggestion-subcategory-tint);
+}
+
+.suggestionSubcategory:hover {
+  background-color: color-mix(in srgb, var(--lcs-color-muted) 16%, transparent);
+}
+
+.suggestionSubcategory .suggestionMeta {
+  color: var(--lcs-color-muted);
+}
+
+.suggestionVerb {
+  border-left-color: var(--lcs-color-ink);
+  background-color: var(--suggestion-verb-tint);
+}
+
+.suggestionVerb:hover {
+  background-color: color-mix(in srgb, var(--lcs-color-ink) 10%, transparent);
+}
+
+.suggestionVerb .suggestionMeta {
+  color: var(--lcs-color-label);
+}
+
+.suggestionConjugation {
+  border-left-color: var(--lcs-color-steel);
+}
+
+.suggestionConjugation:hover {
+  background-color: var(--lcs-color-page);
+}
+
+.noSuggestions {
+  padding: var(--lcs-space-6) var(--lcs-space-7);
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-action);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .suggestion {
+    transition: none;
+  }
+}

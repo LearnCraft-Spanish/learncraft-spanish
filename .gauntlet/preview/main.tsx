@@ -1,12 +1,10 @@
-import type { JSX } from 'react';
+import type { ComponentType, JSX } from 'react';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { installNetworkGuard } from './networkGuard';
 
 import { PreviewProviders } from './PreviewProviders';
-import { HomeSpecimen } from './specimens/home';
-import { SmokeSpecimen } from './specimens/smoke';
 import '@interface/styles/tokens.css';
 
 declare global {
@@ -15,19 +13,49 @@ declare global {
   }
 }
 
+type SpecimenModule = {
+  default: ComponentType;
+  deferReady?: boolean;
+};
+
 installNetworkGuard();
 
 const params = new URLSearchParams(window.location.search);
-const specimen = params.get('specimen') ?? 'smoke';
+const requested = params.get('specimen') ?? 'smoke';
+
+const modules = import.meta.glob<SpecimenModule>('./specimens/*.tsx', {
+  eager: true,
+});
+
+function specimenNameFromPath(path: string): string {
+  const file = path.split('/').pop() ?? '';
+  return file.replace(/\.tsx$/, '');
+}
+
+const byName = new Map<string, SpecimenModule>();
+for (const [path, mod] of Object.entries(modules)) {
+  byName.set(specimenNameFromPath(path), mod);
+}
+
+const resolvedName = byName.has(requested) ? requested : 'smoke';
+if (resolvedName !== requested) {
+  console.warn(
+    `[gauntlet] specimen "${requested}" not found; falling back to smoke`,
+  );
+}
+
+const resolved = byName.get(resolvedName);
+if (!resolved?.default) {
+  throw new Error(
+    `[gauntlet] specimen "${resolvedName}" has no default export`,
+  );
+}
+
+const Specimen = resolved.default;
+const deferReady = resolved.deferReady === true;
 
 function SpecimenRoot(): JSX.Element {
-  switch (specimen) {
-    case 'home':
-      return <HomeSpecimen />;
-    case 'smoke':
-    default:
-      return <SmokeSpecimen />;
-  }
+  return <Specimen />;
 }
 
 const rootEl = document.getElementById('root');
@@ -43,4 +71,7 @@ createRoot(rootEl).render(
   </StrictMode>,
 );
 
-window.__SPECIMEN__ = { ready: true, name: specimen };
+window.__SPECIMEN__ = {
+  ready: !deferReady,
+  name: resolvedName,
+};

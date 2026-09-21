@@ -1,0 +1,32 @@
+.root {
+  position: fixed;
+  z-index: var(--lcs-z-bottom-bar);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--lcs-page-pad) var(--lcs-space-9);
+  gap: var(--lcs-space-5);
+  pointer-events: none;
+}
+
+.column {
+  display: flex;
+  width: 100%;
+  max-width: var(--lcs-max-width);
+  flex-direction: column;
+  margin: 0 auto;
+  gap: var(--lcs-space-5);
+}
+
+/* Only the bars take pointer events, so the page stays usable around them. */
+.column > * {
+  pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+  .root {
+    padding: 0 var(--lcs-page-pad-narrow) var(--lcs-space-7);
+  }
+}

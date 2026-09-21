@@ -1,0 +1,365 @@
+.sentenceCell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--lcs-space-4);
+}
+
+.sentenceCell button:hover,
+.expandToggle button:hover {
+  background-color: transparent;
+}
+
+.sentence {
+  min-width: 0;
+  color: var(--lcs-color-ink);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-body);
+  line-height: var(--lcs-line-body);
+}
+
+.spanishRun {
+  font-weight: var(--lcs-weight-bold);
+}
+
+.embeddedEnglish {
+  font-weight: var(--lcs-weight-regular);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--lcs-space-1);
+}
+
+.expandToggle button {
+  padding: var(--lcs-space-2);
+}
+
+.collectAction button,
+.ownedAction button,
+.removeAction button {
+  min-width: 88px;
+}
+
+/* Desktop: labeled button only. Shown as the compact glyph below 768px. */
+.actionIcon {
+  display: none;
+}
+
+.ownedAction button,
+.removeAction button {
+  position: relative;
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+}
+
+/* Visually-hidden stable name; label text never changes with it. */
+.ownedA11yName {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: -1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/*
+ * Finder collected: "Owned" text never changes. Hover/focus matches the
+ * Manager's red-fill Remove treatment exactly, including the fill
+ * transition, so the two surfaces feel like one control family — only the
+ * color shifts, not the label.
+ */
+.ownedAction button:not(:disabled) {
+  transition:
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    border-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.ownedAction button:hover:not(:disabled),
+.ownedAction button:focus-visible:not(:disabled) {
+  background-color: var(--lcs-color-error);
+  border-color: var(--lcs-color-error);
+  color: var(--lcs-color-on-action);
+}
+
+/*
+ * Manager: always "Remove". Red border/text at rest; red fill + on-action
+ * (white) text on hover/focus. Disabled keeps the Button's grey treatment —
+ * never the inverted hover fill. No dedicated --lcs-color-on-error token;
+ * Button.destructive already pairs --lcs-color-error with --lcs-color-on-action.
+ */
+.removeAction button:not(:disabled) {
+  border-color: var(--lcs-color-error);
+  color: var(--lcs-color-error);
+  transition:
+    background-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    border-color var(--lcs-motion-micro) var(--lcs-ease-standard),
+    color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.removeAction button:hover:not(:disabled),
+.removeAction button:focus-visible:not(:disabled) {
+  background-color: var(--lcs-color-error);
+  border-color: var(--lcs-color-error);
+  color: var(--lcs-color-on-action);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ownedAction button:not(:disabled),
+  .removeAction button:not(:disabled) {
+    transition: none;
+  }
+}
+
+/*
+ * Mobile action column is 44px. Icon-only controls + column-reverse keep the
+ * DOM order (chevron then action) for desktop/tab, while stacking action on
+ * top and chevron below. Labels stay in the accessibility tree via the
+ * visually-hidden idiom — never display:none / visibility:hidden.
+ */
+@media (max-width: 768px) {
+  .actions {
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: center;
+    gap: var(--lcs-space-1);
+  }
+
+  .collectAction button,
+  .ownedAction button,
+  .removeAction button {
+    position: relative;
+    width: var(--lcs-control-height-sm);
+    min-width: 0;
+    height: var(--lcs-control-height-sm);
+    min-height: var(--lcs-control-height-sm);
+    padding: 0;
+  }
+
+  /*
+   * --lcs-control-border is 1.5px; browsers rasterize a fractional stroke
+   * unevenly around border-radius (corners read thicker than the sides).
+   * Integer 1px keeps the outline uniform on the 40×40 control — 2px looked
+   * heavy next to the 16px glyph. No matching integer token; raw px is
+   * intentional. Desktop keeps the token.
+   */
+  .ownedAction button,
+  .removeAction button {
+    border-width: 1px;
+  }
+
+  .actionVisibleLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    margin: -1px;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .actionIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.expandPanel {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  padding: var(--lcs-space-1) var(--lcs-space-7) var(--lcs-space-8) 60px;
+  gap: var(--lcs-space-8) calc(var(--lcs-space-9) + var(--lcs-space-3));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.columnEyebrow {
+  margin-bottom: var(--lcs-space-3);
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-2);
+}
+
+.hint {
+  margin: var(--lcs-space-3) 0 0;
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-chip);
+}
+
+.emptySpecial {
+  margin: 0;
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+}
+
+.dateList {
+  display: flex;
+  margin: 0;
+  flex-direction: column;
+  gap: var(--lcs-space-2);
+}
+
+.dateRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-3);
+}
+
+.dateLabel {
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+}
+
+.dateValue {
+  margin: 0;
+  color: var(--lcs-color-ink);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+  font-weight: var(--lcs-weight-medium);
+}
+
+.vocabChip button,
+.specialChip > * {
+  padding: 5px var(--lcs-space-5);
+  border-radius: var(--lcs-radius-sm);
+  font-weight: var(--lcs-weight-medium);
+}
+
+/*
+ * Mobile: larger vocabulary tags for thumb targets (~44px). Special tags
+ * match so the two columns in the expand panel stay visually even.
+ * Desktop stays on the compact rule above.
+ */
+@media (max-width: 768px) {
+  .expandPanel {
+    /* Match right padding so the content block centers in the card. */
+    padding-left: var(--lcs-space-7);
+  }
+
+  /*
+   * Containing block for Popover's mobileCentered panel once the popover
+   * root is position: static. Symmetric expandPanel padding keeps this row
+   * centered in the card, so left: 50% + margin-left: -42.5vw centers on
+   * the screen.
+   */
+  .chipRow {
+    position: relative;
+    gap: var(--lcs-space-7);
+  }
+
+  .vocabChip button,
+  .specialChip > * {
+    min-height: var(--lcs-control-height);
+    padding: var(--lcs-space-5) var(--lcs-space-7);
+    font-size: var(--lcs-text-action);
+  }
+}
+
+.vocabChip button {
+  background-color: var(--lcs-tint-label);
+  color: var(--lcs-color-on-label);
+}
+
+.vocabChip button[aria-pressed='true'],
+.vocabChip button[aria-pressed='true']:hover {
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+.smokeChip > * {
+  background-color: var(--lcs-tint-label);
+}
+
+.vocabDetail {
+  width: 280px;
+  max-width: min(280px, calc(100vw - 40px));
+  padding: var(--lcs-space-5) var(--lcs-space-6);
+}
+
+.vocabWord {
+  margin: 0;
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.vocabDescriptor {
+  margin: var(--lcs-space-1) 0 0;
+  color: var(--lcs-on-dark-60);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+  font-style: italic;
+}
+
+.vocabMeta {
+  display: flex;
+  margin-top: var(--lcs-space-4);
+  flex-direction: column;
+  gap: var(--lcs-space-1);
+}
+
+.vocabMeta p {
+  margin: 0;
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-chip);
+}
+
+.taughtIn {
+  margin-top: var(--lcs-space-5);
+}
+
+.vocabLessonList {
+  display: flex;
+  max-height: 220px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex-direction: column;
+  gap: var(--lcs-space-4);
+  list-style: none;
+}
+
+.vocabLesson {
+  margin: 0;
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.vocabUnit {
+  margin: 0;
+  color: var(--lcs-on-dark-60);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+}
+
+.vocabLessonItemCurrent .vocabUnit {
+  color: var(--lcs-color-on-surface-dark);
+}
+
+/*
+ * Mobile centered vocab popover is ~85vw. Drop the 280px desktop width so
+ * the detail fills the panel. Keep the lesson list as the internal scroll
+ * (tighter than desktop's 220px) so many lessons do not stretch the panel.
+ */
+@media (max-width: 768px) {
+  .vocabDetail {
+    width: 100%;
+    max-width: none;
+    padding: var(--lcs-space-6) var(--lcs-space-7);
+  }
+
+  .vocabLessonList {
+    max-height: 160px;
+  }
+}

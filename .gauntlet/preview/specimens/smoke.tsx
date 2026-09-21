@@ -5,7 +5,7 @@ import { UiScope } from '@interface/components/general/UiScope/UiScope';
 /**
  * Self-contained specimen that proves the capture loop without Downloads handoffs.
  */
-export function SmokeSpecimen(): JSX.Element {
+export default function SmokeSpecimen(): JSX.Element {
   return (
     <div
       data-gauntlet-specimen="smoke"

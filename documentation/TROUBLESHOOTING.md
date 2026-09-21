@@ -280,7 +280,7 @@ pnpm --version
 
 **Solution**:
 
-1. Use the in-repo harness — [`.gauntlet/README.md`](../.gauntlet/README.md). Never log into Auth0 and never point at a backend for visual checks.
+1. Use the in-repo harness — [`.gauntlet/README.md`](../.gauntlet/README.md). Never log into Auth0 and never point at a backend for visual checks. Review specimens, bars other than smoke, and `out/` PNGs are local (gitignored); tear them down when the review is done.
 2. `pnpm gauntlet:install` once, then `pnpm gauntlet:preview` with Shell `required_permissions: ["all"]`.
 3. Capture: `pnpm gauntlet:capture-bar -- --specimen <name> [--bar path]` then `pnpm gauntlet:capture-app -- --specimen <name>`.
 4. If capture-app fails on dimension mismatch, re-run capture-bar so `out/<specimen>/bar/crop-manifest.json` matches the handoff frames; ensure `*.states.json` labels match `[data-screen-label]`.
