@@ -1,10 +1,12 @@
 import type { SrsDifficulty } from '@domain/srs';
+import type { CardAudioHandle } from '@interface/components/textQuiz/CardAudioButton';
 import type {
   JSX,
   KeyboardEvent,
   MouseEvent,
   PointerEvent,
   ReactNode,
+  RefObject,
 } from 'react';
 import { quizFaceRuns } from '@domain/functions/quizFaceRuns';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
@@ -58,6 +60,8 @@ interface QuizCardProps {
   answerShowing: boolean;
   face: QuizCardFace;
   audioUrl: string | null;
+  /** Lets the quiz screen toggle this face's audio from Space. */
+  audioControlRef?: RefObject<CardAudioHandle | null>;
   /** Undefined for non-students, who cannot favourite a card. */
   favourite?: QuizCardFavourite;
   /** Answer side only, and only once the vocabulary is fully tagged. */
@@ -84,6 +88,7 @@ export function QuizCard({
   answerShowing,
   face,
   audioUrl,
+  audioControlRef,
   favourite,
   showHelpButton,
   helpOpen,
@@ -142,7 +147,13 @@ export function QuizCard({
     if (event.target !== event.currentTarget) {
       return;
     }
-    if (event.key === ' ' || event.key === 'Enter') {
+    if (event.key === ' ') {
+      // Space play/pause is handled on the document. Prevent the implicit
+      // role=button activation that would otherwise flip the card.
+      event.preventDefault();
+      return;
+    }
+    if (event.key === 'Enter') {
       event.preventDefault();
       onFlip();
     }
@@ -211,7 +222,11 @@ export function QuizCard({
         </>
       )}
       <div className={styles.utilityRow} onClick={stopPropagation}>
-        <CardAudioButton audioUrl={audioUrl} label="Play sentence audio" />
+        <CardAudioButton
+          audioUrl={audioUrl}
+          label="Play sentence audio"
+          ref={audioControlRef}
+        />
         {favourite && (
           /* Handoff: bare Dorado star (no circular fill). `sm` keeps a
            * square 32px hit target near the 34×34 audio tile. Glyph color

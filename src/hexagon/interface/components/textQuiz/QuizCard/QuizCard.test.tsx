@@ -152,6 +152,22 @@ describe('quiz card', () => {
     expect(audioButton.hasAttribute('disabled')).toBe(false);
   });
 
+  it('flips with Enter when the card is focused', () => {
+    const { onFlip } = renderCard();
+
+    fireEvent.keyDown(getCard(), { key: 'Enter' });
+
+    expect(onFlip).toHaveBeenCalledOnce();
+  });
+
+  it('does not flip with Space when the card is focused', () => {
+    const { onFlip } = renderCard();
+
+    fireEvent.keyDown(getCard(), { key: ' ' });
+
+    expect(onFlip).not.toHaveBeenCalled();
+  });
+
   it('still renders the favourite control when audio is absent', () => {
     renderCard({
       audioUrl: null,

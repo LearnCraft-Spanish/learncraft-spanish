@@ -5,11 +5,13 @@
 @media (min-width: 769px) {
   .root {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     /* Ghost under the dock — softer than body muted. */
     color: var(--lcs-color-placeholder);
     font-size: var(--lcs-text-caption-mobile);
     gap: var(--lcs-space-3);
+    row-gap: var(--lcs-space-2);
   }
 }
 
@@ -24,7 +26,7 @@
   color: var(--lcs-border-card);
 }
 
-/* White keycap shell — shared by ← / space / →. Keep bg/border opaque;
+/* White keycap shell — shared by ← / ↑ / → / 1 / 2. Keep bg/border opaque;
  * mute only the glyph span so the plate never reads flat grey. */
 .key {
   display: inline-flex;
@@ -43,7 +45,7 @@
   line-height: 1;
 }
 
-/* Space is the primary shortcut — full ink + bold. */
+/* Flip (↑) is the primary shortcut — full ink + bold. */
 .strong {
   color: var(--lcs-color-ink);
   font-weight: var(--lcs-weight-bold);

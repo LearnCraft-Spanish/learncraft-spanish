@@ -1,4 +1,5 @@
 import type { SrsDifficulty } from '@domain/srs';
+import type { CardAudioHandle } from '@interface/components/textQuiz/CardAudioButton';
 import type { TextQuizV2Props } from '@interface/components/textQuiz/TextQuizV2/TextQuizV2.types';
 import type { JSX } from 'react';
 import { orderVocabularyByAppearance } from '@domain/functions/orderVocabularyByAppearance';
@@ -24,16 +25,13 @@ const INTERACTIVE_TAGS = new Set([
 
 const TEXT_ENTRY_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
 
-/** True while focus sits on a control that already owns its own key handling. */
-function isFocusOnInteractiveElement(): boolean {
+/** True while focus sits on a native control that already owns Space. */
+function isFocusOnNativeControl(): boolean {
   const active = document.activeElement;
   if (!(active instanceof HTMLElement)) {
     return false;
   }
-  return (
-    INTERACTIVE_TAGS.has(active.tagName) ||
-    active.getAttribute('role') === 'button'
-  );
+  return INTERACTIVE_TAGS.has(active.tagName);
 }
 
 /** True while focus sits in a field where arrow keys move the caret. */
@@ -77,6 +75,7 @@ export function TextQuizV2({
    * instead of the chip-anchored panel — in-flow, the panel was cramped
    * into the card's own scroll region. */
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const audioControlRef = useRef<CardAudioHandle | null>(null);
 
   // A new card can never carry over the previous one's chip selection, even
   // if the caller navigates by some path other than `onPrevious`/`onNext`.
@@ -121,6 +120,10 @@ export function TextQuizV2({
     onGrade?.(difficulty);
   }
 
+  function handleToggleAudio(): void {
+    audioControlRef.current?.togglePlayback();
+  }
+
   // Keep one stable document listener; read latest handlers from the ref so
   // we do not tear down / re-add on every render.
   const keyActionsRef = useRef({
@@ -129,6 +132,7 @@ export function TextQuizV2({
     handleGrade,
     handlePrevious,
     handleNext,
+    handleToggleAudio,
   });
   keyActionsRef.current = {
     srs,
@@ -136,43 +140,57 @@ export function TextQuizV2({
     handleGrade,
     handlePrevious,
     handleNext,
+    handleToggleAudio,
   };
 
   // The keyboard legend in `KeyboardHints` advertises these shortcuts, so
-  // they are wired globally rather than only while the card has focus. Space
-  // is suppressed when a control already owns it (buttons, the card, chips);
-  // arrow keys are suppressed only in text-entry fields where they move the
-  // caret — prev/next and SRS grading still work from the card or dock.
+  // they are wired globally rather than only while the card has focus.
+  // Space play/pause is a hidden shortcut: skip it when a native control
+  // already owns Space (buttons, links, fields). Arrow keys and 1/2 are
+  // skipped only in text-entry fields. Left/right are always previous/next;
+  // in SRS, 1/2 grade hard/easy on either face.
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent): void {
       const actions = keyActionsRef.current;
       if (event.key === ' ') {
-        if (isFocusOnInteractiveElement()) {
+        if (isFocusOnNativeControl()) {
           return;
         }
         event.preventDefault();
-        actions.handleFlip();
+        actions.handleToggleAudio();
         return;
       }
-      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      if (
+        event.key === 'ArrowUp' ||
+        event.key === 'ArrowDown' ||
+        event.key === 'ArrowLeft' ||
+        event.key === 'ArrowRight' ||
+        event.key === '1' ||
+        event.key === '2'
+      ) {
         if (isFocusOnTextEntry()) {
           return;
         }
       }
+      if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        actions.handleFlip();
+        return;
+      }
       if (event.key === 'ArrowLeft') {
-        if (actions.srs) {
-          actions.handleGrade('hard');
-        } else {
-          actions.handlePrevious();
-        }
+        actions.handlePrevious();
         return;
       }
       if (event.key === 'ArrowRight') {
-        if (actions.srs) {
-          actions.handleGrade('easy');
-        } else {
-          actions.handleNext();
+        actions.handleNext();
+        return;
+      }
+      if (event.key === '1' || event.key === '2') {
+        if (!actions.srs) {
+          return;
         }
+        event.preventDefault();
+        actions.handleGrade(event.key === '1' ? 'hard' : 'easy');
       }
     }
 
@@ -287,6 +305,7 @@ export function TextQuizV2({
           answerShowing={answerShowing}
           face={face}
           audioUrl={audioUrl}
+          audioControlRef={audioControlRef}
           favourite={favourite}
           showHelpButton={showHelpButton}
           helpOpen={getHelpIsOpen}

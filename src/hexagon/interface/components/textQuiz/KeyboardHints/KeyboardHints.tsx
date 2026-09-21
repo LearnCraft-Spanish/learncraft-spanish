@@ -10,25 +10,26 @@ interface HintItem {
   label: string;
 }
 
-const SRS_HINTS: HintItem[] = [
-  { key: '←', label: 'hard' },
-  { key: 'space', label: 'flip' },
-  { key: '→', label: 'easy' },
+const NAV_HINTS: HintItem[] = [
+  { key: '←', label: 'previous' },
+  { key: '↑', label: 'flip' },
+  { key: '→', label: 'next' },
 ];
 
-const PLAIN_HINTS: HintItem[] = [
-  { key: '←', label: 'previous' },
-  { key: 'space', label: 'flip' },
-  { key: '→', label: 'next' },
+const SRS_GRADE_HINTS: HintItem[] = [
+  { key: '1', label: 'hard' },
+  { key: '2', label: 'easy' },
 ];
 
 /**
  * Desktop-only legend for the shortcuts `TextQuizV2` wires up globally.
- * Purely descriptive of behavior that already exists elsewhere, so it is
- * hidden from assistive technology rather than announced as content.
+ * Left/right are always previous/next. SRS adds `1` hard / `2` easy.
+ * Space play/pause is intentionally omitted — it is a hidden shortcut.
+ * Purely descriptive, so it is hidden from assistive technology rather
+ * than announced as content.
  */
 export function KeyboardHints({ srs }: KeyboardHintsProps): JSX.Element {
-  const hints = srs ? SRS_HINTS : PLAIN_HINTS;
+  const hints = srs ? [...NAV_HINTS, ...SRS_GRADE_HINTS] : NAV_HINTS;
 
   return (
     <div className={styles.root} aria-hidden="true">
@@ -36,9 +37,7 @@ export function KeyboardHints({ srs }: KeyboardHintsProps): JSX.Element {
         <span className={styles.item} key={hint.label}>
           {index > 0 && <span className={styles.sep}>·</span>}
           <kbd className={styles.key}>
-            <span
-              className={hint.key === 'space' ? styles.strong : styles.muted}
-            >
+            <span className={hint.key === '↑' ? styles.strong : styles.muted}>
               {hint.key}
             </span>
           </kbd>
