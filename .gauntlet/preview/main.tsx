@@ -1,16 +1,10 @@
-import type { JSX } from 'react';
+import type { ComponentType, JSX } from 'react';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { installNetworkGuard } from './networkGuard';
 
 import { PreviewProviders } from './PreviewProviders';
-import { AudioQuizSpecimen } from './specimens/audio-quiz';
-import { GetHelpSpecimen } from './specimens/get-help';
-import { HomeSpecimen } from './specimens/home';
-import { SmokeSpecimen } from './specimens/smoke';
-import { TextQuizSpecimen } from './specimens/text-quiz';
-import { VocabLookupSpecimen } from './specimens/vocab-lookup';
 import '@interface/styles/tokens.css';
 
 declare global {
@@ -19,30 +13,49 @@ declare global {
   }
 }
 
+type SpecimenModule = {
+  default: ComponentType;
+  deferReady?: boolean;
+};
+
 installNetworkGuard();
 
 const params = new URLSearchParams(window.location.search);
-const specimen = params.get('specimen') ?? 'smoke';
+const requested = params.get('specimen') ?? 'smoke';
 
-/** Specimens that set `ready` themselves after async setup (e.g. chip click). */
-const DEFERS_READY = new Set(['text-quiz', 'audio-quiz']);
+const modules = import.meta.glob<SpecimenModule>('./specimens/*.tsx', {
+  eager: true,
+});
+
+function specimenNameFromPath(path: string): string {
+  const file = path.split('/').pop() ?? '';
+  return file.replace(/\.tsx$/, '');
+}
+
+const byName = new Map<string, SpecimenModule>();
+for (const [path, mod] of Object.entries(modules)) {
+  byName.set(specimenNameFromPath(path), mod);
+}
+
+const resolvedName = byName.has(requested) ? requested : 'smoke';
+if (resolvedName !== requested) {
+  console.warn(
+    `[gauntlet] specimen "${requested}" not found; falling back to smoke`,
+  );
+}
+
+const resolved = byName.get(resolvedName);
+if (!resolved?.default) {
+  throw new Error(
+    `[gauntlet] specimen "${resolvedName}" has no default export`,
+  );
+}
+
+const Specimen = resolved.default;
+const deferReady = resolved.deferReady === true;
 
 function SpecimenRoot(): JSX.Element {
-  switch (specimen) {
-    case 'home':
-      return <HomeSpecimen />;
-    case 'get-help':
-      return <GetHelpSpecimen />;
-    case 'vocab-lookup':
-      return <VocabLookupSpecimen />;
-    case 'text-quiz':
-      return <TextQuizSpecimen />;
-    case 'audio-quiz':
-      return <AudioQuizSpecimen />;
-    case 'smoke':
-    default:
-      return <SmokeSpecimen />;
-  }
+  return <Specimen />;
 }
 
 const rootEl = document.getElementById('root');
@@ -59,6 +72,6 @@ createRoot(rootEl).render(
 );
 
 window.__SPECIMEN__ = {
-  ready: !DEFERS_READY.has(specimen),
-  name: specimen,
+  ready: !deferReady,
+  name: resolvedName,
 };
