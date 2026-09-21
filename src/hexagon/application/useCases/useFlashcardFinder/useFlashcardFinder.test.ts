@@ -197,7 +197,14 @@ describe('useFlashcardFinder', () => {
   });
 
   it('collects the selected examples the student does not already own', async () => {
-    const examples = createMockExampleWithVocabularyList(2);
+    // The list factory repeats one seeded example, so ids must be assigned
+    // before a selection can contain two different rows.
+    const examples = createMockExampleWithVocabularyList(2).map(
+      (example, index) => ({
+        ...example,
+        id: index + 1,
+      }),
+    );
     filteredExamples = examples;
     const createFlashcards = vi.fn(async () => []);
     overrideMockUseStudentFlashcards({

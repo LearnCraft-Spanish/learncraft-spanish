@@ -439,7 +439,14 @@ describe('flashcard finder v2 interactions', () => {
 
   it('shows the use case selection and forwards selection changes', async () => {
     const user = userEvent.setup();
-    const examples = createMockExampleWithVocabularyList(2);
+    // The list factory repeats one seeded example, so ids must be assigned
+    // before a selection can contain two different rows.
+    const examples = createMockExampleWithVocabularyList(2).map(
+      (example, index) => ({
+        ...example,
+        id: index + 1,
+      }),
+    );
     const changeSelection = vi.fn();
     overrideMockUseFlashcardFinder({
       displayExamples: examples,
