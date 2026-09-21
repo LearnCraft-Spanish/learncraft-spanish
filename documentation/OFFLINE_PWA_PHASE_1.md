@@ -37,16 +37,16 @@ Related product context: [`DOMAIN_GLOSSARY.md`](./DOMAIN_GLOSSARY.md) (flashcard
 
 These reduce phase 1 risk; stages should build on them rather than replace them.
 
-| Area | Today |
-| ---- | ----- |
-| Review My Flashcards | `/myflashcards` supports collected-card text quiz, SRS toggle (due cards), and audio quiz (online) |
-| SRS result model | Reviews are easy / hard / viewed → flashcard interval updates (not a separate “quiz result” record for this surface) |
-| Pending review queue | `srs-pending-updates` in `localStorage`; batch flush to API; restore on failure |
-| Flush on return | `useFlushFlashcardUpdatesOnLoad` retries pending updates after flashcards load |
-| Domain SRS | Client computes new interval at flush time (`calculateNewSrsInterval`) |
-| Icons / chrome hints | `logo192` / `logo512`, `theme-color`, apple-touch-icon in `index.html` |
-| Hosting | Netlify SPA fallback; long-cache hashed `/assets/*`; `index.html` no-cache |
-| Hexagon seams | Ports for HTTP, Auth0, localStorage — room for IndexedDB / cache ports without smearing IO into domain |
+| Area                 | Today                                                                                                                |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Review My Flashcards | `/myflashcards` supports collected-card text quiz, SRS toggle (due cards), and audio quiz (online)                   |
+| SRS result model     | Reviews are easy / hard / viewed → flashcard interval updates (not a separate “quiz result” record for this surface) |
+| Pending review queue | `srs-pending-updates` in `localStorage`; batch flush to API; restore on failure                                      |
+| Flush on return      | `useFlushFlashcardUpdatesOnLoad` retries pending updates after flashcards load                                       |
+| Domain SRS           | Client computes new interval at flush time (`calculateNewSrsInterval`)                                               |
+| Icons / chrome hints | `logo192` / `logo512`, `theme-color`, apple-touch-icon in `index.html`                                               |
+| Hosting              | Netlify SPA fallback; long-cache hashed `/assets/*`; `index.html` no-cache                                           |
+| Hexagon seams        | Ports for HTTP, Auth0, localStorage — room for IndexedDB / cache ports without smearing IO into domain               |
 
 ---
 
@@ -54,58 +54,58 @@ These reduce phase 1 risk; stages should build on them rather than replace them.
 
 ### A. Installable PWA surface
 
-| Missing | Why it matters |
-| ------- | -------------- |
-| Web app manifest (`manifest.webmanifest` or equivalent) | Name, icons, `start_url`, `display`, theme — required for install / home screen |
-| Manifest linked from `index.html` | Browser discovery of installability |
-| Maskable / sized icons wired through the manifest | Reliable install icons across Android / desktop |
-| Service worker | Without it, there is no offline shell and limited “installed app” behavior |
-| Install / Add to Home Screen guidance (esp. iOS) | iOS does not use the same install prompt as Chromium |
-| Offline / sync status in the UI | Students need to know when they are offline and when reviews are waiting to upload |
+| Missing                                                 | Why it matters                                                                     |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Web app manifest (`manifest.webmanifest` or equivalent) | Name, icons, `start_url`, `display`, theme — required for install / home screen    |
+| Manifest linked from `index.html`                       | Browser discovery of installability                                                |
+| Maskable / sized icons wired through the manifest       | Reliable install icons across Android / desktop                                    |
+| Service worker                                          | Without it, there is no offline shell and limited “installed app” behavior         |
+| Install / Add to Home Screen guidance (esp. iOS)        | iOS does not use the same install prompt as Chromium                               |
+| Offline / sync status in the UI                         | Students need to know when they are offline and when reviews are waiting to upload |
 
 ### B. Offline runtime (app can open and run)
 
-| Missing | Why it matters |
-| ------- | -------------- |
-| Precached app shell (HTML + JS/CSS chunks for `/myflashcards` and shared vendors) | Cold open with no network must not white-screen |
-| Strategy for Vite code-splitting / chunk updates offline | Avoid infinite reload loops when a chunk is missing offline |
-| Self-hosted or SW-cached fonts | Google Fonts CDN fails offline today |
-| Gate that does not hard-require live Auth0 + API on every cold start | `/myflashcards` is auth-gated; memory-only Auth0 session dies on restart |
+| Missing                                                                           | Why it matters                                                           |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Precached app shell (HTML + JS/CSS chunks for `/myflashcards` and shared vendors) | Cold open with no network must not white-screen                          |
+| Strategy for Vite code-splitting / chunk updates offline                          | Avoid infinite reload loops when a chunk is missing offline              |
+| Self-hosted or SW-cached fonts                                                    | Google Fonts CDN fails offline today                                     |
+| Gate that does not hard-require live Auth0 + API on every cold start              | `/myflashcards` is auth-gated; memory-only Auth0 session dies on restart |
 
 ### C. Offline study data
 
-| Missing | Why it matters |
-| ------- | -------------- |
-| Durable flashcard snapshot (beyond React Query memory) | Query cache is lost on reload; offline restart has no cards |
-| Durable minimal student / role snapshot | SRS access and flush rules depend on own-user student role |
-| Decision on filters offline (lesson / skill-tag deps) | Full filter panel needs course/lesson/tag data; phase 1 may simplify |
+| Missing                                                             | Why it matters                                                        |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Durable flashcard snapshot (beyond React Query memory)              | Query cache is lost on reload; offline restart has no cards           |
+| Durable minimal student / role snapshot                             | SRS access and flush rules depend on own-user student role            |
+| Decision on filters offline (lesson / skill-tag deps)               | Full filter panel needs course/lesson/tag data; phase 1 may simplify  |
 | Optimistic local application of reviews to intervals / `nextReview` | Without this, due lists stay stale across offline sessions until sync |
-| Stronger pending-update identity (full timestamps vs date-only) | Same-day / multi-session sync correctness; code already notes a TODO |
+| Stronger pending-update identity (full timestamps vs date-only)     | Same-day / multi-session sync correctness; code already notes a TODO  |
 
 ### D. Sync when back online
 
-| Missing | Why it matters |
-| ------- | -------------- |
-| Explicit reconnect flush (e.g. `online` / visibility), not only quiz end + next full load | Student may reconnect without remounting the quiz |
-| Pending-count / failed-sync UX | Invisible queue erodes trust |
-| Documented conflict / idempotency rules with API | Retries and multi-device reviews must not corrupt intervals |
-| Confirmation that batch `updateMyFlashcards` is the phase 1 upload contract | Align frontend + `lcs-api` before building more surface area |
+| Missing                                                                                   | Why it matters                                               |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Explicit reconnect flush (e.g. `online` / visibility), not only quiz end + next full load | Student may reconnect without remounting the quiz            |
+| Pending-count / failed-sync UX                                                            | Invisible queue erodes trust                                 |
+| Documented conflict / idempotency rules with API                                          | Retries and multi-device reviews must not corrupt intervals  |
+| Confirmation that batch `updateMyFlashcards` is the phase 1 upload contract               | Align frontend + `lcs-api` before building more surface area |
 
 ### E. Auth / security for offline
 
-| Missing | Why it matters |
-| ------- | -------------- |
-| Auth0 session strategy for reopen offline (`cacheLocation`, refresh tokens, or offline-unlocked mode) | Largest product/security decision in phase 1 |
-| Rules for when local flashcard data may be read without a live token | Privacy on shared devices; logout must clear local study data |
-| No silent API calls while offline that clear the pending queue | Flush must only clear after successful upload |
+| Missing                                                                                               | Why it matters                                                |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Auth0 session strategy for reopen offline (`cacheLocation`, refresh tokens, or offline-unlocked mode) | Largest product/security decision in phase 1                  |
+| Rules for when local flashcard data may be read without a live token                                  | Privacy on shared devices; logout must clear local study data |
+| No silent API calls while offline that clear the pending queue                                        | Flush must only clear after successful upload                 |
 
 ### F. Explicitly not required for phase 1 text/SRS
 
-| Missing | Defer unless product insists |
-| ------- | ---------------------------- |
-| Offline audio asset cache (S3 MP3s) | Storage, CORS, quota — follow-on stage |
-| Background Sync / Periodic Sync APIs | Nice-to-have; `online` + load flush is enough for v1 |
-| Offline Finder / Manager / add-remove flashcards | Mutations and catalog are out of phase 1 |
+| Missing                                          | Defer unless product insists                         |
+| ------------------------------------------------ | ---------------------------------------------------- |
+| Offline audio asset cache (S3 MP3s)              | Storage, CORS, quota — follow-on stage               |
+| Background Sync / Periodic Sync APIs             | Nice-to-have; `online` + load flush is enough for v1 |
+| Offline Finder / Manager / add-remove flashcards | Mutations and catalog are out of phase 1             |
 
 ---
 
