@@ -241,4 +241,29 @@ describe('useFlashcardFinder', () => {
     expect(createFlashcards).not.toHaveBeenCalled();
     expect(result.current.selectedIds.size).toBe(0);
   });
+
+  it('keeps the selection when creating flashcards fails', async () => {
+    const examples = createMockExampleWithVocabularyList(1);
+    filteredExamples = examples;
+    overrideMockUseStudentFlashcards({
+      createFlashcards: vi.fn(async () => {
+        throw new Error('save failed');
+      }),
+      isExampleCollected: () => false,
+    });
+
+    const { result } = renderHook(() => useFlashcardFinder());
+
+    act(() => {
+      result.current.changeSelection(new Set([examples[0].id]));
+    });
+
+    await expect(
+      act(async () => {
+        await result.current.collectSelected();
+      }),
+    ).rejects.toThrow('save failed');
+
+    expect(result.current.selectedIds).toEqual(new Set([examples[0].id]));
+  });
 });

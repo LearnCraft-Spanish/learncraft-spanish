@@ -18,6 +18,10 @@ Bar: `documentation/PR_STANDARDS.md`, `documentation/TESTING_STANDARDS.md`, `doc
 - Architecture of the finder page: the critic picked ours.
 - The empty-quiz guard: the critic picked ours. A no-op `readyQuiz` fails the test, and deleting the guard fails it too.
 
+## Round 4 — review
+
+Claude’s review asked for a test of the failed-collect notice. That path is now covered on the finder page. `collectSelected` also keeps the selection when `createFlashcards` rejects, and a use-case test locks that in. A successful collect still clears the selection.
+
 ## Still true, and not treated as blocking
 
 - The diff against `development` is about 50,000 lines. The standards ask for a small PR. This branch is the student UI redesign, so the description has to carry that justification.

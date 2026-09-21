@@ -529,6 +529,22 @@ describe('flashcard finder v2 interactions', () => {
     expect(screen.queryByTestId('notice')).not.toBeInTheDocument();
   });
 
+  it('shows a notice when collecting the selection fails', async () => {
+    const user = userEvent.setup();
+    overrideMockUseFlashcardFinder({
+      collectSelected: vi.fn(async () => {
+        throw new Error('save failed');
+      }),
+    });
+    renderV2();
+
+    await user.click(screen.getByRole('button', { name: 'mock-collect' }));
+
+    expect(await screen.findByTestId('notice')).toHaveTextContent(
+      'Could not add those flashcards.',
+    );
+  });
+
   it('shows a notice when copying every match fails', async () => {
     const user = userEvent.setup();
     overrideMockUseFlashcardFinder({

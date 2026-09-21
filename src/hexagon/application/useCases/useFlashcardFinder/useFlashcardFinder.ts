@@ -189,12 +189,12 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
           !flashcardsQuery.isExampleCollected({ exampleId: example.id }),
       );
 
-    selectedExamplesRef.current.clear();
-    setSelectedIds(new Set());
-
     if (toCollect.length > 0) {
       await flashcardsQuery.createFlashcards(toCollect);
     }
+
+    selectedExamplesRef.current.clear();
+    setSelectedIds(new Set());
   }, [flashcardsQuery, selectedIds]);
 
   const resetFilters = (): void => {
