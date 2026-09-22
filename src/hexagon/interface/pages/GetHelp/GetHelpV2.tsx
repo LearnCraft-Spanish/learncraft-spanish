@@ -5,8 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import styles from './GetHelpV2.module.scss';
 
 /** Placeholder until the real walkthrough videos are ready. */
-const GETTING_STARTED_VIDEO_URL = 'https://www.google.com';
-const FLASHCARD_FINDER_VIDEO_URL = 'https://www.google.com';
+const GETTING_STARTED_VIDEO_URL = 'https://youtu.be/lwJnttax4ww';
+const USING_SEARCH_FEATURES = 'https://youtu.be/BPesokkSv3E';
+const RECOMMENDED_DAILY_ROUTINE = 'https://youtu.be/IGrrDC6bDrs';
 
 /**
  * Help hub (v2): vocab lookup plus short video walkthroughs. No use-case
@@ -25,7 +26,7 @@ export function GetHelpV2(): JSX.Element {
           <EntryCard
             icon="search"
             title="Vocab lookup"
-            meta="Details and lessons that teach a word"
+            meta="Find what lessons teach a word"
             onGo={goToVocabLookup}
           />
           <EntryCard
@@ -36,9 +37,15 @@ export function GetHelpV2(): JSX.Element {
           />
           <EntryCard
             icon="playerPlay"
-            title="Flashcard finder & custom quizzing"
+            title="Using search features"
             meta="Short video guide"
-            href={FLASHCARD_FINDER_VIDEO_URL}
+            href={USING_SEARCH_FEATURES}
+          />
+          <EntryCard
+            icon="playerPlay"
+            title="Recommended daily routine"
+            meta="Short video guide"
+            href={RECOMMENDED_DAILY_ROUTINE}
           />
         </div>
       </div>

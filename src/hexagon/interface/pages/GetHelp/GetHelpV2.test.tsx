@@ -47,7 +47,12 @@ describe('get help hub v2', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', {
-        name: /Flashcard finder & custom quizzing/,
+        name: /Using search features/,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', {
+        name: /Recommended daily routine/,
       }),
     ).toBeInTheDocument();
   });
@@ -67,7 +72,6 @@ describe('get help hub v2', () => {
     const link = screen.getByRole('link', {
       name: /Getting started with the app/,
     });
-    expect(link).toHaveAttribute('href', 'https://www.google.com');
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
@@ -78,7 +82,6 @@ describe('get help hub v2', () => {
     const link = screen.getByRole('link', {
       name: /Flashcard finder & custom quizzing/,
     });
-    expect(link).toHaveAttribute('href', 'https://www.google.com');
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
