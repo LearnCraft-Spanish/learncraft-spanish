@@ -7,9 +7,6 @@ import AudioQuizEnd from '@interface/components/Quizzing/general/AudioQuizEnd';
 import { QuizProgress } from '@interface/components/Quizzing/general/QuizProgress';
 import React, { useCallback, useEffect } from 'react';
 
-// TO DO: Remove duplicate styles.
-import 'src/App.css';
-
 import './AudioBasedReview.css';
 
 /**
@@ -74,8 +71,7 @@ export default function AudioQuiz({
   // Destructure the hook return
   const {
     goToQuestion,
-    goToHint,
-    restartCurrentStep,
+    replay,
     nextExample,
     previousExample,
     nextExampleReady,
@@ -203,8 +199,6 @@ export default function AudioQuiz({
             autoplay={autoplay}
             closeQuiz={cleanupFunction}
             currentStep={currentStep}
-            goToHint={goToHint}
-            goToQuestion={goToQuestion}
             isFirstExample={currentExampleNumber === 1}
             isLastExample={currentExampleNumber === quizLength}
             nextExample={nextExample}
@@ -212,7 +206,7 @@ export default function AudioQuiz({
             nextStep={nextStep}
             previousExample={previousExample}
             previousExampleReady={previousExampleReady}
-            restartCurrentStep={restartCurrentStep}
+            replay={replay}
           />
         </>
       )}

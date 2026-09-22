@@ -135,6 +135,7 @@ export function createMockAudioQuizReturn(
     goToHint: vi.fn<() => void>(),
     goToAnswer: vi.fn<() => void>(),
     restartCurrentStep: vi.fn<() => void>(),
+    replay: vi.fn<() => void>(),
     nextExample: vi.fn<() => void>(),
     previousExample: vi.fn<() => void>(),
     quizLength: 0,

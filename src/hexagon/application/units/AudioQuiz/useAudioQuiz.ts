@@ -17,6 +17,7 @@ import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useAudioQuizMapper } from '@application/units/useAudioQuizMapper';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
+import { audioQuizReplayTarget } from '@domain/functions/audioQuizCopy';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import silence2s from 'src/assets/audio/2s.mp3';
 
@@ -49,6 +50,8 @@ export interface AudioQuizReturn {
   goToHint: () => void;
   goToAnswer: () => void;
   restartCurrentStep: () => void;
+  /** Replay the source clip for this step — question, hint, or current. */
+  replay: () => void;
   nextExample: () => void;
   previousExample: () => void;
   quizLength: number;
@@ -458,6 +461,25 @@ export function useAudioQuiz({
   const restartCurrentStep = useCallback(() => {
     setRestartTrigger((prev) => prev + 1);
   }, []);
+
+  const replay = useCallback(() => {
+    const target = audioQuizReplayTarget({
+      quizType: audioQuizType,
+      step: currentStep,
+    });
+    switch (target) {
+      case 'question':
+        goToQuestion();
+        break;
+      case 'hint':
+        goToHint();
+        break;
+      case 'current':
+      default:
+        restartCurrentStep();
+        break;
+    }
+  }, [audioQuizType, currentStep, goToQuestion, goToHint, restartCurrentStep]);
 
   // Steps the quiz forward
   const nextStep = useCallback(() => {
@@ -877,6 +899,7 @@ export function useAudioQuiz({
     goToHint,
     goToAnswer,
     restartCurrentStep, // Restart the current step audio
+    replay,
     nextExample,
     previousExample,
     progressStatus,

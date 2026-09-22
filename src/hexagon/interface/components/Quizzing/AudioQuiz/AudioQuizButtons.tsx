@@ -1,4 +1,5 @@
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
+import { audioQuizReplayLabel } from '@domain/functions/audioQuizCopy';
 import React from 'react';
 
 interface AudioQuizButtonsProps {
@@ -6,8 +7,6 @@ interface AudioQuizButtonsProps {
   autoplay: boolean;
   closeQuiz: () => void;
   currentStep: AudioQuizStep;
-  goToHint: () => void;
-  goToQuestion: () => void;
   isFirstExample: boolean;
   isLastExample: boolean;
   nextExample: () => void;
@@ -15,7 +14,7 @@ interface AudioQuizButtonsProps {
   nextStep: () => void;
   previousExample: () => void;
   previousExampleReady: boolean;
-  restartCurrentStep: () => void;
+  replay: () => void;
 }
 
 export default function AudioQuizButtons({
@@ -23,8 +22,6 @@ export default function AudioQuizButtons({
   autoplay,
   closeQuiz,
   currentStep,
-  goToHint,
-  goToQuestion,
   isFirstExample,
   isLastExample,
   nextExample,
@@ -32,7 +29,7 @@ export default function AudioQuizButtons({
   nextStep,
   previousExample,
   previousExampleReady,
-  restartCurrentStep,
+  replay,
 }: AudioQuizButtonsProps): React.JSX.Element {
   function nextStepButtonText(): string {
     switch (audioQuizType) {
@@ -78,55 +75,15 @@ export default function AudioQuizButtons({
     }
   }
 
-  function previousStepButton(): React.JSX.Element {
-    if (audioQuizType === AudioQuizType.Speaking) {
-      if (currentStep === AudioQuizStep.Question) {
-        return (
-          <button type="button" onClick={() => restartCurrentStep()}>
-            Replay English
-          </button>
-        );
-      } else {
-        return (
-          <button type="button" onClick={() => goToQuestion()}>
-            Replay English
-          </button>
-        );
-      }
-    } else {
-      switch (currentStep) {
-        case AudioQuizStep.Question:
-          return (
-            <button type="button" onClick={() => restartCurrentStep()}>
-              Replay Spanish
-            </button>
-          );
-        case AudioQuizStep.Guess:
-          return (
-            <button type="button" onClick={() => goToQuestion()}>
-              Replay Spanish
-            </button>
-          );
-        case AudioQuizStep.Hint:
-          return (
-            <button type="button" onClick={() => restartCurrentStep()}>
-              Replay Spanish
-            </button>
-          );
-        case AudioQuizStep.Answer:
-          return (
-            <button type="button" onClick={() => goToHint()}>
-              Replay Spanish
-            </button>
-          );
-      }
-    }
-  }
-
   return (
     <div className="audioQuizButtons">
       <div className="buttonBox switchOnMobile">
-        {previousStepButton()}
+        <button type="button" onClick={() => replay()}>
+          {audioQuizReplayLabel({
+            quizType: audioQuizType,
+            step: currentStep,
+          })}
+        </button>
         <button
           type="button"
           className="greenButton"

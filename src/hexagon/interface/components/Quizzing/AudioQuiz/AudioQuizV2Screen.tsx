@@ -1,0 +1,135 @@
+import type { AudioQuizReturn } from '@application/units/AudioQuiz/useAudioQuiz';
+import type { QuizCategory } from '@domain/functions/quizTitle';
+import type { JSX } from 'react';
+import { useVocabInfo } from '@application/units/useVocabInfo';
+import { AudioQuizType } from '@domain/audioQuizzing';
+import { audioQuizTitle } from '@domain/functions/quizTitle';
+import { AudioQuizEndV2 } from '@interface/components/audioQuiz/AudioQuizEndV2';
+import { AudioQuizV2 } from '@interface/components/audioQuiz/AudioQuizV2';
+import { Loading } from '@interface/components/Loading';
+import { setMobileStackOverride } from '@interface/hooks/useMobileStackChrome';
+import { useCallback, useEffect } from 'react';
+import styles from './AudioQuizV2Screen.module.scss';
+
+export interface AudioQuizV2ScreenProps {
+  audioQuizReturn: AudioQuizReturn;
+  /** "Custom Quiz" vs "My Flashcards Quiz" progress-header eyebrow — set
+   * by `RegularAudioQuiz` / `ReviewMyFlashcardsAudioQuiz`, the only layer
+   * that knows which page mounted this screen. */
+  quizCategory: QuizCategory;
+}
+
+/**
+ * Drop-in v2 replacement for `AudioQuiz`, gated behind the student UI
+ * version in `RegularAudioQuiz` and `ReviewMyFlashcardsAudioQuiz`. Same
+ * loading / complete states as the legacy screen — only the active-card
+ * view (`AudioQuizV2`) and the complete screen (`AudioQuizEndV2`) are
+ * redesigned.
+ *
+ * `vocabInfoHook` is sourced the same way `useTextQuiz` sources it for
+ * `TextQuizV2Screen` (`const vocabInfoHook = useVocabInfo;`) — `useAudioQuiz`
+ * does not expose one, and this passes the hook itself through as a value
+ * (never called here), so it does not count against the "one hook per
+ * component" rule.
+ */
+export function AudioQuizV2Screen({
+  audioQuizReturn,
+  quizCategory,
+}: AudioQuizV2ScreenProps): JSX.Element {
+  const {
+    autoplay,
+    audioQuizType,
+    currentStep,
+    currentStepValue,
+    currentExampleNumber,
+    progressStatus,
+    isPlaying,
+    pause,
+    play,
+    nextStep,
+    replay,
+    nextExample,
+    previousExample,
+    quizLength,
+    cleanupFunction,
+    isQuizComplete,
+    restartQuiz,
+    getHelpIsOpen,
+    setGetHelpIsOpen,
+    vocabComplete,
+    vocabulary,
+    addPendingRemoveProps,
+  } = audioQuizReturn;
+
+  useEffect(() => {
+    const { subtitle } = audioQuizTitle(
+      quizCategory,
+      audioQuizType === AudioQuizType.Speaking,
+    );
+    setMobileStackOverride({ title: subtitle, onBack: cleanupFunction });
+    return () => setMobileStackOverride(null);
+  }, [quizCategory, audioQuizType, cleanupFunction]);
+
+  const handlePlay = useCallback((): void => {
+    play().catch(() => {
+      // Autoplay restrictions are not actionable here — `isPlaying` simply
+      // stays false and the play button remains available to retry.
+    });
+  }, [play]);
+
+  const handlePause = useCallback((): void => {
+    pause().catch(() => {});
+  }, [pause]);
+
+  if (isQuizComplete) {
+    return (
+      <AudioQuizEndV2
+        speakingOrListening={
+          audioQuizType === AudioQuizType.Speaking ? 'speaking' : 'listening'
+        }
+        isAutoplay={autoplay}
+        quizLength={quizLength}
+        restartQuiz={restartQuiz}
+        returnToQuizSetup={cleanupFunction}
+      />
+    );
+  }
+
+  // Mirrors the legacy `AudioQuiz`'s own guard, preventing a flash of an
+  // incomplete card while the first step's audio is still parsing.
+  if (currentExampleNumber <= 0 || !currentStepValue?.displayText) {
+    return (
+      <div className={styles.loadingRoot}>
+        <Loading message="Setting up Quiz..." />
+      </div>
+    );
+  }
+
+  return (
+    <AudioQuizV2
+      audioQuizType={audioQuizType}
+      quizCategory={quizCategory}
+      autoplay={autoplay}
+      exampleNumber={currentExampleNumber}
+      quizLength={quizLength}
+      currentStep={currentStep}
+      displayText={currentStepValue.displayText}
+      isSpanishText={currentStepValue.spanish}
+      progressStatus={progressStatus * 100}
+      isPlaying={isPlaying}
+      play={handlePlay}
+      pause={handlePause}
+      onPrimary={nextStep}
+      onReplay={replay}
+      onPrevious={previousExample}
+      onNext={nextExample}
+      onExit={cleanupFunction}
+      getHelpIsOpen={getHelpIsOpen}
+      setGetHelpIsOpen={setGetHelpIsOpen}
+      vocabulary={vocabulary}
+      vocabComplete={vocabComplete}
+      vocabInfoHook={useVocabInfo}
+      addPendingRemoveProps={addPendingRemoveProps}
+    />
+  );
+}

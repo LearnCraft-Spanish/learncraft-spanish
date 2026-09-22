@@ -1,3 +1,4 @@
+import type { UseCombinedFiltersWithVocabularyReturnType } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type {
   ExampleWithVocabulary,
@@ -10,6 +11,18 @@ import { useMemo } from 'react';
 
 export interface UseFilterOwnedFlashcardsReturn {
   filteredFlashcards: Flashcard[];
+  /**
+   * The combined-filter subscription this hook already owns. Exposed so a page
+   * use case can hand the very same instance to a presentational filter section
+   * instead of subscribing to `useCombinedFilters` a second time.
+   */
+  combinedFilters: UseCombinedFiltersWithVocabularyReturnType;
+  /**
+   * The owned-flashcards subscription this hook already owns. Exposed so a page
+   * use case can hand the very same instance to its table and menus instead of
+   * subscribing to `useStudentFlashcards` a second time.
+   */
+  flashcardsQuery: UseStudentFlashcardsReturn;
   studentFlashcardsLoading: boolean;
   filteredFlashcardsLoading: boolean;
   error: Error | null;
@@ -19,6 +32,8 @@ export function useFilterOwnedFlashcards(
   filterOwnedFlashcards: boolean,
 ): UseFilterOwnedFlashcardsReturn {
   // The coordinator state to track the active filters
+  const combinedFilters: UseCombinedFiltersWithVocabularyReturnType =
+    useCombinedFiltersWithVocabulary();
   const {
     selectedSkillTags,
     excludeSpanglish,
@@ -26,15 +41,11 @@ export function useFilterOwnedFlashcards(
     lessonRangeVocabRequired,
     lessonVocabKnown,
     isLoading: isLoadingCombinedFiltersWithVocabulary,
-  } = useCombinedFiltersWithVocabulary();
+  } = combinedFilters;
 
   // The owned flashcards to be filtered from the useStudentFlashcards hook
-  const {
-    flashcards,
-    collectedExamples,
-    isLoading,
-    error,
-  }: UseStudentFlashcardsReturn = useStudentFlashcards();
+  const flashcardsQuery: UseStudentFlashcardsReturn = useStudentFlashcards();
+  const { flashcards, collectedExamples, isLoading, error } = flashcardsQuery;
 
   const filteredFlashcards = useMemo(() => {
     if (!filterOwnedFlashcards) {
@@ -71,6 +82,8 @@ export function useFilterOwnedFlashcards(
 
   return {
     filteredFlashcards,
+    combinedFilters,
+    flashcardsQuery,
     studentFlashcardsLoading: isLoading,
     filteredFlashcardsLoading: isLoadingCombinedFiltersWithVocabulary,
     error,

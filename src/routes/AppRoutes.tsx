@@ -1,12 +1,16 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
-import { Loading } from '@interface/components/Loading';
+import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
+import { config } from '@config';
+import { UiScope } from '@interface/components/general/UiScope/UiScope';
+import { LoadingScreen } from '@interface/components/Loading';
 import { lazy, Suspense } from 'react';
-import { Route } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 import NotFoundPage from '../NotFoundPage';
 import Menu from '../sections/Menu';
 import SentryRoutes from './SentryRoutes';
 
 // Student / authenticated user pages
+const HomePage = lazy(() => import('@interface/pages/Home'));
 const OfficialQuizzesRoutes = lazy(
   () => import('@interface/pages/OfficialQuizzes/OfficialQuizzesRoutes'),
 );
@@ -16,16 +20,19 @@ const ReviewMyFlashcards = lazy(
 const FlashcardManager = lazy(
   () => import('@interface/pages/FlashcardManager'),
 );
-const CombinedCustomQuiz = lazy(
-  () => import('@interface/pages/CombinedCustomQuiz'),
-);
+const QuizzesPage = lazy(() => import('@interface/pages/Quizzes'));
+const CustomQuiz = lazy(() => import('@interface/pages/CustomQuiz'));
 const LimitedCustomQuiz = lazy(
   () => import('@interface/pages/LimitedCustomQuiz'),
 );
 const FlashcardFinderPage = lazy(
   () => import('@interface/pages/FlashcardFinder'),
 );
-const GetHelpPage = lazy(() => import('@interface/pages/GetHelpPage'));
+const GetHelpHub = lazy(() => import('@interface/pages/GetHelp'));
+const GetHelpVocab = lazy(() => import('@interface/pages/GetHelp/VocabLookup'));
+
+// Development-only, gated by environment so it never registers in production
+const UiGallery = lazy(() => import('@interface/pages/UiGallery'));
 
 // Coach / Admin pages
 const FrequensayPage = lazy(() => import('@interface/pages/FrequensayPage'));
@@ -49,27 +56,90 @@ const ExampleManagerRouter = lazy(
 export default function AppRoutes() {
   const { isAdmin, isCoach, isStudent, isLimited, isAuthenticated } =
     useAuthAdapter();
+  const { version } = useStudentUiVersion();
 
   return (
-    <Suspense fallback={<Loading message="Loading..." />}>
+    <Suspense
+      fallback={
+        // The bound version is already known here (`useStudentUiVersion`
+        // resolved before `App` mounted this tree). v1 keeps the paper
+        // canvas; v2 still gets `PageShell` via `LoadingScreen`.
+        <LoadingScreen message="Loading..." />
+      }
+    >
       <SentryRoutes>
-        <Route path="/" element={<Menu />} />
+        <Route
+          path="/"
+          element={
+            isStudent ? (
+              <UiScope>
+                <HomePage />
+              </UiScope>
+            ) : (
+              <Menu />
+            )
+          }
+        />
         <Route
           path="/myflashcards"
-          element={isAuthenticated && <ReviewMyFlashcards />}
+          element={
+            isAuthenticated && (
+              <UiScope>
+                <ReviewMyFlashcards />
+              </UiScope>
+            )
+          }
         />
-        <Route path="/manage-flashcards" element={<FlashcardManager />} />
-        <Route path="/officialquizzes/*" element={<OfficialQuizzesRoutes />} />
+        <Route
+          path="/manage-flashcards"
+          element={
+            <UiScope>
+              <FlashcardManager />
+            </UiScope>
+          }
+        />
+        <Route
+          path="/quizzes"
+          element={
+            !isAuthenticated ? null : version === 'v2' ? (
+              <UiScope>
+                <QuizzesPage />
+              </UiScope>
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+        <Route
+          path="/officialquizzes/*"
+          element={
+            <UiScope>
+              <OfficialQuizzesRoutes />
+            </UiScope>
+          }
+        />
         <Route
           path="/customquiz"
           element={
             (isLimited || isStudent || isCoach || isAdmin) &&
-            (isLimited ? <LimitedCustomQuiz /> : <CombinedCustomQuiz />)
+            (isLimited ? (
+              <LimitedCustomQuiz />
+            ) : (
+              <UiScope>
+                <CustomQuiz />
+              </UiScope>
+            ))
           }
         />
         <Route
           path="/flashcardfinder"
-          element={(isStudent || isAdmin || isCoach) && <FlashcardFinderPage />}
+          element={
+            (isStudent || isAdmin || isCoach) && (
+              <UiScope>
+                <FlashcardFinderPage />
+              </UiScope>
+            )
+          }
         />
         <Route
           path="/frequensay"
@@ -77,7 +147,23 @@ export default function AppRoutes() {
         />
         <Route
           path="/get-help"
-          element={(isStudent || isCoach || isAdmin) && <GetHelpPage />}
+          element={
+            (isStudent || isCoach || isAdmin) && (
+              <UiScope>
+                <GetHelpHub />
+              </UiScope>
+            )
+          }
+        />
+        <Route
+          path="/get-help/vocab"
+          element={
+            (isStudent || isCoach || isAdmin) && (
+              <UiScope>
+                <GetHelpVocab />
+              </UiScope>
+            )
+          }
         />
         <Route
           path="/weeklyrecords"
@@ -96,6 +182,9 @@ export default function AppRoutes() {
           element={isAdmin && <DatabaseTables />}
         />
         <Route path="/example-manager/*" element={<ExampleManagerRouter />} />
+        {config.environment !== 'production' && (
+          <Route path="/ui-gallery" element={<UiGallery />} />
+        )}
         <Route path="/*" element={<NotFoundPage />} />
         <Route
           path="/admin-dashboard"

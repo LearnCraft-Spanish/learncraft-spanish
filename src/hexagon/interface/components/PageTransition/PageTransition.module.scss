@@ -1,0 +1,105 @@
+.stage {
+  position: relative;
+}
+
+.stageAnimating {
+  height: calc(100dvh - var(--lcs-app-header-height));
+  overflow: hidden;
+}
+
+.incoming {
+  min-height: 100%;
+}
+
+.incomingAnimating,
+.ghost {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  background-color: var(--lcs-color-page);
+}
+
+.ghostForward {
+  z-index: 1;
+}
+
+.ghostBack {
+  z-index: 2;
+}
+
+.incomingForward {
+  z-index: 2;
+}
+
+.incomingBack {
+  z-index: 1;
+}
+
+.slideOutToLeft {
+  animation: slideOutToLeft var(--lcs-motion-panel) var(--lcs-ease-standard)
+    both;
+}
+
+.slideOutToRight {
+  animation: slideOutToRight var(--lcs-motion-panel) var(--lcs-ease-standard)
+    both;
+}
+
+.slideInFromRight {
+  animation: slideInFromRight var(--lcs-motion-panel) var(--lcs-ease-standard)
+    both;
+}
+
+.slideInFromLeft {
+  animation: slideInFromLeft var(--lcs-motion-panel) var(--lcs-ease-standard)
+    both;
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slideOutToLeft,
+  .slideOutToRight,
+  .slideInFromRight,
+  .slideInFromLeft {
+    animation: none;
+  }
+}

@@ -1,22 +1,16 @@
 /* Used by App.js, ExampleRetriever.js, Menu.js */
 
-/*General Theming Styles*/
-:root {
-  --brand: #449ac2;
-  --theme: #6f6259;
-  --accent: #b0a96f;
-  --light: #ffffff;
-  --dark: #3c3c3c;
-  --error-bg: darkred;
-  --error-text: red;
-}
+/* Palette tokens live in src/hexagon/interface/styles/tokens.css */
 
 * {
   box-sizing: border-box;
 }
 
+/* Canvas behind confirmed v2 surfaces. Until then `.App.paperShell`
+ * / `.mainContent` (`App.module.scss`) paint parchment so this color
+ * does not leak around short v1 pages or the logged-out screen. */
 body {
-  background-image: url('./assets/paper-small.jpeg');
+  background-color: var(--lcs-color-page);
 }
 
 a {

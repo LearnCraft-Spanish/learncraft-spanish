@@ -1,0 +1,55 @@
+.root {
+  position: relative;
+  z-index: var(--lcs-z-popover);
+  overflow: visible;
+}
+
+.tagSearch {
+  position: relative;
+  z-index: var(--lcs-z-popover);
+  width: 100%;
+  max-width: 520px;
+}
+
+.tagSearch :global(svg) {
+  width: var(--lcs-space-7);
+  height: var(--lcs-space-7);
+}
+
+.tagSearch :global(input) {
+  padding-left: 40px;
+}
+
+.tagSearch > div {
+  display: block;
+  width: 100%;
+}
+
+.tagSearch > div > div {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/*
+ * Hang the suggestion sheet below the 44px field (plus the 6px gap).
+ * Card is unclipped so the sheet can paint past the section edge.
+ */
+.tagSearchOpen > div > div:last-child {
+  top: calc(var(--lcs-control-height) + var(--lcs-space-2));
+  right: 0;
+  overflow: hidden;
+  border-radius: var(--lcs-radius-xl);
+  box-shadow: var(--lcs-shadow-popover);
+}
+
+.loading {
+  margin: 0;
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+}
+
+.detail {
+  /* Give the absolute WordChips panel room to hang below the chip. */
+  position: relative;
+  min-height: var(--lcs-space-9);
+}

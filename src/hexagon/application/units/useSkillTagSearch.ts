@@ -16,6 +16,15 @@ export interface UseSkillTagSearchProps {
    * the full tag catalog.
    */
   reachableSkills?: ReachableSkills;
+  /**
+   * Narrows the tag catalog before ranking/limiting. Applied first so a
+   * caller that only wants a subset of tag types -- e.g. vocab lookup
+   * restricting to Vocabulary/Idiom via `filterToVocabularyTags` -- doesn't
+   * lose matches to higher-ranked tags of an excluded type that would
+   * otherwise fill up `SUGGESTION_LIMIT` before the type filter ran. Leave
+   * undefined to search the full tag catalog.
+   */
+  filterTags?: (tags: SkillTag[]) => SkillTag[];
 }
 
 export interface UseSkillTagSearchReturnType {
@@ -30,6 +39,7 @@ export interface UseSkillTagSearchReturnType {
 
 export function useSkillTagSearch({
   reachableSkills,
+  filterTags,
 }: UseSkillTagSearchProps = {}): UseSkillTagSearchReturnType {
   const { skillTags, isLoading, error } = useSkillTags();
   const [tagSearchTerm, setTagSearchTerm] = useState('');
@@ -60,14 +70,20 @@ export function useSkillTagSearch({
   // Undefined means the lesson range is unknown or still loading, which is
   // different from a range that teaches nothing.
   const availableTags: SkillTag[] | undefined = useMemo(() => {
-    if (!skillTags || !reachableSkills) {
+    if (!skillTags) {
       return skillTags;
     }
+
+    const narrowedTags = filterTags ? filterTags(skillTags) : skillTags;
+
+    if (!reachableSkills) {
+      return narrowedTags;
+    }
     return filterSkillTagsByReachability(
-      skillTags,
+      narrowedTags,
       toReachableSkillSets(reachableSkills),
     );
-  }, [skillTags, reachableSkills]);
+  }, [skillTags, reachableSkills, filterTags]);
 
   const tagSuggestions: SkillTag[] = useMemo(() => {
     if (!availableTags?.length) return [];

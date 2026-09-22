@@ -1,0 +1,48 @@
+.root {
+  flex: none;
+  vertical-align: middle;
+}
+
+.inherit {
+  color: inherit;
+}
+
+.action {
+  color: var(--lcs-color-action);
+}
+
+.onAction {
+  color: var(--lcs-color-on-action);
+}
+
+.muted {
+  color: var(--lcs-color-muted);
+}
+
+.label {
+  color: var(--lcs-color-label);
+}
+
+.onLabel {
+  color: var(--lcs-color-on-label);
+}
+
+.steel {
+  color: var(--lcs-color-steel);
+}
+
+.onDark {
+  color: var(--lcs-color-on-surface-dark);
+}
+
+.error {
+  color: var(--lcs-color-error);
+}
+
+.warning {
+  color: var(--lcs-color-warning);
+}
+
+.warningInk {
+  color: var(--lcs-color-warning-ink);
+}

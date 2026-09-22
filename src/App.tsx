@@ -1,42 +1,83 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useFlushFlashcardUpdatesOnLoad } from '@application/units/flushFlashcardUpdatesOnLoad';
-import { Loading } from '@interface/components/Loading';
-import Nav from '@interface/components/Nav/Nav';
+import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
+import { AppHeader } from '@interface/components/AppHeader';
+import { PrimaryNav } from '@interface/components/AppHeader/PrimaryNav';
+import { LoadingScreen } from '@interface/components/Loading';
+import { LoggedOut } from '@interface/components/LoggedOut';
+import Nav from '@interface/components/Nav';
+import { PageTransition } from '@interface/components/PageTransition/PageTransition';
 import { SubHeaderComponent } from '@interface/components/SubHeader';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
+import styles from './App.module.scss';
 import ExtraCoachingCTA from './hexagon/interface/components/BuyMoreCoachingSessionsBanner/BuyMoreCoachingSessionsBanner';
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
 import './contextual.scss';
 
-export const App: React.FC = () => {
-  // React Router hooks
-  const location = useLocation();
-  const { isAuthenticated, isLoading } = useAuthAdapter();
+const V1_NO_SUBHEADER_PATHS = [
+  '/student-drill-down',
+  '/customquiz',
+  '/myflashcards',
+  '/quizzes',
+  '/coaching-dashboard',
+];
+const V1_NO_SUBHEADER_SEGMENTS = ['example-manager', 'officialquizzes'];
 
-  // Auto-flush any pending SRS updates from localStorage on app load
+export const App: React.FC = () => {
+  const location = useLocation();
+  const { isAuthenticated, isLoading, login } = useAuthAdapter();
+  const { version, isLoading: versionLoading } = useStudentUiVersion();
+
   useFlushFlashcardUpdatesOnLoad();
 
-  return (
-    <div className="App">
-      <ExtraCoachingCTA />
-      <Nav />
-      {location.pathname !== '/student-drill-down' &&
-        location.pathname !== '/customquiz' &&
-        location.pathname !== '/myflashcards' &&
-        location.pathname !== '/coaching-dashboard' &&
-        location.pathname.split('/')[1] !== 'example-manager' &&
-        location.pathname.split('/')[1] !== 'officialquizzes' && (
-          <SubHeaderComponent />
-        )}
+  const showSpinner =
+    (isLoading && !isAuthenticated) || (isAuthenticated && versionLoading);
+  const phase = showSpinner
+    ? 'loading'
+    : isAuthenticated
+      ? 'ready'
+      : 'loggedOut';
+  const isV2 = phase === 'ready' && version === 'v2';
+  const showPaperBackground = !isV2;
+  const showSubHeader =
+    !isV2 &&
+    !V1_NO_SUBHEADER_PATHS.includes(location.pathname) &&
+    !V1_NO_SUBHEADER_SEGMENTS.includes(location.pathname.split('/')[1]);
 
-      {isLoading && !isAuthenticated ? (
-        <Loading message="Logging in..." />
+  return (
+    <div className={showPaperBackground ? `App ${styles.paperShell}` : 'App'}>
+      {isV2 ? (
+        <>
+          <ExtraCoachingCTA />
+          <AppHeader>
+            <PrimaryNav />
+          </AppHeader>
+        </>
       ) : (
-        <AppRoutes />
+        <>
+          {phase === 'ready' && <ExtraCoachingCTA />}
+          <Nav />
+          {showSubHeader && <SubHeaderComponent />}
+        </>
       )}
+
+      <div className={styles.mainContent}>
+        {phase === 'loading' ? (
+          <LoadingScreen
+            message={isAuthenticated ? 'Loading...' : 'Logging in...'}
+          />
+        ) : phase === 'ready' ? (
+          <PageTransition>
+            <AppRoutes />
+          </PageTransition>
+        ) : (
+          <LoggedOut onLogIn={login} />
+        )}
+      </div>
+
       <ToastContainer
         theme="colored"
         transition={Zoom}

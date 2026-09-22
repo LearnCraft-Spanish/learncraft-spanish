@@ -58,6 +58,37 @@ export const createMockCourseWithLessonsList = createZodListFactory(
   CourseWithLessonsSchema,
 );
 
+/**
+ * Course id 11 ("Spanish in One Month Challenge") does not exist in any
+ * fixture, mock, or handler in this repo -- it only exists in the live API.
+ * This fixture's `name` and lesson data are INVENTED for test coverage of
+ * the vocab-tag course whitelist (see `domain/functions/filterLessonsByRelevantCourses.ts`).
+ * Confirm the real name and lesson numbers against the API before treating
+ * this as authoritative.
+ */
+export function createMockSpanishInOneMonthChallengeCourse(
+  overrides: Partial<CourseWithLessons> = {},
+): CourseWithLessons {
+  return {
+    id: 11,
+    name: 'Spanish in One Month Challenge',
+    published: true,
+    lessons: [
+      {
+        id: 1101,
+        lessonNumber: 1,
+        courseName: 'Spanish in One Month Challenge',
+      },
+      {
+        id: 1102,
+        lessonNumber: 2,
+        courseName: 'Spanish in One Month Challenge',
+      },
+    ],
+    ...overrides,
+  };
+}
+
 export const createMockLessonWithVocab = createZodFactory(
   LessonWithVocabSchema,
 );

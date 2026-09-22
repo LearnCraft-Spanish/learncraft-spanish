@@ -1,0 +1,24 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--lcs-space-11) var(--lcs-space-8);
+  gap: var(--lcs-space-5);
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  color: var(--lcs-color-ink);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-body);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.guidance {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--lcs-color-muted);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-caption);
+}
