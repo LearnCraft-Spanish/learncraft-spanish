@@ -679,7 +679,35 @@ describe('flashcard manager v2 filtering toggle', () => {
 
     renderV2();
 
-    expect(screen.getByText('4 filters applied')).toBeInTheDocument();
+    expect(screen.getByText('4 filters to apply')).toBeInTheDocument();
+  });
+
+  it('says filters are applied once the toggle is on', () => {
+    const [firstTag] = createMockSkillTagList(1);
+    overrideMockUseFlashcardManager({
+      filterOwnedFlashcards: true,
+      exampleFilter: {
+        ...defaultMockUseFlashcardManager.exampleFilter,
+        selectedSkillTags: [firstTag],
+      },
+    });
+
+    renderV2();
+
+    expect(screen.getByText('1 filter applied')).toBeInTheDocument();
+  });
+
+  it('uses the singular when one filter is waiting', () => {
+    overrideMockUseFlashcardManager({
+      exampleFilter: {
+        ...defaultMockUseFlashcardManager.exampleFilter,
+        excludeSpanglish: true,
+      },
+    });
+
+    renderV2();
+
+    expect(screen.getByText('1 filter to apply')).toBeInTheDocument();
   });
 
   it('does not count the admin-only unpublished toggle as an applied filter', () => {
@@ -1268,6 +1296,50 @@ describe('flashcard manager v2 actions menu', () => {
     );
 
     expect(mockNavigate).toHaveBeenCalledWith('/flashcardfinder');
+  });
+
+  it('quizzes the whole collection when filters are off', async () => {
+    const user = userEvent.setup();
+    renderV2();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Quiz these flashcards' }),
+    );
+
+    const { onGoingToQuiz } = managerSpies();
+    expect(onGoingToQuiz).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith('/myflashcards');
+  });
+
+  it('quizzes the filtered collection from the title action', async () => {
+    const user = userEvent.setup();
+    overrideMockUseFlashcardManager({ filterOwnedFlashcards: true });
+    renderV2();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Quiz these flashcards' }),
+    );
+
+    const { onGoingToQuiz } = managerSpies();
+    expect(onGoingToQuiz).toHaveBeenCalledOnce();
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/myflashcards?enableFiltering=true',
+    );
+    expect(vi.mocked(onGoingToQuiz).mock.invocationCallOrder[0]).toBeLessThan(
+      mockNavigate.mock.invocationCallOrder[0],
+    );
+  });
+
+  it('disables the quiz action when the collection is empty', () => {
+    overrideMockUseFlashcardManager({
+      allFlashcards: [],
+      displayFlashcards: [],
+    });
+    renderV2();
+
+    expect(
+      screen.getByRole('button', { name: 'Quiz these flashcards' }),
+    ).toBeDisabled();
   });
 
   it('enables filtering before quizzing the filtered flashcards', async () => {

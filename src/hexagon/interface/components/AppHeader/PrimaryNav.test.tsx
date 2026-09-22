@@ -17,7 +17,7 @@ describe('primary nav', () => {
       screen.getByRole('link', { name: 'Flashcard Finder' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: 'My flashcards' }),
+      screen.getByRole('link', { name: 'My Flashcards' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Quizzes' })).toBeInTheDocument();
   });

@@ -9,7 +9,7 @@
 .titleRow {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: var(--lcs-space-7);
   min-height: calc(
@@ -18,6 +18,11 @@
   );
   margin-bottom: var(--lcs-space-8);
   text-align: left;
+}
+
+.quizAction {
+  flex: none;
+  margin-left: auto;
 }
 
 .titleGroup {
@@ -34,6 +39,15 @@
  */
 .filterControl {
   margin-bottom: var(--lcs-space-8);
+}
+
+/*
+ * The default eyebrow is Green Smoke — a section kicker, not a control
+ * name. Next to the switch that text *is* the toggle's label, so ink
+ * matches the page title instead of reading as leftover header chrome.
+ */
+.filterControl h2 {
+  color: var(--lcs-color-ink);
 }
 
 .filterControlActions {
@@ -54,6 +68,19 @@
 
 @media (max-width: 768px) {
   .titleRow {
+    min-height: 0;
+  }
+
+  /* The page title moves into the app header; the quiz action stays. */
+  .title {
     display: none;
+  }
+
+  .quizAction {
+    width: 100%;
+  }
+
+  .quizAction button {
+    width: 100%;
   }
 }

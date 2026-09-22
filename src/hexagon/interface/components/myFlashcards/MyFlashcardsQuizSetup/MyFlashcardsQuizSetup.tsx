@@ -32,8 +32,13 @@ function appliedFilterCount(
   );
 }
 
-function appliedFilterCountLabel(count: number): string {
-  return count === 1 ? '1 filter applied' : `${count} filters applied`;
+/**
+ * Same wording as Flashcard Manager: the toggle decides whether the count
+ * has narrowed the set ("applied") or is only waiting ("to apply").
+ */
+function filterCountLabel(count: number, filteringOn: boolean): string {
+  const noun = count === 1 ? '1 filter' : `${count} filters`;
+  return filteringOn ? `${noun} applied` : `${noun} to apply`;
 }
 
 /**
@@ -68,7 +73,7 @@ export function MyFlashcardsQuizSetup({
               <div className={styles.filterControlActions}>
                 {filterCount > 0 && (
                   <Badge tone="action">
-                    {appliedFilterCountLabel(filterCount)}
+                    {filterCountLabel(filterCount, quiz.filterOwnedFlashcards)}
                   </Badge>
                 )}
                 <Toggle

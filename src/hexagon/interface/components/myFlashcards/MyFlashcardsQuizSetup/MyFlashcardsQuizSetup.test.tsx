@@ -124,7 +124,19 @@ describe('myFlashcardsQuizSetup', () => {
       },
     });
 
-    expect(screen.getByText('2 filters applied')).toBeInTheDocument();
+    expect(screen.getByText('2 filters to apply')).toBeInTheDocument();
+  });
+
+  it('says filters are applied once the toggle is on', () => {
+    renderSetup({
+      filterOwnedFlashcards: true,
+      exampleFilter: {
+        ...defaultMockUseQuizMyFlashcards.exampleFilter,
+        excludeSpanglish: true,
+      },
+    });
+
+    expect(screen.getByText('1 filter applied')).toBeInTheDocument();
   });
 
   it('resets filters from the filter section', async () => {

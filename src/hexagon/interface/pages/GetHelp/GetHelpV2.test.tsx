@@ -80,7 +80,7 @@ describe('get help hub v2', () => {
     renderGetHelp();
 
     const link = screen.getByRole('link', {
-      name: /Flashcard finder & custom quizzing/,
+      name: /Using search feature/,
     });
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');

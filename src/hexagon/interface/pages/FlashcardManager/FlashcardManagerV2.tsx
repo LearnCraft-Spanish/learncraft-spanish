@@ -8,6 +8,7 @@ import type { Flashcard } from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
 import useFlashcardManager from '@application/useCases/useFlashcardManager';
 import { Badge } from '@interface/components/general/Badge/Badge';
+import { Button } from '@interface/components/general/Buttons/Button/Button';
 import {
   Card,
   CardSectionHeader,
@@ -92,8 +93,14 @@ function appliedFilterCount(
   );
 }
 
-function appliedFilterCountLabel(count: number): string {
-  return count === 1 ? '1 filter applied' : `${count} filters applied`;
+/**
+ * The toggle decides whether those filters are narrowing the list. Off, they
+ * are only waiting, so the badge says "to apply" rather than claiming they
+ * already narrowed the collection.
+ */
+function filterCountLabel(count: number, filteringOn: boolean): string {
+  const noun = count === 1 ? '1 filter' : `${count} filters`;
+  return filteringOn ? `${noun} applied` : `${noun} to apply`;
 }
 
 function FlashcardManagerV2Loaded({
@@ -245,6 +252,19 @@ function FlashcardManagerV2Loaded({
     navigate('/myflashcards?enableFiltering=true');
   };
 
+  /**
+   * "These" is the collection on screen. Filters off means the whole owned
+   * set, so the quiz starts unfiltered. Filters on means the narrowed set,
+   * which is the same handoff the results menu already uses.
+   */
+  const handleQuizThese = (): void => {
+    if (filterOwnedFlashcards) {
+      handleQuizFiltered();
+      return;
+    }
+    navigate('/myflashcards');
+  };
+
   const emptyTitle = filterOwnedFlashcards
     ? 'No flashcards match'
     : 'No flashcards yet';
@@ -261,6 +281,15 @@ function FlashcardManagerV2Loaded({
           <div className={styles.titleGroup}>
             <h1 className={styles.title}>Flashcard Manager</h1>
           </div>
+          <div className={styles.quizAction}>
+            <Button
+              trailingIcon="arrowRight"
+              disabled={allFlashcards.length === 0}
+              onClick={handleQuizThese}
+            >
+              Quiz these flashcards
+            </Button>
+          </div>
         </div>
         <div className={styles.filterControl}>
           <Card>
@@ -270,7 +299,7 @@ function FlashcardManagerV2Loaded({
                 <div className={styles.filterControlActions}>
                   {filterCount > 0 && (
                     <Badge tone="action">
-                      {appliedFilterCountLabel(filterCount)}
+                      {filterCountLabel(filterCount, filterOwnedFlashcards)}
                     </Badge>
                   )}
                   <Toggle
