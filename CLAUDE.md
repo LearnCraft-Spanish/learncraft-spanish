@@ -19,8 +19,6 @@ For the full documentation hierarchy (architecture, patterns, standards, etc.), 
 
 ## Operating Modes
 
-
-
 ### PR Review
 
 Follow `documentation/PR_STANDARDS.md` checklist + `documentation/PR_REVIEW_GUIDE.md` steps. Verify architecture against `BOUNDARIES.md` files in each layer touched — linter is NOT authoritative.
@@ -53,6 +51,7 @@ Answer questions here about:
 Reference `documentation/ENGINEERING_DOCTRINE.md` and `src/hexagon/ARCHITECTURE.md` for architectural decisions and stability assessment.
 
 ---
+
 ## Cursor Cloud specific instructions
 
 Guidance for Cloud Agents setting up and running this repo in a fresh VM.
