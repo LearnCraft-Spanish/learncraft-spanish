@@ -1,3 +1,5 @@
+import type { CourseWithLessons } from '@learncraft-spanish/shared';
+
 export interface PrerequisiteCourse {
   courseId: number;
   courseName: string;
@@ -179,4 +181,26 @@ export function transformToLessonRanges({
       toLessonNumber,
     },
   ];
+}
+
+/**
+ * Lesson the filter range should snap to after a full reset.
+ * Prerequisite courses land on their virtual lesson; everyone else lands
+ * on the course's first lesson. `null` means "do not touch the range"
+ * (no course selected, or the course has no lessons yet).
+ */
+export function lessonNumberAfterFilterReset(
+  course: CourseWithLessons | null,
+): number | null {
+  if (course === null) {
+    return null;
+  }
+
+  const prerequisites = getPrerequisitesForCourse(course.id);
+  if (prerequisites && prerequisites.prerequisites.length > 0) {
+    return generateVirtualLessonId(course.id, 0);
+  }
+
+  const firstLesson = course.lessons[0];
+  return firstLesson ? firstLesson.lessonNumber : null;
 }

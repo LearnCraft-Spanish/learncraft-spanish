@@ -1,0 +1,5 @@
+/* Trigger chrome lives in ActionsMenu. This class is the finder's hook on
+ * that root for anything finder-specific. */
+.root {
+  display: inline-block;
+}

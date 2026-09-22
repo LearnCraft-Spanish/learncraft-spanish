@@ -1,0 +1,122 @@
+.root {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--lcs-space-9);
+  background-color: var(--lcs-color-action);
+  padding: var(--lcs-space-6) var(--lcs-space-9);
+  /* Full-viewport screens subtract `--lcs-app-header-height` from 100dvh,
+   * so this bar must never render shorter than the token. If the padding
+   * or content height above changes, update the token (and its mobile
+   * media query) in `tokens.css` to match. */
+  min-height: var(--lcs-app-header-height);
+}
+
+/* Always links home — logged-out users still land on the marketing-facing
+ * root, so this doesn't add a second header action there. */
+.brand {
+  display: flex;
+  grid-column: 1;
+  align-items: center;
+  gap: var(--lcs-space-4);
+  justify-self: start;
+  color: var(--lcs-color-on-action);
+  text-decoration: none;
+  transition: opacity var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+.brand:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.logo {
+  display: block;
+  flex: none;
+  pointer-events: none;
+}
+
+.wordmark {
+  display: inline-block;
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-medium);
+  letter-spacing: var(--lcs-tracking-wordmark);
+  transition: transform var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+.brand:hover .wordmark {
+  transform: scale(1.1);
+}
+
+.nav {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.account {
+  display: flex;
+  grid-column: 3;
+  justify-self: end;
+  transition: opacity var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+.stack {
+  display: none;
+}
+
+.stackTitle {
+  overflow: hidden;
+  margin: 0;
+  color: var(--lcs-color-on-action);
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+  letter-spacing: var(--lcs-tracking-wordmark);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .root {
+    grid-template-columns: 1fr auto;
+    padding: var(--lcs-space-4) var(--lcs-space-7);
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .account {
+    grid-column: 2;
+  }
+
+  .stackMode .brand,
+  .stackMode .account {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .stack {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    padding: var(--lcs-space-4) var(--lcs-space-7);
+    gap: var(--lcs-space-4);
+    min-width: 0;
+  }
+
+  /* IconButton `onDark` is for navy surfaces; the bar is celestial blue. */
+  .stack svg {
+    color: var(--lcs-color-on-action);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark,
+  .brand,
+  .account {
+    transition: none;
+  }
+}

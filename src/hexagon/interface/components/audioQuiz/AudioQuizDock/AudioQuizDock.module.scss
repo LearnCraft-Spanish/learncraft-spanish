@@ -1,0 +1,123 @@
+.root {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  /* Handoff: 8px between primary / replay / nav rows. */
+  gap: var(--lcs-space-3);
+}
+
+/* DOM order is replay-then-primary; `column-reverse` puts primary on top
+ * visually on mobile without duplicating markup for the desktop row. */
+.primaryRow {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--lcs-space-3);
+}
+
+.replay,
+.primary,
+.previous,
+.next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--lcs-radius-lg);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: var(--lcs-weight-bold);
+  gap: 6px;
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.replay:focus-visible,
+.primary:focus-visible,
+.previous:focus-visible,
+.next:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+/* 52/44px are the handoff's literal dock button heights, not scale steps
+ * (see `QuizDock`, same note for its 52/56px slot). */
+.replay {
+  height: 44px;
+  border: var(--lcs-control-border) solid var(--lcs-color-action);
+  background-color: transparent;
+  color: var(--lcs-color-action);
+  font-size: var(--lcs-text-action);
+}
+
+.replay:hover {
+  background-color: var(--lcs-tint-hover);
+}
+
+.primary {
+  height: 52px;
+  border: none;
+  background-color: var(--lcs-color-action);
+  color: var(--lcs-color-on-action);
+  font-size: var(--lcs-text-body);
+}
+
+.primary:hover {
+  background-color: var(--lcs-color-action-hover);
+}
+
+.navRow {
+  display: flex;
+  align-items: center;
+  gap: var(--lcs-space-3);
+}
+
+.previous,
+.next {
+  flex: 1;
+  height: 44px;
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+  background-color: transparent;
+  color: var(--lcs-color-ink);
+  font-size: var(--lcs-text-action);
+}
+
+.previous:hover:not(:disabled),
+.next:hover {
+  background-color: rgba(60, 60, 60, 0.08);
+}
+
+.previous:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+@media (min-width: 769px) {
+  .primaryRow {
+    flex-direction: row;
+    gap: var(--lcs-space-5);
+  }
+
+  .replay {
+    width: 220px;
+    height: 52px;
+    font-size: var(--lcs-text-control);
+  }
+
+  .primary {
+    flex: 1;
+  }
+
+  .previous,
+  .next {
+    flex: none;
+    height: 40px;
+    padding: 0 var(--lcs-space-6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .replay,
+  .primary,
+  .previous,
+  .next {
+    transition: none;
+  }
+}

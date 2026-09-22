@@ -5,8 +5,13 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import App from './App';
+// Tokens must evaluate before App.css so :root exists before first paint.
+// Layer order is reserved in index.html; this import order is for load timing.
+/* eslint-disable perfectionist/sort-imports */
+import '@interface/styles/tokens.css';
 import './index.css';
+import App from './App';
+/* eslint-enable perfectionist/sort-imports */
 
 // error reload key prevents infinite reloads if reload doesnt fix the error
 const CHUNK_ERROR_RELOAD_KEY = 'chunk_load_error_reloaded';

@@ -118,6 +118,43 @@ describe('useSkillTagSearch', () => {
     );
   });
 
+  it('narrows the catalog with filterTags before ranking, so filtered-out tags cannot crowd out matches', async () => {
+    // Without a pre-filter, 25 structural (Verb) tags matching "po" would
+    // sort ahead of por/porque (structural tags rank before individual
+    // terms within a tier) and fill SUGGESTION_LIMIT before a post-hoc type
+    // filter ever ran. filterTags must be applied before ranking/limiting.
+    const manyVerbTags: SkillTag[] = Array.from({ length: 25 }, (_, i) => ({
+      type: SkillType.Verb,
+      key: `Verb-po-${i}`,
+      name: `po-verb-${i}`,
+      verbId: i + 1,
+      verbTags: [],
+    }));
+
+    overrideMockSkillTagsAdapter({
+      getSkillTags: async () => [...manyVerbTags, porTag, porqueTag],
+    });
+
+    const { result } = renderHook(
+      () =>
+        useSkillTagSearch({
+          filterTags: (tags) =>
+            tags.filter((tag) => tag.type === SkillType.Vocabulary),
+        }),
+      { wrapper: createQueryClientWrapper() },
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await search(result, 'po');
+
+    await waitFor(() =>
+      expect(result.current.tagSuggestions.map((tag) => tag.key)).toEqual([
+        'Vocabulary-1',
+        'Vocabulary-99',
+      ]),
+    );
+  });
+
   it('withholds every tag when the lesson range reaches nothing', async () => {
     const { result } = renderSearch(nothingReachable);
 

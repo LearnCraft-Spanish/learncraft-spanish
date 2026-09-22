@@ -18,7 +18,7 @@ When a user is selecting lessons for a course that has prerequisites (like Post-
 
 ### How It Works
 
-1. **Configuration**: Prerequisites are defined in `COURSE_PREREQUISITES` array
+1. **Configuration**: Prerequisites are defined in `COURSES_WITH_PREREQUISITES` array
 2. **Virtual Lessons**: Negative lesson numbers represent prerequisite courses
 3. **UI Display**: Virtual lessons show with 📚 icon and descriptive names
 4. **Backend Queries**: Automatically combines vocabulary from multiple courses
@@ -28,7 +28,7 @@ When a user is selecting lessons for a course that has prerequisites (like Post-
 
 To add a new course prerequisite relationship:
 
-1. Add a new `CoursePrerequisites` object to the `COURSE_PREREQUISITES` array in `coursePrerequisites.ts`:
+1. Add a new `CourseWithPrerequisites` object to the `COURSES_WITH_PREREQUISITES` array in `coursePrerequisites.ts`:
 
 ```typescript
 {

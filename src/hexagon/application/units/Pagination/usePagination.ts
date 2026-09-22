@@ -12,6 +12,8 @@ export interface PaginationState {
   previousPage: () => void;
   nextPage: () => void;
   goToFirstPage: () => void;
+  /** Jump straight to a page. Out-of-range values clamp to the valid range. */
+  goToPage: (page: number) => void;
 }
 
 export interface UsePaginationParams {
@@ -65,6 +67,14 @@ export function usePagination({
     setSelectedPageNumber(1);
   }, []);
 
+  const goToPage = useCallback(
+    (page: number) => {
+      const lastPage = Math.max(maxPage, 1);
+      setSelectedPageNumber(Math.min(Math.max(page, 1), lastPage));
+    },
+    [maxPage],
+  );
+
   const isOnFirstPage = useMemo(() => {
     return safePageNumber === 1;
   }, [safePageNumber]);
@@ -85,5 +95,6 @@ export function usePagination({
     nextPage,
     previousPage,
     goToFirstPage,
+    goToPage,
   };
 }

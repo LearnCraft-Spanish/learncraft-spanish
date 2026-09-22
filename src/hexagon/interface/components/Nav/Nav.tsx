@@ -1,29 +1,25 @@
+import type { JSX } from 'react';
 import {
   LoginButton,
   LogoutButton,
 } from '@interface/components/general/Buttons';
-
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import home from 'src/assets/icons/home.svg';
 import logo from 'src/assets/typelogosmall.png';
 
-export default function Nav(): React.JSX.Element {
-  const navigate = useNavigate();
+/**
+ * Legacy top bar. `App` mounts this for logged-out visitors and every v1
+ * session; v2 (beta-tester students) get `AppHeader` instead.
+ */
+export default function Nav(): JSX.Element {
+  const { pathname } = useLocation();
   return (
-    // Correct html tag is <nav> not <div>
-    <div
-      className={`div-header ${window.location.pathname === '/' ? ' ' : 'notRoot'}`}
-    >
-      <div
-        className="homeButton"
-        onClick={() => navigate('/')}
-        aria-description="home navigation"
-      >
+    <div className={`div-header ${pathname === '/' ? ' ' : 'notRoot'}`}>
+      <Link to="/" className="homeButton" aria-description="home navigation">
         <img id="logo" src={logo} alt="Learncraft Spanish Logo" />
         <img src={home} alt="" id="homeIcon" />
-      </div>
+      </Link>
       <LogoutButton />
       <LoginButton />
     </div>

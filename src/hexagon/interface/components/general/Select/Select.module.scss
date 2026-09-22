@@ -1,0 +1,61 @@
+.root {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--lcs-control-height);
+  padding: 0 var(--lcs-space-6);
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-surface);
+  color: var(--lcs-color-ink);
+  font-family: inherit;
+  font-size: var(--lcs-text-control);
+  transition: border-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.root:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+/* Required scope controls carry the action border. */
+.emphasis {
+  border-color: var(--lcs-color-action);
+}
+
+.invalid {
+  border-color: var(--lcs-color-error);
+}
+
+.root:disabled {
+  background-color: var(--lcs-color-page);
+  color: var(--lcs-color-muted);
+  cursor: not-allowed;
+}
+
+/**
+ * Shown in place of the control when its value is fixed. Deliberately not a
+ * disabled `select` — a greyed dropdown reads as broken rather than inactive.
+ */
+.readout {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--lcs-control-height);
+  padding: 0 var(--lcs-space-6);
+  border: var(--lcs-control-border) solid var(--lcs-border-card);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-page);
+  color: var(--lcs-color-muted);
+  font-family: inherit;
+  font-size: var(--lcs-text-control);
+}
+
+.readout:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    transition: none;
+  }
+}

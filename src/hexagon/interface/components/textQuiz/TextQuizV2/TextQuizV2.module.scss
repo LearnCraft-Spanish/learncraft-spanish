@@ -1,0 +1,78 @@
+/*
+ * No `PageShell` here on purpose: this is a feature component, not a page
+ * (compare `customQuiz/CustomQuizSetup`, which is also unwrapped). It mounts
+ * inside legacy pages (`ReviewMyFlashcards`, `CombinedCustomQuiz`, `OfficialQuiz`)
+ * that do not wrap it in `PageShell`, so this component paints its own
+ * `--lcs-color-page` background instead of inheriting the old paper texture.
+ * The 860px-max inner column reuses the same page-padding tokens `PageShell`
+ * switches on at the same breakpoint.
+ */
+.root {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  max-width: 860px;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0 auto;
+  /* Full-bleed page color: the column is 860px wide but legacy wrappers leave
+   * the old parchment texture visible on the sides — box-shadow + clip-path
+   * paints `--lcs-color-page` across the full viewport width. */
+  background-color: var(--lcs-color-page);
+  box-shadow: 0 0 0 100vmax var(--lcs-color-page);
+  clip-path: inset(0 -100vmax);
+  /* Bottom padding matches the top: the keyboard legend (desktop) and the
+   * dock buttons (mobile) are the last elements, and neither should sit
+   * flush against the bottom edge of the page. */
+  padding: var(--lcs-space-9) var(--lcs-page-pad);
+  gap: var(--lcs-space-9);
+  /* Fill exactly the viewport the app chrome leaves behind. In the real
+   * app the quiz is mounted inside legacy pages (`ReviewMyFlashcards`,
+   * `CombinedCustomQuiz`, `OfficialQuiz`) whose plain block wrappers give
+   * no height, so `flex: 1` alone collapsed the card to content height.
+   * A definite height here is what lets `.cardRow`'s `flex: 1` stretch the
+   * card; over-tall help content then scrolls inside the card (`.content`
+   * in `QuizCard`) instead of pushing the dock off screen. Where a flex
+   * ancestor does provide height (the gauntlet specimen), `flex: 1` wins
+   * and this is ignored. */
+  height: calc(100vh - var(--lcs-app-header-height));
+  height: calc(100dvh - var(--lcs-app-header-height));
+}
+
+.cardRow {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.empty {
+  margin: auto;
+  color: var(--lcs-color-muted);
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .root {
+    padding: var(--lcs-space-6) var(--lcs-page-pad-narrow);
+    gap: var(--lcs-space-6);
+    /* The fixed `PrimaryTabBar` covers the bottom edge on mobile; `App`
+     * reserves exactly `--lcs-mobile-tabbar-offset` of room for it (0px
+     * when the bar isn't mounted). Only subtracted here, below 768px —
+     * the bar is `display: none` on desktop even when the flag sets the
+     * variable. */
+    height: calc(
+      100vh - var(--lcs-app-header-height) - var(
+          --lcs-mobile-tabbar-offset,
+          0px
+        )
+    );
+    height: calc(
+      100dvh - var(--lcs-app-header-height) - var(
+          --lcs-mobile-tabbar-offset,
+          0px
+        )
+    );
+  }
+}

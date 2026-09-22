@@ -1,0 +1,57 @@
+.wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--lcs-control-height);
+  padding: 0 var(--lcs-space-6);
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-surface);
+  color: var(--lcs-color-ink);
+  font-family: inherit;
+  font-size: var(--lcs-text-control);
+  transition: border-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.input::placeholder {
+  color: var(--lcs-color-placeholder);
+}
+
+.input:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.input:disabled {
+  background-color: var(--lcs-color-page);
+  color: var(--lcs-color-muted);
+  cursor: not-allowed;
+}
+
+.withIcon {
+  padding-left: var(--lcs-space-11);
+}
+
+.invalid {
+  border-color: var(--lcs-color-error);
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  left: var(--lcs-space-6);
+  display: flex;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input {
+    transition: none;
+  }
+}

@@ -198,3 +198,19 @@ Don't use relative imports across layers (`../../../domain/types`).
 2. Internal aliases by layer (`@domain`, `@application`, `@interface`)
 3. Relative imports (`./utils`, `./types`)
 4. Styles (`./styles.css`)
+
+---
+
+## Styling
+
+New student UI uses colocated CSS Modules (`Component.module.scss`) and design tokens from `@interface/styles/tokens.css`. Existing global `.scss` files stay global until that feature is redesigned; the build wraps them in `@layer legacy`.
+
+```tsx
+import styles from './QuizSetup.module.scss';
+
+export function QuizSetup() {
+  return <section className={styles.root}>…</section>;
+}
+```
+
+Do not add new global class names, new unlayered stylesheets, or `!important`. Shared chrome is a versioned primitive, not a copy from `App.css`. Layer order and flag rollout: [`src/hexagon/interface/styles/README.md`](../src/hexagon/interface/styles/README.md).

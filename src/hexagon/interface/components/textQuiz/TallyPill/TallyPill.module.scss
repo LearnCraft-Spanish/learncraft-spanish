@@ -1,0 +1,69 @@
+.root {
+  position: absolute;
+  top: 0;
+  box-sizing: border-box;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Vertical capsules — handoff 44×68, icon stacked over count. */
+  width: 44px;
+  min-height: 68px;
+  padding: var(--lcs-space-5) var(--lcs-space-4);
+  border-radius: var(--lcs-radius-pill);
+  gap: var(--lcs-space-1);
+}
+
+/* Soft pastel pills: 8% fill + 35% border like the handoff. Glyphs stay
+ * error/success-colored — never white / on-action. */
+.error {
+  border: var(--lcs-border-hairline) solid
+    color-mix(in srgb, var(--lcs-color-error) 35%, transparent);
+  background-color: color-mix(in srgb, var(--lcs-color-error) 8%, transparent);
+  color: var(--lcs-color-error);
+
+  svg {
+    color: var(--lcs-color-error);
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.75;
+  }
+}
+
+.success {
+  border: var(--lcs-border-hairline) solid
+    color-mix(in srgb, var(--lcs-color-success) 35%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--lcs-color-success) 8%,
+    transparent
+  );
+  color: var(--lcs-color-success);
+
+  svg {
+    color: var(--lcs-color-success);
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.75;
+  }
+}
+
+/* -64px is the handoff's literal flanking offset, not a scale step. */
+.left {
+  left: -64px;
+}
+
+.right {
+  right: -64px;
+}
+
+.count {
+  font-size: var(--lcs-text-body);
+  font-weight: var(--lcs-weight-bold);
+}
+
+@media (min-width: 769px) {
+  .root {
+    display: flex;
+  }
+}

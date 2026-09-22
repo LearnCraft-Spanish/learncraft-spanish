@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gauntlet smoke bar</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 40px;
+        background: #e7e3d9;
+        font-family: Poppins, Avenir, Helvetica, sans-serif;
+        color: #3c3c3c;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 28px;
+        align-items: flex-start;
+      }
+      .cap {
+        font-size: 13px;
+        color: #6f6259;
+        margin-bottom: 10px;
+      }
+      .frame {
+        background: #f0ede6;
+        border-radius: 20px;
+        border: 0.5px solid rgba(60, 60, 60, 0.13);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+      }
+      .frame-header {
+        padding: 12px 16px;
+        background: #e7e3d9;
+        border-bottom: 0.5px solid rgba(60, 60, 60, 0.13);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .frame-body {
+        flex: 1;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .title {
+        margin: 0;
+        font-weight: 700;
+        font-size: 20px;
+      }
+      .copy {
+        margin: 0;
+        font-size: 14px;
+        max-width: 42ch;
+      }
+      .btn {
+        appearance: none;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        background: #449ac2;
+        color: #fff;
+        font: inherit;
+        font-weight: 600;
+        cursor: default;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Smoke bar</h1>
+    <p>
+      Tiny committed design bar for tooling self-test. Compare to
+      specimen=smoke.
+    </p>
+    <div class="row">
+      <div>
+        <div class="cap">Mobile 390×780</div>
+        <div
+          class="frame"
+          style="width: 390px; height: 780px"
+          data-screen-label="smoke-mobile"
+        >
+          <div class="frame-header">Smoke · mobile</div>
+          <div class="frame-body">
+            <p class="title">Gauntlet smoke</p>
+            <p class="copy">
+              Auth0-free specimen using real Button + UiScope. No API calls.
+            </p>
+            <button class="btn" type="button">Continue</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="cap">Desktop 1240×760</div>
+        <div
+          class="frame"
+          style="width: 1240px; height: 760px"
+          data-screen-label="smoke-desktop"
+        >
+          <div class="frame-header">Smoke · desktop</div>
+          <div class="frame-body">
+            <p class="title">Gauntlet smoke</p>
+            <p class="copy">
+              Auth0-free specimen using real Button + UiScope. No API calls.
+            </p>
+            <button class="btn" type="button">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

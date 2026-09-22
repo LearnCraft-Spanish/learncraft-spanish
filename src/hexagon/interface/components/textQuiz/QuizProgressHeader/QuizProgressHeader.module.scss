@@ -1,0 +1,126 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-4);
+}
+
+.mobileRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.position {
+  flex: 1;
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+  font-weight: var(--lcs-weight-bold);
+  text-align: center;
+}
+
+.miniPill {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  /* Handoff: padding 4px 10px — keep soft pastel pill, not icon discs. */
+  padding: 4px 10px;
+  border-radius: var(--lcs-radius-pill);
+  font-size: var(--lcs-text-caption);
+  font-weight: var(--lcs-weight-bold);
+  gap: 6px;
+}
+
+/* Soft 1.5px / 35% ring + 6% pastel fill. Glyphs MUST stay error/success
+ * ink (never white / on-action) — force stroke+color on the SVG. */
+.miniPill.hard {
+  border: 1.5px solid
+    color-mix(in srgb, var(--lcs-color-error) 35%, transparent);
+  background-color: color-mix(in srgb, var(--lcs-color-error) 6%, transparent);
+  color: var(--lcs-color-error);
+
+  svg {
+    color: var(--lcs-color-error) !important;
+    stroke: var(--lcs-color-error) !important;
+    fill: none !important;
+    opacity: 1;
+    stroke-width: 1.75;
+  }
+}
+
+.miniPill.easy {
+  border: 1.5px solid
+    color-mix(in srgb, var(--lcs-color-success) 35%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--lcs-color-success) 6%,
+    transparent
+  );
+  color: var(--lcs-color-success);
+
+  svg {
+    color: var(--lcs-color-success) !important;
+    stroke: var(--lcs-color-success) !important;
+    fill: none !important;
+    opacity: 1;
+    stroke-width: 1.75;
+  }
+}
+
+.desktopRow {
+  display: none;
+}
+
+.leftGroup {
+  display: flex;
+  /* Arrow pinned to the TOP of the row — bottom-aligned it read as hanging
+   * off the title's baseline. */
+  align-items: flex-start;
+  gap: var(--lcs-space-4);
+  min-width: 0;
+}
+
+.positionDesktop {
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-body);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.title {
+  margin: var(--lcs-space-1) 0 0;
+  color: var(--lcs-color-ink);
+  font-size: var(--lcs-text-h3);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--lcs-radius-pill);
+  background-color: var(--lcs-border-card);
+}
+
+.fill {
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--lcs-color-action);
+  transition: width var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+@media (min-width: 769px) {
+  .mobileRow {
+    display: none;
+  }
+
+  .desktopRow {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--lcs-space-9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

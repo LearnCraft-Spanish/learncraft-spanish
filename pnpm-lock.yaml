@@ -18,8 +18,8 @@ importers:
         specifier: ^0.12.2
         version: 0.12.2
       '@learncraft-spanish/shared':
-        specifier: ^0.24.1
-        version: 0.24.1
+        specifier: ^0.25.0
+        version: 0.25.0
       '@sentry/cli':
         specifier: ^2.42.2
         version: 2.50.2
@@ -29,6 +29,9 @@ importers:
       '@sentry/vite-plugin':
         specifier: ^3.2.1
         version: 3.6.1
+      '@tabler/icons-react':
+        specifier: ^3.46.0
+        version: 3.46.0(react@19.1.1)
       '@tanstack/react-query':
         specifier: ^5.66.9
         version: 5.83.0(react@19.1.1)
@@ -126,6 +129,9 @@ importers:
       '@tanstack/eslint-plugin-query':
         specifier: ^5.66.1
         version: 5.81.2(eslint@9.32.0)(typescript@5.8.3)
+      '@testing-library/dom':
+        specifier: ^10.4.0
+        version: 10.4.1
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.6.4
@@ -1399,8 +1405,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@learncraft-spanish/shared@0.24.1':
-    resolution: {integrity: sha512-Qy/SAr+H8GLCvNNMF1+wSVmOnx1aOSjLowW4lDZHG6mK1t4/KoGf4ghA1F9ymLTy58rvNBdY8XCsy6vToKCmqA==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.24.1/1daa1c3a02b59ae0ad1014821721f52ed0d3eb7f}
+  '@learncraft-spanish/shared@0.25.0':
+    resolution: {integrity: sha512-lDU14YXlE8YINd0kw3kjr1iQdD9gO96+J3S0TMsX1SgWuBIU4BAyBIjB/RnHmdvpkp611acFkw18WB+QxJYqJw==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.25.0/3a46a0242414d28b14d42a2d6a4dd571583b3f3d}
 
   '@mswjs/interceptors@0.39.5':
     resolution: {integrity: sha512-B9nHSJYtsv79uo7QdkZ/b/WoKm20IkVSmTc/WCKarmDtFwM0dRx2ouEniqwNkzCSLn3fydzKmnMzjtfdOWt3VQ==}
@@ -1839,6 +1845,14 @@ packages:
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: '>=9.0.0'
+
+  '@tabler/icons-react@3.46.0':
+    resolution: {integrity: sha512-CCm7xJWhDT2PH4ZIFkP6AgYKtVhq0gpYkjUN+GVh1AzmIQaa77OW0bQPBPQiTE0PsXMR9oSxFqA3qBglzPyrVQ==}
+    peerDependencies:
+      react: '>= 16'
+
+  '@tabler/icons@3.46.0':
+    resolution: {integrity: sha512-f2RYFl3fzPwj5WO82x6en0dmkjefxEfOm16D1ByM6cj/McNiwOkL4VaPUoP9VVIrXAD9WnTSVFr70px703b//A==}
 
   '@tanstack/eslint-plugin-query@5.81.2':
     resolution: {integrity: sha512-h4k6P6fm5VhKP5NkK+0TTVpGGyKQdx6tk7NYYG7J7PkSu7ClpLgBihw7yzK8N3n5zPaF3IMyErxfoNiXWH/3/A==}
@@ -6168,7 +6182,7 @@ snapshots:
   '@babel/core@7.25.9':
     dependencies:
       '@ampproject/remapping': 2.3.0
-      '@babel/code-frame': 7.27.1
+      '@babel/code-frame': 7.29.7
       '@babel/generator': 7.25.9
       '@babel/helper-compilation-targets': 7.27.2
       '@babel/helper-module-transforms': 7.27.3(@babel/core@7.25.9)
@@ -7321,7 +7335,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
 
-  '@learncraft-spanish/shared@0.24.1':
+  '@learncraft-spanish/shared@0.25.0':
     dependencies:
       zod: 3.25.76
 
@@ -7733,6 +7747,13 @@ snapshots:
       espree: 10.4.0
       estraverse: 5.3.0
       picomatch: 4.0.3
+
+  '@tabler/icons-react@3.46.0(react@19.1.1)':
+    dependencies:
+      '@tabler/icons': 3.46.0
+      react: 19.1.1
+
+  '@tabler/icons@3.46.0': {}
 
   '@tanstack/eslint-plugin-query@5.81.2(eslint@9.32.0)(typescript@5.8.3)':
     dependencies:
@@ -11376,14 +11397,14 @@ snapshots:
 
   parse-json@5.2.0:
     dependencies:
-      '@babel/code-frame': 7.27.1
+      '@babel/code-frame': 7.29.7
       error-ex: 1.3.2
       json-parse-even-better-errors: 2.3.1
       lines-and-columns: 1.2.4
 
   parse-json@8.3.0:
     dependencies:
-      '@babel/code-frame': 7.27.1
+      '@babel/code-frame': 7.29.7
       index-to-position: 1.2.0
       type-fest: 4.41.0
 

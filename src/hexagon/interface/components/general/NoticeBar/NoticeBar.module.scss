@@ -1,0 +1,41 @@
+.root {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcs-space-5);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--lcs-space-6) var(--lcs-space-8);
+  border-radius: var(--lcs-radius-xl);
+  animation: rise var(--lcs-motion-panel) var(--lcs-ease-standard);
+  background-color: var(--lcs-color-surface-dark);
+  color: var(--lcs-color-on-surface-dark);
+}
+
+.message {
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-control);
+}
+
+.actions {
+  display: flex;
+  gap: var(--lcs-space-5);
+  align-items: center;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    animation: none;
+  }
+}

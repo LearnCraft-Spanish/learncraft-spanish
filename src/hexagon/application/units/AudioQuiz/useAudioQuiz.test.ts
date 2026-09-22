@@ -185,6 +185,94 @@ describe('useAudioQuiz', () => {
     });
   });
 
+  describe('replay', () => {
+    it('speaking guess and hint return to the question step', () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, autoplay: true }),
+      );
+
+      act(() => {
+        result.current.goToGuess();
+      });
+      act(() => {
+        result.current.replay();
+      });
+      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+
+      act(() => {
+        result.current.goToHint();
+      });
+      act(() => {
+        result.current.replay();
+      });
+      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+    });
+
+    it('speaking answer returns to the hint step', () => {
+      const { result } = renderHook(() => useAudioQuiz(defaultProps));
+
+      act(() => {
+        result.current.goToAnswer();
+      });
+      act(() => {
+        result.current.replay();
+      });
+      expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
+    });
+
+    it('listening guess returns to the question step', () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({
+          ...defaultProps,
+          audioQuizType: AudioQuizType.Listening,
+          autoplay: true,
+        }),
+      );
+
+      act(() => {
+        result.current.goToGuess();
+      });
+      act(() => {
+        result.current.replay();
+      });
+      expect(result.current.currentStep).toBe(AudioQuizStep.Question);
+    });
+
+    it('listening hint stays on the hint step', () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({
+          ...defaultProps,
+          audioQuizType: AudioQuizType.Listening,
+        }),
+      );
+
+      act(() => {
+        result.current.goToHint();
+      });
+      act(() => {
+        result.current.replay();
+      });
+      expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
+    });
+
+    it('listening answer returns to the hint step', () => {
+      const { result } = renderHook(() =>
+        useAudioQuiz({
+          ...defaultProps,
+          audioQuizType: AudioQuizType.Listening,
+        }),
+      );
+
+      act(() => {
+        result.current.goToAnswer();
+      });
+      act(() => {
+        result.current.replay();
+      });
+      expect(result.current.currentStep).toBe(AudioQuizStep.Hint);
+    });
+  });
+
   describe('example navigation', () => {
     it('should navigate to next example when ready', async () => {
       const { result } = renderHook(() => useAudioQuiz(defaultProps));
