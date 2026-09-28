@@ -109,12 +109,9 @@ describe('textQuizV2Screen', () => {
     expect(screen.getByText('Lessons 1-5')).toBeInTheDocument();
   });
 
-  it('shows Previous/Next (no grading) for a non-SRS active card', () => {
+  it('shows Previous/Next on the question side of a non-SRS card', () => {
     const useTextQuizReturn =
       createMockTextQuizReturnWithExamples(mockExamples);
-    // The dock only shows Previous/Next (or Hard/Easy) on the answer side —
-    // the prompt side is a fixed-height placeholder instead.
-    useTextQuizReturn.answerShowing = true;
 
     render(
       <MockAllProviders>
@@ -127,6 +124,32 @@ describe('textQuizV2Screen', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Next/ })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Hard/ })).toBeNull();
+    expect(
+      screen.queryByText('Flip the card to see the answer'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps the SRS placeholder above Previous/Next until the answer shows', () => {
+    const useTextQuizReturn =
+      createMockTextQuizReturnWithExamples(mockExamples);
+
+    render(
+      <MockAllProviders>
+        <TextQuizV2Screen
+          useTextQuizReturn={useTextQuizReturn}
+          srsQuizProps={createSrsQuizProps()}
+        />
+      </MockAllProviders>,
+    );
+
+    const placeholder = screen.getByText('Flip the card to see the answer');
+    const previous = screen.getByRole('button', { name: /Previous/ });
+    expect(
+      placeholder.compareDocumentPosition(previous) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /Hard/ })).toBeNull();
+    expect(screen.getByRole('button', { name: /^Next/ })).toBeInTheDocument();
   });
 
   it('advances to the next card via Next', async () => {

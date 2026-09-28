@@ -7,8 +7,8 @@ import type { Vocabulary } from '@learncraft-spanish/shared';
 
 /**
  * The v2 text quiz screen. One card serves both variants; `srs` is the only
- * switch, and it controls exactly three things — the answer-side dock, the
- * tallies, and swipe-to-grade.
+ * switch, and it controls exactly three things — the grade row above
+ * previous/next, the tallies, and swipe-to-grade.
  */
 export interface TextQuizV2Props {
   /** `true` renders the grading dock, the tallies, and swipe. */

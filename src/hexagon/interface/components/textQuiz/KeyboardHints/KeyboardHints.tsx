@@ -25,25 +25,29 @@ const SRS_GRADE_HINTS: HintItem[] = [
  * Desktop-only legend for the shortcuts `TextQuizV2` wires up globally.
  * Left/right are always previous/next. SRS adds `1` hard / `2` easy.
  * Space play/pause is intentionally omitted — it is a hidden shortcut.
- * Purely descriptive, so it is hidden from assistive technology rather
- * than announced as content.
+ * The title marks the row as keyboard controls so the keycaps are not
+ * mistaken for quiz buttons. Purely descriptive, so the whole legend is
+ * hidden from assistive technology rather than announced as content.
  */
 export function KeyboardHints({ srs }: KeyboardHintsProps): JSX.Element {
   const hints = srs ? [...NAV_HINTS, ...SRS_GRADE_HINTS] : NAV_HINTS;
 
   return (
     <div className={styles.root} aria-hidden="true">
-      {hints.map((hint, index) => (
-        <span className={styles.item} key={hint.label}>
-          {index > 0 && <span className={styles.sep}>·</span>}
-          <kbd className={styles.key}>
-            <span className={hint.key === '↑' ? styles.strong : styles.muted}>
-              {hint.key}
-            </span>
-          </kbd>
-          <span>{hint.label}</span>
-        </span>
-      ))}
+      <p className={styles.title}>Keyboard controls</p>
+      <div className={styles.hints}>
+        {hints.map((hint, index) => (
+          <span className={styles.item} key={hint.label}>
+            {index > 0 && <span className={styles.sep}>·</span>}
+            <kbd className={styles.key}>
+              <span className={hint.key === '↑' ? styles.strong : styles.muted}>
+                {hint.key}
+              </span>
+            </kbd>
+            <span>{hint.label}</span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

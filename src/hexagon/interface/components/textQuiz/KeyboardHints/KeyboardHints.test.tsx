@@ -7,6 +7,12 @@ describe('keyboard hints', () => {
     cleanup();
   });
 
+  it('titles the legend so the keycaps are not mistaken for quiz buttons', () => {
+    render(<KeyboardHints srs={false} />);
+
+    expect(screen.getByText('Keyboard controls')).toBeTruthy();
+  });
+
   it('shows previous, flip, and next for a non-SRS quiz', () => {
     render(<KeyboardHints srs={false} />);
 
