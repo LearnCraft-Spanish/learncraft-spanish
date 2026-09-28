@@ -5,10 +5,12 @@
   gap: var(--lcs-space-4);
 }
 
-/* 52/56px are the handoff's literal dock button heights, not scale steps. */
+/* 52/56px are the handoff's literal dock button heights, not scale steps.
+ * `height` (not min-height) so the SRS grade row and the nav row stay the
+ * same size when the placeholder swaps for Hard/Easy. */
 .slot {
   display: flex;
-  min-height: 52px;
+  height: 52px;
 }
 
 .placeholder {
@@ -126,7 +128,7 @@
 
 @media (min-width: 769px) {
   .slot {
-    min-height: 56px;
+    height: 56px;
   }
 
   .buttons {

@@ -29,17 +29,58 @@ function renderDock(overrides: Partial<QuizDockProps> = {}): {
   return { onGrade, onPrevious, onNext };
 }
 
+function expectBefore(earlier: HTMLElement, later: HTMLElement): void {
+  expect(
+    earlier.compareDocumentPosition(later) & Node.DOCUMENT_POSITION_FOLLOWING,
+  ).toBeTruthy();
+}
+
 describe('quiz dock', () => {
   afterEach(() => {
     cleanup();
   });
 
-  it('shows the prompt-side placeholder when the answer is not showing', () => {
-    renderDock({ answerShowing: false });
+  it('shows Previous and Next on the question side of a non-SRS quiz', () => {
+    renderDock({ srs: false, answerShowing: false });
 
     expect(
-      screen.getByText('Flip the card to see the answer'),
+      screen.getByRole('button', { name: /Previous/ }),
     ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Next/ })).toBeInTheDocument();
+    expect(
+      screen.queryByText('Flip the card to see the answer'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps the SRS placeholder above Previous and Next on the question side', () => {
+    renderDock({ srs: true, answerShowing: false });
+
+    const placeholder = screen.getByText('Flip the card to see the answer');
+    const previous = screen.getByRole('button', { name: /Previous/ });
+    const next = screen.getByRole('button', { name: /^Next/ });
+
+    expectBefore(placeholder, previous);
+    expectBefore(placeholder, next);
+    expect(
+      screen.queryByRole('button', { name: /Hard/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Easy/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('puts Hard and Easy above Previous and Next on the SRS answer side', () => {
+    renderDock({ srs: true, answerShowing: true });
+
+    const hard = screen.getByRole('button', { name: /Hard/ });
+    const easy = screen.getByRole('button', { name: /Easy/ });
+    const previous = screen.getByRole('button', { name: /Previous/ });
+
+    expectBefore(hard, previous);
+    expectBefore(easy, previous);
+    expect(
+      screen.queryByText('Flip the card to see the answer'),
+    ).not.toBeInTheDocument();
   });
 
   it('labels the non-SRS Next button as Next on any card but the last', () => {
@@ -72,11 +113,12 @@ describe('quiz dock', () => {
     expect(screen.getByRole('button', { name: /Previous/ })).toBeDisabled();
   });
 
-  it('ignores isLast for the SRS dock and shows Hard/Easy instead', () => {
+  it('ignores isLast for the SRS dock and shows Hard/Easy plus Next', () => {
     renderDock({ srs: true, isLast: true });
 
     expect(screen.getByRole('button', { name: /Hard/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Easy/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Next/ })).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: /Finish/ }),
     ).not.toBeInTheDocument();
