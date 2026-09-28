@@ -81,6 +81,9 @@ describe('quiz dock', () => {
     expect(
       screen.queryByText('Flip the card to see the answer'),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('or swipe the card · left hard, right easy'),
+    ).not.toBeInTheDocument();
   });
 
   it('labels the non-SRS Next button as Next on any card but the last', () => {

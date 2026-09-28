@@ -5,14 +5,25 @@
 @media (min-width: 769px) {
   .root {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     /* Ghost under the dock — softer than body muted. */
     color: var(--lcs-color-placeholder);
     font-size: var(--lcs-text-caption-mobile);
-    gap: var(--lcs-space-3);
-    row-gap: var(--lcs-space-2);
+    gap: var(--lcs-space-2);
   }
+}
+
+.title {
+  margin: 0;
+}
+
+.hints {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--lcs-space-3);
+  row-gap: var(--lcs-space-2);
 }
 
 .item {

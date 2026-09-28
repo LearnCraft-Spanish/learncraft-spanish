@@ -81,17 +81,6 @@ export function QuizDock({
           </button>
         </div>
       </div>
-
-      {/* Reserved even on the prompt side so the dock's total height never
-       * changes between faces — only its visibility toggles. */}
-      {srs && (
-        <p
-          className={styles.swipeCaption}
-          style={{ visibility: answerShowing ? 'visible' : 'hidden' }}
-        >
-          or swipe the card · left hard, right easy
-        </p>
-      )}
     </div>
   );
 }
