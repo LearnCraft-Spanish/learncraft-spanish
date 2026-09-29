@@ -1,0 +1,128 @@
+/* The deck: an empty plate (z 0) under the live card (z 1), and — only
+ * while navigating back — the previous card sliding in on top (z 2). The
+ * card layer stays in flow so the stage sizes exactly like a bare card. */
+.cardStage {
+  display: flex;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  perspective: 1200px;
+}
+
+/* Same geometry as the `QuizCard` plate (20px is the handoff's one-off
+ * frame radius), empty, and nudged down/in so a sliver of the next card
+ * shows below the live one. */
+.deckPeek {
+  position: absolute;
+  z-index: 0;
+  box-sizing: border-box;
+  inset: 0;
+  border: var(--lcs-border-hairline) solid var(--lcs-border-card);
+  border-radius: 20px;
+  background-color: var(--lcs-color-surface);
+  pointer-events: none;
+  transform: translateY(6px) scale(0.985);
+}
+
+.cardLayer {
+  display: flex;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.incomingLayer {
+  display: flex;
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+}
+
+/* `forwards` holds the end pose until the parent commits the next card, so
+ * the old card never flashes back to rest first. */
+.exitNext {
+  animation: exitNext var(--lcs-motion-panel) var(--lcs-ease-standard) forwards;
+}
+
+.exitHard {
+  animation: exitHard var(--lcs-motion-panel) var(--lcs-ease-standard) forwards;
+}
+
+.exitEasy {
+  animation: exitEasy var(--lcs-motion-panel) var(--lcs-ease-standard) forwards;
+}
+
+.enterPrev {
+  animation: enterPrev var(--lcs-motion-panel) var(--lcs-ease-standard) forwards;
+}
+
+.settle {
+  animation: settle var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+@keyframes exitNext {
+  from {
+    opacity: 1;
+    transform: translateX(0) rotate(0);
+  }
+
+  to {
+    opacity: 0.92;
+    transform: translateX(-110%) rotate(-6deg);
+  }
+}
+
+@keyframes exitHard {
+  from {
+    transform: translateX(0) rotate(0);
+  }
+
+  to {
+    transform: translateX(-120%) rotate(-12deg);
+  }
+}
+
+@keyframes exitEasy {
+  from {
+    transform: translateX(0) rotate(0);
+  }
+
+  to {
+    transform: translateX(120%) rotate(12deg);
+  }
+}
+
+@keyframes enterPrev {
+  from {
+    transform: translateX(-110%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes settle {
+  from {
+    transform: translateY(6px) scale(0.985);
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* `useQuizCardMotion` skips every phase under reduced motion; this is the
+ * CSS-side guarantee that nothing moves if a class lands anyway. */
+@media (prefers-reduced-motion: reduce) {
+  .exitNext,
+  .exitHard,
+  .exitEasy,
+  .enterPrev,
+  .settle {
+    animation: none;
+  }
+}

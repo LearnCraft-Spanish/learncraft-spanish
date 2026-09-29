@@ -3,9 +3,22 @@ import type { FlashcardForDisplay } from '@domain/quizzing';
 import type { Vocabulary } from '@learncraft-spanish/shared';
 import type { ComponentProps } from 'react';
 import { TextQuizV2 } from '@interface/components/textQuiz/TextQuizV2/TextQuizV2';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  QUIZ_CARD_EXIT_MS,
+  QUIZ_CARD_FLIP_MS,
+} from '@interface/hooks/useQuizCardMotion';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+/** Matches the motion hook's unexported fallback slack. */
+const MOTION_FALLBACK_SLACK_MS = 80;
 
 const VOCABULARY: Vocabulary[] = [
   {
@@ -54,14 +67,34 @@ function vocabInfoHook(vocab: Vocabulary): VocabInfo {
   } as unknown as VocabInfo;
 }
 
-/** Stubs `matchMedia` (absent in jsdom) so `useMediaQuery` can match. */
-function stubMobile(matches: boolean): void {
+/**
+ * Stubs `matchMedia` (absent in jsdom). `mobile` drives the 768px layout
+ * query. Reduced motion defaults to on so navigation stays synchronous;
+ * card-motion tests opt out.
+ */
+function stubMedia(
+  options: {
+    mobile?: boolean;
+    reducedMotion?: boolean;
+  } = {},
+): void {
+  const mobile = options.mobile ?? false;
+  const reducedMotion = options.reducedMotion ?? true;
   vi.stubGlobal('matchMedia', (query: string) => ({
-    matches,
+    matches: query.includes('prefers-reduced-motion')
+      ? reducedMotion
+      : query.includes('max-width')
+        ? mobile
+        : false,
     media: query,
     addEventListener: () => {},
     removeEventListener: () => {},
   }));
+}
+
+/** Stubs `matchMedia` (absent in jsdom) so `useMediaQuery` can match. */
+function stubMobile(matches: boolean): void {
+  stubMedia({ mobile: matches, reducedMotion: true });
 }
 
 function renderQuiz(): void {
@@ -784,5 +817,167 @@ describe('text quiz v2 keyboard navigation', () => {
     fireEvent.keyDown(document, { key: '1' });
 
     expect(onGrade).not.toHaveBeenCalled();
+  });
+});
+
+describe('text quiz v2 card motion', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllTimers();
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  function finishMotion(durationMs: number): void {
+    act(() => {
+      vi.advanceTimersByTime(durationMs + MOTION_FALLBACK_SLACK_MS);
+    });
+  }
+
+  it('flips immediately, then ignores another flip until the phase ends', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    stubMedia({ reducedMotion: false });
+    const { toggleAnswer } = renderQuizWithProps({
+      getHelpIsOpen: false,
+      exampleNumber: 2,
+    });
+
+    fireEvent.keyDown(document, { key: 'ArrowUp' });
+    expect(toggleAnswer).toHaveBeenCalledOnce();
+
+    fireEvent.keyDown(document, { key: 'ArrowDown' });
+    expect(toggleAnswer).toHaveBeenCalledOnce();
+
+    finishMotion(QUIZ_CARD_FLIP_MS);
+    fireEvent.keyDown(document, { key: 'ArrowDown' });
+    expect(toggleAnswer).toHaveBeenCalledTimes(2);
+  });
+
+  it('defers next until the exit phase completes', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    stubMedia({ reducedMotion: false });
+    const { onNext } = renderQuizWithProps({
+      getHelpIsOpen: false,
+      exampleNumber: 2,
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /^Next$/ }));
+    expect(onNext).not.toHaveBeenCalled();
+
+    finishMotion(QUIZ_CARD_EXIT_MS);
+    expect(onNext).toHaveBeenCalledOnce();
+  });
+
+  it('defers a grade until the exit phase completes and drops a second grade', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    stubMedia({ reducedMotion: false });
+    const { onGrade } = renderQuizWithProps({
+      srs: true,
+      answerShowing: true,
+      getHelpIsOpen: false,
+      tallies: { hard: 0, easy: 0 },
+      exampleNumber: 2,
+    });
+
+    fireEvent.keyDown(document, { key: '1' });
+    fireEvent.keyDown(document, { key: '2' });
+    expect(onGrade).not.toHaveBeenCalled();
+
+    finishMotion(QUIZ_CARD_EXIT_MS);
+    expect(onGrade).toHaveBeenCalledOnce();
+    expect(onGrade).toHaveBeenCalledWith('hard');
+  });
+
+  it('goes back immediately when the previous card was never shown', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    stubMedia({ reducedMotion: false });
+    const { onPrevious } = renderQuizWithProps({
+      getHelpIsOpen: false,
+      exampleNumber: 2,
+    });
+
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    expect(onPrevious).toHaveBeenCalledOnce();
+  });
+
+  it('defers previous when that card is cached and shows its question face', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    stubMedia({ reducedMotion: false });
+    const onPrevious = vi.fn();
+    const first = {
+      ...QUIZ_EXAMPLE,
+      question: { ...QUIZ_EXAMPLE.question, text: 'First question' },
+    } as FlashcardForDisplay;
+    const second = {
+      ...QUIZ_EXAMPLE,
+      question: { ...QUIZ_EXAMPLE.question, text: 'Second question' },
+    } as FlashcardForDisplay;
+    const props = {
+      srs: false,
+      eyebrow: 'My Flashcards Quiz',
+      subtitle: 'Lessons 1–111 · 249 cards',
+      quizLength: 249,
+      answerShowing: false,
+      toggleAnswer: vi.fn(),
+      getHelpIsOpen: false,
+      setGetHelpIsOpen: vi.fn(),
+      vocabInfoHook,
+      addPendingRemoveProps: undefined,
+      onPrevious,
+      onNext: vi.fn(),
+      onExit: vi.fn(),
+    };
+
+    const { rerender } = render(
+      <TextQuizV2 {...props} exampleNumber={1} quizExample={first} />,
+    );
+    rerender(<TextQuizV2 {...props} exampleNumber={2} quizExample={second} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /^Previous$/ }));
+    expect(onPrevious).not.toHaveBeenCalled();
+    // Incoming snapshot mounts both flip faces with the cached question text.
+    expect(screen.getAllByText('First question')).toHaveLength(2);
+    expect(screen.getByText('Second question')).toBeTruthy();
+
+    finishMotion(QUIZ_CARD_EXIT_MS);
+    expect(onPrevious).toHaveBeenCalledOnce();
+    expect(screen.queryAllByText('First question')).toHaveLength(0);
+  });
+
+  it('goes back immediately under reduced motion even when the card is cached', () => {
+    stubMedia({ reducedMotion: true });
+    const onPrevious = vi.fn();
+    const first = {
+      ...QUIZ_EXAMPLE,
+      question: { ...QUIZ_EXAMPLE.question, text: 'First question' },
+    } as FlashcardForDisplay;
+    const second = {
+      ...QUIZ_EXAMPLE,
+      question: { ...QUIZ_EXAMPLE.question, text: 'Second question' },
+    } as FlashcardForDisplay;
+    const props = {
+      srs: false,
+      eyebrow: 'My Flashcards Quiz',
+      subtitle: 'Lessons 1–111 · 249 cards',
+      quizLength: 249,
+      answerShowing: false,
+      toggleAnswer: vi.fn(),
+      getHelpIsOpen: false,
+      setGetHelpIsOpen: vi.fn(),
+      vocabInfoHook,
+      addPendingRemoveProps: undefined,
+      onPrevious,
+      onNext: vi.fn(),
+      onExit: vi.fn(),
+    };
+
+    const { rerender } = render(
+      <TextQuizV2 {...props} exampleNumber={1} quizExample={first} />,
+    );
+    rerender(<TextQuizV2 {...props} exampleNumber={2} quizExample={second} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /^Previous$/ }));
+    expect(onPrevious).toHaveBeenCalledOnce();
+    expect(screen.queryByText('First question')).toBeNull();
   });
 });

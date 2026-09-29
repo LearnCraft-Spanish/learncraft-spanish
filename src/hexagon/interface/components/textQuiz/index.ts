@@ -1,6 +1,7 @@
 export * from '@interface/components/textQuiz/CardAudioButton';
 export * from '@interface/components/textQuiz/KeyboardHints';
 export * from '@interface/components/textQuiz/QuizCard';
+export * from '@interface/components/textQuiz/QuizCardStage';
 export * from '@interface/components/textQuiz/QuizDock';
 export * from '@interface/components/textQuiz/QuizProgressHeader';
 export * from '@interface/components/textQuiz/TallyPill';

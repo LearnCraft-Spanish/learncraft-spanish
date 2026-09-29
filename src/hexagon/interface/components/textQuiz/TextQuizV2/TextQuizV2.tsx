@@ -1,10 +1,13 @@
+import type { FlashcardForDisplay } from '@domain/quizzing';
 import type { SrsDifficulty } from '@domain/srs';
 import type { CardAudioHandle } from '@interface/components/textQuiz/CardAudioButton';
+import type { QuizCardDrag } from '@interface/components/textQuiz/QuizCard';
 import type { TextQuizV2Props } from '@interface/components/textQuiz/TextQuizV2/TextQuizV2.types';
 import type { JSX } from 'react';
 import { orderVocabularyByAppearance } from '@domain/functions/orderVocabularyByAppearance';
 import { KeyboardHints } from '@interface/components/textQuiz/KeyboardHints';
 import { QuizCard } from '@interface/components/textQuiz/QuizCard';
+import { QuizCardStage } from '@interface/components/textQuiz/QuizCardStage';
 import { QuizDock } from '@interface/components/textQuiz/QuizDock';
 import { QuizProgressHeader } from '@interface/components/textQuiz/QuizProgressHeader';
 import { TallyPill } from '@interface/components/textQuiz/TallyPill';
@@ -12,6 +15,7 @@ import { WordChips } from '@interface/components/textQuiz/WordChips';
 import { WordPanel } from '@interface/components/textQuiz/WordPanel';
 import { WordPanelModal } from '@interface/components/textQuiz/WordPanelModal';
 import { useMediaQuery } from '@interface/hooks/useMediaQuery';
+import { useQuizCardMotion } from '@interface/hooks/useQuizCardMotion';
 import { useEffect, useRef, useState } from 'react';
 import styles from './TextQuizV2.module.scss';
 
@@ -32,6 +36,40 @@ function isFocusOnNativeControl(): boolean {
     return false;
   }
   return INTERACTIVE_TAGS.has(active.tagName);
+}
+
+function noop(): void {}
+
+/**
+ * Question face of a card the student has already seen. Shown only while
+ * the previous-card phase is running; the stage owns when it is mounted.
+ */
+function IncomingQuestionCard({
+  example,
+}: {
+  example: FlashcardForDisplay;
+}): JSX.Element {
+  const questionFace = {
+    text: example.question.text,
+    spanish: example.question.spanish,
+  };
+  return (
+    <div className={styles.incomingPlate} aria-hidden="true">
+      <QuizCard
+        srs={false}
+        answerShowing={false}
+        promptFace={questionFace}
+        answerFace={questionFace}
+        audioUrl={null}
+        showHelpButton={false}
+        helpOpen={false}
+        onToggleHelp={noop}
+        hintText=""
+        onFlip={noop}
+        interactionLocked
+      />
+    </div>
+  );
 }
 
 /** True while focus sits in a field where arrow keys move the caret. */
@@ -75,7 +113,11 @@ export function TextQuizV2({
    * instead of the chip-anchored panel — in-flow, the panel was cramped
    * into the card's own scroll region. */
   const isMobile = useMediaQuery('(max-width: 768px)');
+  // Visual phases only. Commits stay the callbacks this screen already owned.
+  const motion = useQuizCardMotion();
   const audioControlRef = useRef<CardAudioHandle | null>(null);
+  const faceCacheRef = useRef(new Map<number, FlashcardForDisplay>());
+  const exitDragRef = useRef<QuizCardDrag | null>(null);
 
   // A new card can never carry over the previous one's chip selection, even
   // if the caller navigates by some path other than `onPrevious`/`onNext`.
@@ -83,14 +125,23 @@ export function TextQuizV2({
     setSelectedWordId(null);
   }, [exampleNumber]);
 
+  useEffect(() => {
+    if (quizExample) {
+      faceCacheRef.current.set(exampleNumber, quizExample);
+    }
+  }, [exampleNumber, quizExample]);
+
   function closeHelpAndClearWord(): void {
     setGetHelpIsOpen(false);
     setSelectedWordId(null);
   }
 
   function handleFlip(): void {
+    if (motion.isAnimating) {
+      return;
+    }
     closeHelpAndClearWord();
-    toggleAnswer();
+    motion.flip(() => toggleAnswer());
   }
 
   function handleToggleHelp(): void {
@@ -106,18 +157,48 @@ export function TextQuizV2({
   }
 
   function handlePrevious(): void {
+    if (motion.isAnimating) {
+      return;
+    }
     closeHelpAndClearWord();
-    onPrevious();
+    const cached = faceCacheRef.current.get(exampleNumber - 1);
+    if (!cached || motion.reducedMotion) {
+      onPrevious();
+      return;
+    }
+    motion.previous(() => onPrevious());
   }
 
   function handleNext(): void {
+    if (motion.isAnimating) {
+      return;
+    }
     closeHelpAndClearWord();
-    onNext();
+    motion.next(() => onNext());
   }
 
   function handleGrade(difficulty: SrsDifficulty): void {
+    if (motion.isAnimating) {
+      return;
+    }
     closeHelpAndClearWord();
-    onGrade?.(difficulty);
+    exitDragRef.current = null;
+    motion.grade(difficulty, () => onGrade?.(difficulty));
+  }
+
+  function handleSwipeCommit(
+    difficulty: SrsDifficulty,
+    drag: QuizCardDrag,
+  ): void {
+    if (motion.isAnimating) {
+      return;
+    }
+    closeHelpAndClearWord();
+    exitDragRef.current = drag;
+    motion.grade(difficulty, () => {
+      exitDragRef.current = null;
+      onGrade?.(difficulty);
+    });
   }
 
   function handleToggleAudio(): void {
@@ -216,9 +297,21 @@ export function TextQuizV2({
   }
 
   const { question, answer } = quizExample;
-  const face = answerShowing
-    ? { text: answer.text, spanish: answer.spanish }
-    : { text: question.text, spanish: question.spanish };
+  const promptFace = { text: question.text, spanish: question.spanish };
+  const answerFace = { text: answer.text, spanish: answer.spanish };
+  const exitDrag = exitDragRef.current;
+  const exitTint =
+    exitDrag !== null
+      ? null
+      : motion.phase === 'exitingHard'
+        ? 'hard'
+        : motion.phase === 'exitingEasy'
+          ? 'easy'
+          : null;
+  const previousExample =
+    motion.phase === 'enteringPrevious'
+      ? faceCacheRef.current.get(exampleNumber - 1)
+      : undefined;
   const spanishText = question.spanish ? question.text : answer.text;
   // Same policy as legacy `FlashcardDisplay`: prefer the current face's
   // clip, but if the answer face has none, fall back to the question clip
@@ -300,21 +393,36 @@ export function TextQuizV2({
           />
         )}
 
-        <QuizCard
-          srs={srs}
-          answerShowing={answerShowing}
-          face={face}
-          audioUrl={audioUrl}
-          audioControlRef={audioControlRef}
-          favourite={favourite}
-          showHelpButton={showHelpButton}
-          helpOpen={getHelpIsOpen}
-          onToggleHelp={handleToggleHelp}
-          hintText={hintText}
-          onFlip={handleFlip}
-          helpContent={helpContent}
-          onGrade={handleGrade}
-        />
+        <QuizCardStage
+          phase={motion.phase}
+          showPeek={exampleNumber < quizLength}
+          incoming={
+            previousExample ? (
+              <IncomingQuestionCard example={previousExample} />
+            ) : undefined
+          }
+          onMotionComplete={motion.completePhase}
+        >
+          <QuizCard
+            srs={srs}
+            answerShowing={answerShowing}
+            promptFace={promptFace}
+            answerFace={answerFace}
+            audioUrl={audioUrl}
+            audioControlRef={audioControlRef}
+            favourite={favourite}
+            showHelpButton={showHelpButton}
+            helpOpen={getHelpIsOpen}
+            onToggleHelp={handleToggleHelp}
+            hintText={hintText}
+            onFlip={handleFlip}
+            helpContent={helpContent}
+            interactionLocked={motion.isAnimating}
+            onSwipeCommit={handleSwipeCommit}
+            exitTransform={exitDrag}
+            exitTint={exitTint}
+          />
+        </QuizCardStage>
 
         {srs && tallies && (
           <TallyPill
