@@ -5,6 +5,11 @@ import {
   resetMockUseAppHeader,
 } from '@application/useCases/AppHeader/useAppHeader.mock';
 import {
+  mockUseStudentSelector,
+  overrideMockUseStudentSelector,
+  resetMockUseStudentSelector,
+} from '@application/useCases/useStudentSelector/useStudentSelector.mock';
+import {
   mockUseStudentUiVersion,
   overrideMockUseStudentUiVersion,
   resetMockUseStudentUiVersion,
@@ -22,6 +27,10 @@ vi.mock('@application/useCases/AppHeader', () => ({
 
 vi.mock('@application/useCases/useStudentUiVersion', () => ({
   useStudentUiVersion: mockUseStudentUiVersion,
+}));
+
+vi.mock('@application/useCases/useStudentSelector', () => ({
+  useStudentSelector: mockUseStudentSelector,
 }));
 
 function stubMobile(matches: boolean): void {
@@ -49,7 +58,170 @@ describe('component AppHeader', () => {
   afterEach(() => {
     setMobileStackOverride(null);
     resetMockUseStudentUiVersion();
+    resetMockUseStudentSelector();
     vi.unstubAllGlobals();
+  });
+
+  describe('coach/admin', () => {
+    const staff = {
+      isAuthenticated: true,
+      isLoading: false,
+      isStaff: true,
+      studentName: 'Coach Carla',
+      studentEmail: 'carla@fake.not',
+    };
+
+    it('replaces the student nav with "Use as student"', () => {
+      overrideMockUseAppHeader({ ...staff, isUsingAsStudent: false });
+
+      renderHeader(<a href="/flashcardfinder">Flashcard Finder</a>);
+
+      expect(
+        screen.getByRole('button', { name: 'Use as student' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: 'Flashcard Finder' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('opens the student picker from "Use as student"', async () => {
+      overrideMockUseAppHeader({ ...staff, isUsingAsStudent: false });
+
+      renderHeader();
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Use as student' }),
+      );
+
+      expect(
+        screen.getByRole('dialog', { name: 'Use as student' }),
+      ).toBeInTheDocument();
+    });
+
+    it('keeps "Use as student" on mobile', () => {
+      stubMobile(true);
+      overrideMockUseAppHeader({ ...staff, isUsingAsStudent: false });
+
+      renderHeader();
+
+      expect(
+        screen.getByRole('button', { name: 'Use as student' }),
+      ).toBeInTheDocument();
+    });
+
+    it('shows the student nav and who they are using the app as', async () => {
+      overrideMockUseAppHeader({
+        ...staff,
+        isUsingAsStudent: true,
+        usingAs: { name: 'Ana Ruiz', email: 'ana@fake.not' },
+      });
+
+      renderHeader(<a href="/flashcardfinder">Flashcard Finder</a>);
+
+      expect(
+        screen.getByRole('link', { name: 'Flashcard Finder' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Use as student' }),
+      ).not.toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('button', { name: 'Account' }));
+      expect(screen.getByText('Coach Carla')).toBeInTheDocument();
+      expect(screen.getByText('Ana Ruiz')).toBeInTheDocument();
+      expect(screen.getByText('ana@fake.not')).toBeInTheDocument();
+    });
+
+    it('opens the picker from the account menu\'s "Use as student"', async () => {
+      overrideMockUseAppHeader({ ...staff, isUsingAsStudent: false });
+
+      renderHeader();
+      await userEvent.click(screen.getByRole('button', { name: 'Account' }));
+      await userEvent.click(
+        screen.getByRole('menuitem', { name: 'Use as student' }),
+      );
+
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('dialog', { name: 'Use as student' }),
+      ).toBeInTheDocument();
+    });
+
+    it('opens the picker from "Change student"', async () => {
+      overrideMockUseAppHeader({
+        ...staff,
+        isUsingAsStudent: true,
+        usingAs: { name: 'Ana Ruiz', email: 'ana@fake.not' },
+      });
+      overrideMockUseStudentSelector({ isUsingAsStudent: true });
+
+      renderHeader();
+      await userEvent.click(screen.getByRole('button', { name: 'Account' }));
+      await userEvent.click(
+        screen.getByRole('menuitem', { name: 'Change student' }),
+      );
+
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('dialog', { name: 'Change student' }),
+      ).toBeInTheDocument();
+    });
+
+    it('replaces Log out with a way back to the staff view, and goes home', async () => {
+      const stopUsingAsStudent = vi.fn();
+      const logout = vi.fn();
+      overrideMockUseAppHeader({
+        ...staff,
+        staffRole: 'admin',
+        isUsingAsStudent: true,
+        usingAs: { name: 'Ana Ruiz', email: 'ana@fake.not' },
+        stopUsingAsStudent,
+        logout,
+      });
+
+      function PathReadout(): JSX.Element {
+        const { pathname } = useLocation();
+        return <div data-testid="path">{pathname}</div>;
+      }
+      render(
+        <MemoryRouter initialEntries={['/flashcardfinder']}>
+          <AppHeader />
+          <PathReadout />
+        </MemoryRouter>,
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: 'Account' }));
+      expect(
+        screen.queryByRole('menuitem', { name: /Log out/ }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByText('Back to your admin view')).toBeInTheDocument();
+
+      await userEvent.click(
+        screen.getByRole('menuitem', { name: /Stop using as student/ }),
+      );
+
+      expect(stopUsingAsStudent).toHaveBeenCalledOnce();
+      expect(logout).not.toHaveBeenCalled();
+      expect(screen.getByTestId('path')).toHaveTextContent(/^\/$/);
+    });
+  });
+
+  it('never shows staff controls to a student', async () => {
+    overrideMockUseAppHeader({
+      isAuthenticated: true,
+      isLoading: false,
+      isStaff: false,
+      studentName: 'Maria Silva',
+    });
+
+    renderHeader(<a href="/flashcardfinder">Flashcard Finder</a>);
+    await userEvent.click(screen.getByRole('button', { name: 'Account' }));
+
+    expect(
+      screen.queryByRole('button', { name: 'Use as student' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getAllByRole('menuitem').map((item) => item.textContent),
+    ).toEqual(['Log out']);
+    expect(screen.queryByText('Using as')).not.toBeInTheDocument();
   });
 
   it('renders the wordmark', () => {

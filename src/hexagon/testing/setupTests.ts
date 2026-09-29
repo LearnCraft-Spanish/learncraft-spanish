@@ -101,6 +101,10 @@ import {
   mockSelectedCourseAndLessons,
   resetMockSelectedCourseAndLessons,
 } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+import {
+  mockUseUsingAsStudent,
+  resetMockUseUsingAsStudent,
+} from '@application/coordinators/hooks/useUsingAsStudent.mock';
 
 import {
   mockUseSpellingsKnownForLesson,
@@ -224,6 +228,10 @@ vi.mock('@application/coordinators/hooks/useIncludeUnpublished', () => ({
   useIncludeUnpublished: vi.fn(() => mockUseIncludeUnpublished),
 }));
 
+vi.mock('@application/coordinators/hooks/useUsingAsStudent', () => ({
+  useUsingAsStudent: vi.fn(() => mockUseUsingAsStudent),
+}));
+
 vi.mock('@application/units/useStudentFlashcards', () => ({
   useStudentFlashcards: vi.fn(() => mockUseStudentFlashcards),
 }));
@@ -265,6 +273,7 @@ const resetGlobalMocks = () => {
   resetMockActiveStudent();
   resetMockSelectedCourseAndLessons();
   resetMockUseIncludeUnpublished();
+  resetMockUseUsingAsStudent();
 
   // unit mocks
   resetMockUseStudentFlashcards();

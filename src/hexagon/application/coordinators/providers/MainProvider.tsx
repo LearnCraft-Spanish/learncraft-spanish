@@ -4,6 +4,7 @@ import { ExampleFilterContextProvider } from '@application/coordinators/provider
 import { IsFlushingStudentFlashcardUpdatesProvider } from '@application/coordinators/providers/IsFlushingStudentFlashcardUpdatesProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import TempIdContextProvider from '@application/coordinators/providers/TempIdContextProvider';
+import { UsingAsStudentProvider } from '@application/coordinators/providers/UsingAsStudentProvider';
 import { AudioEngineProvider } from '@composition/providers/AudioProvider';
 export default function MainProvider({
   children,
@@ -14,15 +15,17 @@ export default function MainProvider({
     <BannerDisplayProvider>
       <TempIdContextProvider>
         <ActiveStudentProvider>
-          <SelectedCourseAndLessonsProvider>
-            <AudioEngineProvider>
-              <ExampleFilterContextProvider>
-                <IsFlushingStudentFlashcardUpdatesProvider>
-                  {children}
-                </IsFlushingStudentFlashcardUpdatesProvider>
-              </ExampleFilterContextProvider>
-            </AudioEngineProvider>
-          </SelectedCourseAndLessonsProvider>
+          <UsingAsStudentProvider>
+            <SelectedCourseAndLessonsProvider>
+              <AudioEngineProvider>
+                <ExampleFilterContextProvider>
+                  <IsFlushingStudentFlashcardUpdatesProvider>
+                    {children}
+                  </IsFlushingStudentFlashcardUpdatesProvider>
+                </ExampleFilterContextProvider>
+              </AudioEngineProvider>
+            </SelectedCourseAndLessonsProvider>
+          </UsingAsStudentProvider>
         </ActiveStudentProvider>
       </TempIdContextProvider>
     </BannerDisplayProvider>

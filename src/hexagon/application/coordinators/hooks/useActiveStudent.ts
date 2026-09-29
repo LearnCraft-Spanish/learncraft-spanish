@@ -57,6 +57,10 @@ export function useActiveStudent(): UseActiveStudentReturnType {
     [canChangeStudent, updateSelectedStudent],
   );
 
+  const resetActiveStudent = useCallback(() => {
+    updateSelectedStudent({ email: null, changed: false });
+  }, [updateSelectedStudent]);
+
   const userToFetch: string | null = useMemo(() => {
     // If user has made any selection, use the context value (even if null)
     if (hasUserMadeSelection) {
@@ -120,8 +124,16 @@ export function useActiveStudent(): UseActiveStudentReturnType {
       error,
       isOwnUser,
       changeActiveStudent,
+      resetActiveStudent,
     }),
-    [appUser, isLoading, error, changeActiveStudent, isOwnUser],
+    [
+      appUser,
+      isLoading,
+      error,
+      changeActiveStudent,
+      resetActiveStudent,
+      isOwnUser,
+    ],
   );
   return returnValue;
 }

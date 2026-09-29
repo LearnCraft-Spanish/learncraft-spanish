@@ -10,6 +10,8 @@ export interface UseActiveStudentReturnType {
   error: Error | null;
   isOwnUser: boolean;
   changeActiveStudent: (newEmail: string | null) => void;
+  /** Drop any selection and go back to the signed-in user's own record. */
+  resetActiveStudent: () => void;
 }
 
 export interface UseSelectedCourseAndLessonsReturnType {

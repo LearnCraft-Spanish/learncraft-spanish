@@ -7,6 +7,11 @@ const defaultMockResult: UseAppHeaderResult = {
   isLoading: false,
   studentName: undefined,
   studentEmail: undefined,
+  isStaff: false,
+  staffRole: null,
+  isUsingAsStudent: false,
+  usingAs: null,
+  stopUsingAsStudent: vi.fn<() => void>(),
   login: vi.fn<() => void>(),
   logout: vi.fn<() => void>(),
 };
