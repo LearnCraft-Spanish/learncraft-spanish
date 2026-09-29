@@ -1,6 +1,8 @@
 import type { AuthPort, AuthUser } from '@application/ports/authPort';
 
-type PreviewRole = 'student' | 'coach' | 'admin' | 'limited';
+import { emailForRole, readPreviewRole, type PreviewRole } from './previewRole';
+
+export const GAUNTLET_STUB = true;
 
 function rolesFor(role: PreviewRole): string[] {
   switch (role) {
@@ -10,24 +12,12 @@ function rolesFor(role: PreviewRole): string[] {
       return ['Coach', 'Student'];
     case 'limited':
       return ['Limited'];
+    case 'free':
+      return [];
     case 'student':
     default:
       return ['Student'];
   }
-}
-
-function readRole(): PreviewRole {
-  const params = new URLSearchParams(window.location.search);
-  const raw = (params.get('role') ?? 'student').toLowerCase();
-  if (
-    raw === 'admin' ||
-    raw === 'coach' ||
-    raw === 'limited' ||
-    raw === 'student'
-  ) {
-    return raw;
-  }
-  return 'student';
 }
 
 /**
@@ -35,9 +25,9 @@ function readRole(): PreviewRole {
  * No Vitest `vi` — plain functions only.
  */
 export function useAuthAdapter(): AuthPort {
-  const role = readRole();
+  const role = readPreviewRole();
   const authUser: AuthUser = {
-    email: `gauntlet-${role}@fake.not`,
+    email: emailForRole(role),
     roles: rolesFor(role),
   };
 

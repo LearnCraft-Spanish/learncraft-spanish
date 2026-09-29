@@ -30,6 +30,7 @@
     "preview": "vite preview",
     "gauntlet:install": "pnpm --dir .gauntlet install && PLAYWRIGHT_BROWSERS_PATH=\"$PWD/.gauntlet/browsers\" pnpm --dir .gauntlet exec playwright install chromium",
     "gauntlet:preview": "vite --config .gauntlet/preview/vite.config.ts",
+    "gauntlet:stop": "node .gauntlet/capture/stop-preview.mjs",
     "gauntlet:capture-bar": "node .gauntlet/capture/capture-bar.mjs",
     "gauntlet:capture-app": "node .gauntlet/capture/capture-app.mjs",
     "refresh-mockdata": "tsx .github/workflows/update-cache.ts",

@@ -6,10 +6,20 @@ import { installNetworkGuard } from './networkGuard';
 
 import { PreviewProviders } from './PreviewProviders';
 import '@interface/styles/tokens.css';
+import 'src/index.css';
+import 'src/App.css';
+import 'src/contextual.scss';
+
+import * as authAdapterModule from '@application/adapters/authAdapter';
+
+const gauntletAuth = authAdapterModule as { GAUNTLET_STUB?: boolean };
+if (gauntletAuth.GAUNTLET_STUB !== true) {
+  throw new Error('[gauntlet] auth stub did not load');
+}
 
 declare global {
   interface Window {
-    __SPECIMEN__?: { ready: boolean; name: string };
+    __SPECIMEN__?: { ready: boolean; name: string; blocked?: number };
   }
 }
 
@@ -63,6 +73,7 @@ if (!rootEl) {
   throw new Error('[gauntlet] #root missing');
 }
 
+window.__SPECIMEN__ = { ready: false, name: resolvedName, blocked: 0 };
 createRoot(rootEl).render(
   <StrictMode>
     <PreviewProviders>
@@ -70,8 +81,4 @@ createRoot(rootEl).render(
     </PreviewProviders>
   </StrictMode>,
 );
-
-window.__SPECIMEN__ = {
-  ready: !deferReady,
-  name: resolvedName,
-};
+window.__SPECIMEN__.ready = !deferReady;
