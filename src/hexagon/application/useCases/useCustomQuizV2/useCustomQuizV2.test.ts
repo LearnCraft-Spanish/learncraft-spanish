@@ -1,7 +1,15 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import { overrideMockExampleAdapter } from '@application/adapters/exampleAdapter.mock';
+import {
+  mockAudioAdapter,
+  resetMockAudioAdapter,
+} from '@application/adapters/audioAdapter.mock';
 import { mockLastStudiedLessonAdapter } from '@application/adapters/lastStudiedLessonAdapter.mock';
 import { overrideMockSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+import {
+  mockUseExampleQuery,
+  overrideMockUseExampleQuery,
+  resetMockUseExampleQuery,
+} from '@application/queries/ExampleQueries/useExampleQuery.mock';
 import {
   CustomQuizType,
   useCustomQuizV2,
@@ -19,12 +27,12 @@ import {
 import silence1s from 'src/assets/audio/1s.mp3';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const primeAudioElement = vi.hoisted(() =>
-  vi.fn<(silenceUrl: string) => void>(),
-);
-
 vi.mock('@application/adapters/audioAdapter', () => ({
-  useAudioAdapter: () => ({ primeAudioElement }),
+  useAudioAdapter: () => mockAudioAdapter,
+}));
+
+vi.mock('@application/queries/ExampleQueries/useExampleQuery', () => ({
+  useExampleQuery: mockUseExampleQuery,
 }));
 
 const student = getAppUserFromEmail('student-no-flashcards@fake.not')!;
@@ -47,11 +55,12 @@ function renderCustomQuiz() {
 
 /** Serves `available` examples on the page out of `total` matches. */
 function serveExamples(available: number, total = available) {
-  overrideMockExampleAdapter({
-    getFilteredExamples: async () => ({
-      examples: createMockExampleWithVocabularyList(available),
-      totalCount: total,
-    }),
+  overrideMockUseExampleQuery({
+    filteredExamples: createMockExampleWithVocabularyList(available),
+    totalCount: total,
+    isLoading: false,
+    isDependenciesLoading: false,
+    error: null,
   });
 }
 
@@ -60,17 +69,17 @@ function createExamples(
   spanishAudio: (index: number) => string = () =>
     'https://audio.example/clip.mp3',
 ): ExampleWithVocabulary[] {
-  return Array.from({ length: count }, (_, index) => {
-    return {
-      id: index + 1,
-      spanishAudio: spanishAudio(index),
-    } as ExampleWithVocabulary;
-  });
+  return createMockExampleWithVocabularyList(count).map((example, index) => ({
+    ...example,
+    id: index + 1,
+    spanishAudio: spanishAudio(index),
+  }));
 }
 
 describe('useCustomQuizV2', () => {
   beforeEach(() => {
-    primeAudioElement.mockClear();
+    resetMockUseExampleQuery();
+    resetMockAudioAdapter();
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-no-flashcards@fake.not')!,
@@ -304,54 +313,47 @@ describe('useCustomQuizV2', () => {
     expect(result.current.audioQuizProps.autoplay).toBe(false);
   });
 
-  it('treats the first load as initial and a later filter load as a refresh', async () => {
-    let callCount = 0;
-    let releaseFirst: (value: {
-      examples: ExampleWithVocabulary[];
-      totalCount: number;
-    }) => void = () => {};
-    let releaseNext: (value: {
-      examples: ExampleWithVocabulary[];
-      totalCount: number;
-    }) => void = () => {};
-    overrideMockExampleAdapter({
-      getFilteredExamples: () => {
-        callCount += 1;
-        if (callCount === 1) {
-          return new Promise((resolve) => {
-            releaseFirst = resolve;
-          });
-        }
-        return new Promise((resolve) => {
-          releaseNext = resolve;
-        });
-      },
+  it('treats the first load as initial and a later filter load as a refresh', () => {
+    overrideMockUseExampleQuery({
+      isLoading: true,
+      isDependenciesLoading: false,
+      filteredExamples: null,
+      totalCount: null,
     });
-
     const { result, rerender } = renderCustomQuiz();
 
-    await waitFor(() => expect(result.current.isLoadingExamples).toBe(true));
+    expect(result.current.isLoadingExamples).toBe(true);
     expect(result.current.isInitialLoading).toBe(true);
     expect(result.current.quizLengthOptions).toEqual([]);
     expect(result.current.quizNotReady).toBe(true);
 
-    releaseFirst({ examples: [], totalCount: 0 });
-    await waitFor(() => expect(result.current.totalCount).toBe(0));
+    overrideMockUseExampleQuery({
+      isLoading: false,
+      filteredExamples: [],
+      totalCount: 0,
+    });
+    rerender();
+    expect(result.current.totalCount).toBe(0);
     expect(result.current.isInitialLoading).toBe(false);
     expect(result.current.quizNotReady).toBe(true);
 
-    overrideMockSelectedCourseAndLessons({
-      toLesson: lcspCourse.lessons[0],
-      toLessonNumber: 2,
+    overrideMockUseExampleQuery({
+      isLoading: true,
+      filteredExamples: null,
+      totalCount: null,
     });
     rerender();
-
-    await waitFor(() => expect(result.current.isLoadingExamples).toBe(true));
+    expect(result.current.isLoadingExamples).toBe(true);
     expect(result.current.isInitialLoading).toBe(false);
     expect(result.current.quizLengthOptions).toEqual([]);
 
-    releaseNext({ examples: createExamples(10), totalCount: 10 });
-    await waitFor(() => expect(result.current.quizLengthOptions).toEqual([10]));
+    overrideMockUseExampleQuery({
+      isLoading: false,
+      filteredExamples: createExamples(10),
+      totalCount: 10,
+    });
+    rerender();
+    expect(result.current.quizLengthOptions).toEqual([10]);
     expect(result.current.isInitialLoading).toBe(false);
     expect(result.current.quizNotReady).toBe(false);
   });
@@ -360,43 +362,44 @@ describe('useCustomQuizV2', () => {
     const examples = createExamples(8, (index) =>
       index < 2 ? '' : 'https://audio.example/clip.mp3',
     );
-    let releaseNext: (value: {
-      examples: ExampleWithVocabulary[];
-      totalCount: number;
-    }) => void = () => {};
-    let callCount = 0;
-    overrideMockExampleAdapter({
-      getFilteredExamples: () => {
-        callCount += 1;
-        if (callCount === 1) {
-          return Promise.resolve({
-            examples,
-            totalCount: examples.length,
-          });
-        }
-        return new Promise((resolve) => {
-          releaseNext = resolve;
-        });
-      },
+    overrideMockUseExampleQuery({
+      filteredExamples: examples,
+      totalCount: examples.length,
+      isLoading: false,
+      isDependenciesLoading: false,
+      error: null,
     });
 
-    const { result } = renderCustomQuiz();
-    await waitFor(() => expect(result.current.quizLengthOptions).toEqual([8]));
+    const { result, rerender } = renderCustomQuiz();
+    expect(result.current.quizLengthOptions).toEqual([8]);
     expect(result.current.quizLength).toBe(8);
     expect(result.current.isAudioQuiz).toBe(false);
+
+    overrideMockUseExampleQuery({
+      filteredExamples: null,
+      totalCount: null,
+      isLoading: true,
+    });
+    rerender();
+    expect(result.current.quizLengthOptions).toEqual([8]);
 
     await act(async () => {
       result.current.setQuizType(CustomQuizType.Audio);
     });
 
-    await waitFor(() => expect(result.current.isLoadingExamples).toBe(true));
+    expect(result.current.isLoadingExamples).toBe(true);
     expect(result.current.isAudioQuiz).toBe(true);
     expect(result.current.isInitialLoading).toBe(false);
     expect(result.current.quizLengthOptions).toEqual([8]);
     expect(result.current.quizLength).toBe(8);
 
-    releaseNext({ examples, totalCount: examples.length });
-    await waitFor(() => expect(result.current.quizLengthOptions).toEqual([6]));
+    overrideMockUseExampleQuery({
+      filteredExamples: examples,
+      totalCount: examples.length,
+      isLoading: false,
+    });
+    rerender();
+    expect(result.current.quizLengthOptions).toEqual([6]);
     expect(result.current.quizLength).toBe(6);
     expect(result.current.isLoadingExamples).toBe(false);
 
@@ -404,7 +407,7 @@ describe('useCustomQuizV2', () => {
     const audible = examples.filter(
       (example) => example.spanishAudio.length > 0,
     );
-    primeAudioElement.mockClear();
+    mockAudioAdapter.primeAudioElement.mockClear();
 
     await act(async () => {
       result.current.readyQuiz();
@@ -419,24 +422,25 @@ describe('useCustomQuizV2', () => {
     expect(drawn.every((example) => example.spanishAudio.length > 0)).toBe(
       true,
     );
-    expect(primeAudioElement).toHaveBeenCalledTimes(1);
-    expect(primeAudioElement).toHaveBeenCalledWith(silence1s);
+    expect(mockAudioAdapter.primeAudioElement).toHaveBeenCalledTimes(1);
+    expect(mockAudioAdapter.primeAudioElement).toHaveBeenCalledWith(silence1s);
   });
 
   it('shuffles a text slice without priming audio, then cleanup empties both quizzes', async () => {
     const examples = createExamples(8, (index) =>
       index === 0 ? '' : 'https://audio.example/clip.mp3',
     );
-    overrideMockExampleAdapter({
-      getFilteredExamples: async () => ({
-        examples,
-        totalCount: examples.length,
-      }),
+    overrideMockUseExampleQuery({
+      filteredExamples: examples,
+      totalCount: examples.length,
+      isLoading: false,
+      isDependenciesLoading: false,
+      error: null,
     });
     vi.spyOn(Math, 'random').mockReturnValue(0);
 
     const { result } = renderCustomQuiz();
-    await waitFor(() => expect(result.current.quizLength).toBe(8));
+    expect(result.current.quizLength).toBe(8);
 
     await act(async () => {
       result.current.readyQuiz();
@@ -449,7 +453,7 @@ describe('useCustomQuizV2', () => {
     expect(result.current.audioQuizProps.examplesToQuiz).toBe(
       result.current.textQuizProps.examples,
     );
-    expect(primeAudioElement).not.toHaveBeenCalled();
+    expect(mockAudioAdapter.primeAudioElement).not.toHaveBeenCalled();
 
     await act(async () => {
       result.current.textQuizProps.cleanupFunction();
@@ -477,16 +481,15 @@ describe('useCustomQuizV2', () => {
     courseFailure.unmount();
 
     overrideMockSelectedCourseAndLessons({ error: null });
-    overrideMockExampleAdapter({
-      getFilteredExamples: async () => {
-        throw new Error('examples failed');
-      },
+    overrideMockUseExampleQuery({
+      error: new Error('examples failed'),
+      filteredExamples: null,
+      totalCount: null,
+      isLoading: false,
     });
     const exampleFailure = renderCustomQuiz();
-    await waitFor(() =>
-      expect(exampleFailure.result.current.error?.message).toBe(
-        'examples failed',
-      ),
+    expect(exampleFailure.result.current.error?.message).toBe(
+      'examples failed',
     );
   });
 });

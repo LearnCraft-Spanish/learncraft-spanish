@@ -1,87 +1,45 @@
-import type { UseExampleQueryReturnType } from '@application/queries/ExampleQueries/useExampleQuery';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import { overrideMockExampleAdapter } from '@application/adapters/exampleAdapter.mock';
+import {
+  mockUseExampleQuery,
+  overrideMockUseExampleQuery,
+  readMockUseExampleQuery,
+  resetMockUseExampleQuery,
+} from '@application/queries/ExampleQueries/useExampleQuery.mock';
 import { useCustomQuiz } from '@application/useCases/useCustomQuiz/useCustomQuiz';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
+import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const exampleQueryCalls = vi.hoisted(
-  () =>
-    [] as Array<{
-      pageSize: number;
-      audioRequired: boolean | undefined;
-      disableCache: boolean;
-    }>,
-);
-
-const updatePageSizeSpy = vi.hoisted(() =>
-  vi.fn<(newPageSize: number) => void>(),
-);
-
-interface ExampleQueryModule {
-  useExampleQuery: (
-    pageSize: number,
-    audioRequired?: boolean,
-    disableCache?: boolean,
-  ) => UseExampleQueryReturnType;
-}
-
-vi.mock('@application/queries/ExampleQueries/useExampleQuery', async () => {
-  const actual = (await vi.importActual(
-    '@application/queries/ExampleQueries/useExampleQuery',
-  )) as ExampleQueryModule;
-
-  return {
-    useExampleQuery: (
-      pageSize: number,
-      audioRequired?: boolean,
-      disableCache = false,
-    ) => {
-      exampleQueryCalls.push({ pageSize, audioRequired, disableCache });
-      const query = actual.useExampleQuery(
-        pageSize,
-        audioRequired,
-        disableCache,
-      );
-      return {
-        ...query,
-        updatePageSize: (newPageSize: number) => {
-          updatePageSizeSpy(newPageSize);
-          query.updatePageSize(newPageSize);
-        },
-      };
-    },
-  };
-});
+vi.mock('@application/queries/ExampleQueries/useExampleQuery', () => ({
+  useExampleQuery: mockUseExampleQuery,
+}));
 
 function createExamples(
   count: number,
   spanishAudio: (index: number) => string = () =>
     'https://audio.example/clip.mp3',
 ): ExampleWithVocabulary[] {
-  return Array.from({ length: count }, (_, index) => {
-    return {
-      id: index + 1,
-      spanishAudio: spanishAudio(index),
-    } as ExampleWithVocabulary;
-  });
+  return createMockExampleWithVocabularyList(count).map((example, index) => ({
+    ...example,
+    id: index + 1,
+    spanishAudio: spanishAudio(index),
+  }));
 }
 
 function serveExamples(
   examples: ExampleWithVocabulary[],
   totalCount: number | null = examples.length,
 ) {
-  overrideMockExampleAdapter({
-    getFilteredExamples: async () => {
-      return {
-        examples,
-        totalCount,
-      } as { examples: ExampleWithVocabulary[]; totalCount: number };
-    },
+  overrideMockUseExampleQuery({
+    filteredExamples: examples,
+    totalCount,
+    isLoading: false,
+    isDependenciesLoading: false,
+    error: null,
   });
 }
 
@@ -91,22 +49,19 @@ function renderCustomQuiz() {
   });
 }
 
-async function renderLoadedQuiz(
+function renderLoadedQuiz(
   examples: ExampleWithVocabulary[],
   totalCount: number | null = examples.length,
 ) {
   serveExamples(examples, totalCount);
-  const view = renderCustomQuiz();
-  if (totalCount === null) {
-    await waitFor(() =>
-      expect(view.result.current.availableQuizLengths).toContain(10),
-    );
-  } else {
-    await waitFor(() =>
-      expect(view.result.current.totalCount).toBe(totalCount),
-    );
+  return renderCustomQuiz();
+}
+
+function expectExampleQueryCalls(disableCache: boolean) {
+  expect(mockUseExampleQuery.mock.calls.length).toBeGreaterThan(0);
+  for (const call of mockUseExampleQuery.mock.calls) {
+    expect(call).toEqual([150, false, disableCache]);
   }
-  return view;
 }
 
 function signIn({ isCoach, isAdmin }: { isCoach: boolean; isAdmin: boolean }) {
@@ -126,82 +81,77 @@ function signIn({ isCoach, isAdmin }: { isCoach: boolean; isAdmin: boolean }) {
 
 describe('useCustomQuiz', () => {
   beforeEach(() => {
-    exampleQueryCalls.length = 0;
-    updatePageSizeSpy.mockClear();
+    resetMockUseExampleQuery();
     signIn({ isCoach: false, isAdmin: false });
   });
 
-  it('offers no length and an empty slice while examples are still loading', async () => {
-    let release: (value: {
-      examples: ExampleWithVocabulary[];
-      totalCount: number;
-    }) => void = () => {};
-    overrideMockExampleAdapter({
-      getFilteredExamples: () =>
-        new Promise((resolve) => {
-          release = resolve;
-        }),
+  it('offers no length and an empty slice while examples are still loading', () => {
+    overrideMockUseExampleQuery({
+      isLoading: true,
+      filteredExamples: null,
+      totalCount: null,
     });
+    const { result, rerender } = renderCustomQuiz();
 
-    const { result } = renderCustomQuiz();
-
-    await waitFor(() => expect(result.current.isLoadingExamples).toBe(true));
+    expect(result.current.isLoadingExamples).toBe(true);
     expect(result.current.availableQuizLengths).toEqual([]);
     expect(result.current.safeQuizLength).toBe(0);
     expect(result.current.examplesToQuiz).toEqual([]);
     expect(result.current.totalCount).toBeNull();
 
-    release({ examples: createExamples(20), totalCount: 20 });
-    await waitFor(() => expect(result.current.isLoadingExamples).toBe(false));
+    serveExamples(createExamples(20));
+    rerender();
+    expect(result.current.isLoadingExamples).toBe(false);
+    expect(result.current.availableQuizLengths).toEqual([10, 20]);
   });
 
-  it('uses the exact set when nothing reaches the first preset', async () => {
-    const { result } = await renderLoadedQuiz(createExamples(0), 5);
+  it('uses the exact set when nothing reaches the first preset', () => {
+    const { result } = renderLoadedQuiz(createExamples(0), 5);
 
     expect(result.current.availableQuizLengths).toEqual([0]);
     expect(result.current.safeQuizLength).toBe(0);
     expect(result.current.totalCount).toBe(5);
 
-    const eight = await renderLoadedQuiz(createExamples(8));
+    const eight = renderLoadedQuiz(createExamples(8));
     expect(eight.result.current.availableQuizLengths).toEqual([8]);
     expect(eight.result.current.safeQuizLength).toBe(8);
     eight.unmount();
   });
 
-  it('keeps presets that fit and adds the exact size below 100', async () => {
-    const { result } = await renderLoadedQuiz(createExamples(25), 80);
+  it('keeps presets that fit and adds the exact size below 100', () => {
+    const { result } = renderLoadedQuiz(createExamples(25), 80);
 
     expect(result.current.availableQuizLengths).toEqual([10, 20, 25]);
     expect(result.current.totalCount).toBe(80);
   });
 
-  it('does not add a second copy of 100 when the page is exactly that preset', async () => {
-    const { result } = await renderLoadedQuiz(createExamples(100), 250);
+  it('does not add a second copy of 100 when the page is exactly that preset', () => {
+    const { result } = renderLoadedQuiz(createExamples(100), 250);
 
     expect(result.current.availableQuizLengths).toEqual([10, 20, 50, 100]);
   });
 
-  it('adds the exact size at 99 and the total count once the page passes 100', async () => {
-    const under = await renderLoadedQuiz(createExamples(99), 250);
+  it('adds the exact size at 99 and the total count once the page passes 100', () => {
+    const under = renderLoadedQuiz(createExamples(99), 250);
     expect(under.result.current.availableQuizLengths).toEqual([10, 20, 50, 99]);
     under.unmount();
 
-    const over = await renderLoadedQuiz(createExamples(101), 250);
+    const over = renderLoadedQuiz(createExamples(101), 250);
     expect(over.result.current.availableQuizLengths).toEqual([
       10, 20, 50, 100, 250,
     ]);
     over.unmount();
   });
 
-  it('adds 0 when a page of 100 or more has no total', async () => {
-    const { result } = await renderLoadedQuiz(createExamples(150), null);
+  it('adds 0 when a page of 100 or more has no total', () => {
+    const { result } = renderLoadedQuiz(createExamples(150), null);
 
     expect(result.current.availableQuizLengths).toEqual([0, 10, 20, 50, 100]);
     expect(result.current.totalCount).toBeNull();
   });
 
   it('defaults to 20 and clamps a longer choice down to a length that fits', async () => {
-    const { result } = await renderLoadedQuiz(createExamples(50));
+    const { result } = renderLoadedQuiz(createExamples(50));
 
     expect(result.current.availableQuizLengths).toEqual([10, 20, 50]);
     expect(result.current.safeQuizLength).toBe(20);
@@ -243,7 +193,7 @@ describe('useCustomQuiz', () => {
   });
 
   it('defaults to the first length at or under 20 when 20 does not fit', async () => {
-    const { result } = await renderLoadedQuiz(createExamples(15));
+    const { result } = renderLoadedQuiz(createExamples(15));
 
     expect(result.current.availableQuizLengths).toEqual([10, 15]);
     expect(result.current.safeQuizLength).toBe(10);
@@ -264,7 +214,7 @@ describe('useCustomQuiz', () => {
     const examples = createExamples(25, (index) =>
       index === 24 ? '' : 'https://audio.example/clip.mp3',
     );
-    const { result } = await renderLoadedQuiz(examples);
+    const { result } = renderLoadedQuiz(examples);
 
     expect(result.current.safeQuizLength).toBe(20);
     expect(result.current.examplesToQuiz).toEqual(
@@ -282,41 +232,47 @@ describe('useCustomQuiz', () => {
   });
 
   it('starts the quiz without loading a larger page at 150, and does above it', async () => {
-    const atBoundary = await renderLoadedQuiz(createExamples(150), 150);
+    const atBoundary = renderLoadedQuiz(createExamples(150), 150);
     await act(async () => {
       atBoundary.result.current.setSelectedQuizLength(150);
     });
     expect(atBoundary.result.current.safeQuizLength).toBe(150);
-    updatePageSizeSpy.mockClear();
+    vi.mocked(readMockUseExampleQuery().updatePageSize).mockClear();
 
     await act(async () => {
       atBoundary.result.current.startCustomQuiz();
     });
 
     expect(atBoundary.result.current.customQuizReady).toBe(true);
-    expect(updatePageSizeSpy).not.toHaveBeenCalled();
+    expect(
+      vi.mocked(readMockUseExampleQuery().updatePageSize),
+    ).not.toHaveBeenCalled();
     atBoundary.unmount();
 
-    const aboveBoundary = await renderLoadedQuiz(createExamples(151), 151);
+    const aboveBoundary = renderLoadedQuiz(createExamples(151), 151);
     await act(async () => {
       aboveBoundary.result.current.setSelectedQuizLength(151);
     });
     expect(aboveBoundary.result.current.safeQuizLength).toBe(151);
-    updatePageSizeSpy.mockClear();
+    vi.mocked(readMockUseExampleQuery().updatePageSize).mockClear();
 
     await act(async () => {
       aboveBoundary.result.current.startCustomQuiz();
     });
 
     expect(aboveBoundary.result.current.customQuizReady).toBe(true);
-    expect(updatePageSizeSpy).toHaveBeenCalledTimes(1);
-    expect(updatePageSizeSpy).toHaveBeenCalledWith(151);
+    expect(
+      vi.mocked(readMockUseExampleQuery().updatePageSize),
+    ).toHaveBeenCalledTimes(1);
+    expect(
+      vi.mocked(readMockUseExampleQuery().updatePageSize),
+    ).toHaveBeenCalledWith(151);
     aboveBoundary.unmount();
   });
 
   it('marks an empty quiz ready without changing the page size', async () => {
-    const { result } = await renderLoadedQuiz(createExamples(0), 0);
-    updatePageSizeSpy.mockClear();
+    const { result } = renderLoadedQuiz(createExamples(0), 0);
+    vi.mocked(readMockUseExampleQuery().updatePageSize).mockClear();
 
     await act(async () => {
       result.current.startCustomQuiz();
@@ -324,43 +280,26 @@ describe('useCustomQuiz', () => {
 
     expect(result.current.safeQuizLength).toBe(0);
     expect(result.current.customQuizReady).toBe(true);
-    expect(updatePageSizeSpy).not.toHaveBeenCalled();
+    expect(
+      vi.mocked(readMockUseExampleQuery().updatePageSize),
+    ).not.toHaveBeenCalled();
   });
 
-  it('loads a page of 150 without requiring audio, and skips the cache for staff', async () => {
-    const student = await renderLoadedQuiz(createExamples(20));
-    expect(exampleQueryCalls.length).toBeGreaterThan(0);
-    for (const call of exampleQueryCalls) {
-      expect(call).toEqual({
-        pageSize: 150,
-        audioRequired: false,
-        disableCache: false,
-      });
-    }
+  it('loads a page of 150 without requiring audio, and skips the cache for staff', () => {
+    const student = renderLoadedQuiz(createExamples(20));
+    expectExampleQueryCalls(false);
     student.unmount();
 
-    exampleQueryCalls.length = 0;
+    mockUseExampleQuery.mockClear();
     signIn({ isCoach: true, isAdmin: false });
-    const coach = await renderLoadedQuiz(createExamples(20));
-    for (const call of exampleQueryCalls) {
-      expect(call).toEqual({
-        pageSize: 150,
-        audioRequired: false,
-        disableCache: true,
-      });
-    }
+    const coach = renderLoadedQuiz(createExamples(20));
+    expectExampleQueryCalls(true);
     coach.unmount();
 
-    exampleQueryCalls.length = 0;
+    mockUseExampleQuery.mockClear();
     signIn({ isCoach: false, isAdmin: true });
-    const admin = await renderLoadedQuiz(createExamples(20));
-    for (const call of exampleQueryCalls) {
-      expect(call).toEqual({
-        pageSize: 150,
-        audioRequired: false,
-        disableCache: true,
-      });
-    }
+    const admin = renderLoadedQuiz(createExamples(20));
+    expectExampleQueryCalls(true);
     admin.unmount();
   });
 
