@@ -1,6 +1,7 @@
 import {
   QUIZ_CARD_EXIT_MS,
   QUIZ_CARD_FLIP_MS,
+  QUIZ_CARD_PREVIOUS_MS,
   useQuizCardMotion,
 } from '@interface/hooks/useQuizCardMotion';
 import { act, renderHook } from '@testing-library/react';
@@ -263,6 +264,27 @@ describe('useQuizCardMotion', () => {
     });
     expect(result.current.phase).toBe('idle');
     expect(commit).toHaveBeenCalledOnce();
+  });
+
+  it('runs a previous commit from the fallback timer', () => {
+    const commit = vi.fn<() => void>();
+    const { result } = renderHook(() => useQuizCardMotion());
+
+    act(() => {
+      result.current.previous(commit);
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(QUIZ_CARD_PREVIOUS_MS + FALLBACK_SLACK_MS - 1);
+    });
+    expect(commit).not.toHaveBeenCalled();
+    expect(result.current.phase).toBe('enteringPrevious');
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(commit).toHaveBeenCalledOnce();
+    expect(result.current.phase).toBe('idle');
   });
 
   it('runs an exit commit from the fallback timer', () => {

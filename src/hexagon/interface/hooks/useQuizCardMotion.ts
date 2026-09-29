@@ -4,6 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const QUIZ_CARD_FLIP_MS = 320;
 export const QUIZ_CARD_EXIT_MS = 320;
+/**
+ * Pull the previous card out from under the deck, then land it on top.
+ * Matches `var(--lcs-motion-panel)` on `.enterPrev` in
+ * `QuizCardStage.module.scss`.
+ */
+export const QUIZ_CARD_PREVIOUS_MS = QUIZ_CARD_EXIT_MS;
 
 /** jsdom never fires animationend; finish this long after the CSS duration. */
 const FALLBACK_SLACK_MS = 80;
@@ -111,7 +117,12 @@ export function useQuizCardMotion(): QuizCardMotion {
 
   const previous = useCallback(
     (commit: () => void): void => {
-      startPhase('enteringPrevious', commit, QUIZ_CARD_EXIT_MS, 'onComplete');
+      startPhase(
+        'enteringPrevious',
+        commit,
+        QUIZ_CARD_PREVIOUS_MS,
+        'onComplete',
+      );
     },
     [startPhase],
   );

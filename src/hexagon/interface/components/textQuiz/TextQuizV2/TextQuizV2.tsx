@@ -1,7 +1,10 @@
 import type { FlashcardForDisplay } from '@domain/quizzing';
 import type { SrsDifficulty } from '@domain/srs';
 import type { CardAudioHandle } from '@interface/components/textQuiz/CardAudioButton';
-import type { QuizCardDrag } from '@interface/components/textQuiz/QuizCard';
+import type {
+  QuizCardDrag,
+  QuizCardFace,
+} from '@interface/components/textQuiz/QuizCard';
 import type { TextQuizV2Props } from '@interface/components/textQuiz/TextQuizV2/TextQuizV2.types';
 import type { JSX } from 'react';
 import { orderVocabularyByAppearance } from '@domain/functions/orderVocabularyByAppearance';
@@ -41,25 +44,22 @@ function isFocusOnNativeControl(): boolean {
 function noop(): void {}
 
 /**
- * Question face of a card the student has already seen. Shown only while
- * the previous-card phase is running; the stage owns when it is mounted.
+ * Question face of a card that is not the live one: the previous card while
+ * it is pulled back onto the deck, or the next card while the live card is
+ * leaving. The stage owns when it is mounted.
  */
 function IncomingQuestionCard({
-  example,
+  question,
 }: {
-  example: FlashcardForDisplay;
+  question: QuizCardFace;
 }): JSX.Element {
-  const questionFace = {
-    text: example.question.text,
-    spanish: example.question.spanish,
-  };
   return (
     <div className={styles.incomingPlate} aria-hidden="true">
       <QuizCard
         srs={false}
         answerShowing={false}
-        promptFace={questionFace}
-        answerFace={questionFace}
+        promptFace={question}
+        answerFace={question}
         audioUrl={null}
         showHelpButton={false}
         helpOpen={false}
@@ -96,6 +96,7 @@ export function TextQuizV2({
   exampleNumber,
   quizLength,
   quizExample,
+  upcomingQuestion = null,
   answerShowing,
   toggleAnswer,
   getHelpIsOpen,
@@ -312,6 +313,11 @@ export function TextQuizV2({
     motion.phase === 'enteringPrevious'
       ? faceCacheRef.current.get(exampleNumber - 1)
       : undefined;
+  const revealUpcoming =
+    upcomingQuestion !== null &&
+    (motion.phase === 'exitingNext' ||
+      motion.phase === 'exitingHard' ||
+      motion.phase === 'exitingEasy');
   const spanishText = question.spanish ? question.text : answer.text;
   // Same policy as legacy `FlashcardDisplay`: prefer the current face's
   // clip, but if the answer face has none, fall back to the question clip
@@ -396,9 +402,14 @@ export function TextQuizV2({
         <QuizCardStage
           phase={motion.phase}
           showPeek={exampleNumber < quizLength}
+          underneath={
+            revealUpcoming && upcomingQuestion ? (
+              <IncomingQuestionCard question={upcomingQuestion} />
+            ) : undefined
+          }
           incoming={
             previousExample ? (
-              <IncomingQuestionCard example={previousExample} />
+              <IncomingQuestionCard question={previousExample.question} />
             ) : undefined
           }
           onMotionComplete={motion.completePhase}

@@ -36,22 +36,31 @@ export interface QuizCardStageProps {
   children: ReactNode;
   /** Snapshot of the previous card; rendered only while entering. */
   incoming?: ReactNode;
+  /**
+   * The next card, in the peek pose, while the live card is leaving.
+   * Replaces the empty plate for that phase.
+   */
+  underneath?: ReactNode;
   /** Fires once per phase when its animation or flip transition ends. */
   onMotionComplete: () => void;
 }
 
 /**
- * Stacks the live card over an empty "next card" plate and runs the
- * layer-level motions: next / hard / easy fly-outs on the card layer, the
- * previous card sliding in over it, and a short settle when a new card
- * takes the top of the deck. Opacity and transform only; the flip itself
- * lives in `QuizCard`, and this stage just reports when it ends.
+ * Stacks the live card over the next card — an empty plate until a leave
+ * animation, then that card's question — and runs the layer-level motions:
+ * next / hard / easy fly-outs on the card layer, the previous card pulled
+ * out from under the deck and placed on top, and a short settle when a new
+ * card takes the top of the deck. The previous card's stacking and its
+ * motion are separate elements, so a transform cannot paint it over the
+ * live card before it has swung out. The flip itself lives in `QuizCard`;
+ * this stage just reports when it ends.
  */
 export function QuizCardStage({
   phase,
   showPeek,
   children,
   incoming,
+  underneath,
   onMotionComplete,
 }: QuizCardStageProps): JSX.Element {
   const [prevPhase, setPrevPhase] = useState(phase);
@@ -113,7 +122,13 @@ export function QuizCardStage({
 
   return (
     <div className={styles.cardStage}>
-      {showPeek && <div className={styles.deckPeek} aria-hidden />}
+      {underneath ? (
+        <div className={styles.underneath} aria-hidden>
+          {underneath}
+        </div>
+      ) : (
+        showPeek && <div className={styles.deckPeek} aria-hidden />
+      )}
 
       <div
         className={[
@@ -134,7 +149,7 @@ export function QuizCardStage({
           className={`${styles.incomingLayer} ${styles.enterPrev}`}
           onAnimationEnd={handleIncomingAnimationEnd}
         >
-          {incoming}
+          <div className={styles.incomingMotion}>{incoming}</div>
         </div>
       )}
     </div>

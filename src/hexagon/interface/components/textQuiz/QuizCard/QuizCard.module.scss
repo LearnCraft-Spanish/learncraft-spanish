@@ -30,8 +30,11 @@
   transform-style: preserve-3d;
 }
 
+/* Negative X brings the top edge toward the viewer on the way to the
+ * answer. The way back (removing this transform) brings the bottom edge
+ * forward. */
 .flipped {
-  transform: rotateY(180deg);
+  transform: rotateX(-180deg);
 }
 
 /* Only a same-card flip animates; a new card lands on its prompt instantly. */
@@ -60,7 +63,7 @@
 }
 
 .sideBack {
-  transform: rotateY(180deg);
+  transform: rotateX(-180deg);
 }
 
 /* Belt and braces with `inert`: a turned-away plate never takes a hit. */

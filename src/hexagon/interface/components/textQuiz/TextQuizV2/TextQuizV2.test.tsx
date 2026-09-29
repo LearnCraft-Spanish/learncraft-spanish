@@ -6,6 +6,7 @@ import { TextQuizV2 } from '@interface/components/textQuiz/TextQuizV2/TextQuizV2
 import {
   QUIZ_CARD_EXIT_MS,
   QUIZ_CARD_FLIP_MS,
+  QUIZ_CARD_PREVIOUS_MS,
 } from '@interface/hooks/useQuizCardMotion';
 import {
   act,
@@ -868,6 +869,24 @@ describe('text quiz v2 card motion', () => {
     expect(onNext).toHaveBeenCalledOnce();
   });
 
+  it('shows the next card under the one that is leaving', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    stubMedia({ reducedMotion: false });
+    renderQuizWithProps({
+      getHelpIsOpen: false,
+      exampleNumber: 2,
+      quizLength: 3,
+      upcomingQuestion: { text: 'Next question', spanish: false },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /^Next$/ }));
+    expect(screen.getByText('I know it.')).toBeTruthy();
+    expect(screen.getAllByText('Next question')).toHaveLength(2);
+
+    finishMotion(QUIZ_CARD_EXIT_MS);
+    expect(screen.queryByText('Next question')).toBeNull();
+  });
+
   it('defers a grade until the exit phase completes and drops a second grade', () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     stubMedia({ reducedMotion: false });
@@ -939,7 +958,7 @@ describe('text quiz v2 card motion', () => {
     expect(screen.getAllByText('First question')).toHaveLength(2);
     expect(screen.getByText('Second question')).toBeTruthy();
 
-    finishMotion(QUIZ_CARD_EXIT_MS);
+    finishMotion(QUIZ_CARD_PREVIOUS_MS);
     expect(onPrevious).toHaveBeenCalledOnce();
     expect(screen.queryAllByText('First question')).toHaveLength(0);
   });

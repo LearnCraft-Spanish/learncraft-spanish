@@ -126,9 +126,11 @@ export interface QuizCardProps {
  * click from bubbling before it gets here) or after a drag past the tap
  * threshold (which suppresses the flip that would otherwise follow).
  *
- * The prompt and answer are two plates on a `rotateY` flipper. Only a flip
- * of the same card animates; a new card (or reduced motion) swaps sides
- * instantly. The hidden plate is `inert`, so its controls never take focus.
+ * The prompt and answer are two plates on a `rotateX` flipper. Question to
+ * answer brings the top edge forward; flipping back brings the bottom edge
+ * forward. Only a flip of the same card animates;
+ * a new card (or reduced motion) swaps sides instantly. The hidden plate
+ * is `inert`, so its controls never take focus.
  */
 export function QuizCard({
   srs,
