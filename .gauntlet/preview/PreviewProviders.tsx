@@ -1,4 +1,5 @@
 import type { JSX, ReactNode } from 'react';
+import MainProvider from '@application/coordinators/providers/MainProvider';
 import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
 import { ModalProvider } from '@composition/providers/ModalProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -27,17 +28,22 @@ interface PreviewProvidersProps {
 
 /**
  * Auth0-free provider tree for visual specimens.
- * Does not mount production Providers / Auth0Provider / MainProvider.
+ * App provider tree without Auth0.
  */
 export function PreviewProviders({
   children,
   route = '/',
 }: PreviewProvidersProps): JSX.Element {
   return (
-    <MemoryRouter initialEntries={[route]}>
+    <MemoryRouter
+      initialEntries={[route]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <QueryClientProvider client={queryClient}>
         <ContextualMenuProvider>
-          <ModalProvider>{children}</ModalProvider>
+          <ModalProvider>
+            <MainProvider>{children}</MainProvider>
+          </ModalProvider>
         </ContextualMenuProvider>
       </QueryClientProvider>
     </MemoryRouter>

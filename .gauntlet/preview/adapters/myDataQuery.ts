@@ -1,35 +1,20 @@
 import type { UseMyDataReturn } from '@application/queries/useMyData';
-import type { AppUser } from '@learncraft-spanish/shared';
 
-function forceV1(): boolean {
-  const raw = new URLSearchParams(window.location.search).get('flags');
-  return raw === 'off' || raw === '0' || raw === 'false';
-}
+import { previewUserForRole } from './fixtures';
+import { readPreviewRole } from './previewRole';
 
-const previewStudent: AppUser = {
-  name: 'Gauntlet Student',
-  emailAddress: 'gauntlet-student@fake.not',
-  recordId: 1,
-  courseId: 2,
-  lessonNumber: 1,
-  studentRole: 'student',
-  betaTester: true,
-};
+export const GAUNTLET_STUB = true;
 
 /**
  * Auth0-free / network-free `useMyData` for gauntlet preview.
- * Defaults to a beta-tester student (v2). `?flags=off` forces v1.
+ * Role fixtures come from `fixtures.ts`; `?flags=` only affects student beta.
  */
 export function useMyData(): UseMyDataReturn {
-  const isV1 = forceV1();
-  const myData: AppUser = {
-    ...previewStudent,
-    betaTester: !isV1,
-  };
+  const myData = previewUserForRole(readPreviewRole());
 
   return {
     myData,
-    isBetaTester: myData.betaTester,
+    isBetaTester: myData?.betaTester ?? false,
     isLoading: false,
     error: null,
   };
