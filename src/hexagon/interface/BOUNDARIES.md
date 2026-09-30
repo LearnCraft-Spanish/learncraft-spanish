@@ -32,7 +32,7 @@ interface/
 ### ✅ DO
 
 - Use React components for rendering
-- Call **no more than ONE hook** per component (define a use-case in application if complex)
+- Call **no more than ONE hook** per component from the application layer (define a use-case in application if complex). you can use interface hooks as well as 1 application hook when needed.
 - **Only destructure** the hook result (no business logic, no transformations)
 - **Reference explicit return types for application hooks** - Application-defined interfaces, never use inferred types or `typeof`
 - Pass values directly to child components (no logical combination with props)
@@ -43,7 +43,7 @@ interface/
 
 ### ❌ DON'T
 
-- **NO multiple hooks** in a single component (ONE hook only)
+- **NO multiple hooks** in a single component from the application layer (ONE application hook only)
 - **NO business logic, transformations, or orchestration** (application layer handles this)
 - **NO new global class names** in un-hashed `.scss` / `.css` files
 - **NO new unlayered author CSS** (the PostCSS plugin assigns layers; do not add side-effect stylesheets that bypass `src/`)
@@ -59,7 +59,7 @@ Layer order (first loses, last wins): `@layer legacy, tokens, primitives, featur
 
 **Interface depends on:**
 
-- ✅ `application/` (primarily use cases - strictly no more than ONE hook per component)
+- ✅ `application/` (primarily use cases - strictly no more than ONE hook per component from here)
 - ✅ `domain/` (types and schemas - can import freely)
 - ✅ React and React Router
 - ✅ Composition layer providers via context
