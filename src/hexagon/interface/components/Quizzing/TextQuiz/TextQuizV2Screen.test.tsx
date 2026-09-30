@@ -13,7 +13,7 @@ import { cleanup, render, renderHook, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 function createSrsQuizProps(
   overrides: Partial<UseStudentFlashcardUpdatesReturn> = {},
@@ -27,13 +27,31 @@ function createSrsQuizProps(
   };
 }
 
+/**
+ * jsdom has no `matchMedia`. Prefer reduced motion so next/grade commits
+ * fire immediately without waiting on CSS animationend.
+ */
+function stubMatchMedia(): void {
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: query.includes('prefers-reduced-motion'),
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  }));
+}
+
 describe('textQuizV2Screen', () => {
   const mockExamples: ExampleWithVocabulary[] =
     createMockExampleWithVocabularyList(3);
 
+  beforeEach(() => {
+    stubMatchMedia();
+  });
+
   afterEach(() => {
     cleanup();
     setMobileStackOverride(null);
+    vi.unstubAllGlobals();
   });
 
   it('shows the loading screen while examples load', () => {

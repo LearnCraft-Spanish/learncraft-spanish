@@ -90,6 +90,60 @@ describe('quiz card', () => {
     expect(onGrade).not.toHaveBeenCalled();
   });
 
+  it('reports a committed swipe through onSwipeCommit instead of onGrade', () => {
+    const onSwipeCommit = vi.fn();
+    const { onGrade } = renderCard({
+      srs: true,
+      answerShowing: true,
+      onSwipeCommit,
+    });
+
+    drag(getCard(), 0, 90);
+
+    expect(onGrade).not.toHaveBeenCalled();
+    expect(onSwipeCommit).toHaveBeenCalledOnce();
+    expect(onSwipeCommit).toHaveBeenCalledWith('easy', {
+      dx: 90,
+      rotateDeg: 90 / 60,
+    });
+  });
+
+  it('reports a leftward swipe through onSwipeCommit as hard', () => {
+    const onSwipeCommit = vi.fn();
+    renderCard({
+      srs: true,
+      answerShowing: true,
+      onSwipeCommit,
+    });
+
+    drag(getCard(), 0, -90);
+
+    expect(onSwipeCommit).toHaveBeenCalledOnce();
+    expect(onSwipeCommit).toHaveBeenCalledWith('hard', {
+      dx: -90,
+      rotateDeg: -90 / 60,
+    });
+  });
+
+  it('does not flip or commit a swipe while interaction is locked', () => {
+    const onSwipeCommit = vi.fn();
+    const { onFlip, onGrade } = renderCard({
+      srs: true,
+      answerShowing: true,
+      interactionLocked: true,
+      onSwipeCommit,
+    });
+    const card = getCard();
+
+    drag(card, 0, 120);
+    fireEvent.click(card);
+    fireEvent.keyDown(card, { key: 'Enter' });
+
+    expect(onSwipeCommit).not.toHaveBeenCalled();
+    expect(onGrade).not.toHaveBeenCalled();
+    expect(onFlip).not.toHaveBeenCalled();
+  });
+
   it('suppresses the flip after a drag past the 6px tap threshold', () => {
     const { onFlip } = renderCard({ srs: true, answerShowing: true });
     const card = getCard();

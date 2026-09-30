@@ -40,6 +40,7 @@ export function TextQuizV2Screen({
     examplesAreLoading,
     exampleNumber,
     quizExample,
+    upcomingQuestion,
     quizLength,
     nextExample,
     previousExample,
@@ -105,6 +106,7 @@ export function TextQuizV2Screen({
             exampleNumber={exampleNumber}
             quizLength={quizLength}
             quizExample={quizExample}
+            upcomingQuestion={upcomingQuestion}
             answerShowing={answerShowing}
             toggleAnswer={toggleAnswer}
             getHelpIsOpen={getHelpIsOpen}

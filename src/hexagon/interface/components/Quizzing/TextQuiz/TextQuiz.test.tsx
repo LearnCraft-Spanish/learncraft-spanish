@@ -89,6 +89,7 @@ function MockQuizWrapper({
     examplesAreLoading: false,
     addPendingRemoveProps: undefined,
     quizExample,
+    upcomingQuestion: null,
     nextExample,
     previousExample,
     exampleNumber: exampleIndex + 1,
@@ -162,6 +163,7 @@ function MockQuizWrapperWithAudio({
     quizExample: currentExample
       ? createMockFlashcardForDisplay(currentExample, startWithSpanish)
       : null,
+    upcomingQuestion: null,
     nextExample: () => {
       if (exampleIndex < examplesWithAudio.length - 1) {
         setExampleIndex(exampleIndex + 1);

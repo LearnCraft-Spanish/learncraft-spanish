@@ -1,0 +1,183 @@
+/* The deck: an empty plate (z 0) under the live card (z 1), and — only
+ * while navigating back — the previous card, which starts behind the deck
+ * and finishes on top. The card layer stays in flow so the stage sizes
+ * exactly like a bare card. */
+.cardStage {
+  display: flex;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  perspective: 1200px;
+}
+
+/* Same geometry as the `QuizCard` plate (20px is the handoff's one-off
+ * frame radius), empty, and nudged down/in so a sliver of the next card
+ * shows below the live one. */
+.deckPeek {
+  position: absolute;
+  z-index: 0;
+  box-sizing: border-box;
+  inset: 0;
+  border: var(--lcs-border-hairline) solid var(--lcs-border-card);
+  border-radius: 20px;
+  background-color: var(--lcs-color-surface);
+  pointer-events: none;
+  transform: translateY(6px) scale(0.985);
+}
+
+/* Same pose as the empty plate, but a real card. Shown only while the live
+ * card is leaving, so the sentence underneath is the one about to land. */
+.underneath {
+  display: flex;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  transform: translateY(6px) scale(0.985);
+}
+
+.cardLayer {
+  display: flex;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Behind the live card (z 1). Only the stacking animation lifts it, and
+ * that animation is not on the transformed child — a transform on this
+ * element itself would composite it above the live card for the whole arc. */
+.incomingLayer {
+  display: flex;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+}
+
+/* `forwards` holds the end pose until the parent commits the next card, so
+ * the old card never flashes back to rest first. */
+.exitNext {
+  animation: exitNext var(--lcs-motion-panel) var(--lcs-ease-standard) forwards;
+}
+
+.exitHard {
+  animation: exitHard var(--lcs-motion-panel) var(--lcs-ease-standard) forwards;
+}
+
+.exitEasy {
+  animation: exitEasy var(--lcs-motion-panel) var(--lcs-ease-standard) forwards;
+}
+
+/* One arc: tucked behind the deck, top-left corner swings out, then the
+ * card accelerates back onto the top. Same length as `--lcs-motion-panel`
+ * — keep in sync with `QUIZ_CARD_PREVIOUS_MS`. Stacking stays on this
+ * element; the swing is on `.incomingMotion`. z-index steps forward at the
+ * crest so the live card's text stays put until the previous card is
+ * clearly out. */
+.enterPrev {
+  z-index: 0;
+  animation: enterPrevStack var(--lcs-motion-panel) linear forwards;
+}
+
+.incomingMotion {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  transform-origin: 70% 62%;
+  animation: enterPrev var(--lcs-motion-panel) linear forwards;
+}
+
+.settle {
+  animation: settle var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+@keyframes exitNext {
+  from {
+    opacity: 1;
+    transform: translateX(0) rotate(0);
+  }
+
+  to {
+    opacity: 0.92;
+    transform: translateX(-110%) rotate(-6deg);
+  }
+}
+
+@keyframes exitHard {
+  from {
+    transform: translateX(0) rotate(0);
+  }
+
+  to {
+    transform: translateX(-120%) rotate(-12deg);
+  }
+}
+
+@keyframes exitEasy {
+  from {
+    transform: translateX(0) rotate(0);
+  }
+
+  to {
+    transform: translateX(120%) rotate(12deg);
+  }
+}
+
+@keyframes enterPrevStack {
+  0%,
+  42% {
+    z-index: 0;
+  }
+
+  43%,
+  100% {
+    z-index: 3;
+  }
+}
+
+@keyframes enterPrev {
+  0% {
+    filter: drop-shadow(0 0 0 rgb(60 60 60 / 0%));
+    /* Steady swing out to the tilt — most of the travel stays in this beat. */
+    animation-timing-function: cubic-bezier(0.4, 0.2, 0.45, 0.95);
+    transform: translateY(6px) scale(0.985) rotate(0deg);
+  }
+
+  44% {
+    filter: drop-shadow(0 14px 20px rgb(60 60 60 / 16%));
+    /* Keep moving off the tilt, then accelerate onto the deck. */
+    animation-timing-function: cubic-bezier(0.25, 0.3, 0.6, 0.2);
+    transform: translate(-22%, -18px) rotate(-13deg) scale(1);
+  }
+
+  100% {
+    filter: drop-shadow(0 0 0 rgb(60 60 60 / 0%));
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes settle {
+  from {
+    transform: translateY(6px) scale(0.985);
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* `useQuizCardMotion` skips every phase under reduced motion; this is the
+ * CSS-side guarantee that nothing moves if a class lands anyway. */
+@media (prefers-reduced-motion: reduce) {
+  .exitNext,
+  .exitHard,
+  .exitEasy,
+  .enterPrev,
+  .incomingMotion,
+  .settle {
+    animation: none;
+  }
+}

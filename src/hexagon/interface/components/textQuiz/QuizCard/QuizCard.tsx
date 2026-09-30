@@ -7,11 +7,13 @@ import type {
   PointerEvent,
   ReactNode,
   RefObject,
+  TransitionEvent,
 } from 'react';
 import { quizFaceRuns } from '@domain/functions/quizFaceRuns';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
 import { IconButton } from '@interface/components/general/IconButton/IconButton';
 import { CardAudioButton } from '@interface/components/textQuiz/CardAudioButton';
+import { QUIZ_CARD_FLIP_MS } from '@interface/hooks/useQuizCardMotion';
 import { useEffect, useRef, useState } from 'react';
 import styles from './QuizCard.module.scss';
 
@@ -29,6 +31,9 @@ const SWIPE_TAP_THRESHOLD_PX = 6;
 const SWIPE_ROTATE_DIVISOR = 60;
 const SWIPE_TINT_DIVISOR = 90;
 
+/** jsdom (and a backgrounded tab) never fires `transitionend`. */
+const FLIP_FALLBACK_SLACK_MS = 80;
+
 /** Guards the `matchMedia` call, which jsdom does not implement. */
 function prefersReducedMotion(): boolean {
   return (
@@ -38,11 +43,16 @@ function prefersReducedMotion(): boolean {
   );
 }
 
+/** The rotate term is zeroed under reduced motion; the offset is not. */
+function rotateFor(dx: number): number {
+  return prefersReducedMotion() ? 0 : dx / SWIPE_ROTATE_DIVISOR;
+}
+
 function clamp01(value: number): number {
   return Math.min(1, Math.max(0, value));
 }
 
-interface QuizCardFace {
+export interface QuizCardFace {
   text: string;
   /** Spanish renders through `quizFaceRuns`; English is plain regular text. */
   spanish: boolean;
@@ -54,11 +64,32 @@ interface QuizCardFavourite {
   onToggle: () => void;
 }
 
-interface QuizCardProps {
+/** A card pose: horizontal offset in px plus a 2D rotation. */
+export interface QuizCardDrag {
+  dx: number;
+  rotateDeg: number;
+}
+
+export interface QuizCardExitTransform extends QuizCardDrag {
+  opacity?: number;
+}
+
+export interface QuizCardProps {
   /** Gates swipe-to-grade — the only thing this component branches on. */
   srs: boolean;
   answerShowing: boolean;
-  face: QuizCardFace;
+  /**
+   * Both faces, always rendered back to back so the card can flip between
+   * them. Pass both or neither.
+   */
+  promptFace?: QuizCardFace;
+  answerFace?: QuizCardFace;
+  /**
+   * Legacy single face (whichever side is showing). Used only when
+   * `promptFace`/`answerFace` are absent; the side swaps instantly.
+   */
+  face?: QuizCardFace;
+  /** Audio for the showing face; its control renders on that face only. */
   audioUrl: string | null;
   /** Lets the quiz screen toggle this face's audio from Space. */
   audioControlRef?: RefObject<CardAudioHandle | null>;
@@ -74,6 +105,18 @@ interface QuizCardProps {
   helpContent?: ReactNode;
   /** SRS only. Swiping past the threshold calls this instead of flipping. */
   onGrade?: (difficulty: SrsDifficulty) => void;
+  /**
+   * SRS only. When present, a swipe past the threshold calls this instead of
+   * `onGrade` and the card holds its drag pose so the parent's fly-out
+   * continues from it.
+   */
+  onSwipeCommit?: (difficulty: SrsDifficulty, drag: QuizCardDrag) => void;
+  /** Ignores flip, drag, and grade — e.g. while a stage motion is running. */
+  interactionLocked?: boolean;
+  /** Parent-driven pose; overrides the drag offset while set. */
+  exitTransform?: QuizCardExitTransform | null;
+  /** Holds the matching swipe tint at full opacity during a grade exit. */
+  exitTint?: 'hard' | 'easy' | null;
 }
 
 /**
@@ -82,10 +125,18 @@ interface QuizCardProps {
  * anywhere on the card flips it, except on a nested button (which stops the
  * click from bubbling before it gets here) or after a drag past the tap
  * threshold (which suppresses the flip that would otherwise follow).
+ *
+ * The prompt and answer are two plates on a `rotateX` flipper. Question to
+ * answer brings the top edge forward; flipping back brings the bottom edge
+ * forward. Only a flip of the same card animates;
+ * a new card (or reduced motion) swaps sides instantly. The hidden plate
+ * is `inert`, so its controls never take focus.
  */
 export function QuizCard({
   srs,
   answerShowing,
+  promptFace,
+  answerFace,
   face,
   audioUrl,
   audioControlRef,
@@ -97,24 +148,55 @@ export function QuizCard({
   onFlip,
   helpContent,
   onGrade,
+  onSwipeCommit,
+  interactionLocked = false,
+  exitTransform = null,
+  exitTint = null,
 }: QuizCardProps): JSX.Element {
   const [dx, setDx] = useState(0);
+  const [springingBack, setSpringingBack] = useState(false);
+  const [flipAnimating, setFlipAnimating] = useState(false);
   const dragStartXRef = useRef<number | null>(null);
   const draggedPastTapRef = useRef(false);
 
+  const dualFace = promptFace !== undefined && answerFace !== undefined;
+  const frontFace = dualFace ? promptFace : answerShowing ? null : face;
+  const backFace = dualFace ? answerFace : answerShowing ? face : null;
+  const cardKey = dualFace
+    ? `${promptFace.text}\u0000${answerFace.text}`
+    : (face?.text ?? '');
+
   // Neither a flip back to the prompt nor a fresh card should carry over a
   // stale drag offset from the card that was just graded or navigated away
-  // from.
-  useEffect(() => {
+  // from. Adjusted during render (not in an effect) so a new card never
+  // paints a frame at the old card's pose.
+  const [shown, setShown] = useState({ cardKey, answerShowing });
+  if (shown.cardKey !== cardKey || shown.answerShowing !== answerShowing) {
+    setShown({ cardKey, answerShowing });
     setDx(0);
-  }, [answerShowing, face.text]);
+    setSpringingBack(false);
+    setFlipAnimating(shown.cardKey === cardKey && !prefersReducedMotion());
+  }
+
+  useEffect(() => {
+    if (!flipAnimating) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      setFlipAnimating(false);
+    }, QUIZ_CARD_FLIP_MS + FLIP_FALLBACK_SLACK_MS);
+    return () => clearTimeout(timer);
+  }, [flipAnimating]);
+
+  const locked = interactionLocked || flipAnimating;
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>): void {
-    if (!answerShowing) {
+    if (!answerShowing || locked) {
       return;
     }
     dragStartXRef.current = event.clientX;
     draggedPastTapRef.current = false;
+    setSpringingBack(false);
   }
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>): void {
@@ -133,12 +215,39 @@ export function QuizCard({
       return;
     }
     dragStartXRef.current = null;
-    if (Math.abs(dx) > SWIPE_GRADE_THRESHOLD_PX) {
+    if (Math.abs(dx) > SWIPE_GRADE_THRESHOLD_PX && !interactionLocked) {
+      const difficulty = dx > 0 ? 'easy' : 'hard';
+      if (onSwipeCommit) {
+        onSwipeCommit(difficulty, { dx, rotateDeg: rotateFor(dx) });
+        return;
+      }
       setDx(0);
-      onGrade?.(dx > 0 ? 'easy' : 'hard');
+      onGrade?.(difficulty);
       return;
     }
+    if (dx !== 0) {
+      setSpringingBack(true);
+    }
     setDx(0);
+  }
+
+  function handleRootTransitionEnd(
+    event: TransitionEvent<HTMLDivElement>,
+  ): void {
+    if (event.target === event.currentTarget) {
+      setSpringingBack(false);
+    }
+  }
+
+  function handleFlipperTransitionEnd(
+    event: TransitionEvent<HTMLDivElement>,
+  ): void {
+    if (
+      event.target === event.currentTarget &&
+      event.propertyName === 'transform'
+    ) {
+      setFlipAnimating(false);
+    }
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>): void {
@@ -155,7 +264,9 @@ export function QuizCard({
     }
     if (event.key === 'Enter') {
       event.preventDefault();
-      onFlip();
+      if (!locked) {
+        onFlip();
+      }
     }
   }
 
@@ -170,6 +281,9 @@ export function QuizCard({
       draggedPastTapRef.current = false;
       return;
     }
+    if (locked) {
+      return;
+    }
     onFlip();
   }
 
@@ -182,112 +296,175 @@ export function QuizCard({
       }
     : {};
 
-  const dragStyle = srs
+  const pose: QuizCardExitTransform | null =
+    exitTransform ?? (srs ? { dx, rotateDeg: rotateFor(dx) } : null);
+  const poseStyle = pose
     ? {
-        transform: `translateX(${dx}px) rotate(${
-          prefersReducedMotion() ? 0 : dx / SWIPE_ROTATE_DIVISOR
-        }deg)`,
+        transform: `translateX(${pose.dx}px) rotate(${pose.rotateDeg}deg)`,
+        opacity: pose.opacity,
       }
     : undefined;
+  const tintDx = pose?.dx ?? 0;
+
+  function renderSide(side: 'front' | 'back'): JSX.Element {
+    const sideFace = side === 'front' ? frontFace : backFace;
+    const showing = (side === 'back') === answerShowing;
+    const sideHelpOpen = showing && helpOpen;
+    return (
+      <div
+        className={[
+          styles.side,
+          side === 'back' ? styles.sideBack : null,
+          showing ? null : styles.sideHidden,
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        aria-hidden={showing ? undefined : true}
+        inert={!showing}
+      >
+        {srs && side === 'back' && (
+          <>
+            <div
+              className={[styles.tintHard, exitTint ? styles.tintExiting : null]
+                .filter(Boolean)
+                .join(' ')}
+              style={{
+                opacity:
+                  exitTint === 'hard'
+                    ? 1
+                    : clamp01(-tintDx / SWIPE_TINT_DIVISOR),
+              }}
+            />
+            <div
+              className={[styles.tintEasy, exitTint ? styles.tintExiting : null]
+                .filter(Boolean)
+                .join(' ')}
+              style={{
+                opacity:
+                  exitTint === 'easy'
+                    ? 1
+                    : clamp01(tintDx / SWIPE_TINT_DIVISOR),
+              }}
+            />
+          </>
+        )}
+        <div className={styles.utilityRow} onClick={stopPropagation}>
+          {showing && (
+            <CardAudioButton
+              audioUrl={audioUrl}
+              label="Play sentence audio"
+              ref={audioControlRef}
+            />
+          )}
+          {favourite && (
+            /* Handoff: bare Dorado star (no circular fill). `sm` keeps a
+             * square 32px hit target near the 34×34 audio tile. Glyph color
+             * is forced in `.favourite svg` so it stays Dorado, not steel.
+             * Rendered on both plates so it does not pop mid-flip. */
+            <span className={styles.favourite}>
+              <IconButton
+                icon={favourite.isFavourited ? 'starFilled' : 'star'}
+                label={
+                  favourite.isFavourited
+                    ? 'Remove from my flashcards'
+                    : 'Add to my flashcards'
+                }
+                size="sm"
+                iconSize="lg"
+                tone="muted"
+                variant="bare"
+                disabled={favourite.isPending}
+                onClick={favourite.onToggle}
+              />
+            </span>
+          )}
+        </div>
+
+        <div
+          className={
+            sideHelpOpen
+              ? `${styles.content} ${styles.helpOpen}`
+              : styles.content
+          }
+        >
+          {sideFace && (
+            <div className={styles.face}>
+              {sideFace.spanish
+                ? quizFaceRuns(sideFace.text).map((run, index) => (
+                    <span
+                      key={index}
+                      className={run.bold ? styles.bold : styles.regular}
+                    >
+                      {run.text}
+                    </span>
+                  ))
+                : sideFace.text}
+            </div>
+          )}
+
+          {sideHelpOpen && helpContent && (
+            <div className={styles.helpContent} onClick={stopPropagation}>
+              {helpContent}
+            </div>
+          )}
+        </div>
+
+        {showing && showHelpButton && (
+          <div className={styles.helpButtonRow} onClick={stopPropagation}>
+            <Button
+              variant="secondary"
+              leadingIcon={helpOpen ? 'x' : 'checklist'}
+              onClick={onToggleHelp}
+            >
+              {helpOpen ? 'Hide help' : 'Get help'}
+            </Button>
+          </div>
+        )}
+
+        {/* The hint describes the showing side only; a blank line keeps
+         * the hidden plate's layout from shifting mid-flip. */}
+        <p className={styles.hint}>{showing ? hintText : '\u00A0'}</p>
+      </div>
+    );
+  }
 
   return (
     <div
       role="button"
       tabIndex={0}
+      aria-disabled={interactionLocked || undefined}
       aria-label={`Flashcard, showing the ${
         answerShowing ? 'answer' : 'prompt'
       }. Press to flip.`}
       className={[
         styles.root,
         srs ? styles.swipeable : null,
+        springingBack ? styles.springBack : null,
+        exitTransform ? styles.exiting : null,
         helpOpen ? styles.helpOpen : null,
       ]
         .filter(Boolean)
         .join(' ')}
-      style={dragStyle}
+      style={poseStyle}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
+      onTransitionEnd={handleRootTransitionEnd}
       {...dragHandlers}
     >
-      {srs && (
-        <>
-          <div
-            className={styles.tintHard}
-            style={{ opacity: clamp01(-dx / SWIPE_TINT_DIVISOR) }}
-          />
-          <div
-            className={styles.tintEasy}
-            style={{ opacity: clamp01(dx / SWIPE_TINT_DIVISOR) }}
-          />
-        </>
-      )}
-      <div className={styles.utilityRow} onClick={stopPropagation}>
-        <CardAudioButton
-          audioUrl={audioUrl}
-          label="Play sentence audio"
-          ref={audioControlRef}
-        />
-        {favourite && (
-          /* Handoff: bare Dorado star (no circular fill). `sm` keeps a
-           * square 32px hit target near the 34×34 audio tile. Glyph color
-           * is forced in `.favourite svg` so it stays Dorado, not steel. */
-          <span className={styles.favourite}>
-            <IconButton
-              icon={favourite.isFavourited ? 'starFilled' : 'star'}
-              label={
-                favourite.isFavourited
-                  ? 'Remove from my flashcards'
-                  : 'Add to my flashcards'
-              }
-              size="sm"
-              iconSize="lg"
-              tone="muted"
-              variant="bare"
-              disabled={favourite.isPending}
-              onClick={favourite.onToggle}
-            />
-          </span>
-        )}
-      </div>
-
       <div
-        className={
-          helpOpen ? `${styles.content} ${styles.helpOpen}` : styles.content
-        }
+        className={[
+          styles.flipper,
+          answerShowing ? styles.flipped : null,
+          flipAnimating ? styles.flipAnimating : null,
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        data-quiz-card-flipper=""
+        onTransitionEnd={handleFlipperTransitionEnd}
       >
-        <div className={styles.face}>
-          {face.spanish
-            ? quizFaceRuns(face.text).map((run, index) => (
-                <span
-                  key={index}
-                  className={run.bold ? styles.bold : styles.regular}
-                >
-                  {run.text}
-                </span>
-              ))
-            : face.text}
-        </div>
-
-        {helpOpen && helpContent && (
-          <div className={styles.helpContent} onClick={stopPropagation}>
-            {helpContent}
-          </div>
-        )}
+        {renderSide('front')}
+        {renderSide('back')}
       </div>
-
-      {showHelpButton && (
-        <div className={styles.helpButtonRow} onClick={stopPropagation}>
-          <Button
-            variant="secondary"
-            leadingIcon={helpOpen ? 'x' : 'checklist'}
-            onClick={onToggleHelp}
-          >
-            {helpOpen ? 'Hide help' : 'Get help'}
-          </Button>
-        </div>
-      )}
-
-      <p className={styles.hint}>{hintText}</p>
     </div>
   );
 }
