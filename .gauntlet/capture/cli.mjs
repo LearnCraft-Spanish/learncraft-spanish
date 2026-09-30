@@ -9,10 +9,10 @@ export const REPO = resolve(GAUNTLET, '..');
 
 /**
  * @param {string[]} argv
- * @returns {{ specimen: string, bar: string | null, help: boolean }}
+ * @returns {{ specimen: string, bar: string | null, noBar: boolean, help: boolean }}
  */
 export function parseArgs(argv) {
-  const out = { specimen: 'smoke', bar: null, help: false };
+  const out = { specimen: 'smoke', bar: null, noBar: false, help: false };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--' || arg === '') {
@@ -24,6 +24,8 @@ export function parseArgs(argv) {
       out.specimen = argv[++i] ?? out.specimen;
     } else if (arg === '--bar') {
       out.bar = argv[++i] ?? null;
+    } else if (arg === '--no-bar') {
+      out.noBar = true;
     }
   }
   return out;
