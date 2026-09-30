@@ -12,13 +12,18 @@ export interface UsingAsIdentity {
 export interface UseAppHeaderResult {
   isAuthenticated: boolean;
   isLoading: boolean;
+  /** Auth has settled and the visitor is logged in. */
+  isSignedIn: boolean;
   studentName: string | undefined;
   studentEmail: string | undefined;
-  /** Coach or admin: gets the "Use as student" controls. */
+  /** Coach or admin: the account menu can open the student picker. */
   isStaff: boolean;
   /** Which staff view "Stop using as student" returns to. */
   staffRole: 'admin' | 'coach' | null;
-  isUsingAsStudent: boolean;
+  /** Signed-in coach/admin in their own view: "Use as student" replaces the student nav. */
+  showUseAsStudent: boolean;
+  /** Coach/admin using the app as a student: "Change student", and a way back instead of Log out. */
+  isStaffUsingAsStudent: boolean;
   /** The student a coach/admin is using the app as, once loaded. */
   usingAs: UsingAsIdentity | null;
   /** Back to the signed-in coach/admin's own view. */
@@ -48,8 +53,12 @@ export default function useAppHeader(): UseAppHeaderResult {
   const { appUser, resetActiveStudent } = useActiveStudent();
   const { isUsingAsStudent, setIsUsingAsStudent } = useUsingAsStudent();
 
+  const isSignedIn = !isLoading && isAuthenticated;
+  const isStaff = isAdmin || isCoach;
+  const isStaffUsingAsStudent = isStaff && isUsingAsStudent;
+
   const usingAs =
-    isUsingAsStudent && appUser
+    isStaffUsingAsStudent && appUser
       ? { name: appUser.name, email: appUser.emailAddress }
       : null;
 
@@ -61,11 +70,13 @@ export default function useAppHeader(): UseAppHeaderResult {
   return {
     isAuthenticated,
     isLoading,
+    isSignedIn,
     studentName: myData?.name,
     studentEmail: authUser?.email,
-    isStaff: isAdmin || isCoach,
+    isStaff,
     staffRole: isAdmin ? 'admin' : isCoach ? 'coach' : null,
-    isUsingAsStudent,
+    showUseAsStudent: isSignedIn && isStaff && !isUsingAsStudent,
+    isStaffUsingAsStudent,
     usingAs,
     stopUsingAsStudent,
     login,

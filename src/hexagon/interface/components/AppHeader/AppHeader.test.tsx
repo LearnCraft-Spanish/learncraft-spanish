@@ -66,13 +66,14 @@ describe('component AppHeader', () => {
     const staff = {
       isAuthenticated: true,
       isLoading: false,
+      isSignedIn: true,
       isStaff: true,
       studentName: 'Coach Carla',
       studentEmail: 'carla@fake.not',
     };
 
     it('replaces the student nav with "Use as student"', () => {
-      overrideMockUseAppHeader({ ...staff, isUsingAsStudent: false });
+      overrideMockUseAppHeader({ ...staff, showUseAsStudent: true });
 
       renderHeader(<a href="/flashcardfinder">Flashcard Finder</a>);
 
@@ -85,7 +86,7 @@ describe('component AppHeader', () => {
     });
 
     it('opens the student picker from "Use as student"', async () => {
-      overrideMockUseAppHeader({ ...staff, isUsingAsStudent: false });
+      overrideMockUseAppHeader({ ...staff, showUseAsStudent: true });
 
       renderHeader();
       await userEvent.click(
@@ -99,7 +100,7 @@ describe('component AppHeader', () => {
 
     it('keeps "Use as student" on mobile', () => {
       stubMobile(true);
-      overrideMockUseAppHeader({ ...staff, isUsingAsStudent: false });
+      overrideMockUseAppHeader({ ...staff, showUseAsStudent: true });
 
       renderHeader();
 
@@ -111,7 +112,7 @@ describe('component AppHeader', () => {
     it('shows the student nav and who they are using the app as', async () => {
       overrideMockUseAppHeader({
         ...staff,
-        isUsingAsStudent: true,
+        isStaffUsingAsStudent: true,
         usingAs: { name: 'Ana Ruiz', email: 'ana@fake.not' },
       });
 
@@ -131,7 +132,7 @@ describe('component AppHeader', () => {
     });
 
     it('opens the picker from the account menu\'s "Use as student"', async () => {
-      overrideMockUseAppHeader({ ...staff, isUsingAsStudent: false });
+      overrideMockUseAppHeader({ ...staff, showUseAsStudent: true });
 
       renderHeader();
       await userEvent.click(screen.getByRole('button', { name: 'Account' }));
@@ -148,7 +149,7 @@ describe('component AppHeader', () => {
     it('opens the picker from "Change student"', async () => {
       overrideMockUseAppHeader({
         ...staff,
-        isUsingAsStudent: true,
+        isStaffUsingAsStudent: true,
         usingAs: { name: 'Ana Ruiz', email: 'ana@fake.not' },
       });
       overrideMockUseStudentSelector({ isUsingAsStudent: true });
@@ -171,7 +172,7 @@ describe('component AppHeader', () => {
       overrideMockUseAppHeader({
         ...staff,
         staffRole: 'admin',
-        isUsingAsStudent: true,
+        isStaffUsingAsStudent: true,
         usingAs: { name: 'Ana Ruiz', email: 'ana@fake.not' },
         stopUsingAsStudent,
         logout,
@@ -208,6 +209,7 @@ describe('component AppHeader', () => {
     overrideMockUseAppHeader({
       isAuthenticated: true,
       isLoading: false,
+      isSignedIn: true,
       isStaff: false,
       studentName: 'Maria Silva',
     });
@@ -254,6 +256,7 @@ describe('component AppHeader', () => {
     overrideMockUseAppHeader({
       isAuthenticated: true,
       isLoading: false,
+      isSignedIn: true,
       studentName: 'Maria Silva',
       studentEmail: 'maria@example.com',
     });
@@ -267,7 +270,11 @@ describe('component AppHeader', () => {
   });
 
   it('shows no lesson, card, or due count anywhere in the header', () => {
-    overrideMockUseAppHeader({ isAuthenticated: true, isLoading: false });
+    overrideMockUseAppHeader({
+      isAuthenticated: true,
+      isLoading: false,
+      isSignedIn: true,
+    });
 
     renderHeader();
 
@@ -304,6 +311,7 @@ describe('component AppHeader', () => {
     overrideMockUseAppHeader({
       isAuthenticated: true,
       isLoading: false,
+      isSignedIn: true,
       studentName: 'Maria Silva',
       studentEmail: 'maria@example.com',
     });
@@ -322,7 +330,11 @@ describe('component AppHeader', () => {
   it('calls an in-page override when the stack back button is pressed', async () => {
     stubMobile(true);
     overrideMockUseStudentUiVersion({ version: 'v2' });
-    overrideMockUseAppHeader({ isAuthenticated: true, isLoading: false });
+    overrideMockUseAppHeader({
+      isAuthenticated: true,
+      isLoading: false,
+      isSignedIn: true,
+    });
     const onBack = vi.fn();
     setMobileStackOverride({ title: 'Choose tags', onBack });
 
@@ -339,7 +351,11 @@ describe('component AppHeader', () => {
   it('navigates to the parent path when stack back is pressed', async () => {
     stubMobile(true);
     overrideMockUseStudentUiVersion({ version: 'v2' });
-    overrideMockUseAppHeader({ isAuthenticated: true, isLoading: false });
+    overrideMockUseAppHeader({
+      isAuthenticated: true,
+      isLoading: false,
+      isSignedIn: true,
+    });
 
     function PathReadout(): JSX.Element {
       const { pathname } = useLocation();

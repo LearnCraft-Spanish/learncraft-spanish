@@ -28,13 +28,13 @@ interface AppHeaderProps {
  */
 export function AppHeader({ children }: AppHeaderProps): JSX.Element {
   const {
-    isAuthenticated,
-    isLoading,
+    isSignedIn,
     studentName,
     studentEmail,
     isStaff,
     staffRole,
-    isUsingAsStudent,
+    showUseAsStudent,
+    isStaffUsingAsStudent,
     usingAs,
     stopUsingAsStudent,
     logout,
@@ -48,9 +48,6 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
   const closeSelector = (): void => setSelectorAnchor(null);
 
   const isStack = stack !== null;
-  const isSignedIn = !isLoading && isAuthenticated;
-  const showUseAsStudent = isSignedIn && isStaff && !isUsingAsStudent;
-  const showStudentNav = !showUseAsStudent && Boolean(children);
 
   const rootClassName = [
     styles.root,
@@ -61,18 +58,17 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
     .join(' ');
 
   const openFromAccount = (): void => setSelectorAnchor('account');
-  const staffUsingAsStudent = isStaff && isUsingAsStudent;
 
   const accountMenu = (
     <AccountMenu
       studentName={studentName}
       studentEmail={studentEmail}
       onLogOut={logout}
-      usingAs={isStaff ? usingAs : null}
+      usingAs={usingAs}
       onUseAsStudent={showUseAsStudent ? openFromAccount : undefined}
-      onChangeStudent={staffUsingAsStudent ? openFromAccount : undefined}
+      onChangeStudent={isStaffUsingAsStudent ? openFromAccount : undefined}
       stopUsingAsStudent={
-        staffUsingAsStudent
+        isStaffUsingAsStudent
           ? {
               label: 'Stop using as student',
               caption: `Back to your ${staffRole ?? 'coach'} view`,
@@ -106,9 +102,7 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
         <span className={styles.wordmark}>LEARNCRAFT</span>
       </Link>
 
-      {showStudentNav && <nav className={styles.nav}>{children}</nav>}
-
-      {showUseAsStudent && (
+      {showUseAsStudent ? (
         <div className={styles.staffAction} aria-hidden={isStack}>
           <StudentSelector
             open={selectorAnchor === 'nav'}
@@ -130,6 +124,8 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
             }
           />
         </div>
+      ) : (
+        Boolean(children) && <nav className={styles.nav}>{children}</nav>
       )}
 
       <div className={styles.account} aria-hidden={isStack}>

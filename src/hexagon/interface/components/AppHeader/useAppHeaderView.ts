@@ -21,11 +21,13 @@ export interface AppHeaderStack {
 export interface UseAppHeaderViewResult {
   isAuthenticated: boolean;
   isLoading: boolean;
+  isSignedIn: boolean;
   studentName: string | undefined;
   studentEmail: string | undefined;
   isStaff: boolean;
   staffRole: 'admin' | 'coach' | null;
-  isUsingAsStudent: boolean;
+  showUseAsStudent: boolean;
+  isStaffUsingAsStudent: boolean;
   usingAs: UsingAsIdentity | null;
   stopUsingAsStudent: () => void;
   logout: () => void;
@@ -41,11 +43,13 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
   const {
     isAuthenticated,
     isLoading,
+    isSignedIn,
     studentName,
     studentEmail,
     isStaff,
     staffRole,
-    isUsingAsStudent,
+    showUseAsStudent,
+    isStaffUsingAsStudent,
     usingAs,
     stopUsingAsStudent,
     logout,
@@ -73,11 +77,13 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
   return {
     isAuthenticated,
     isLoading,
+    isSignedIn,
     studentName,
     studentEmail,
     isStaff,
     staffRole,
-    isUsingAsStudent,
+    showUseAsStudent,
+    isStaffUsingAsStudent,
     usingAs,
     stopUsingAsStudent,
     logout,
