@@ -1,434 +1,260 @@
-# 📚 Domain Glossary
+# Domain Glossary
 
-_Business terminology and concepts for LearnCraft Spanish_
+The shared language of LearnCraft Spanish as this frontend presents it: learners and their flashcards and quizzes, coaching, and staff content tools.
 
-This glossary defines the key terms, concepts, and business logic specific to the LearnCraft Spanish application. Understanding these terms is essential for working effectively in the codebase.
+Entity fields live in `@learncraft-spanish/shared`, not here. A _Schema_ line names the folder under the package's `src/domain/` that owns an entity's definition.
 
----
+## People & Roles
 
-## User Roles
+**App User**:
+Whoever is logged in to the app: any tier of Student, a Free User, a Coach, or an Admin.
+_Schema_: `appUser`
+_Note_: the shared `AppUser` schema holds only the logged-in person's student record, so Free Users, and Coaches or Admins without a student record, have none.
 
-### Student
+**Student**:
+A person with an app student record, which carries their Course, Current Lesson, Cohort, and level of app access.
+_Avoid_: user
+_Schema_: `student`
 
-A user who is learning Spanish. Students can:
+**Limited Student**:
+A Student on the lower membership tier: a one-time payment for lifetime access to audio quizzes only.
+_Avoid_: limited user
 
-- Take quizzes and review vocabulary
-- Create and study custom flashcards
-- Track their progress through courses and lessons
-- Access audio pronunciations
-- Review spaced repetition flashcards
+**Free User**:
+A logged-in person without app access, either never a Student or a Student whose role is `none` after cancelling their membership. Free Users can still take Official Quizzes.
+_Avoid_: guest
 
-### Coach
+**Coaching Student**:
+A current or former paying coaching client, recorded in student records separately from the Student record. Usually the same human as a Student, matched only informally by email.
+_Avoid_: SR Student, student (when the coaching record is meant)
+_Schema_: `sr-student`
 
-A staff member who assists students. Coaches can:
+**Coach**:
+Staff who coach Coaching Students through calls, homework, and Weekly Records, and who can use the app on any Student's behalf.
+_Avoid_: staff, tutor
+_Schema_: `coach`
 
-- View student progress and performance
-- Assign lessons and track completion
-- Review student activity and engagement
-- Provide guidance and support
-- Access coaching dashboard with metrics
+**Admin**:
+Staff with access to content and data tools on top of every Coach tool. An Admin may coach no one, be a coach team lead with their own students, or be a Coach with an extra responsibility such as creating Examples or grading homework.
 
-### Admin
+**Primary Coach**:
+The Coach responsible for a Coaching Student, their Membership, and their Weekly Records.
 
-System administrators with full access. Admins can:
+**Homework Corrector**:
+The Coach who graded an Assignment; not necessarily the student's Primary Coach.
 
-- Manage users, courses, and content
-- View system-wide metrics and analytics
-- Configure system settings
-- Access all coaching and student features
-- Manage database tables directly
+## Curriculum
 
----
+**Course**:
+A curriculum made of numbered Lessons and their Official Quizzes, such as "LearnCraft Spanish" or "Spanish in One Month".
+_Avoid_: Program (legacy name that survives in some tables and endpoints, e.g. `relatedProgram`)
+_Schema_: `courses`
 
-## Learning Content
+**Lesson**:
+One numbered unit of a Course. A student is meant to complete one Lesson each weekday.
+_Schema_: `lessons`
 
-### Course
+**Course Prerequisite**:
+A Course whose Lessons count as earlier Lessons of another Course, so a Lesson Range can reach back into it.
 
-A structured learning path with multiple lessons. A course represents a coherent curriculum (e.g., "Beginner Spanish", "Intermediate Grammar").
+**Current Lesson**:
+The Lesson a Student's record says they are on, set by their Cohort or by staff.
 
-**Properties**:
+**Last Studied Lesson**:
+The Lesson a learner most recently studied on this device, used to default their quizzes. Works for Free Users too.
 
-- `id`: Unique identifier
-- `name`: Display name
-- `description`: Course overview
-- `level`: Difficulty level (beginner, intermediate, advanced)
-- `lessons`: Array of associated lessons
-
-### Lesson
-
-A specific unit of learning within a course. Each lesson focuses on particular vocabulary, grammar, or concepts.
-
-**Properties**:
-
-- `id`: Unique identifier
-- `courseId`: Parent course
-- `lessonNumber`: Order within course
-- `name`: Lesson title
-- `startPage`: Starting page in curriculum
-- `endPage`: Ending page in curriculum
+**Cohort**:
+A lettered group (A–J) of Students who move through a Course on a shared schedule; the Course tracks one Current Lesson per Cohort.
+_Note_: every Student is given a Cohort letter, but only a small fraction actually follow a cohort schedule. Last Studied Lesson exists so lesson tracking works for everyone else.
 
 **Lesson Range**:
+A from-Lesson and to-Lesson a Student picks to narrow a quiz to recent material, such as their latest 20 Lessons.
 
-- **Cumulative**: Includes all vocabulary from lesson 1 up to the selected lesson
-- **Range**: Only includes vocabulary from the selected lesson
+## Examples & Vocabulary
 
-### Vocabulary / Vocab
+**Example**:
+A Spanish sentence with its English translation, tagged with the Vocabulary it uses and usually carrying Spanish and English audio.
+_Avoid_: sentence
+_Schema_: `example`
 
-Spanish words or phrases that students learn. Core content unit in the system.
+**Vocabulary Complete**:
+An Example whose Vocabulary tags are all recorded and verified as correct by a Coach.
 
-**Properties**:
+**Spanglish**:
+An Example whose Spanish side deliberately mixes in English words, used in early Lessons before the student knows enough vocabulary for full Spanish sentences. Students can exclude them from quizzes.
 
-- `id`: Unique identifier
-- `spanish`: Spanish text
-- `english`: English translation
-- `audioUrl`: Pronunciation audio file
-- `lessonId`: Associated lesson
-- `skillTags`: Associated skill categories
-- `category`: Vocabulary category (noun, verb, phrase, etc.)
+**Vocabulary**:
+A single Spanish word in one sense, identified by its word and Descriptor, with one or more Spellings and a Subcategory. "Vocab" is accepted shorthand for one Vocabulary item.
+_Avoid_: word
+_Schema_: `vocabulary`
 
-### Example
+**Descriptor**:
+A short English gloss that tells apart Vocabulary items sharing the same word.
 
-A sentence or phrase demonstrating vocabulary usage in context.
+**Spelling**:
+A written form in which a Vocabulary item appears in Examples. A student's **Known Spellings** are the Spellings they have met by a given Lesson.
 
-**Properties**:
+**Subcategory**:
+A themed group of Vocabulary within one part of speech, such as "Time, general".
 
-- `id`: Unique identifier
-- `spanish`: Spanish example sentence
-- `english`: English translation
-- `vocabularyId`: Related vocabulary item
-- `audioUrl`: Audio pronunciation
+**Skill Tag**:
+A label used to filter Examples, pointing at one Vocabulary item, Idiom, Subcategory, Verb, or Conjugation.
+_Schema_: `vocabulary`
 
----
+## Flashcards & SRS
 
-## Quizzing System
+**Flashcard**:
+An Example a Student has collected for spaced-repetition review.
+_Avoid_: card
+_Schema_: `flashcard`
 
-### Quiz
+**Collect**:
+To add an Example to a Student's Flashcards. Collected Flashcards are **owned**.
+_Avoid_: add, save
 
-An interactive session where students practice vocabulary or grammar.
+**Custom Flashcard**:
+A Flashcard made on request for one Student, using words they are actively trying to learn, rather than drawn from the premade Examples taught to everyone. Usually has no audio, no Vocabulary tags, and is not Vocabulary Complete. Delivered by assigning an Example.
 
-**Quiz Types**:
+**SRS**:
+The spaced repetition system that schedules when each owned Flashcard is next due, based on how the Student rated it.
+_Avoid_: SM-2
 
-- **Text Quiz**: Type the correct translation
-- **Audio Quiz**: Listen and type what you hear
-- **Official Quiz**: Pre-defined quiz with specific examples (sentences) created by instructors
-- **Custom Quiz**: User-created quiz with selected lessons, skill tags, categories, and filters
-- **Limited Quiz**: Quiz with a limited number of items (e.g., first 50 words from selected range)
+**Interval**:
+The number of days until a Flashcard is next due for review.
 
-**Quiz Modes**:
+**Easy / Hard / Viewed**:
+How a Flashcard review is recorded: Easy lengthens the Interval, Hard shortens it, and Viewed (seen but not rated) leaves it unchanged. The exact rule lives in `src/hexagon/domain/srs.ts`.
 
-- **Spanish First**: Spanish prompt shown first (text or audio), provide English response
-- **English First**: English prompt shown first, provide Spanish response
-- **Listening Quiz**: Listen to Spanish audio, type what you hear
-- **Speaking Quiz**: Read Spanish text, record your pronunciation
+## Quizzes
 
-### Question
+**Quiz**:
+A practice session over a set of Examples. Every quiz has a source (Official, Custom, or My Flashcards) and a format (Text or Audio).
+_Avoid_: drill
 
-A single item in a quiz session.
+**Official Quiz**:
+A curated, published quiz for one Lesson of a Course. The only quiz grouping students talk about.
+_Schema_: `quiz`
 
-**Properties**:
+**Quiz Group**:
+An internal grouping that ties a set of Official Quizzes to a Course, such as "LearnCraft Spanish" and the much larger "LearnCraft Spanish Extended", each with one quiz per Lesson.
+_Schema_: `quiz-group`
 
-- `prompt`: What the student sees (Spanish or English text, or audio)
-- `correctAnswer`: Expected response
-- `userAnswer`: Student's submitted answer
-- `isCorrect`: Whether answer was correct
-- `attemptNumber`: How many times attempted
+**Custom Quiz**:
+A quiz a learner builds from filters such as Lesson Range, Skill Tags, and excluding Spanglish.
 
-### Quiz Result
+**My Flashcards Quiz**:
+A quiz over a Student's owned Flashcards.
 
-The outcome of a completed quiz session.
+**Text Quiz**:
+A quiz that shows one side of each Example as text, then reveals the other.
 
-**Properties**:
+**Start with Spanish**:
+The Text Quiz setting that shows the Spanish side first.
+_Avoid_: Spanish First, English First
 
-- `quizId`: Associated quiz
-- `studentId`: Student who took the quiz
-- `score`: Percentage correct
-- `totalQuestions`: Number of questions
-- `correctAnswers`: Number correct
-- `completedAt`: Timestamp
-- `timeSpent`: Duration in seconds
+**SRS Quiz**:
+A Text Quiz over a Student's owned Flashcards in which each card is rated Easy or Hard.
 
----
+**Audio Quiz**:
+A quiz played through each Example's Spanish and English audio, as either a Listening Quiz or a Speaking Quiz. The student's voice is never recorded.
 
-## Flashcard System
+**Listening Quiz**:
+An Audio Quiz that plays the Spanish, gives the student time to understand it, then gives the English.
 
-### Flashcard
+**Speaking Quiz**:
+An Audio Quiz that plays the English, gives the student time to say the Spanish aloud, then plays the Spanish.
 
-A study card for vocabulary review using spaced repetition.
+## Coaching
 
-**Properties**:
+**SrCourse**:
+A coaching membership tier, stating how many Private Calls and Group Calls a Coaching Student gets each week; occasionally a special student-type course. Unrelated to the curriculum Course.
+_Avoid_: course (unqualified), coaching course
+_Schema_: `sr-course`
 
-- `id`: Unique identifier
-- `vocabularyId`: Associated vocabulary
-- `studentId`: Owner student
-- `front`: Front of card (usually Spanish)
-- `back`: Back of card (usually English)
-- `ease`: Spaced repetition ease factor
-- `interval`: Days until next review
-- `nextReview`: Scheduled review date
+**SrLesson**:
+A stopgap coaching lesson that maps a Weekly Record onto a range of five curriculum Lessons, one per weekday. Due to be replaced.
+_Avoid_: lesson (unqualified)
+_Schema_: `sr-lesson`
 
-**SRS (Spaced Repetition System)**:
-Uses a modified SM-2 algorithm to schedule reviews based on student performance.
+**Membership**:
+A Coaching Student's enrollment in an SrCourse for a date range, with a Primary Coach. Can be put on hold.
+_Avoid_: subscription
+_Schema_: `membership`
 
-### Flashcard Update
+**Bundle Credits**:
+Add-on coaching sessions a Coaching Student buys for extra practice beyond their Membership. They belong to the student rather than the Membership and expire after six months, so they survive a change of SrCourse.
+_Schema_: `bundle-credits`
 
-A pending change to a flashcard (used for batch operations).
+**Weekly Record**:
+The main record of a Coaching Student's progress for one week of their Membership, generated each week for each of a Coach's students. Holds the week's SrLesson, Assignments, Private Calls, and Group Call attendance.
+_Avoid_: week (the code's name, `Week`)
+_Schema_: `week`
 
-**Update Types**:
+**Hold Week**:
+A Weekly Record for a paused week that does not count toward the Membership.
 
-- **Add**: Create new flashcard
-- **Remove**: Delete flashcard
-- **Update**: Modify flashcard properties (ease, interval)
+**Incomplete Week**:
+A Weekly Record the Coach has not finished filling in.
 
-**Update Queue**:
-Flashcard changes are queued and flushed on page load or explicit save to optimize API calls.
+**Assignment**:
+Homework recorded on a Weekly Record and graded by a Homework Corrector.
+_Schema_: `assignment`
 
----
+**Assign an Example**:
+To give an Example to a Student as a Flashcard, or add it to an Official Quiz, through the Example Assigner.
+_Avoid_: assignment (reserved for homework)
 
-## Skill System
+**Private Call**:
+A one-on-one call between a Coach and a Coaching Student, recorded on a Weekly Record.
+_Schema_: `privateCall`
 
-### Skill Tag
+**Strategy Call**:
+A Private Call with someone other than the student's Primary Coach, to assess how the student is progressing and decide the best next steps. May not belong to a Weekly Record.
 
-A categorization label for vocabulary (e.g., "Transportation", "Food", "Past Tense").
+**Group Call**:
+A coaching session one Coach runs for several Coaching Students, with attendance recorded on each attendee's Weekly Record.
+_Avoid_: group session (the code's name, `GroupSession`)
+_Schema_: `groupCall`
 
-**Properties**:
+**Leads to Re-engage**:
+Coaching Students who have gone inactive or quiet, grouped by Coach, for follow-up.
+_Schema_: `coach`
 
-- `id`: Unique identifier
-- `name`: Tag name
-- `category`: Broader category
-- `description`: What this skill covers
+## Tools
 
-**Usage**:
+**Flashcard Finder**:
+Where Students browse Examples by filter and collect them.
 
-- Vocabulary items can have multiple skill tags
-- Students can filter quizzes by skill tag
-- Progress can be tracked by skill tag
+**My Flashcards**:
+Where Students quiz themselves on their owned Flashcards.
 
-### Subcategory
+**Flashcard Manager**:
+Where Students review and remove their owned Flashcards.
 
-A grouping of related vocabulary or grammar concepts.
+**Official Quizzes**:
+Where learners pick an Official Quiz for a Course.
 
-**Examples**:
+**Get Help**:
+Student help pages, including **Vocab Lookup** for looking up a Vocabulary item.
 
-- Verbs: Regular, Irregular, Reflexive
-- Nouns: People, Places, Things
-- Grammar: Tenses, Moods, Articles
+**FrequenSay**:
+A Coach tool that finds the words in a pasted text a student has not learned by a given Lesson, by comparing against their Known Spellings.
 
----
+**Coaching Dashboard**:
+A Coach's home screen, showing their Incomplete Weeks and recent Private Calls, Group Calls, and Assignments.
 
-## Progress Tracking
+**Weekly Records**:
+The screen where Coaches fill in Weekly Records.
 
-### Student Progress
+**Student Drill Down**:
+Where a Coach can find any Coaching Student and view all of their Memberships and Weekly Records.
+_Avoid_: Student Details
 
-Tracking of student advancement through courses and lessons.
+**Example Manager**:
+Admin tools for creating, editing, and searching Examples, including the **Example Assigner** for assigning Examples.
 
-**Metrics**:
+**Admin Dashboard**:
+Admin-only reports, such as Leads to Re-engage.
 
-- `lessonsCompleted`: Number of lessons finished
-- `vocabularyMastered`: Number of vocabulary items learned
-- `quizzesTaken`: Total quizzes completed
-- `averageScore`: Mean quiz score
-- `streakDays`: Consecutive days of activity
-
-### Assignment
-
-A lesson or quiz assigned by a coach to a student.
-
-**Properties**:
-
-- `id`: Unique identifier
-- `studentId`: Assigned student
-- `coachId`: Assigning coach
-- `lessonId` or `quizId`: Assigned content
-- `dueDate`: Deadline
-- `completedAt`: Completion timestamp
-- `status`: pending, completed, overdue
-
----
-
-## Audio System
-
-### Audio Player
-
-Global audio playback coordinator for pronunciation practice.
-
-**Features**:
-
-- Play vocabulary pronunciation
-- Play example sentence audio
-- Control playback (play, pause, stop)
-- Queue multiple audio clips
-- Auto-advance in quiz mode
-
-### Audio Context
-
-Global state for audio playback across the application.
-
-**State**:
-
-- `currentAudio`: Currently playing audio URL
-- `isPlaying`: Playback status
-- `queue`: Queued audio items
-- `autoPlay`: Whether to auto-play next item
-
----
-
-## Database & API
-
-### Program
-
-A top-level curriculum structure (may contain multiple courses).
-
-**Note**: This is legacy terminology; "Course" is preferred in modern codebase.
-
-### Record
-
-Generic term for database entries in admin/coaching interfaces.
-
-**Types**:
-
-- Student Records
-- Course Records
-- Lesson Records
-- Vocabulary Records
-- Quiz Records
-
----
-
-## Quiz Configuration
-
-### Quiz Config
-
-Settings for a quiz session.
-
-**Properties**:
-
-- `mode`: text | audio | mixed
-- `direction`: spanish-to-english | english-to-spanish
-- `lessonRange`: Which lessons to include
-- `includeType`: cumulative | range | custom
-- `vocabularyIds`: Specific vocabulary (for custom quizzes)
-- `limit`: Maximum number of questions
-- `shuffle`: Whether to randomize question order
-
-### Official Quiz
-
-A pre-configured quiz with specific examples (sentences) and settings, created by instructors.
-
-**Properties**:
-
-- `id`: Unique identifier
-- `name`: Quiz title
-- `description`: What the quiz covers
-- `exampleIds`: Included examples (sentences)
-- `config`: Quiz settings
-- `isPublished`: Whether students can access it
-
----
-
-## Coaching Features
-
-### Coach Dashboard
-
-Interface for coaches to monitor student progress.
-
-**Features**:
-
-- Student list with recent activity
-- Lesson completion rates
-- Quiz performance metrics
-- Assignment tracking
-- Weekly summaries
-
-### Weekly Summary
-
-A report of student activity for a specific week.
-
-**Metrics**:
-
-- Lessons completed
-- Quizzes taken
-- Average scores
-- Time spent studying
-- Flashcards reviewed
-
----
-
-## Common Business Rules
-
-### Vocabulary Inclusion
-
-**Cumulative Mode**: Lessons 1-10 includes all vocabulary from lesson 1 through lesson 10.
-**Range Mode**: Lesson 5-7 includes only vocabulary from lessons 5, 6, and 7.
-
-### Spaced Repetition Algorithm
-
-Flashcards use a modified SM-2 algorithm:
-
-- **Again**: Reset interval to 1 day, decrease ease
-- **Hard**: Increase interval by 1.2x
-- **Good**: Increase interval by ease factor (default 2.5)
-- **Easy**: Increase interval by ease factor \* 1.3, increase ease
-
-### Quiz Scoring
-
-- **Correct on First Try**: Full points
-- **Correct on Second Try**: Partial points (typically 50%)
-- **Incorrect**: No points, but question may reappear
-
-### Auto-Save Behavior
-
-Flashcard updates are queued and auto-saved when:
-
-- User navigates away from flashcard page
-- User explicitly clicks "Save"
-- User closes the browser (via beforeunload handler)
-
----
-
-## Legacy vs Modern Terminology
-
-Some terms have evolved as the codebase has been refactored:
-
-| Legacy Term       | Modern Term        | Notes                            |
-| ----------------- | ------------------ | -------------------------------- |
-| Program           | Course             | "Course" is preferred            |
-| Vocab Quiz DB     | Vocabulary Service | Old admin table name             |
-| Student Records   | Student Service    | Legacy admin interface           |
-| useOfficialQuizDB | useOfficialQuizzes | Renamed for clarity              |
-| Drill Down        | Student Details    | Old name for student detail view |
-
-When working in legacy code, you may see these older terms. New code should use modern terminology.
-
----
-
-## Acronyms and Abbreviations
-
-- **SRS**: Spaced Repetition System
-- **SM-2**: SuperMemo 2 (spaced repetition algorithm)
-- **SPA**: Single Page Application
-- **API**: Application Programming Interface
-- **UI**: User Interface
-- **UX**: User Experience
-- **TBD**: To Be Determined
-- **WIP**: Work In Progress
-
----
-
-## Related Documentation
-
-- [`ARCHITECTURE.md`](../src/hexagon/ARCHITECTURE.md) - How domain concepts are organized in code
-- [`DATA_FLOW.md`](./DATA_FLOW.md) - How data moves through the system
-- [`FEATURE_WORKFLOW.md`](./FEATURE_WORKFLOW.md) - Building features with these concepts
-- [`COMMON_PATTERNS.md`](./COMMON_PATTERNS.md) - Coding patterns and conventions
-
----
-
-## Questions?
-
-If you encounter a term not defined here, please:
-
-1. Check the codebase for usage examples
-2. Ask the team for clarification
-3. Update this glossary with the new term
-
-This glossary is a living document and should be updated as the domain evolves.
+**Database Tables**:
+Admin-only screens for editing raw records such as Courses, Lessons, and Quiz Groups.

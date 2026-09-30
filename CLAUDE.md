@@ -127,3 +127,19 @@ pnpm gauntlet:preview   # Auth0-free visual specimen (port 5273)
 **Visual redesign / gauntlet screenshots:** Use [`.gauntlet/README.md`](./.gauntlet/README.md) and the [visual-gauntlet skill](./.cursor/skills/visual-gauntlet/SKILL.md). Never Auth0 and never real backend calls. Main fans out a **capture specialist** (`required_permissions: ["all"]`) for PNGs, then a **critic** that only `Read`s blind image paths — critics must not run Vite/Playwright. Do not claim visual review without `.gauntlet/out/<specimen>/bar/` + `app/` PNGs. `GenerateImage` is not a substitute.
 
 All scripts: [`documentation/SCRIPTS.md`](./documentation/SCRIPTS.md)
+
+---
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues on `LearnCraft-Spanish/learncraft-spanish`, via the `gh` CLI. See `documentation/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `documentation/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context, in the repo's existing files: `documentation/DOMAIN_GLOSSARY.md` and the per-layer `DECISIONS.md` files under `src/hexagon/`. See `documentation/agents/domain.md`.
