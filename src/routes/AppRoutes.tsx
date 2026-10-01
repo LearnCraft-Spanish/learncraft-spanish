@@ -3,6 +3,7 @@ import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
 import { config } from '@config';
 import { UiScope } from '@interface/components/general/UiScope/UiScope';
 import { LoadingScreen } from '@interface/components/Loading';
+import { RequireStudentTools } from '@interface/components/RequireStudentTools';
 import { lazy, Suspense } from 'react';
 import { Navigate, Route } from 'react-router-dom';
 import NotFoundPage from '../NotFoundPage';
@@ -70,41 +71,39 @@ export default function AppRoutes() {
       <SentryRoutes>
         <Route
           path="/"
-          element={
-            isStudent ? (
-              <UiScope>
-                <HomePage />
-              </UiScope>
-            ) : (
-              <Menu />
-            )
-          }
+          element={isStudent || isCoach || isAdmin ? <HomePage /> : <Menu />}
         />
         <Route
           path="/myflashcards"
           element={
             isAuthenticated && (
-              <UiScope>
-                <ReviewMyFlashcards />
-              </UiScope>
+              <RequireStudentTools>
+                <UiScope>
+                  <ReviewMyFlashcards />
+                </UiScope>
+              </RequireStudentTools>
             )
           }
         />
         <Route
           path="/manage-flashcards"
           element={
-            <UiScope>
-              <FlashcardManager />
-            </UiScope>
+            <RequireStudentTools>
+              <UiScope>
+                <FlashcardManager />
+              </UiScope>
+            </RequireStudentTools>
           }
         />
         <Route
           path="/quizzes"
           element={
             !isAuthenticated ? null : version === 'v2' ? (
-              <UiScope>
-                <QuizzesPage />
-              </UiScope>
+              <RequireStudentTools>
+                <UiScope>
+                  <QuizzesPage />
+                </UiScope>
+              </RequireStudentTools>
             ) : (
               <Navigate to="/" replace />
             )
@@ -113,31 +112,38 @@ export default function AppRoutes() {
         <Route
           path="/officialquizzes/*"
           element={
-            <UiScope>
-              <OfficialQuizzesRoutes />
-            </UiScope>
+            <RequireStudentTools>
+              <UiScope>
+                <OfficialQuizzesRoutes />
+              </UiScope>
+            </RequireStudentTools>
           }
         />
         <Route
           path="/customquiz"
           element={
-            (isLimited || isStudent || isCoach || isAdmin) &&
-            (isLimited ? (
-              <LimitedCustomQuiz />
-            ) : (
-              <UiScope>
-                <CustomQuiz />
-              </UiScope>
-            ))
+            (isLimited || isStudent || isCoach || isAdmin) && (
+              <RequireStudentTools>
+                {isLimited ? (
+                  <LimitedCustomQuiz />
+                ) : (
+                  <UiScope>
+                    <CustomQuiz />
+                  </UiScope>
+                )}
+              </RequireStudentTools>
+            )
           }
         />
         <Route
           path="/flashcardfinder"
           element={
             (isStudent || isAdmin || isCoach) && (
-              <UiScope>
-                <FlashcardFinderPage />
-              </UiScope>
+              <RequireStudentTools>
+                <UiScope>
+                  <FlashcardFinderPage />
+                </UiScope>
+              </RequireStudentTools>
             )
           }
         />

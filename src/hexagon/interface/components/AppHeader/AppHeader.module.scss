@@ -1,5 +1,8 @@
 .root {
   position: relative;
+  /* Its own layer, so account and student-picker dropdowns paint over page
+   * cards that raise themselves to --lcs-z-popover (e.g. Finder filters). */
+  z-index: var(--lcs-z-header);
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
@@ -54,6 +57,39 @@
   justify-self: center;
 }
 
+.staffAction {
+  grid-column: 2;
+  justify-self: center;
+  transition: opacity var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+.useAsStudent {
+  display: flex;
+  align-items: center;
+  height: var(--lcs-control-height-sm);
+  padding: 0 var(--lcs-space-6);
+  border: var(--lcs-border-hairline) solid var(--lcs-color-on-action);
+  border-radius: var(--lcs-radius-pill);
+  background: transparent;
+  color: var(--lcs-color-on-action);
+  font-family: var(--lcs-font-sans);
+  font-size: var(--lcs-text-control);
+  font-weight: var(--lcs-weight-bold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.useAsStudent:hover,
+.useAsStudent[aria-expanded='true'] {
+  background-color: var(--lcs-on-action-20);
+}
+
+.useAsStudent:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
 .account {
   display: flex;
   grid-column: 3;
@@ -91,7 +127,28 @@
     grid-column: 2;
   }
 
+  /* Staff keep "Use as student" on mobile: the student nav it replaces is
+   * desktop-only, but this is the only way into the student view. */
+  .withStaffAction {
+    grid-template-columns: 1fr auto auto;
+    gap: var(--lcs-space-4);
+  }
+
+  .withStaffAction .staffAction {
+    grid-column: 2;
+  }
+
+  .withStaffAction .account {
+    grid-column: 3;
+  }
+
+  .useAsStudent {
+    padding: 0 var(--lcs-space-5);
+    font-size: var(--lcs-text-caption);
+  }
+
   .stackMode .brand,
+  .stackMode .staffAction,
   .stackMode .account {
     opacity: 0;
     pointer-events: none;
@@ -116,6 +173,8 @@
 @media (prefers-reduced-motion: reduce) {
   .wordmark,
   .brand,
+  .staffAction,
+  .useAsStudent,
   .account {
     transition: none;
   }

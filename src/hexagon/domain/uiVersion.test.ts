@@ -29,4 +29,23 @@ describe('resolveStudentUiVersion', () => {
   it('returns v1 when there is no user record', () => {
     expect(resolveStudentUiVersion(null)).toBe('v1');
   });
+
+  it('returns v2 for staff with no student role or beta flag', () => {
+    expect(
+      resolveStudentUiVersion({ studentRole: 'none', betaTester: false }, true),
+    ).toBe('v2');
+  });
+
+  it('returns v2 for staff before their own record has loaded', () => {
+    expect(resolveStudentUiVersion(null, true)).toBe('v2');
+  });
+
+  it('keeps a non-staff limited beta tester on v1', () => {
+    expect(
+      resolveStudentUiVersion(
+        { studentRole: 'limited', betaTester: true },
+        false,
+      ),
+    ).toBe('v1');
+  });
 });

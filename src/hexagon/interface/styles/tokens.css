@@ -193,6 +193,8 @@
     --lcs-z-popover: 100;
     --lcs-z-menu: 110;
     --lcs-z-bottom-bar: 120;
+    /* App header and its dropdowns: above page popovers and bottom bars. */
+    --lcs-z-header: 125;
     /* Modal scrims sit above every persistent chrome layer, tab bar included. */
     --lcs-z-modal: 130;
   }

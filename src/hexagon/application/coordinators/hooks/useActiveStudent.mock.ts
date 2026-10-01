@@ -8,6 +8,7 @@ const defaultMockAdapter: UseActiveStudentReturnType = {
   error: null,
   isOwnUser: false,
   changeActiveStudent: vi.fn<() => void>(),
+  resetActiveStudent: vi.fn<() => void>(),
 };
 
 // Create an overrideable mock with the default implementation

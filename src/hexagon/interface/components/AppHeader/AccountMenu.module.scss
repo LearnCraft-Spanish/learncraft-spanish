@@ -76,10 +76,28 @@
   color: var(--lcs-color-muted);
 }
 
-.logOut {
+.usingAs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-1);
+  padding: var(--lcs-space-3) var(--lcs-space-5) var(--lcs-space-4);
+  border-bottom: var(--lcs-border-hairline) solid var(--lcs-divider);
+  background-color: var(--lcs-tint-action);
+}
+
+.usingAsLabel {
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-eyebrow);
+  font-weight: var(--lcs-weight-bold);
+  letter-spacing: var(--lcs-tracking-wordmark);
+  text-transform: uppercase;
+}
+
+.menuItem {
   display: flex;
   min-height: var(--lcs-control-height);
   align-items: center;
+  justify-content: flex-start;
   gap: var(--lcs-space-4);
   width: 100%;
   padding: 0 var(--lcs-space-5);
@@ -94,11 +112,24 @@
   cursor: pointer;
 }
 
-.logOut:hover {
+.menuItemText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-1);
+  padding: var(--lcs-space-3) 0;
+}
+
+.menuItemCaption {
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-caption);
+  font-weight: var(--lcs-weight-regular);
+}
+
+.menuItem:hover {
   background-color: var(--lcs-tint-hover);
 }
 
-.logOut:focus-visible {
+.menuItem:focus-visible {
   outline: var(--lcs-focus-ring);
   outline-offset: var(--lcs-focus-offset);
 }

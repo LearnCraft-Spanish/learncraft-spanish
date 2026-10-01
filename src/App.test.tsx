@@ -2,6 +2,7 @@ import { ActiveStudentProvider } from '@application/coordinators/providers/Activ
 import { IsFlushingStudentFlashcardUpdatesProvider } from '@application/coordinators/providers/IsFlushingStudentFlashcardUpdatesProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import { SelectedExamplesProvider } from '@application/coordinators/providers/SelectedExamplesProvider';
+import { UsingAsStudentProvider } from '@application/coordinators/providers/UsingAsStudentProvider';
 import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
 import { ModalProvider } from '@composition/providers/ModalProvider';
 import { render, waitFor } from '@testing-library/react';
@@ -13,10 +14,16 @@ import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import {
+  mockUseMyData,
+  overrideMockUseMyData,
+  resetMockUseMyData,
+} from 'src/hexagon/application/queries/useMyData.mock';
+import {
   mockUseStudentUiVersion,
   overrideMockUseStudentUiVersion,
   resetMockUseStudentUiVersion,
 } from 'src/hexagon/application/useCases/useStudentUiVersion.mock';
+import { createMockAppUser } from 'src/hexagon/testing/factories/appUserFactories';
 import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
@@ -24,6 +31,20 @@ import App from './App';
 vi.mock('@application/useCases/useStudentUiVersion', () => ({
   useStudentUiVersion: mockUseStudentUiVersion,
 }));
+
+vi.mock('@application/queries/useMyData', () => ({
+  useMyData: () => mockUseMyData,
+}));
+
+// Chrome reads `useStudentUiVersion`; the home view resolves the version
+// from `useMyData` itself. Keep both saying "beta-tester student".
+function asV2BetaStudent(): void {
+  overrideMockUseStudentUiVersion({ version: 'v2' });
+  overrideMockUseMyData({
+    myData: createMockAppUser({ studentRole: 'student', betaTester: true }),
+    isBetaTester: true,
+  });
+}
 
 // `MockAllProviders`'s `route` prop wraps `children` in its own extra
 // `<Routes>` when `route !== '/'`. That's fine for a single leaf page, but
@@ -40,13 +61,15 @@ function renderAppAtRoute(route: string) {
         <ModalProvider>
           <MockQueryClientProvider>
             <ActiveStudentProvider>
-              <SelectedCourseAndLessonsProvider>
-                <IsFlushingStudentFlashcardUpdatesProvider>
-                  <SelectedExamplesProvider>
-                    <App />
-                  </SelectedExamplesProvider>
-                </IsFlushingStudentFlashcardUpdatesProvider>
-              </SelectedCourseAndLessonsProvider>
+              <UsingAsStudentProvider>
+                <SelectedCourseAndLessonsProvider>
+                  <IsFlushingStudentFlashcardUpdatesProvider>
+                    <SelectedExamplesProvider>
+                      <App />
+                    </SelectedExamplesProvider>
+                  </IsFlushingStudentFlashcardUpdatesProvider>
+                </SelectedCourseAndLessonsProvider>
+              </UsingAsStudentProvider>
             </ActiveStudentProvider>
           </MockQueryClientProvider>
         </ModalProvider>
@@ -59,6 +82,7 @@ function renderAppAtRoute(route: string) {
 describe('app', () => {
   afterEach(() => {
     resetMockUseStudentUiVersion();
+    resetMockUseMyData();
   });
   it('renders without crashing', () => {
     render(
@@ -81,11 +105,12 @@ describe('app', () => {
 
   it('shows a log out option in the account menu when logged in on v2', async () => {
     const user = userEvent.setup();
-    overrideMockUseStudentUiVersion({ version: 'v2' });
+    asV2BetaStudent();
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
         isAdmin: false,
+        isCoach: false,
         isStudent: true,
       },
       {
@@ -189,11 +214,12 @@ describe('app', () => {
   });
 
   it('does not paint the paper shell for a v2 viewer', async () => {
-    overrideMockUseStudentUiVersion({ version: 'v2' });
+    asV2BetaStudent();
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
         isAdmin: false,
+        isCoach: false,
         isStudent: true,
       },
       {
@@ -242,11 +268,12 @@ describe('app', () => {
   });
 
   it('uses the v2 header and not the legacy nav for a beta-tester student', async () => {
-    overrideMockUseStudentUiVersion({ version: 'v2' });
+    asV2BetaStudent();
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
         isAdmin: false,
+        isCoach: false,
         isStudent: true,
       },
       {
@@ -269,6 +296,7 @@ describe('app', () => {
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
         isAdmin: false,
+        isCoach: false,
         isStudent: true,
       },
       {
@@ -306,6 +334,7 @@ describe('app', () => {
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
         isAdmin: false,
+        isCoach: false,
         isStudent: true,
       },
       {
@@ -323,11 +352,12 @@ describe('app', () => {
   });
 
   it('hides the sub-header on the v2 student home screen', async () => {
-    overrideMockUseStudentUiVersion({ version: 'v2' });
+    asV2BetaStudent();
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
         isAdmin: false,
+        isCoach: false,
         isStudent: true,
       },
       {
@@ -347,11 +377,12 @@ describe('app', () => {
   });
 
   it('does not mount the primary tab bar off Home when student home v2 is on', async () => {
-    overrideMockUseStudentUiVersion({ version: 'v2' });
+    asV2BetaStudent();
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
         isAdmin: false,
+        isCoach: false,
         isStudent: true,
       },
       {
@@ -369,11 +400,12 @@ describe('app', () => {
   });
 
   it('hides the sub-header on the v2 flashcard finder screen', async () => {
-    overrideMockUseStudentUiVersion({ version: 'v2' });
+    asV2BetaStudent();
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
         isAdmin: false,
+        isCoach: false,
         isStudent: true,
       },
       {
@@ -394,11 +426,12 @@ describe('app', () => {
   });
 
   it('hides the sub-header on the v2 flashcard manager screen', async () => {
-    overrideMockUseStudentUiVersion({ version: 'v2' });
+    asV2BetaStudent();
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
         isAdmin: false,
+        isCoach: false,
         isStudent: true,
       },
       {
@@ -505,6 +538,59 @@ describe('app', () => {
       expect(getByText('No student Selected')).toBeInTheDocument();
     });
     expect(queryByText(/welcome back/i)).not.toBeInTheDocument();
+  });
+
+  it('gives a coach the v2 header with "Use as student" and only coaching tools', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+      isAuthenticated: true,
+      isLoading: false,
+      isAdmin: false,
+      isCoach: true,
+      isStudent: true,
+      isLimited: false,
+    });
+    const { getByRole, getByText, queryByRole, queryByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+
+    await waitFor(() => {
+      expect(
+        getByRole('button', { name: 'Use as student' }),
+      ).toBeInTheDocument();
+    });
+    expect(getByText('LEARNCRAFT')).toBeInTheDocument();
+    expect(
+      queryByRole('navigation', { name: 'Primary' }),
+    ).not.toBeInTheDocument();
+    expect(getByText('Coaching Tools')).toBeInTheDocument();
+    expect(queryByText(/quiz my flashcards/i)).not.toBeInTheDocument();
+    expect(queryByText(/official quizzes/i)).not.toBeInTheDocument();
+    expect(queryByText('Admin Tools')).not.toBeInTheDocument();
+  });
+
+  it('sends a coach who is not using the app as a student away from student tools', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+      isAuthenticated: true,
+      isLoading: false,
+      isAdmin: false,
+      isCoach: true,
+      isStudent: true,
+      isLimited: false,
+    });
+    const { getByText, queryByRole } = renderAppAtRoute('/flashcardfinder');
+
+    await waitFor(() => {
+      expect(getByText('Coaching Tools')).toBeInTheDocument();
+    });
+    expect(
+      queryByRole('heading', { name: 'Flashcard Finder' }),
+    ).not.toBeInTheDocument();
   });
 
   it('displays example manager if admin', async () => {

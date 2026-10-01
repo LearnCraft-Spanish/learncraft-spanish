@@ -3,6 +3,7 @@ import { ActiveStudentProvider } from '@application/coordinators/providers/Activ
 import { IsFlushingStudentFlashcardUpdatesProvider } from '@application/coordinators/providers/IsFlushingStudentFlashcardUpdatesProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import { SelectedExamplesProvider } from '@application/coordinators/providers/SelectedExamplesProvider';
+import { UsingAsStudentProvider } from '@application/coordinators/providers/UsingAsStudentProvider';
 import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
 import { ModalProvider } from '@composition/providers/ModalProvider';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -25,25 +26,27 @@ export default function MockAllProviders({
         <ModalProvider>
           <MockQueryClientProvider>
             <ActiveStudentProvider>
-              <SelectedCourseAndLessonsProvider>
-                <IsFlushingStudentFlashcardUpdatesProvider>
-                  <SelectedExamplesProvider>
-                    {route === '/' && (
-                      <MockQueryClientProvider>
-                        {children}
-                      </MockQueryClientProvider>
-                    )}
-                    {route !== '/' && (
-                      <Routes>
-                        <Route
-                          path={`${route}${childRoutes ? '/*' : ''}`}
-                          element={children}
-                        />
-                      </Routes>
-                    )}
-                  </SelectedExamplesProvider>
-                </IsFlushingStudentFlashcardUpdatesProvider>
-              </SelectedCourseAndLessonsProvider>
+              <UsingAsStudentProvider>
+                <SelectedCourseAndLessonsProvider>
+                  <IsFlushingStudentFlashcardUpdatesProvider>
+                    <SelectedExamplesProvider>
+                      {route === '/' && (
+                        <MockQueryClientProvider>
+                          {children}
+                        </MockQueryClientProvider>
+                      )}
+                      {route !== '/' && (
+                        <Routes>
+                          <Route
+                            path={`${route}${childRoutes ? '/*' : ''}`}
+                            element={children}
+                          />
+                        </Routes>
+                      )}
+                    </SelectedExamplesProvider>
+                  </IsFlushingStudentFlashcardUpdatesProvider>
+                </SelectedCourseAndLessonsProvider>
+              </UsingAsStudentProvider>
             </ActiveStudentProvider>
           </MockQueryClientProvider>
         </ModalProvider>
