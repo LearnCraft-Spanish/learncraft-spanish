@@ -34,6 +34,12 @@
   font-size: var(--lcs-text-caption);
 }
 
+.verbDetail {
+  margin: var(--lcs-space-1) 0 0;
+  color: var(--lcs-on-dark-85);
+  font-size: var(--lcs-text-caption);
+}
+
 .divider {
   height: var(--lcs-border-hairline);
   margin: var(--lcs-space-4) 0;
@@ -79,6 +85,10 @@
 
   .meta {
     margin-top: var(--lcs-space-4);
+  }
+
+  .verbDetail {
+    margin-top: var(--lcs-space-2);
   }
 
   .divider {
