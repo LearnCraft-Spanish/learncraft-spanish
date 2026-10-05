@@ -14,6 +14,8 @@ export interface UseTextQuizProps {
   examplesAreLoading?: boolean;
   startWithSpanish?: boolean;
   cleanupFunction: () => void;
+  /** False hides the add/remove flashcard controls. Defaults to true. */
+  canCollect?: boolean;
 }
 
 export interface AddPendingRemoveProps {
@@ -53,6 +55,7 @@ export function useTextQuiz({
   examplesAreLoading = false,
   startWithSpanish = false,
   cleanupFunction,
+  canCollect = true,
 }: UseTextQuizProps): TextQuizReturn {
   const { isStudent } = useAuthAdapter();
 
@@ -245,20 +248,21 @@ export function useTextQuiz({
 
   return {
     examplesAreLoading,
-    addPendingRemoveProps: isStudent
-      ? {
-          isAdding: isAddingFlashcard({ exampleId: currentExample?.id ?? 0 }),
-          isRemoving: isRemovingFlashcard({
-            exampleId: currentExample?.id ?? 0,
-          }),
-          isCollected: isExampleCollected({
-            exampleId: currentExample?.id ?? 0,
-          }),
-          isCustom: isCustomFlashcard({ exampleId: currentExample?.id ?? 0 }),
-          addFlashcard,
-          removeFlashcard,
-        }
-      : undefined,
+    addPendingRemoveProps:
+      isStudent && canCollect
+        ? {
+            isAdding: isAddingFlashcard({ exampleId: currentExample?.id ?? 0 }),
+            isRemoving: isRemovingFlashcard({
+              exampleId: currentExample?.id ?? 0,
+            }),
+            isCollected: isExampleCollected({
+              exampleId: currentExample?.id ?? 0,
+            }),
+            isCustom: isCustomFlashcard({ exampleId: currentExample?.id ?? 0 }),
+            addFlashcard,
+            removeFlashcard,
+          }
+        : undefined,
 
     quizExample,
     upcomingQuestion,

@@ -96,6 +96,7 @@ export const defaultMockUseCustomQuizV2: UseCustomQuizV2Return = {
     examples: [],
     startWithSpanish: false,
     cleanupFunction: vi.fn<() => void>(),
+    canCollect: true,
   } satisfies UseTextQuizProps,
   audioQuizProps: {
     examplesToQuiz: [],
@@ -103,6 +104,7 @@ export const defaultMockUseCustomQuizV2: UseCustomQuizV2Return = {
     autoplay: true,
     ready: false,
     cleanupFunction: vi.fn<() => void>(),
+    canCollect: true,
   } satisfies AudioQuizProps,
 };
 

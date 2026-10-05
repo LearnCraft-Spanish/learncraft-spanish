@@ -212,6 +212,21 @@ describe('useTextQuiz', () => {
       expect(result.current.addPendingRemoveProps).toBeUndefined();
     });
 
+    it('should not provide add/remove props when collecting is not allowed', () => {
+      overrideMockAuthAdapter({ isStudent: true });
+
+      const { result } = renderHook(() =>
+        useTextQuiz({
+          examples: mockExamples,
+          startWithSpanish: false,
+          cleanupFunction: mockCleanupFunction,
+          canCollect: false,
+        }),
+      );
+
+      expect(result.current.addPendingRemoveProps).toBeUndefined();
+    });
+
     it('should call createFlashcards when adding flashcard', () => {
       const mockCreateFlashcards = vi.fn().mockResolvedValue([]);
       const mockIsExampleCollected = vi.fn().mockReturnValue(false);
