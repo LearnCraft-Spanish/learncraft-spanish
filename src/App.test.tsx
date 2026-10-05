@@ -1,3 +1,4 @@
+import type * as CustomQuizUseCase from '@application/useCases/useCustomQuizV2';
 import { ActiveStudentProvider } from '@application/coordinators/providers/ActiveStudentProvider';
 import { IsFlushingStudentFlashcardUpdatesProvider } from '@application/coordinators/providers/IsFlushingStudentFlashcardUpdatesProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
@@ -18,6 +19,7 @@ import {
   overrideMockUseMyData,
   resetMockUseMyData,
 } from 'src/hexagon/application/queries/useMyData.mock';
+import { mockUseCustomQuizV2 } from 'src/hexagon/application/useCases/useCustomQuizV2/useCustomQuizV2.mock';
 import {
   mockUseStudentUiVersion,
   overrideMockUseStudentUiVersion,
@@ -35,6 +37,19 @@ vi.mock('@application/useCases/useStudentUiVersion', () => ({
 vi.mock('@application/queries/useMyData', () => ({
   useMyData: () => mockUseMyData,
 }));
+
+// Only the `/customquiz` routing tests reach this; the quiz's own example
+// query is covered by its use case tests.
+vi.mock('@application/useCases/useCustomQuizV2', async () => {
+  const actual = await vi.importActual<typeof CustomQuizUseCase>(
+    '@application/useCases/useCustomQuizV2',
+  );
+  return {
+    ...actual,
+    default: mockUseCustomQuizV2,
+    useCustomQuizV2: mockUseCustomQuizV2,
+  };
+});
 
 // Chrome reads `useStudentUiVersion`; the home view resolves the version
 // from `useMyData` itself. Keep both saying "beta-tester student".
@@ -572,7 +587,7 @@ describe('app', () => {
     expect(queryByText('Admin Tools')).not.toBeInTheDocument();
   });
 
-  it('sends a coach who is not using the app as a student away from student tools', async () => {
+  it('lets a coach who is not using the app as a student open the Flashcard Finder', async () => {
     overrideMockUseStudentUiVersion({ version: 'v2' });
     overrideMockAuthAdapter({
       authUser: getAuthUserFromEmail('student-admin@fake.not')!,
@@ -583,13 +598,55 @@ describe('app', () => {
       isStudent: true,
       isLimited: false,
     });
-    const { getByText, queryByRole } = renderAppAtRoute('/flashcardfinder');
+    const { getByRole, queryByText } = renderAppAtRoute('/flashcardfinder');
+
+    await waitFor(() => {
+      expect(
+        getByRole('heading', { name: 'Flashcard Finder' }),
+      ).toBeInTheDocument();
+    });
+    expect(queryByText('Coaching Tools')).not.toBeInTheDocument();
+  });
+
+  it('lets a coach who is not using the app as a student open Custom Quiz', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+      isAuthenticated: true,
+      isLoading: false,
+      isAdmin: false,
+      isCoach: true,
+      isStudent: true,
+      isLimited: false,
+    });
+    const { getAllByRole, queryByText } = renderAppAtRoute('/customquiz');
+
+    await waitFor(() => {
+      expect(
+        getAllByRole('heading', { name: 'Set up your quiz' }).length,
+      ).toBeGreaterThan(0);
+    });
+    expect(queryByText('Coaching Tools')).not.toBeInTheDocument();
+  });
+
+  it('still sends a coach who is not using the app as a student away from other student tools', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+      isAuthenticated: true,
+      isLoading: false,
+      isAdmin: false,
+      isCoach: true,
+      isStudent: true,
+      isLimited: false,
+    });
+    const { getByText, queryByRole } = renderAppAtRoute('/manage-flashcards');
 
     await waitFor(() => {
       expect(getByText('Coaching Tools')).toBeInTheDocument();
     });
     expect(
-      queryByRole('heading', { name: 'Flashcard Finder' }),
+      queryByRole('heading', { name: 'Flashcard Manager' }),
     ).not.toBeInTheDocument();
   });
 
