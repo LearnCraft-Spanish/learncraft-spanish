@@ -132,7 +132,7 @@ describe('tags card', () => {
     expect(searchInput()).toHaveFocus();
   });
 
-  it('forwards keystrokes and clears the search when the sheet is dismissed', async () => {
+  it('forwards keystrokes and keeps the search when the sheet is dismissed', async () => {
     const user = userEvent.setup();
     const exampleFilter = createFilter('po');
     render(<TagsCard exampleFilter={exampleFilter} />);
@@ -143,9 +143,38 @@ describe('tags card', () => {
     ).toHaveBeenCalledWith(expect.objectContaining({ value: 'por' }));
 
     await user.keyboard('{Escape}');
+
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(searchInput()).toHaveValue('po');
     expect(
       exampleFilter.skillTagSearch.updateTagSearchTerm,
-    ).toHaveBeenLastCalledWith();
+    ).toHaveBeenCalledOnce();
+
+    await user.type(searchInput(), 'r');
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+  });
+
+  it('keeps the search when the student clicks off it, and reopens on focus', async () => {
+    const user = userEvent.setup();
+    const exampleFilter = createFilter('por');
+    render(<TagsCard exampleFilter={exampleFilter} />);
+
+    await user.click(screen.getByText('None — every lesson in range'));
+
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(searchInput()).toHaveValue('por');
+    expect(
+      screen.getByRole('button', { name: 'Clear tag search' }),
+    ).toBeInTheDocument();
+    expect(
+      exampleFilter.skillTagSearch.updateTagSearchTerm,
+    ).not.toHaveBeenCalled();
+
+    await user.click(searchInput());
+
+    expect(
+      screen.getByRole('option', { name: 'por eso idiom' }),
+    ).toBeInTheDocument();
   });
 
   it('clears the search when switching to presets and back after picking one', async () => {

@@ -970,7 +970,7 @@ describe('filter section', () => {
     expect(screen.getByText('No tags match that.')).toBeInTheDocument();
   });
 
-  it('forwards tag search keystrokes and dismisses the popover', async () => {
+  it('forwards tag search keystrokes and dismisses the popover without clearing the search', async () => {
     const user = userEvent.setup();
     const exampleFilter = createFilter({
       skillTagSearch: {
@@ -984,17 +984,64 @@ describe('filter section', () => {
       },
     });
     renderSection(exampleFilter);
-
-    await user.type(
-      screen.getByPlaceholderText('Search tags — vocabulary, idiom, verb…'),
-      'r',
+    const tagSearch = screen.getByPlaceholderText(
+      'Search tags — vocabulary, idiom, verb…',
     );
-    expect(exampleFilter.skillTagSearch.updateTagSearchTerm).toHaveBeenCalled();
 
-    await user.keyboard('{Escape}');
+    await user.type(tagSearch, 'r');
     expect(
       exampleFilter.skillTagSearch.updateTagSearchTerm,
-    ).toHaveBeenCalledWith();
+    ).toHaveBeenCalledWith(expect.objectContaining({ value: 'ver' }));
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(tagSearch.closest(`.${styles.tagSearch}`)).not.toHaveClass(
+      styles.tagSearchOpen,
+    );
+    expect(tagSearch).toHaveValue('ve');
+    expect(
+      screen.getByRole('button', { name: 'Clear tag search' }),
+    ).toBeInTheDocument();
+    expect(
+      exampleFilter.skillTagSearch.updateTagSearchTerm,
+    ).toHaveBeenCalledOnce();
+
+    await user.type(tagSearch, 'r');
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+  });
+
+  it('keeps the tag search when the student clicks off it, and reopens on focus', async () => {
+    const user = userEvent.setup();
+    const exampleFilter = createFilter({
+      skillTagSearch: {
+        tagSearchTerm: 'por',
+        tagSuggestions: [vocabularyTag],
+        updateTagSearchTerm: vi.fn(),
+        removeTagFromSuggestions: vi.fn(),
+        addTagBackToSuggestions: vi.fn(),
+        isLoading: false,
+        error: null,
+      },
+    });
+    renderSection(exampleFilter);
+    const tagSearch = screen.getByPlaceholderText(
+      'Search tags — vocabulary, idiom, verb…',
+    );
+
+    await user.click(screen.getByRole('heading', { name: 'Card options' }));
+
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(tagSearch).toHaveValue('por');
+    expect(
+      exampleFilter.skillTagSearch.updateTagSearchTerm,
+    ).not.toHaveBeenCalled();
+
+    await user.click(tagSearch);
+
+    expect(
+      screen.getByRole('option', { name: 'por vocabulary' }),
+    ).toBeInTheDocument();
   });
 
   it('renders applied tags as compact filter tokens', () => {

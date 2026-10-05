@@ -74,12 +74,14 @@ export function FilterSection({
   const [tagFilterMode, setTagFilterMode] = useState<TagFilterMode>(() =>
     filterPreset !== PreSetQuizPreset.None ? 'preset' : 'search',
   );
+  const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
 
   const appliedKeys = new Set(selectedSkillTags.map((tag) => tag.key));
   const suggestions = skillTagSearch.tagSuggestions
     .filter((tag) => !appliedKeys.has(tag.key))
     .slice(0, SUGGESTION_CAP);
-  const searchOpen = skillTagSearch.tagSearchTerm.trim().length > 0;
+  const searchOpen =
+    skillTagSearch.tagSearchTerm.trim().length > 0 && !suggestionsDismissed;
   const hasTags = selectedSkillTags.length > 0;
 
   function changeFromLesson(value: string): void {
@@ -224,16 +226,19 @@ export function FilterSection({
                 >
                   <Popover
                     open={searchOpen}
-                    onDismiss={() =>
-                      setTagQuery(skillTagSearch.updateTagSearchTerm, '')
-                    }
+                    onDismiss={() => setSuggestionsDismissed(true)}
                     trigger={
                       <TextInput
                         id="finder-tag-search"
                         value={skillTagSearch.tagSearchTerm}
-                        onChange={(value) =>
-                          setTagQuery(skillTagSearch.updateTagSearchTerm, value)
-                        }
+                        onChange={(value) => {
+                          setSuggestionsDismissed(false);
+                          setTagQuery(
+                            skillTagSearch.updateTagSearchTerm,
+                            value,
+                          );
+                        }}
+                        onFocus={() => setSuggestionsDismissed(false)}
                         placeholder={TAG_PLACEHOLDER}
                         leadingIcon="search"
                         onClear={() =>
