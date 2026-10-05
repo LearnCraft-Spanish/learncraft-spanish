@@ -63,6 +63,8 @@ flowchart TB
   FilterCoord --> CourseCoord
 ```
 
+**Staff browse the Finder read-only.** A coach/admin who is not using the app as a student reaches `/flashcardfinder` (and `/customquiz`) from the "Student Tools" section of the staff home. There is no student collection, so `useFlashcardFinder` returns `canCollect: false` (domain rule `canCollectFlashcards`) and the page passes it to `ResultsSection`, which drops the select column, select-all, row Add/Owned, the Custom chip, and "Apply these filters to my flashcards". Search, filters, copy, and "Create a quiz from these examples" stay. `useCustomQuizV2` passes the same flag to the quiz props, so that quiz has no add/remove controls. While using as student, everything behaves as it does for a student.
+
 **Treat Manager and Finder as one redesign surface.** Students move between them (`Find More Matching Flashcards`, `Use these filters on my flashcards` via `?enableFiltering=true`). They share filter chrome and list-item chrome.
 
 **v2 vs v1 is per-user, not per-surface.** A beta-tester student (`studentRole === 'student'` and `betaTester === true` on their own record) gets v2 on every student surface. Everyone else gets v1. The two pages remain one redesign _surface_ — they share the same primitives and the same filter coordinator.
@@ -174,7 +176,7 @@ Do not boil the ocean in a writeup or v1/v2 wrap PR. Record these so the first i
 - Finder use case has no tests; neither page has tests. Add them when the v2 page/components land ([`TESTING_STANDARDS.md`](../../../../documentation/TESTING_STANDARDS.md), 100% interface).
 - `onGoingToQuiz` on Manager sets local filter state then navigates away; Review My Flashcards actually keys off the URL param. Revisit that when wiring the ellipsis menu.
 - Manager table options include `DeleteAllOwnedSpanglish` (extra application hooks in a leaf). Keep the action in the v2 menu; move the mutation through the page/table hook.
-- `/manage-flashcards` is ungated in [`AppRoutes.tsx`](../../../routes/AppRoutes.tsx); Finder requires student/coach/admin. Out of scope for restyling, but do not silently copy the ungated route if we touch routing.
+- Both routes sit behind `RequireStudentTools` in [`AppRoutes.tsx`](../../../routes/AppRoutes.tsx). The Finder also requires student/coach/admin and uses `scope="catalog"` (see below); the Manager uses the default scope, so staff need "Use as student". Do not drop either guard if we touch routing.
 - `includeUnpublished` is collected in filter state and passed through the query hook, but infrastructure `getFilteredExamples` does not put it on the POST body. Product/API bug, not a CSS task — do not “fix” it as a side effect of restyling.
 
 Out of scope for this surface: Custom Quiz, Review My Flashcards (shares `CloseableFilterPanel` **and** `useFilterOwnedFlashcards`), admin Example Manager, Get Help.
