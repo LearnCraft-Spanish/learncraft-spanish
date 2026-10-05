@@ -3,10 +3,12 @@ import type {
   CourseWithLessons,
   ExampleWithVocabulary,
 } from '@learncraft-spanish/shared';
+import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
 import {
   overrideMockExampleAdapter,
   resetMockExampleAdapter,
 } from '@application/adapters/exampleAdapter.mock';
+import { overrideMockUseUsingAsStudent } from '@application/coordinators/hooks/useUsingAsStudent.mock';
 import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import {
   overrideMockUseStudentFlashcards,
@@ -95,6 +97,7 @@ describe('useFlashcardFinder', () => {
     exampleFilter = createExampleFilter(null);
     resetMockExampleAdapter();
     resetMockUseStudentFlashcards();
+    overrideMockAuthAdapter({ isAdmin: false, isCoach: false });
   });
 
   it('scopes the lesson popup to the relevant courses', () => {
@@ -272,5 +275,60 @@ describe('useFlashcardFinder', () => {
     ).rejects.toThrow('save failed');
 
     expect(result.current.selectedIds).toEqual(new Set([examples[0].id]));
+  });
+
+  describe('collecting', () => {
+    it('lets a student collect', () => {
+      const { result } = renderHook(() => useFlashcardFinder());
+
+      expect(result.current.canCollect).toBe(true);
+    });
+
+    it('lets a coach collect while using the app as a student', () => {
+      overrideMockAuthAdapter({ isAdmin: false, isCoach: true });
+      overrideMockUseUsingAsStudent({ isUsingAsStudent: true });
+
+      const { result } = renderHook(() => useFlashcardFinder());
+
+      expect(result.current.canCollect).toBe(true);
+    });
+
+    it('keeps a coach who is not using the app as a student read-only', () => {
+      overrideMockAuthAdapter({ isAdmin: false, isCoach: true });
+
+      const { result } = renderHook(() => useFlashcardFinder());
+
+      expect(result.current.canCollect).toBe(false);
+    });
+
+    it('keeps an admin who is not using the app as a student read-only', () => {
+      overrideMockAuthAdapter({ isAdmin: true, isCoach: false });
+
+      const { result } = renderHook(() => useFlashcardFinder());
+
+      expect(result.current.canCollect).toBe(false);
+    });
+
+    it('creates nothing for a read-only coach even with a selection', async () => {
+      overrideMockAuthAdapter({ isAdmin: false, isCoach: true });
+      const examples = createMockExampleWithVocabularyList(1);
+      filteredExamples = examples;
+      const createFlashcards = vi.fn(async () => []);
+      overrideMockUseStudentFlashcards({
+        createFlashcards,
+        isExampleCollected: () => false,
+      });
+
+      const { result } = renderHook(() => useFlashcardFinder());
+
+      act(() => {
+        result.current.changeSelection(new Set([examples[0].id]));
+      });
+      await act(async () => {
+        await result.current.collectSelected();
+      });
+
+      expect(createFlashcards).not.toHaveBeenCalled();
+    });
   });
 });

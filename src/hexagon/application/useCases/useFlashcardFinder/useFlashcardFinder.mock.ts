@@ -114,6 +114,7 @@ export const defaultMockUseFlashcardFinder: UseFlashcardFinderReturnType = {
   selectedIds: new Set<number>(),
   changeSelection: vi.fn<(next: ReadonlySet<number>) => void>(),
   clearSelection: vi.fn<() => void>(),
+  canCollect: true,
   collectSelected: vi.fn<() => Promise<void>>(async () => {}),
   filteredExamplesLoading: false,
   initialLoading: false,
