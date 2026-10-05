@@ -534,7 +534,7 @@ describe('filter section', () => {
     ).toBeInTheDocument();
   });
 
-  it('searches tags and adds a suggestion', async () => {
+  it('searches tags and adds a suggestion while keeping the typed search', async () => {
     const user = userEvent.setup();
     const exampleFilter = createFilter({
       skillTagSearch: {
@@ -566,7 +566,88 @@ describe('filter section', () => {
     ).toHaveBeenCalledWith(vocabularyTag.key);
     expect(
       exampleFilter.skillTagSearch.updateTagSearchTerm,
+    ).not.toHaveBeenCalled();
+    expect(
+      screen.getByPlaceholderText('Search tags — vocabulary, idiom, verb…'),
+    ).toHaveValue('por');
+    expect(
+      screen.getByRole('option', { name: 'por eso idiom' }),
+    ).toBeInTheDocument();
+  });
+
+  it('lets a student pick several tags for the same search', async () => {
+    const user = userEvent.setup();
+    const filter = createFilter({
+      skillTagSearch: {
+        tagSearchTerm: 'por',
+        tagSuggestions: [vocabularyTag, idiomTag],
+        updateTagSearchTerm: vi.fn(),
+        removeTagFromSuggestions: vi.fn(),
+        addTagBackToSuggestions: vi.fn(),
+        isLoading: false,
+        error: null,
+      },
+    });
+    const { rerender } = render(<FilterSection exampleFilter={filter} />);
+
+    await user.click(screen.getByRole('option', { name: 'por vocabulary' }));
+    rerender(
+      <FilterSection
+        exampleFilter={{ ...filter, selectedSkillTags: [vocabularyTag] }}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('option', { name: 'por vocabulary' }),
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('option', { name: 'por eso idiom' }));
+
+    expect(filter.addSkillTagToFilters).toHaveBeenNthCalledWith(
+      1,
+      vocabularyTag.key,
+    );
+    expect(filter.addSkillTagToFilters).toHaveBeenNthCalledWith(
+      2,
+      idiomTag.key,
+    );
+    expect(filter.skillTagSearch.updateTagSearchTerm).not.toHaveBeenCalled();
+  });
+
+  it('hides the tag search clear button while the search is empty', () => {
+    renderSection();
+
+    expect(
+      screen.queryByRole('button', { name: 'Clear tag search' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('clears the tag search and returns focus to it', async () => {
+    const user = userEvent.setup();
+    const exampleFilter = createFilter({
+      skillTagSearch: {
+        tagSearchTerm: 'por',
+        tagSuggestions: [vocabularyTag],
+        updateTagSearchTerm: vi.fn(),
+        removeTagFromSuggestions: vi.fn(),
+        addTagBackToSuggestions: vi.fn(),
+        isLoading: false,
+        error: null,
+      },
+    });
+    renderSection(exampleFilter);
+
+    await user.click(screen.getByRole('button', { name: 'Clear tag search' }));
+
+    expect(
+      exampleFilter.skillTagSearch.updateTagSearchTerm,
+    ).toHaveBeenCalledOnce();
+    expect(
+      exampleFilter.skillTagSearch.updateTagSearchTerm,
     ).toHaveBeenCalledWith();
+    expect(
+      screen.getByPlaceholderText('Search tags — vocabulary, idiom, verb…'),
+    ).toHaveFocus();
+    expect(exampleFilter.addSkillTagToFilters).not.toHaveBeenCalled();
   });
 
   it('shows vocabulary and verb descriptors and labels vocabulary tags as vocabulary', () => {

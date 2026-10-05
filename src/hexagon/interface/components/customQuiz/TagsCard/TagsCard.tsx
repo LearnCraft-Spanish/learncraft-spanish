@@ -122,6 +122,8 @@ export function TagsCard({
                     onChange={setQuery}
                     placeholder="Search tags"
                     leadingIcon="search"
+                    onClear={() => setQuery('')}
+                    clearLabel="Clear tag search"
                   />
                 }
               >
@@ -130,7 +132,6 @@ export function TagsCard({
                   onSelect={(tag) => {
                     addSkillTagToFilters(tag.key);
                     skillTagSearch.removeTagFromSuggestions(tag.key);
-                    setQuery('');
                   }}
                 />
               </Popover>

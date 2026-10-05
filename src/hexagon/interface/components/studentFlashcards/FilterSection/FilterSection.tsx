@@ -30,6 +30,7 @@ import { useState } from 'react';
 import styles from './FilterSection.module.scss';
 
 const TAG_PLACEHOLDER = 'Search tags — vocabulary, idiom, verb…';
+const TAG_CLEAR_LABEL = 'Clear tag search';
 const SUGGESTION_CAP = 6;
 const EMPTY_TAGS_COPY =
   'No tags applied. Results cover every flashcard in the lesson range.';
@@ -235,6 +236,10 @@ export function FilterSection({
                         }
                         placeholder={TAG_PLACEHOLDER}
                         leadingIcon="search"
+                        onClear={() =>
+                          setTagQuery(skillTagSearch.updateTagSearchTerm, '')
+                        }
+                        clearLabel={TAG_CLEAR_LABEL}
                       />
                     }
                   >
@@ -243,7 +248,6 @@ export function FilterSection({
                       onSelect={(tag) => {
                         addSkillTagToFilters(tag.key);
                         skillTagSearch.removeTagFromSuggestions(tag.key);
-                        setTagQuery(skillTagSearch.updateTagSearchTerm, '');
                       }}
                     />
                   </Popover>
