@@ -47,6 +47,16 @@
   min-height: 0;
 }
 
+/* Fills the stage's incoming layer. Hidden from assistive tech — it is a
+ * snapshot of a card already seen, not a second control. */
+.incomingPlate {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  pointer-events: none;
+}
+
 .empty {
   margin: auto;
   color: var(--lcs-color-muted);

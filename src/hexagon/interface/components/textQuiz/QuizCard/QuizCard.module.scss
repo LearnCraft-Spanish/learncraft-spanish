@@ -1,12 +1,53 @@
 /* 20px is the handoff's literal frame radius — outside the token scale
  * (sm/md/lg/xl/pill = 6/8/10/14/999), so it is a documented one-off rather
- * than a snap to the nearest step. */
+ * than a snap to the nearest step.
+ *
+ * The root is an unpainted hit target (focus ring, drag pose); the white
+ * plates are the two `.side`s on the flipper. Its own `perspective` keeps
+ * the flip 3D whether or not a `QuizCardStage` wraps it. */
 .root {
   display: flex;
   position: relative;
   box-sizing: border-box;
   flex: 1;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 20px;
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  perspective: 1200px;
+  text-align: center;
+}
+
+/* Both sides share one grid cell, so the card sizes to the taller side.
+ * No `overflow` here: anything but `visible` would flatten `preserve-3d`. */
+.flipper {
+  display: grid;
+  flex: 1;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  transform-style: preserve-3d;
+}
+
+/* Negative X brings the top edge toward the viewer on the way to the
+ * answer. The way back (removing this transform) brings the bottom edge
+ * forward. */
+.flipped {
+  transform: rotateX(-180deg);
+}
+
+/* Only a same-card flip animates; a new card lands on its prompt instantly. */
+.flipAnimating {
+  transition: transform var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+.side {
+  display: flex;
+  position: relative;
+  box-sizing: border-box;
   flex-direction: column;
+  grid-area: 1 / 1;
   min-height: 0;
   /* Clip to radius so hint/help never visually “escape” the white plate. */
   overflow: hidden;
@@ -16,19 +57,38 @@
   /* Flat plate — no drop shadow (handoff is hairline border only). */
   box-shadow: none;
   background-color: var(--lcs-color-surface);
-  color: var(--lcs-color-ink);
-  cursor: pointer;
   gap: var(--lcs-space-5);
-  text-align: center;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
-/* SRS only. The transition times the spring-back when a drag doesn't clear
- * the grade threshold; `touch-action: pan-y` lets a vertical page scroll
- * through while still capturing the horizontal swipe gesture. */
+.sideBack {
+  transform: rotateX(-180deg);
+}
+
+/* Belt and braces with `inert`: a turned-away plate never takes a hit. */
+.sideHidden {
+  pointer-events: none;
+}
+
+/* SRS only. `touch-action: pan-y` lets a vertical page scroll through while
+ * still capturing the horizontal swipe gesture. No transition while the
+ * pointer is down, so the card tracks the finger exactly. */
 .swipeable {
   touch-action: pan-y;
-  transition: transform var(--lcs-motion-micro) var(--lcs-ease-standard);
   user-select: none;
+}
+
+/* Spring-back when a drag doesn't clear the grade threshold. */
+.springBack {
+  transition: transform var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+/* Parent-driven `exitTransform` pose. */
+.exiting {
+  transition:
+    transform var(--lcs-motion-panel) var(--lcs-ease-standard),
+    opacity var(--lcs-motion-panel) var(--lcs-ease-standard);
 }
 
 /* Full-card swipe tints, stacked above the card background and below its
@@ -58,6 +118,11 @@
     var(--lcs-color-success) 14%,
     transparent
   );
+}
+
+/* Grade exit: the tint rises to full while the stage flies the card out. */
+.tintExiting {
+  transition: opacity var(--lcs-motion-panel) var(--lcs-ease-standard);
 }
 
 .root:focus-visible {
@@ -169,7 +234,7 @@
 }
 
 @media (min-width: 769px) {
-  .root {
+  .side {
     padding: var(--lcs-space-8);
   }
 
@@ -179,7 +244,7 @@
    * `WordPanel.module.scss`); the swipe tints keep the radius clip via their
    * own `border-radius: inherit`. Mobile is untouched — its word details
    * live in `WordPanelModal`, outside the card entirely. */
-  .root.helpOpen {
+  .root.helpOpen .side {
     overflow: visible;
   }
 
@@ -202,10 +267,13 @@
     animation: none;
   }
 
-  /* Snaps the spring-back instantly instead of animating it. The rotate
-   * term of the drag transform itself is zeroed in JS — see
-   * `prefersReducedMotion` in `QuizCard.tsx`. */
-  .swipeable {
+  /* Snaps the spring-back, flip, and exit pose instantly. The rotate term
+   * of the drag transform itself is zeroed in JS — see `rotateFor` in
+   * `QuizCard.tsx`, which also skips arming the flip transition. */
+  .springBack,
+  .exiting,
+  .flipAnimating,
+  .tintExiting {
     transition: none;
   }
 }

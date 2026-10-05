@@ -1,4 +1,7 @@
-import type { UseAppHeaderResult } from '@application/useCases/AppHeader';
+import type {
+  UseAppHeaderResult,
+  UsingAsIdentity,
+} from '@application/useCases/AppHeader';
 import { useAppHeader } from '@application/useCases/AppHeader';
 import { useStudentUiVersion } from '@application/useCases/useStudentUiVersion';
 import { useMediaQuery } from '@interface/hooks/useMediaQuery';
@@ -18,8 +21,15 @@ export interface AppHeaderStack {
 export interface UseAppHeaderViewResult {
   isAuthenticated: boolean;
   isLoading: boolean;
+  isSignedIn: boolean;
   studentName: string | undefined;
   studentEmail: string | undefined;
+  isStaff: boolean;
+  staffRole: 'admin' | 'coach' | null;
+  showUseAsStudent: boolean;
+  isStaffUsingAsStudent: boolean;
+  usingAs: UsingAsIdentity | null;
+  stopUsingAsStudent: () => void;
   logout: () => void;
   /** Mobile student-v2 stack chrome. `null` on Home, desktop, and non-student routes. */
   stack: AppHeaderStack | null;
@@ -33,8 +43,15 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
   const {
     isAuthenticated,
     isLoading,
+    isSignedIn,
     studentName,
     studentEmail,
+    isStaff,
+    staffRole,
+    showUseAsStudent,
+    isStaffUsingAsStudent,
+    usingAs,
+    stopUsingAsStudent,
     logout,
   }: UseAppHeaderResult = useAppHeader();
   const { pathname } = useLocation();
@@ -60,8 +77,15 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
   return {
     isAuthenticated,
     isLoading,
+    isSignedIn,
     studentName,
     studentEmail,
+    isStaff,
+    staffRole,
+    showUseAsStudent,
+    isStaffUsingAsStudent,
+    usingAs,
+    stopUsingAsStudent,
     logout,
     stack,
   };

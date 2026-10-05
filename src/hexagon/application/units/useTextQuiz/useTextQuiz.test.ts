@@ -58,6 +58,7 @@ describe('useTextQuiz', () => {
       expect(result.current.quizLength).toBe(0);
       expect(result.current.currentExample).toBeNull();
       expect(result.current.quizExample).toBeNull();
+      expect(result.current.upcomingQuestion).toBeNull();
     });
 
     it('should handle empty examples array', () => {
@@ -159,6 +160,10 @@ describe('useTextQuiz', () => {
       expect(quizExample!.question.text).toBe(mockExamples[0].english);
       expect(quizExample!.answer.spanish).toBe(true);
       expect(quizExample!.answer.text).toBe(mockExamples[0].spanish);
+      expect(result.current.upcomingQuestion).toEqual({
+        spanish: false,
+        text: mockExamples[1].english,
+      });
     });
 
     it('should include vocabulary information in answer', () => {
@@ -352,6 +357,7 @@ describe('useTextQuiz', () => {
 
       expect(result.current.exampleNumber).toBe(3);
       expect(result.current.isQuizComplete).toBe(false);
+      expect(result.current.upcomingQuestion).toBeNull();
 
       // Try to go beyond - should mark complete
       act(() => {

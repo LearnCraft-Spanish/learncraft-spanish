@@ -2,6 +2,17 @@
  * Hard network isolation for the visual gauntlet preview.
  * Any non-allowlisted http(s) request throws so specimens never hit a backend.
  */
+
+declare global {
+  interface Window {
+    __SPECIMEN__?: {
+      ready: boolean;
+      name: string;
+      blocked?: number;
+    };
+  }
+}
+
 const ALLOWED_HOST_SUFFIXES = ['localhost', '127.0.0.1', '[::1]'];
 
 function isAllowedUrl(raw: string): boolean {
@@ -33,10 +44,16 @@ function isAllowedUrl(raw: string): boolean {
 
 function assertAllowed(raw: string, via: string): void {
   if (!isAllowedUrl(raw)) {
-    throw new Error(
+    const message =
       `[gauntlet networkGuard] Blocked ${via} to "${raw}". ` +
-        'Visual specimens must not call real APIs. Use fixture adapters or props.',
-    );
+      'Visual specimens must not call real APIs. Use fixture adapters or props.';
+    console.error(message);
+    if (window.__SPECIMEN__) {
+      window.__SPECIMEN__.blocked = (window.__SPECIMEN__.blocked ?? 0) + 1;
+    } else {
+      window.__SPECIMEN__ = { ready: false, name: '', blocked: 1 };
+    }
+    throw new Error(message);
   }
 }
 

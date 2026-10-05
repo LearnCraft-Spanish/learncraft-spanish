@@ -29,6 +29,8 @@ export interface TextQuizReturn {
   examplesAreLoading?: boolean;
   addPendingRemoveProps: AddPendingRemoveProps | undefined;
   quizExample: FlashcardForDisplay | null;
+  /** Question face of the following card, for the plate revealed by next. */
+  upcomingQuestion: Pick<Question, 'text' | 'spanish'> | null;
   nextExample: () => void;
   previousExample: () => void;
   exampleNumber: number;
@@ -157,6 +159,17 @@ export function useTextQuiz({
   const exampleNumber = safeExampleIndex + 1;
   const quizLength = examples?.length || 0;
 
+  const upcomingQuestion = useMemo(() => {
+    const next = examples?.[safeExampleIndex + 1];
+    if (!next) {
+      return null;
+    }
+    return {
+      spanish: startWithSpanish,
+      text: startWithSpanish ? next.spanish : next.english,
+    };
+  }, [examples, safeExampleIndex, startWithSpanish]);
+
   const question: Question | null = useMemo(() => {
     if (!currentExample) {
       return null;
@@ -248,6 +261,7 @@ export function useTextQuiz({
       : undefined,
 
     quizExample,
+    upcomingQuestion,
     exampleNumber,
     quizLength,
     nextExample,

@@ -8,6 +8,15 @@ import {
   overrideMockActiveStudent,
   resetMockActiveStudent,
 } from '@application/coordinators/hooks/useActiveStudent.mock';
+import {
+  mockUseUsingAsStudent,
+  overrideMockUseUsingAsStudent,
+} from '@application/coordinators/hooks/useUsingAsStudent.mock';
+import {
+  mockUseMyData,
+  overrideMockUseMyData,
+  resetMockUseMyData,
+} from '@application/queries/useMyData.mock';
 import useAppHeader from '@application/useCases/AppHeader/useAppHeader';
 import { renderHook } from '@testing-library/react';
 import { createMockAppUser } from '@testing/factories/appUserFactories';
@@ -21,10 +30,15 @@ vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
   useActiveStudent: () => mockActiveStudent,
 }));
 
+vi.mock('@application/queries/useMyData', () => ({
+  useMyData: () => mockUseMyData,
+}));
+
 describe('useAppHeader', () => {
   beforeEach(() => {
     resetMockAuthAdapter();
     resetMockActiveStudent();
+    resetMockUseMyData();
   });
 
   it('passes through isAuthenticated', () => {
@@ -46,22 +60,155 @@ describe('useAppHeader', () => {
     expect(result.current.studentEmail).toBe('student-lcsp@fake.not');
   });
 
-  it('exposes the app user name when viewing their own account', () => {
-    const mockUser = createMockAppUser({ name: 'Maria Silva' });
-    overrideMockActiveStudent({ appUser: mockUser, isOwnUser: true });
+  it("exposes the signed-in user's own name", () => {
+    overrideMockUseMyData({
+      myData: createMockAppUser({ name: 'Maria Silva' }),
+    });
 
     const { result } = renderHook(() => useAppHeader());
 
     expect(result.current.studentName).toBe('Maria Silva');
   });
 
-  it('omits the name when viewing a different student (coach/admin)', () => {
-    const mockUser = createMockAppUser({ name: 'Some Other Student' });
-    overrideMockActiveStudent({ appUser: mockUser, isOwnUser: false });
+  it("keeps the staff member's own name while using the app as a student", () => {
+    overrideMockUseMyData({
+      myData: createMockAppUser({ name: 'Coach Carla' }),
+    });
+    overrideMockActiveStudent({
+      appUser: createMockAppUser({
+        name: 'Some Other Student',
+        emailAddress: 'other@fake.not',
+      }),
+      isOwnUser: false,
+    });
+    overrideMockUseUsingAsStudent({ isUsingAsStudent: true });
 
     const { result } = renderHook(() => useAppHeader());
 
-    expect(result.current.studentName).toBeUndefined();
+    expect(result.current.studentName).toBe('Coach Carla');
+    expect(result.current.usingAs).toEqual({
+      name: 'Some Other Student',
+      email: 'other@fake.not',
+    });
+  });
+
+  it('reports no usingAs while staff are in their own view', () => {
+    overrideMockActiveStudent({
+      appUser: createMockAppUser(),
+      isOwnUser: true,
+    });
+
+    const { result } = renderHook(() => useAppHeader());
+
+    expect(result.current.isStaffUsingAsStudent).toBe(false);
+    expect(result.current.usingAs).toBeNull();
+  });
+
+  it('never reports usingAs for a non-staff user', () => {
+    overrideMockAuthAdapter({ isAdmin: false, isCoach: false });
+    overrideMockActiveStudent({
+      appUser: createMockAppUser(),
+      isOwnUser: false,
+    });
+    overrideMockUseUsingAsStudent({ isUsingAsStudent: true });
+
+    const { result } = renderHook(() => useAppHeader());
+
+    expect(result.current.isStaffUsingAsStudent).toBe(false);
+    expect(result.current.usingAs).toBeNull();
+  });
+
+  it('is signed in only once auth has settled and the visitor is logged in', () => {
+    overrideMockAuthAdapter({ isAuthenticated: true, isLoading: false });
+    expect(renderHook(() => useAppHeader()).result.current.isSignedIn).toBe(
+      true,
+    );
+
+    overrideMockAuthAdapter({ isAuthenticated: true, isLoading: true });
+    expect(renderHook(() => useAppHeader()).result.current.isSignedIn).toBe(
+      false,
+    );
+
+    overrideMockAuthAdapter({ isAuthenticated: false, isLoading: false });
+    expect(renderHook(() => useAppHeader()).result.current.isSignedIn).toBe(
+      false,
+    );
+  });
+
+  describe('showUseAsStudent', () => {
+    it('is offered to signed-in staff in their own view', () => {
+      overrideMockAuthAdapter({ isAdmin: false, isCoach: true });
+
+      const { result } = renderHook(() => useAppHeader());
+
+      expect(result.current.showUseAsStudent).toBe(true);
+      expect(result.current.isStaffUsingAsStudent).toBe(false);
+    });
+
+    it('is withdrawn once staff are using the app as a student', () => {
+      overrideMockAuthAdapter({ isAdmin: false, isCoach: true });
+      overrideMockUseUsingAsStudent({ isUsingAsStudent: true });
+
+      const { result } = renderHook(() => useAppHeader());
+
+      expect(result.current.showUseAsStudent).toBe(false);
+      expect(result.current.isStaffUsingAsStudent).toBe(true);
+    });
+
+    it('is never offered to a student', () => {
+      overrideMockAuthAdapter({ isAdmin: false, isCoach: false });
+
+      const { result } = renderHook(() => useAppHeader());
+
+      expect(result.current.showUseAsStudent).toBe(false);
+    });
+
+    it('waits for auth to settle', () => {
+      overrideMockAuthAdapter({ isAuthenticated: true, isLoading: true });
+
+      const { result } = renderHook(() => useAppHeader());
+
+      expect(result.current.showUseAsStudent).toBe(false);
+    });
+  });
+
+  it('flags coaches and admins as staff, not students', () => {
+    overrideMockAuthAdapter({ isAdmin: false, isCoach: true });
+    const coach = renderHook(() => useAppHeader());
+    expect(coach.result.current.isStaff).toBe(true);
+
+    overrideMockAuthAdapter({ isAdmin: false, isCoach: false });
+    const student = renderHook(() => useAppHeader());
+    expect(student.result.current.isStaff).toBe(false);
+  });
+
+  it('reports which staff view to return to, admin first', () => {
+    overrideMockAuthAdapter({ isAdmin: true, isCoach: true });
+    expect(renderHook(() => useAppHeader()).result.current.staffRole).toBe(
+      'admin',
+    );
+
+    overrideMockAuthAdapter({ isAdmin: false, isCoach: true });
+    expect(renderHook(() => useAppHeader()).result.current.staffRole).toBe(
+      'coach',
+    );
+
+    overrideMockAuthAdapter({ isAdmin: false, isCoach: false });
+    expect(
+      renderHook(() => useAppHeader()).result.current.staffRole,
+    ).toBeNull();
+  });
+
+  it('stops using the app as a student and returns to the own record', () => {
+    overrideMockUseUsingAsStudent({ isUsingAsStudent: true });
+    const { result } = renderHook(() => useAppHeader());
+
+    result.current.stopUsingAsStudent();
+
+    expect(mockActiveStudent.resetActiveStudent).toHaveBeenCalledOnce();
+    expect(mockUseUsingAsStudent.setIsUsingAsStudent).toHaveBeenCalledWith(
+      false,
+    );
   });
 
   it('forwards login and logout from the auth adapter', () => {

@@ -3,6 +3,7 @@ import type { VocabInfo } from '@application/units/useVocabInfo';
 import type { SrsTallies } from '@domain/functions/srsTallies';
 import type { FlashcardForDisplay } from '@domain/quizzing';
 import type { SrsDifficulty } from '@domain/srs';
+import type { QuizCardFace } from '@interface/components/textQuiz/QuizCard';
 import type { Vocabulary } from '@learncraft-spanish/shared';
 
 /**
@@ -23,6 +24,11 @@ export interface TextQuizV2Props {
   exampleNumber: number;
   quizLength: number;
   quizExample: FlashcardForDisplay | null;
+  /**
+   * Question face of the card after this one. Shown on the plate underneath
+   * while the current card leaves. Null on the last card.
+   */
+  upcomingQuestion?: QuizCardFace | null;
   /** `false` shows the prompt side, `true` the answer side. */
   answerShowing: boolean;
   toggleAnswer: () => void;

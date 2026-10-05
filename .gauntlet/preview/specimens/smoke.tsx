@@ -1,11 +1,15 @@
 import type { JSX } from 'react';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
 import { UiScope } from '@interface/components/general/UiScope/UiScope';
 
 /**
  * Self-contained specimen that proves the capture loop without Downloads handoffs.
+ * Renders stub auth email so the self-test proves aliases are live.
  */
 export default function SmokeSpecimen(): JSX.Element {
+  const { authUser } = useAuthAdapter();
+
   return (
     <div
       data-gauntlet-specimen="smoke"
@@ -29,6 +33,7 @@ export default function SmokeSpecimen(): JSX.Element {
         <p style={{ margin: '8px 0 16px', fontSize: 14, maxWidth: 42 * 8 }}>
           Auth0-free specimen using real Button + UiScope. No API calls.
         </p>
+        <p style={{ margin: '0 0 16px', fontSize: 14 }}>{authUser?.email}</p>
         <Button type="button">Continue</Button>
       </UiScope>
     </div>

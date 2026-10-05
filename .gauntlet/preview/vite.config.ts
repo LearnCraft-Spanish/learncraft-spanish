@@ -13,29 +13,60 @@ export default defineConfig({
   cacheDir: path.resolve(GAUNTLET, '.vite-cache'),
   plugins: [react()],
   resolve: {
-    alias: {
-      src: path.resolve(REPO, 'src'),
-      mocks: path.resolve(REPO, 'mocks'),
-      tests: path.resolve(REPO, 'tests'),
+    alias: [
+      // Never Auth0: throw if anything reaches the real SDK
+      {
+        find: '@auth0/auth0-react',
+        replacement: path.resolve(PREVIEW, 'adapters/auth0Forbidden.ts'),
+      },
 
-      '@domain': path.resolve(REPO, 'src/hexagon/domain'),
-      '@application': path.resolve(REPO, 'src/hexagon/application'),
-      '@infrastructure': path.resolve(REPO, 'src/hexagon/infrastructure'),
-      '@interface': path.resolve(REPO, 'src/hexagon/interface'),
-      '@testing': path.resolve(REPO, 'src/hexagon/testing'),
-      '@composition': path.resolve(REPO, 'src/hexagon/composition'),
-      '@config': path.resolve(REPO, 'src/hexagon/config'),
+      // Exact stub swaps MUST precede the '@application' prefix alias
+      {
+        find: /^@application\/adapters\/authAdapter$/,
+        replacement: path.resolve(PREVIEW, 'adapters/authPort.ts'),
+      },
+      {
+        find: /^@application\/queries\/useMyData$/,
+        replacement: path.resolve(PREVIEW, 'adapters/myDataQuery.ts'),
+      },
+      {
+        find: /^@application\/adapters\/appUserAdapter$/,
+        replacement: path.resolve(PREVIEW, 'adapters/appUserAdapter.ts'),
+      },
 
-      // Auth0-free / network-free adapter swaps (exact module ids used by app code)
-      '@application/adapters/authAdapter': path.resolve(
-        PREVIEW,
-        'adapters/authPort.ts',
-      ),
-      '@application/queries/useMyData': path.resolve(
-        PREVIEW,
-        'adapters/myDataQuery.ts',
-      ),
-    },
+      { find: 'src', replacement: path.resolve(REPO, 'src') },
+      { find: 'mocks', replacement: path.resolve(REPO, 'mocks') },
+      { find: 'tests', replacement: path.resolve(REPO, 'tests') },
+
+      {
+        find: '@domain',
+        replacement: path.resolve(REPO, 'src/hexagon/domain'),
+      },
+      {
+        find: '@application',
+        replacement: path.resolve(REPO, 'src/hexagon/application'),
+      },
+      {
+        find: '@infrastructure',
+        replacement: path.resolve(REPO, 'src/hexagon/infrastructure'),
+      },
+      {
+        find: '@interface',
+        replacement: path.resolve(REPO, 'src/hexagon/interface'),
+      },
+      {
+        find: '@testing',
+        replacement: path.resolve(REPO, 'src/hexagon/testing'),
+      },
+      {
+        find: '@composition',
+        replacement: path.resolve(REPO, 'src/hexagon/composition'),
+      },
+      {
+        find: '@config',
+        replacement: path.resolve(REPO, 'src/hexagon/config'),
+      },
+    ],
   },
   define: {
     global: 'globalThis',

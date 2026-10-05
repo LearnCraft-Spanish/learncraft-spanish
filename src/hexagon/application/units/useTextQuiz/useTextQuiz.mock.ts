@@ -56,6 +56,7 @@ export function createMockTextQuizReturn(
     examplesAreLoading: false,
     addPendingRemoveProps: undefined,
     quizExample: null,
+    upcomingQuestion: null,
     nextExample: vi.fn<() => void>(),
     previousExample: vi.fn<() => void>(),
     exampleNumber: 1,
