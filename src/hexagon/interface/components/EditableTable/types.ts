@@ -5,7 +5,7 @@
  */
 
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
-import type { ClipboardEvent, RefCallback } from 'react';
+import type { ClipboardEvent, CSSProperties, RefCallback } from 'react';
 
 // =============================================================================
 // DISPLAY CONFIG (Interface Layer)
@@ -25,6 +25,19 @@ export interface ColumnDisplayConfig {
   placeholder?: string;
   /** Whether to show this column in the table UI (default: true) */
   visible?: boolean;
+  /**
+   * Keeps the column in view while the other columns scroll horizontally.
+   * Once any column is pinned, every column needs a fixed `width` (e.g. '8rem').
+   */
+  pinned?: 'left' | 'right';
+}
+
+/**
+ * Class name and inline style that keep a pinned column's cells in view
+ */
+export interface PinnedCellProps {
+  className: string;
+  style: CSSProperties;
 }
 
 // =============================================================================

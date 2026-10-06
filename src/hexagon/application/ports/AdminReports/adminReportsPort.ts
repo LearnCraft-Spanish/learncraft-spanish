@@ -1,6 +1,7 @@
 import type {
   ActiveMembershipsByCourse,
   AssignmentsCompletedByWeek,
+  CoachCapacityReportRow,
   CoachSummary,
   CoachSummaryDrilldown,
   GroupCallsByCoach,
@@ -39,4 +40,5 @@ export interface AdminReportsPort {
     WeeklyTimeCommitmentByCoach[]
   >;
   getLeadsToReEngageReport: () => Promise<LeadsToReEngage[]>;
+  getCoachCapacityTodayReport: () => Promise<CoachCapacityReportRow[]>;
 }
