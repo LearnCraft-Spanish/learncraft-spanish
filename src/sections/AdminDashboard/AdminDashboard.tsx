@@ -1,3 +1,4 @@
+import { CoachCapacityTodayReport } from '@interface/components/CoachCapacity';
 import { Loading } from '@interface/components/Loading';
 import {
   ActiveMemberships,
@@ -28,6 +29,7 @@ export default function AdminDashboard() {
           <StudentsBySalariedCoach />
           <MembershipsByCoachReports />
           <WeeklyTimeCommitmentByCoach />
+          <CoachCapacityTodayReport />
           <LeadsToReEngage />
           <div className="admin-dashboard-grid">
             <ActiveMemberships />

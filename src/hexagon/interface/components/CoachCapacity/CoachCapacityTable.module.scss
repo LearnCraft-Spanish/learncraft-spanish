@@ -1,0 +1,18 @@
+.textCell,
+.numberCell {
+  padding: 0.5rem;
+}
+
+.textCell {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.numberCell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.message {
+  padding: 1rem;
+}
