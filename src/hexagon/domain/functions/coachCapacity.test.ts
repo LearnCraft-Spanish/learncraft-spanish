@@ -4,6 +4,7 @@ import {
   formatCoachCapacityHours,
   mapCoachCapacityRowToTableRow,
   NOT_SET_DISPLAY,
+  parseCoachCapacitySettingsCells,
   sortCoachCapacityRows,
 } from '@domain/functions/coachCapacity';
 import {
@@ -141,7 +142,7 @@ describe('mapCoachCapacityRowToTableRow', () => {
     });
   });
 
-  it('shows dashes for Desired Hours and Booked % when a coach is not set up', () => {
+  it('leaves Desired Hours empty and shows a dash for Booked % when a coach is not set up', () => {
     const row = createMockCoachCapacityReportRow({
       settings: createMockCoachCapacitySettings({ desiredHours: null }),
       bookedPercent: null,
@@ -149,7 +150,144 @@ describe('mapCoachCapacityRowToTableRow', () => {
 
     const { cells } = mapCoachCapacityRowToTableRow(row);
 
-    expect(cells.desiredHours).toBe('—');
+    expect(cells.desiredHours).toBe('');
     expect(cells.bookedPercent).toBe('—');
+  });
+});
+
+describe('parseCoachCapacitySettingsCells', () => {
+  const validCells = {
+    groupSessionsPerWeek: '2',
+    projectsHours: '1.25',
+    internalTimeHours: '0.50',
+    teamMeetingHours: '1',
+    desiredHours: '20.00',
+  };
+
+  it('reads full settings from the cells, with the notes supplied', () => {
+    expect(
+      parseCoachCapacitySettingsCells(validCells, 'Prefers mornings'),
+    ).toEqual({
+      success: true,
+      settings: {
+        groupSessionsPerWeek: 2,
+        projectsHours: 1.25,
+        internalTimeHours: 0.5,
+        teamMeetingHours: 1,
+        desiredHours: 20,
+        notes: 'Prefers mornings',
+      },
+    });
+  });
+
+  it('reads the formatted cells of a mapped report row back to its settings', () => {
+    const settings = createMockCoachCapacitySettings({
+      groupSessionsPerWeek: 3,
+      projectsHours: 2.25,
+      internalTimeHours: 0,
+      teamMeetingHours: 0.75,
+      desiredHours: null,
+      notes: 'Away in July',
+    });
+    const { cells } = mapCoachCapacityRowToTableRow(
+      createMockCoachCapacityReportRow({ settings }),
+    );
+
+    expect(parseCoachCapacitySettingsCells(cells, settings.notes)).toEqual({
+      success: true,
+      settings,
+    });
+  });
+
+  it('treats an empty Desired Hours cell as not set', () => {
+    const result = parseCoachCapacitySettingsCells(
+      { ...validCells, desiredHours: '  ' },
+      '',
+    );
+
+    expect(result).toMatchObject({
+      success: true,
+      settings: { desiredHours: null },
+    });
+  });
+
+  it('accepts the bounds of the hours range', () => {
+    const result = parseCoachCapacitySettingsCells(
+      {
+        groupSessionsPerWeek: '0',
+        projectsHours: '0',
+        internalTimeHours: '40',
+        teamMeetingHours: '39.75',
+        desiredHours: '0',
+      },
+      '',
+    );
+
+    expect(result.success).toBe(true);
+  });
+
+  it.each([
+    ['above 40', '40.25'],
+    ['below 0', '-0.25'],
+    ['not a 0.25 step', '1.1'],
+    ['not a number', 'abc'],
+    ['empty', ''],
+  ])('rejects hours that are %s', (_, value) => {
+    expect(
+      parseCoachCapacitySettingsCells(
+        { ...validCells, projectsHours: value },
+        '',
+      ),
+    ).toEqual({
+      success: false,
+      errors: { projectsHours: 'Enter hours from 0 to 40 in steps of 0.25' },
+    });
+  });
+
+  it('rejects Desired Hours outside the hours range', () => {
+    expect(
+      parseCoachCapacitySettingsCells(
+        { ...validCells, desiredHours: '45' },
+        '',
+      ),
+    ).toEqual({
+      success: false,
+      errors: { desiredHours: 'Enter hours from 0 to 40 in steps of 0.25' },
+    });
+  });
+
+  it.each([
+    ['fractional', '1.5'],
+    ['negative', '-1'],
+    ['empty', ''],
+  ])('rejects a %s Group Sessions count', (_, value) => {
+    expect(
+      parseCoachCapacitySettingsCells(
+        { ...validCells, groupSessionsPerWeek: value },
+        '',
+      ),
+    ).toEqual({
+      success: false,
+      errors: { groupSessionsPerWeek: 'Enter a whole number from 0 to 40' },
+    });
+  });
+
+  it('reports every invalid cell at once', () => {
+    const result = parseCoachCapacitySettingsCells(
+      {
+        ...validCells,
+        groupSessionsPerWeek: '2.5',
+        internalTimeHours: '41',
+        teamMeetingHours: '0.3',
+      },
+      '',
+    );
+
+    expect(result.success).toBe(false);
+    expect(!result.success && Object.keys(result.errors).sort()).toEqual([
+      'groupSessionsPerWeek',
+      'internalTimeHours',
+      'teamMeetingHours',
+    ]);
   });
 });

@@ -1,17 +1,25 @@
-import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
+import type { CoachCapacityNotesPanelState } from '@application/useCases/useCoachCapacityTodayReport';
 import type {
   CellRenderProps,
   ColumnDisplayConfig,
+  EditableTableUseCaseProps,
 } from '@interface/components/EditableTable/types';
-import type { JSX } from 'react';
-import { EditableTable } from '@interface/components/EditableTable';
+import type { JSX, ReactNode } from 'react';
+import { NOT_SET_DISPLAY } from '@domain/functions/coachCapacity';
+import { CoachCapacityNotesPanel } from '@interface/components/CoachCapacity/CoachCapacityNotesPanel';
+import {
+  EditableTable,
+  StandardCell,
+} from '@interface/components/EditableTable';
+import { useCallback } from 'react';
 import styles from './CoachCapacityTable.module.scss';
 
 export interface CoachCapacityTableProps {
-  rows: TableRow[];
-  columns: ColumnDefinition[];
-  isLoading: boolean;
+  tableProps: EditableTableUseCaseProps;
   isError: boolean;
+  saveError: string | null;
+  onOpenNotes: (rowId: string) => void;
+  notesPanel: CoachCapacityNotesPanelState;
 }
 
 const coachCapacityDisplayConfig: ColumnDisplayConfig[] = [
@@ -32,35 +40,55 @@ const coachCapacityDisplayConfig: ColumnDisplayConfig[] = [
     label: 'Desired Hours',
     width: '7rem',
     pinned: 'right',
+    placeholder: NOT_SET_DISPLAY,
   },
   { id: 'bookedPercent', label: 'Booked %', width: '6rem', pinned: 'right' },
   { id: 'notes', label: 'Notes', width: '18rem' },
 ];
 
-const textColumnIds = new Set(['coach', 'notes']);
-
-const noDirtyRows = new Set<string>();
-const noValidationErrors: Record<string, Record<string, string>> = {};
-function ignoreCellChange(): void {}
-
-function renderCoachCapacityCell({ column, value }: CellRenderProps) {
-  return (
-    <div
-      className={
-        textColumnIds.has(column.id) ? styles.textCell : styles.numberCell
-      }
-    >
-      {value}
-    </div>
-  );
-}
-
 export function CoachCapacityTable({
-  rows,
-  columns,
-  isLoading,
+  tableProps,
   isError,
+  saveError,
+  onOpenNotes,
+  notesPanel,
 }: CoachCapacityTableProps): JSX.Element {
+  const renderCell = useCallback(
+    (props: CellRenderProps): ReactNode => {
+      const { column, row, value, isEditable } = props;
+      if (column.id === 'notes') {
+        return (
+          <button
+            type="button"
+            className={styles.notesButton}
+            onClick={() => onOpenNotes(row.id)}
+          >
+            {value || (
+              <span className={styles.notesPlaceholder}>Add notes</span>
+            )}
+          </button>
+        );
+      }
+      if (isEditable) {
+        return (
+          <div className={styles.inputCell}>
+            <StandardCell {...props} />
+          </div>
+        );
+      }
+      return (
+        <div
+          className={`${styles.readOnlyCell} ${
+            column.id === 'coach' ? styles.textCell : styles.numberCell
+          }`}
+        >
+          {value}
+        </div>
+      );
+    },
+    [onOpenNotes],
+  );
+
   if (isError) {
     return (
       <p className={styles.message} role="alert">
@@ -69,22 +97,23 @@ export function CoachCapacityTable({
     );
   }
 
-  if (!isLoading && rows.length === 0) {
+  if (!tableProps.isLoading && tableProps.rows.length === 0) {
     return <p className={styles.message}>No coaches found</p>;
   }
 
   return (
-    <EditableTable
-      rows={rows}
-      columns={columns}
-      displayConfig={coachCapacityDisplayConfig}
-      renderCell={renderCoachCapacityCell}
-      dirtyRowIds={noDirtyRows}
-      validationErrors={noValidationErrors}
-      onCellChange={ignoreCellChange}
-      isLoading={isLoading}
-      isSaving={false}
-      isValid
-    />
+    <>
+      {saveError && (
+        <p className={styles.saveError} role="alert">
+          {saveError}
+        </p>
+      )}
+      <EditableTable
+        {...tableProps}
+        displayConfig={coachCapacityDisplayConfig}
+        renderCell={renderCell}
+      />
+      <CoachCapacityNotesPanel {...notesPanel} />
+    </>
   );
 }

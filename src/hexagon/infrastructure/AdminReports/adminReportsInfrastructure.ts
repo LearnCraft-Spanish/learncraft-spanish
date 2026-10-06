@@ -1,9 +1,13 @@
-import type { AdminReportsPort } from '@application/ports/AdminReports/adminReportsPort';
+import type {
+  AdminReportsPort,
+  UpdateCoachCapacitySettingsCommand,
+} from '@application/ports/AdminReports/adminReportsPort';
 import type { AuthPort } from '@application/ports/authPort';
 import type {
   ActiveMembershipsByCourse,
   AssignmentsCompletedByWeek,
   CoachCapacityReportRow,
+  CoachCapacitySettings,
   CoachSummary,
   CoachSummaryDrilldown,
   GroupCallsByCoach,
@@ -29,6 +33,7 @@ import {
   getWeeklyCoachSummaryReportEndpoint,
   getWeeklyTimeCommitmentByCoachReportEndpoint,
   getWeeksDrilldownReportEndpoint,
+  updateCoachCapacitySettingsEndpoint,
 } from '@learncraft-spanish/shared';
 
 export function createAdminReportsInfrastructure(
@@ -122,6 +127,14 @@ export function createAdminReportsInfrastructure(
       httpClient.get<CoachCapacityReportRow[]>(
         getCoachCapacityTodayReportEndpoint.path,
         getCoachCapacityTodayReportEndpoint.requiredScopes,
+      ),
+    updateCoachCapacitySettings: (
+      command: UpdateCoachCapacitySettingsCommand,
+    ) =>
+      httpClient.put<CoachCapacitySettings>(
+        updateCoachCapacitySettingsEndpoint.path,
+        updateCoachCapacitySettingsEndpoint.requiredScopes,
+        command,
       ),
   };
 }

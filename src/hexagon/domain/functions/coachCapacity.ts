@@ -1,5 +1,9 @@
 import type { TableRow } from '@domain/PasteTable';
-import type { CoachCapacityReportRow } from '@learncraft-spanish/shared';
+import type {
+  CoachCapacityReportRow,
+  CoachCapacitySettings,
+} from '@learncraft-spanish/shared';
+import { coachCapacitySettingsSchema } from '@learncraft-spanish/shared';
 
 /** Shown in place of a value a coach has not been set up with */
 export const NOT_SET_DISPLAY = '—';
@@ -15,6 +19,28 @@ export type CoachCapacityColumnId =
   | 'desiredHours'
   | 'bookedPercent'
   | 'notes';
+
+/** The settings admins edit inline in the report's cells */
+export type CoachCapacitySettingsColumnId = Exclude<
+  keyof CoachCapacitySettings,
+  'notes'
+>;
+
+const HOURS_ERROR = 'Enter hours from 0 to 40 in steps of 0.25';
+
+const settingsErrors: Record<CoachCapacitySettingsColumnId, string> = {
+  groupSessionsPerWeek: 'Enter a whole number from 0 to 40',
+  projectsHours: HOURS_ERROR,
+  internalTimeHours: HOURS_ERROR,
+  teamMeetingHours: HOURS_ERROR,
+  desiredHours: HOURS_ERROR,
+};
+
+function isSettingsColumnId(
+  id: string | number | undefined,
+): id is CoachCapacitySettingsColumnId {
+  return typeof id === 'string' && id in settingsErrors;
+}
 
 /**
  * Least booked coaches first: coaches with no Desired Hours, then Booked %
@@ -43,20 +69,73 @@ export function formatBookedPercent(bookedPercent: number | null): string {
     : `${Math.round(bookedPercent)}%`;
 }
 
+/**
+ * Editable cells hold input values, so a coach without Desired Hours gets an
+ * empty Desired Hours cell rather than the "not set" dash.
+ */
 export function mapCoachCapacityRowToTableRow(
   row: CoachCapacityReportRow,
 ): TableRow {
+  const { settings } = row;
   const cells: Record<CoachCapacityColumnId, string> = {
     coach: row.coach.fullName,
     coachingHours: formatCoachCapacityHours(row.coachingHours),
-    groupSessionsPerWeek: String(row.settings.groupSessionsPerWeek),
-    projectsHours: formatCoachCapacityHours(row.settings.projectsHours),
-    internalTimeHours: formatCoachCapacityHours(row.settings.internalTimeHours),
-    teamMeetingHours: formatCoachCapacityHours(row.settings.teamMeetingHours),
+    groupSessionsPerWeek: String(settings.groupSessionsPerWeek),
+    projectsHours: formatCoachCapacityHours(settings.projectsHours),
+    internalTimeHours: formatCoachCapacityHours(settings.internalTimeHours),
+    teamMeetingHours: formatCoachCapacityHours(settings.teamMeetingHours),
     committedHours: formatCoachCapacityHours(row.committedHours),
-    desiredHours: formatCoachCapacityHours(row.settings.desiredHours),
+    desiredHours:
+      settings.desiredHours === null
+        ? ''
+        : formatCoachCapacityHours(settings.desiredHours),
     bookedPercent: formatBookedPercent(row.bookedPercent),
-    notes: row.settings.notes,
+    notes: settings.notes,
   };
   return { id: String(row.coach.coach_id), cells };
+}
+
+export type CoachCapacitySettingsParseResult =
+  | { success: true; settings: CoachCapacitySettings }
+  | {
+      success: false;
+      errors: Partial<Record<CoachCapacitySettingsColumnId, string>>;
+    };
+
+function parseCellNumber(value: string | undefined): number {
+  const trimmed = (value ?? '').trim();
+  return trimmed === '' ? Number.NaN : Number(trimmed);
+}
+
+/**
+ * Reads a coach's full settings from their row's cells, validated by the
+ * shared schema. An empty Desired Hours cell means Desired Hours is not set.
+ * Notes are not edited in a cell, so the caller supplies them.
+ */
+export function parseCoachCapacitySettingsCells(
+  cells: Record<string, string>,
+  notes: string,
+): CoachCapacitySettingsParseResult {
+  const desiredHours = (cells.desiredHours ?? '').trim();
+  const result = coachCapacitySettingsSchema.safeParse({
+    groupSessionsPerWeek: parseCellNumber(cells.groupSessionsPerWeek),
+    projectsHours: parseCellNumber(cells.projectsHours),
+    internalTimeHours: parseCellNumber(cells.internalTimeHours),
+    teamMeetingHours: parseCellNumber(cells.teamMeetingHours),
+    desiredHours: desiredHours === '' ? null : parseCellNumber(desiredHours),
+    notes,
+  });
+
+  if (result.success) {
+    return { success: true, settings: result.data };
+  }
+
+  const errors: Partial<Record<CoachCapacitySettingsColumnId, string>> = {};
+  for (const issue of result.error.issues) {
+    const field = issue.path[0];
+    if (isSettingsColumnId(field)) {
+      errors[field] = settingsErrors[field];
+    }
+  }
+  return { success: false, errors };
 }

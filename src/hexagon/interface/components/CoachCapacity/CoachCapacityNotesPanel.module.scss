@@ -1,0 +1,46 @@
+.panel {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: var(--lcs-z-modal);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-5);
+  inline-size: min(28rem, 100vw);
+  padding: var(--lcs-space-9);
+  background: var(--lcs-color-surface);
+  box-shadow: var(--lcs-shadow-menu);
+  color: var(--lcs-color-ink);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lcs-text-h3);
+  text-align: start;
+}
+
+.notes {
+  flex: 1;
+  min-block-size: 12rem;
+  padding: var(--lcs-space-5);
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+  border-radius: var(--lcs-radius-md);
+  font: inherit;
+  resize: none;
+
+  &:focus-visible {
+    outline: var(--lcs-focus-ring);
+    outline-offset: var(--lcs-focus-offset);
+  }
+}
+
+.error {
+  margin: 0;
+  color: var(--lcs-color-error);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--lcs-space-3);
+}
