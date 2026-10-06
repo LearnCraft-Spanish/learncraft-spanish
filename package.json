@@ -135,6 +135,13 @@
     "vite": "^6.4.2",
     "vitest": "^3.0.7"
   },
+  "pnpm": {
+    "overrides": {
+      "@typescript-eslint/eslint-plugin": "8.70.1",
+      "@typescript-eslint/parser": "8.70.1",
+      "typescript-eslint": "8.70.1"
+    }
+  },
   "directories": {
     "test": "tests"
   }
