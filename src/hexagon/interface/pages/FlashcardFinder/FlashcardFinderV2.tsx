@@ -30,6 +30,7 @@ interface FlashcardFinderV2LoadedProps {
   selectedIds: ReadonlySet<number>;
   changeSelection: (next: ReadonlySet<number>) => void;
   clearSelection: () => void;
+  canCollect: boolean;
   collectSelected: () => Promise<void>;
 }
 
@@ -56,6 +57,7 @@ function FlashcardFinderV2Loaded({
   selectedIds,
   changeSelection,
   clearSelection,
+  canCollect,
   collectSelected,
 }: FlashcardFinderV2LoadedProps): JSX.Element {
   // Notice text and the filter-reset counter are visual. Navigation is an
@@ -132,6 +134,7 @@ function FlashcardFinderV2Loaded({
           isAdmin={exampleFilter.isAdmin === true}
           selectedIds={selectedIds}
           onSelectionChange={changeSelection}
+          canCollect={canCollect}
           onNotice={setNotice}
           onApplyFilters={handleApplyFilters}
           onCreateQuiz={handleCreateQuiz}
@@ -170,6 +173,7 @@ export function FlashcardFinderV2(): JSX.Element {
     selectedIds,
     changeSelection,
     clearSelection,
+    canCollect,
     collectSelected,
   } = useFlashcardFinder();
 
@@ -197,6 +201,7 @@ export function FlashcardFinderV2(): JSX.Element {
       selectedIds={selectedIds}
       changeSelection={changeSelection}
       clearSelection={clearSelection}
+      canCollect={canCollect}
       collectSelected={collectSelected}
     />
   );

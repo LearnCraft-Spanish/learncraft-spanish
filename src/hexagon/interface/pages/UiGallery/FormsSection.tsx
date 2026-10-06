@@ -113,6 +113,19 @@ export function FormsSection(): JSX.Element {
               />
             </Field>
           </GallerySpecimen>
+          <GallerySpecimen label="clearable">
+            <Field htmlFor="g-search-clear" label="Search tags">
+              <TextInput
+                id="g-search-clear"
+                value={query}
+                onChange={setQuery}
+                leadingIcon="search"
+                placeholder="Search tags"
+                onClear={() => setQuery('')}
+                clearLabel="Clear tag search"
+              />
+            </Field>
+          </GallerySpecimen>
           <GallerySpecimen label="invalid">
             <Field htmlFor="g-text-err" label="Tag name" error="Unknown tag">
               <TextInput

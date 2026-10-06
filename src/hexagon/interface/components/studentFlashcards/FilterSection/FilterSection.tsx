@@ -30,6 +30,7 @@ import { useState } from 'react';
 import styles from './FilterSection.module.scss';
 
 const TAG_PLACEHOLDER = 'Search tags — vocabulary, idiom, verb…';
+const TAG_CLEAR_LABEL = 'Clear tag search';
 const SUGGESTION_CAP = 6;
 const EMPTY_TAGS_COPY =
   'No tags applied. Results cover every flashcard in the lesson range.';
@@ -73,12 +74,14 @@ export function FilterSection({
   const [tagFilterMode, setTagFilterMode] = useState<TagFilterMode>(() =>
     filterPreset !== PreSetQuizPreset.None ? 'preset' : 'search',
   );
+  const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
 
   const appliedKeys = new Set(selectedSkillTags.map((tag) => tag.key));
   const suggestions = skillTagSearch.tagSuggestions
     .filter((tag) => !appliedKeys.has(tag.key))
     .slice(0, SUGGESTION_CAP);
-  const searchOpen = skillTagSearch.tagSearchTerm.trim().length > 0;
+  const searchOpen =
+    skillTagSearch.tagSearchTerm.trim().length > 0 && !suggestionsDismissed;
   const hasTags = selectedSkillTags.length > 0;
 
   function changeFromLesson(value: string): void {
@@ -223,18 +226,25 @@ export function FilterSection({
                 >
                   <Popover
                     open={searchOpen}
-                    onDismiss={() =>
-                      setTagQuery(skillTagSearch.updateTagSearchTerm, '')
-                    }
+                    onDismiss={() => setSuggestionsDismissed(true)}
                     trigger={
                       <TextInput
                         id="finder-tag-search"
                         value={skillTagSearch.tagSearchTerm}
-                        onChange={(value) =>
-                          setTagQuery(skillTagSearch.updateTagSearchTerm, value)
-                        }
+                        onChange={(value) => {
+                          setSuggestionsDismissed(false);
+                          setTagQuery(
+                            skillTagSearch.updateTagSearchTerm,
+                            value,
+                          );
+                        }}
+                        onFocus={() => setSuggestionsDismissed(false)}
                         placeholder={TAG_PLACEHOLDER}
                         leadingIcon="search"
+                        onClear={() =>
+                          setTagQuery(skillTagSearch.updateTagSearchTerm, '')
+                        }
+                        clearLabel={TAG_CLEAR_LABEL}
                       />
                     }
                   >
@@ -243,7 +253,6 @@ export function FilterSection({
                       onSelect={(tag) => {
                         addSkillTagToFilters(tag.key);
                         skillTagSearch.removeTagFromSuggestions(tag.key);
-                        setTagQuery(skillTagSearch.updateTagSearchTerm, '');
                       }}
                     />
                   </Popover>

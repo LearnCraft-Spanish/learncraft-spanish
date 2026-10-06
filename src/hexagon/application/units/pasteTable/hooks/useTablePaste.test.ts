@@ -36,6 +36,44 @@ const createMockClipboardEvent = (text: string): ClipboardEvent<Element> => {
   } as unknown as ClipboardEvent<Element>;
 };
 
+const setupPaste = ({
+  columns = testColumns,
+  rows,
+  mode,
+  idColumnId,
+  onRowUpdated,
+}: {
+  columns?: ColumnDefinition[];
+  rows: TableRow[];
+  mode?: 'create' | 'edit';
+  idColumnId?: string;
+  onRowUpdated?: (rowId: string, domainId: number) => void;
+}) => {
+  const updateCell = vi.fn();
+  const setRows = vi.fn();
+  const rendered = renderHook(() =>
+    useTablePaste({
+      columns,
+      rows,
+      updateCell,
+      setRows,
+      mode,
+      idColumnId,
+      onRowUpdated,
+    }),
+  );
+
+  const paste = (text: string) => {
+    const event = createMockClipboardEvent(text);
+    act(() => {
+      rendered.result.current.handlePaste(event);
+    });
+    return event;
+  };
+
+  return { ...rendered, updateCell, setRows, paste };
+};
+
 describe('useTablePaste', () => {
   describe('active cell management', () => {
     it('should initialize with no active cell', () => {
@@ -457,6 +495,574 @@ describe('useTablePaste', () => {
 
       // Create mode adds rows
       expect(newRows.length).toBe(2);
+    });
+  });
+
+  describe('rejected pastes', () => {
+    it('should not treat an empty table paste as a successful paste', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+        createGhostRow(),
+      ];
+      const { setRows, updateCell, paste } = setupPaste({ rows });
+
+      for (const text of ['', '\n\n', '   ', '\t', '\r\n\t']) {
+        const event = paste(text);
+
+        expect(event.preventDefault).toHaveBeenCalledTimes(1);
+        expect(event.clipboardData.getData).toHaveBeenCalledWith('text');
+      }
+
+      expect(setRows).not.toHaveBeenCalled();
+      expect(updateCell).not.toHaveBeenCalled();
+    });
+
+    it('should not treat an empty cell paste as a successful paste', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+      ];
+      const { result, setRows, updateCell, paste } = setupPaste({
+        rows,
+        mode: 'edit',
+      });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'name');
+      });
+
+      const event = paste('\n\t\r');
+
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+      expect(event.clipboardData.getData).toHaveBeenCalledWith('text');
+      expect(setRows).not.toHaveBeenCalled();
+      expect(updateCell).not.toHaveBeenCalled();
+    });
+
+    it('should not treat a paste into an unknown column as a successful paste', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+      ];
+      const { result, setRows, updateCell, paste } = setupPaste({
+        rows,
+        mode: 'edit',
+        onRowUpdated: vi.fn(),
+      });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'missing-column');
+      });
+
+      const event = paste('Updated\t100');
+
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+      expect(setRows).not.toHaveBeenCalled();
+      expect(updateCell).not.toHaveBeenCalled();
+    });
+
+    it('should not treat a paste into an unknown row as a successful paste', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+      ];
+      const { result, setRows, updateCell, paste } = setupPaste({
+        rows,
+        mode: 'create',
+      });
+
+      act(() => {
+        result.current.setActiveCellInfo('missing-row', 'name');
+      });
+
+      paste('Updated\t100');
+
+      expect(setRows).not.toHaveBeenCalled();
+      expect(updateCell).not.toHaveBeenCalled();
+    });
+
+    it('should not treat the part of a partial row that falls outside the table as a successful paste', () => {
+      const onRowUpdated = vi.fn();
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+        createTestRow('row-2', { id: '2', name: 'Item 2', value: '20' }),
+        createGhostRow(),
+      ];
+      const { result, setRows, paste } = setupPaste({
+        rows,
+        mode: 'edit',
+        onRowUpdated,
+      });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-2', 'value');
+      });
+
+      paste('200\tEXTRA\n300\tALSO\n400');
+
+      expect(setRows).toHaveBeenCalledTimes(1);
+      const updatedRows = setRows.mock.calls[0][0] as TableRow[];
+
+      expect(updatedRows).toEqual([
+        rows[0],
+        {
+          id: 'row-2',
+          cells: { id: '2', name: 'Item 2', value: '200' },
+        },
+        rows[2],
+      ]);
+      expect(onRowUpdated).toHaveBeenCalledTimes(1);
+      expect(onRowUpdated).toHaveBeenCalledWith('row-2', 2);
+    });
+  });
+
+  describe('cell paste boundaries', () => {
+    it('should keep a single-cell paste unparsed and untrimmed', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+      ];
+      const { result, updateCell, setRows, paste } = setupPaste({ rows });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'name');
+      });
+
+      const event = paste('  New Name  ');
+
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+      expect(event.clipboardData.getData).toHaveBeenCalledWith('text');
+      expect(updateCell).toHaveBeenCalledTimes(1);
+      expect(updateCell).toHaveBeenCalledWith('row-1', 'name', '  New Name  ');
+      expect(setRows).not.toHaveBeenCalled();
+    });
+
+    it.each(['\t', '\n', '\r', ','])(
+      'should treat %j as tabular data rather than one cell',
+      (delimiter) => {
+        const rows = [createGhostRow()];
+        const { result, updateCell, setRows, paste } = setupPaste({
+          rows,
+          mode: 'create',
+        });
+
+        act(() => {
+          result.current.setActiveCellInfo(GHOST_ROW_ID, 'name');
+        });
+
+        paste(`Left${delimiter}Right`);
+
+        expect(updateCell).not.toHaveBeenCalled();
+        expect(setRows).toHaveBeenCalledTimes(1);
+      },
+    );
+
+    it('should trim structured edits and keep the column order of the paste', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+      ];
+      const edited = setupPaste({ rows, mode: 'edit' });
+
+      act(() => {
+        edited.result.current.setActiveCellInfo('row-1', 'name');
+      });
+      edited.paste('  Hi  \t  8  ');
+
+      expect(edited.setRows.mock.calls[0][0]).toEqual([
+        {
+          id: 'row-1',
+          cells: { id: '1', name: 'Hi', value: '8' },
+        },
+      ]);
+
+      const created = setupPaste({
+        rows: [
+          createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+          createGhostRow(),
+        ],
+        mode: 'create',
+      });
+
+      act(() => {
+        created.result.current.setActiveCellInfo('row-1', 'name');
+      });
+      created.paste('New\t99\tEXTRA');
+
+      expect(created.setRows.mock.calls[0][0][0]).toEqual({
+        id: 'row-1',
+        cells: { id: '1', name: 'New', value: '99' },
+      });
+    });
+
+    it('should trim a structured paste and leave columns outside that paste untouched', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+        createGhostRow(),
+      ];
+      const { result, setRows, updateCell, paste } = setupPaste({
+        rows,
+        mode: 'create',
+      });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'name');
+      });
+
+      paste('  Updated  \n  Next  ');
+
+      expect(updateCell).not.toHaveBeenCalled();
+      const updatedRows = setRows.mock.calls[0][0] as TableRow[];
+
+      expect(updatedRows).toHaveLength(2);
+      expect(updatedRows[0]).toEqual({
+        id: 'row-1',
+        cells: { id: '1', name: 'Updated', value: '10' },
+      });
+      expect(updatedRows[1].id).toMatch(/^row-\d+-\d+$/);
+      expect(updatedRows[1].cells).toEqual({
+        id: '',
+        name: 'Next',
+        value: '',
+      });
+    });
+
+    it('should ignore pasted cells that run past the last column', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+      ];
+      const { result, setRows, paste } = setupPaste({
+        rows,
+        mode: 'edit',
+        onRowUpdated: vi.fn(),
+      });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'id');
+      });
+
+      paste('42\tNew Name\t99\tIGNORED');
+
+      const updatedRows = setRows.mock.calls[0][0] as TableRow[];
+      expect(updatedRows).toEqual([
+        {
+          id: 'row-1',
+          cells: { id: '42', name: 'New Name', value: '99' },
+        },
+      ]);
+    });
+
+    it('should call onRowUpdated with the domain id taken from the edited cells', () => {
+      const onRowUpdated = vi.fn();
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+      ];
+      const { result, paste } = setupPaste({
+        rows,
+        mode: 'edit',
+        onRowUpdated,
+      });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'id');
+      });
+      paste('7\tRenamed');
+
+      expect(onRowUpdated).toHaveBeenCalledTimes(1);
+      expect(onRowUpdated).toHaveBeenCalledWith('row-1', 7);
+    });
+
+    it('should not mark a row dirty when a structured paste matches the current cells', () => {
+      const onRowUpdated = vi.fn();
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+      ];
+      const { result, setRows, paste } = setupPaste({
+        rows,
+        mode: 'edit',
+        onRowUpdated,
+      });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'name');
+      });
+      paste('Item 1\t10');
+
+      expect(setRows).toHaveBeenCalledTimes(1);
+      expect(setRows.mock.calls[0][0]).toEqual(rows);
+      expect(onRowUpdated).not.toHaveBeenCalled();
+    });
+
+    it('should update a non-numeric id without marking the row dirty', () => {
+      const onRowUpdated = vi.fn();
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+      ];
+      const { result, setRows, paste } = setupPaste({
+        rows,
+        mode: 'edit',
+        onRowUpdated,
+      });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'id');
+      });
+      paste('abc\tRenamed');
+
+      expect(onRowUpdated).not.toHaveBeenCalled();
+      expect(setRows.mock.calls[0][0]).toEqual([
+        {
+          id: 'row-1',
+          cells: { id: 'abc', name: 'Renamed', value: '10' },
+        },
+      ]);
+    });
+
+    it('should not require onRowUpdated in edit mode', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+      ];
+      const { result, setRows, paste } = setupPaste({ rows, mode: 'edit' });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'name');
+      });
+
+      expect(() => paste('Renamed\t99')).not.toThrow();
+      expect(setRows.mock.calls[0][0][0].cells).toEqual({
+        id: '1',
+        name: 'Renamed',
+        value: '99',
+      });
+    });
+
+    it('should keep values already on the ghost row and number new row ids from Math.random', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(1700000000000);
+      vi.spyOn(Math, 'random').mockReturnValue(0.5);
+
+      const rows = [
+        {
+          id: GHOST_ROW_ID,
+          cells: { id: '', name: 'keep', value: '' },
+        },
+      ];
+      const { result, setRows, paste } = setupPaste({ rows, mode: 'create' });
+
+      act(() => {
+        result.current.setActiveCellInfo(GHOST_ROW_ID, 'value');
+      });
+      paste('55\n66');
+
+      expect(setRows.mock.calls[0][0]).toEqual([
+        {
+          id: 'row-1700000000000-500',
+          cells: { id: '', name: 'keep', value: '55' },
+        },
+        {
+          id: 'row-1700000000000-500',
+          cells: { id: '', name: '', value: '66' },
+        },
+      ]);
+    });
+
+    it('should paste into the rows from the latest render', () => {
+      const updateCell = vi.fn();
+      const setRows = vi.fn();
+      const rowA = createTestRow('row-a', { id: '1', name: 'A', value: '1' });
+      const rowB = createTestRow('row-b', { id: '2', name: 'B', value: '2' });
+      const { result, rerender } = renderHook(
+        ({ rows }: { rows: TableRow[] }) =>
+          useTablePaste({
+            columns: testColumns,
+            rows,
+            updateCell,
+            setRows,
+            mode: 'edit',
+          }),
+        { initialProps: { rows: [rowA] } },
+      );
+
+      rerender({ rows: [rowB] });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-b', 'name');
+      });
+
+      const event = createMockClipboardEvent('After\t9');
+      act(() => {
+        result.current.handlePaste(event);
+      });
+
+      expect(updateCell).not.toHaveBeenCalled();
+      expect(setRows).toHaveBeenCalledTimes(1);
+      expect(setRows.mock.calls[0][0]).toEqual([
+        {
+          id: 'row-b',
+          cells: { id: '2', name: 'After', value: '9' },
+        },
+      ]);
+    });
+
+    it('should turn the ghost row into real rows and keep creating rows in create mode', () => {
+      const onRowUpdated = vi.fn();
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+        createGhostRow(),
+      ];
+      const { result, setRows, paste } = setupPaste({
+        rows,
+        mode: 'create',
+        onRowUpdated,
+      });
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'value');
+      });
+      paste('11\n22\n33');
+
+      const updatedRows = setRows.mock.calls[0][0] as TableRow[];
+      expect(updatedRows).toHaveLength(3);
+      expect(updatedRows.map((row) => row.id)).toEqual([
+        'row-1',
+        expect.stringMatching(/^row-\d+-\d+$/),
+        expect.stringMatching(/^row-\d+-\d+$/),
+      ]);
+      expect(updatedRows.map((row) => row.cells)).toEqual([
+        { id: '1', name: 'Item 1', value: '11' },
+        { id: '', name: '', value: '22' },
+        { id: '', name: '', value: '33' },
+      ]);
+      expect(onRowUpdated).not.toHaveBeenCalled();
+    });
+
+    it('should leave the ghost row alone when editing', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+        createGhostRow(),
+      ];
+      const { result, setRows, paste } = setupPaste({ rows, mode: 'edit' });
+
+      act(() => {
+        result.current.setActiveCellInfo(GHOST_ROW_ID, 'name');
+      });
+      paste('Nope\t1');
+
+      expect(setRows.mock.calls[0][0]).toEqual(rows);
+    });
+  });
+
+  describe('table paste boundaries', () => {
+    it('should keep existing rows, drop the ghost row, and append a table paste', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Item 1', value: '10' }),
+        createGhostRow(),
+      ];
+      const { setRows, updateCell, paste } = setupPaste({
+        rows,
+        mode: 'create',
+      });
+      const event = paste('2\tItem 2\t20');
+
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+      expect(event.clipboardData.getData).toHaveBeenCalledWith('text');
+      expect(updateCell).not.toHaveBeenCalled();
+      const updatedRows = setRows.mock.calls[0][0] as TableRow[];
+
+      expect(updatedRows).toHaveLength(2);
+      expect(updatedRows[0]).toEqual(rows[0]);
+      expect(updatedRows[1].id).toMatch(/^row-/);
+      expect(updatedRows[1].cells).toEqual({
+        id: '2',
+        name: 'Item 2',
+        value: '20',
+      });
+    });
+
+    it('should map a header row by column id instead of by position', () => {
+      const { setRows, paste } = setupPaste({
+        rows: [createGhostRow()],
+        mode: 'create',
+      });
+
+      paste('name\tvalue\tid\nItem\t10\t7');
+
+      const updatedRows = setRows.mock.calls[0][0] as TableRow[];
+      expect(updatedRows).toHaveLength(1);
+      expect(updatedRows[0].cells).toEqual({
+        id: '7',
+        name: 'Item',
+        value: '10',
+      });
+    });
+
+    it('should treat a single matching header cell as a header when it meets the threshold', () => {
+      const { setRows, paste } = setupPaste({
+        rows: [createGhostRow()],
+        mode: 'create',
+      });
+
+      paste('id\tzzz\n5\tReal');
+
+      const updatedRows = setRows.mock.calls[0][0] as TableRow[];
+      expect(updatedRows).toHaveLength(1);
+      expect(updatedRows[0].cells).toEqual({ id: '5', name: '', value: '' });
+    });
+
+    it('should match edit-mode rows on the default id column and ignore rows without a numeric id', () => {
+      const onRowUpdated = vi.fn();
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Original', value: '10' }),
+        createTestRow('row-x', { id: 'abc', name: 'Keep', value: '3' }),
+        createTestRow('row-2', { id: '2', name: 'Same', value: '20' }),
+      ];
+      const { setRows, paste } = setupPaste({
+        rows,
+        mode: 'edit',
+        onRowUpdated,
+      });
+
+      paste('1\tUpdated\t100\n2\tSame\t20\n9\tMissing\t1');
+
+      expect(setRows.mock.calls[0][0]).toEqual([
+        {
+          id: 'row-1',
+          cells: { id: '1', name: 'Updated', value: '100' },
+        },
+        rows[1],
+        rows[2],
+      ]);
+      expect(onRowUpdated).toHaveBeenCalledTimes(1);
+      expect(onRowUpdated).toHaveBeenCalledWith('row-1', 1);
+    });
+
+    it('should blank columns omitted from an edit-mode table paste', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Original', value: '10' }),
+      ];
+      const { setRows, paste } = setupPaste({
+        rows,
+        mode: 'edit',
+        onRowUpdated: vi.fn(),
+      });
+
+      paste('1\tOnly name');
+
+      expect(setRows.mock.calls[0][0]).toEqual([
+        {
+          id: 'row-1',
+          cells: { id: '1', name: 'Only name', value: '' },
+        },
+      ]);
+    });
+
+    it('should not throw when edit mode has no row-updated callback', () => {
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Original', value: '10' }),
+      ];
+      const { setRows, paste } = setupPaste({ rows, mode: 'edit' });
+
+      expect(() => paste('1\tUpdated\t100')).not.toThrow();
+      expect(setRows.mock.calls[0][0]).toEqual([
+        {
+          id: 'row-1',
+          cells: { id: '1', name: 'Updated', value: '100' },
+        },
+      ]);
     });
   });
 });

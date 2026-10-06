@@ -1,11 +1,22 @@
-import { overrideMockExampleAdapter } from '@application/adapters/exampleAdapter.mock';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import {
+  mockAudioAdapter,
+  resetMockAudioAdapter,
+} from '@application/adapters/audioAdapter.mock';
 import { mockLastStudiedLessonAdapter } from '@application/adapters/lastStudiedLessonAdapter.mock';
 import { overrideMockSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+import { overrideMockUseUsingAsStudent } from '@application/coordinators/hooks/useUsingAsStudent.mock';
+import {
+  mockUseExampleQuery,
+  overrideMockUseExampleQuery,
+  resetMockUseExampleQuery,
+} from '@application/queries/ExampleQueries/useExampleQuery.mock';
 import {
   CustomQuizType,
   useCustomQuizV2,
 } from '@application/useCases/useCustomQuizV2';
 import { AudioQuizType } from '@domain/audioQuizzing';
+import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
@@ -14,10 +25,15 @@ import {
   getAppUserFromEmail,
   getAuthUserFromEmail,
 } from 'mocks/data/serverlike/userTable';
+import silence1s from 'src/assets/audio/1s.mp3';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@application/adapters/audioAdapter', () => ({
-  useAudioAdapter: () => ({ primeAudioElement: vi.fn<() => void>() }),
+  useAudioAdapter: () => mockAudioAdapter,
+}));
+
+vi.mock('@application/queries/ExampleQueries/useExampleQuery', () => ({
+  useExampleQuery: mockUseExampleQuery,
 }));
 
 const student = getAppUserFromEmail('student-no-flashcards@fake.not')!;
@@ -40,16 +56,31 @@ function renderCustomQuiz() {
 
 /** Serves `available` examples on the page out of `total` matches. */
 function serveExamples(available: number, total = available) {
-  overrideMockExampleAdapter({
-    getFilteredExamples: async () => ({
-      examples: createMockExampleWithVocabularyList(available),
-      totalCount: total,
-    }),
+  overrideMockUseExampleQuery({
+    filteredExamples: createMockExampleWithVocabularyList(available),
+    totalCount: total,
+    isLoading: false,
+    isDependenciesLoading: false,
+    error: null,
   });
+}
+
+function createExamples(
+  count: number,
+  spanishAudio: (index: number) => string = () =>
+    'https://audio.example/clip.mp3',
+): ExampleWithVocabulary[] {
+  return createMockExampleWithVocabularyList(count).map((example, index) => ({
+    ...example,
+    id: index + 1,
+    spanishAudio: spanishAudio(index),
+  }));
 }
 
 describe('useCustomQuizV2', () => {
   beforeEach(() => {
+    resetMockUseExampleQuery();
+    resetMockAudioAdapter();
     overrideAuthAndAppUser(
       {
         authUser: getAuthUserFromEmail('student-no-flashcards@fake.not')!,
@@ -281,5 +312,227 @@ describe('useCustomQuizV2', () => {
     });
 
     expect(result.current.audioQuizProps.autoplay).toBe(false);
+  });
+
+  describe('flashcard controls', () => {
+    function asCoach(): void {
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+          isAuthenticated: true,
+          isStudent: true,
+          isCoach: true,
+          isAdmin: false,
+          isLimited: false,
+        },
+        { appUser: student, isOwnUser: false },
+      );
+    }
+
+    it('lets a student add and remove flashcards in either quiz', () => {
+      const { result } = renderCustomQuiz();
+
+      expect(result.current.textQuizProps.canCollect).toBe(true);
+      expect(result.current.audioQuizProps.canCollect).toBe(true);
+    });
+
+    it('hides them for a coach who is not using the app as a student', () => {
+      asCoach();
+
+      const { result } = renderCustomQuiz();
+
+      expect(result.current.textQuizProps.canCollect).toBe(false);
+      expect(result.current.audioQuizProps.canCollect).toBe(false);
+    });
+
+    it('keeps them for a coach using the app as a student', () => {
+      asCoach();
+      overrideMockUseUsingAsStudent({ isUsingAsStudent: true });
+
+      const { result } = renderCustomQuiz();
+
+      expect(result.current.textQuizProps.canCollect).toBe(true);
+      expect(result.current.audioQuizProps.canCollect).toBe(true);
+    });
+  });
+
+  it('treats the first load as initial and a later filter load as a refresh', () => {
+    overrideMockUseExampleQuery({
+      isLoading: true,
+      isDependenciesLoading: false,
+      filteredExamples: null,
+      totalCount: null,
+    });
+    const { result, rerender } = renderCustomQuiz();
+
+    expect(result.current.isLoadingExamples).toBe(true);
+    expect(result.current.isInitialLoading).toBe(true);
+    expect(result.current.quizLengthOptions).toEqual([]);
+    expect(result.current.quizNotReady).toBe(true);
+
+    overrideMockUseExampleQuery({
+      isLoading: false,
+      filteredExamples: [],
+      totalCount: 0,
+    });
+    rerender();
+    expect(result.current.totalCount).toBe(0);
+    expect(result.current.isInitialLoading).toBe(false);
+    expect(result.current.quizNotReady).toBe(true);
+
+    overrideMockUseExampleQuery({
+      isLoading: true,
+      filteredExamples: null,
+      totalCount: null,
+    });
+    rerender();
+    expect(result.current.isLoadingExamples).toBe(true);
+    expect(result.current.isInitialLoading).toBe(false);
+    expect(result.current.quizLengthOptions).toEqual([]);
+
+    overrideMockUseExampleQuery({
+      isLoading: false,
+      filteredExamples: createExamples(10),
+      totalCount: 10,
+    });
+    rerender();
+    expect(result.current.quizLengthOptions).toEqual([10]);
+    expect(result.current.isInitialLoading).toBe(false);
+    expect(result.current.quizNotReady).toBe(false);
+  });
+
+  it('holds the last loaded count while a filter is in flight, then keeps only audio examples', async () => {
+    const examples = createExamples(8, (index) =>
+      index < 2 ? '' : 'https://audio.example/clip.mp3',
+    );
+    overrideMockUseExampleQuery({
+      filteredExamples: examples,
+      totalCount: examples.length,
+      isLoading: false,
+      isDependenciesLoading: false,
+      error: null,
+    });
+
+    const { result, rerender } = renderCustomQuiz();
+    expect(result.current.quizLengthOptions).toEqual([8]);
+    expect(result.current.quizLength).toBe(8);
+    expect(result.current.isAudioQuiz).toBe(false);
+
+    overrideMockUseExampleQuery({
+      filteredExamples: null,
+      totalCount: null,
+      isLoading: true,
+    });
+    rerender();
+    expect(result.current.quizLengthOptions).toEqual([8]);
+
+    await act(async () => {
+      result.current.setQuizType(CustomQuizType.Audio);
+    });
+
+    expect(result.current.isLoadingExamples).toBe(true);
+    expect(result.current.isAudioQuiz).toBe(true);
+    expect(result.current.isInitialLoading).toBe(false);
+    expect(result.current.quizLengthOptions).toEqual([8]);
+    expect(result.current.quizLength).toBe(8);
+
+    overrideMockUseExampleQuery({
+      filteredExamples: examples,
+      totalCount: examples.length,
+      isLoading: false,
+    });
+    rerender();
+    expect(result.current.quizLengthOptions).toEqual([6]);
+    expect(result.current.quizLength).toBe(6);
+    expect(result.current.isLoadingExamples).toBe(false);
+
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const audible = examples.filter(
+      (example) => example.spanishAudio.length > 0,
+    );
+    mockAudioAdapter.primeAudioElement.mockClear();
+
+    await act(async () => {
+      result.current.readyQuiz();
+    });
+
+    const drawn = result.current.textQuizProps.examples ?? [];
+    expect(result.current.quizReady).toBe(true);
+    expect(drawn).toEqual(fisherYatesShuffle(audible).slice(0, 6));
+    expect(result.current.audioQuizProps.examplesToQuiz).toBe(
+      result.current.textQuizProps.examples,
+    );
+    expect(drawn.every((example) => example.spanishAudio.length > 0)).toBe(
+      true,
+    );
+    expect(mockAudioAdapter.primeAudioElement).toHaveBeenCalledTimes(1);
+    expect(mockAudioAdapter.primeAudioElement).toHaveBeenCalledWith(silence1s);
+  });
+
+  it('shuffles a text slice without priming audio, then cleanup empties both quizzes', async () => {
+    const examples = createExamples(8, (index) =>
+      index === 0 ? '' : 'https://audio.example/clip.mp3',
+    );
+    overrideMockUseExampleQuery({
+      filteredExamples: examples,
+      totalCount: examples.length,
+      isLoading: false,
+      isDependenciesLoading: false,
+      error: null,
+    });
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    const { result } = renderCustomQuiz();
+    expect(result.current.quizLength).toBe(8);
+
+    await act(async () => {
+      result.current.readyQuiz();
+    });
+
+    const drawn = result.current.textQuizProps.examples ?? [];
+    expect(drawn).toEqual(fisherYatesShuffle(examples).slice(0, 8));
+    expect(drawn).not.toEqual(examples);
+    expect(drawn.map((example) => example.id)).toContain(1);
+    expect(result.current.audioQuizProps.examplesToQuiz).toBe(
+      result.current.textQuizProps.examples,
+    );
+    expect(mockAudioAdapter.primeAudioElement).not.toHaveBeenCalled();
+
+    await act(async () => {
+      result.current.textQuizProps.cleanupFunction();
+    });
+
+    expect(result.current.quizReady).toBe(false);
+    expect(result.current.textQuizProps.examples).toEqual([]);
+    expect(result.current.audioQuizProps.examplesToQuiz).toEqual([]);
+    expect(result.current.audioQuizProps.ready).toBe(false);
+    expect(result.current.audioQuizProps.cleanupFunction).toBe(
+      result.current.textQuizProps.cleanupFunction,
+    );
+  });
+
+  it('reports a course failure and an example failure', async () => {
+    overrideMockSelectedCourseAndLessons({
+      error: new Error('course failed'),
+    });
+    serveExamples(10);
+
+    const courseFailure = renderCustomQuiz();
+    await waitFor(() =>
+      expect(courseFailure.result.current.error?.message).toBe('course failed'),
+    );
+    courseFailure.unmount();
+
+    overrideMockSelectedCourseAndLessons({ error: null });
+    overrideMockUseExampleQuery({
+      error: new Error('examples failed'),
+      filteredExamples: null,
+      totalCount: null,
+      isLoading: false,
+    });
+    const exampleFailure = renderCustomQuiz();
+    expect(exampleFailure.result.current.error?.message).toBe(
+      'examples failed',
+    );
   });
 });

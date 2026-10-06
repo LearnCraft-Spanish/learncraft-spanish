@@ -37,6 +37,16 @@
   padding-left: var(--lcs-space-11);
 }
 
+/* Reserved even while the button is hidden, so typing never reflows the text. */
+.withClear {
+  padding-right: var(--lcs-space-11);
+}
+
+/* The primitive draws its own clear button; WebKit would add a second one. */
+.withClear::-webkit-search-cancel-button {
+  appearance: none;
+}
+
 .invalid {
   border-color: var(--lcs-color-error);
 }
@@ -48,6 +58,14 @@
   display: flex;
   transform: translateY(-50%);
   pointer-events: none;
+}
+
+.clear {
+  position: absolute;
+  top: 50%;
+  right: var(--lcs-space-3);
+  display: flex;
+  transform: translateY(-50%);
 }
 
 @media (prefers-reduced-motion: reduce) {

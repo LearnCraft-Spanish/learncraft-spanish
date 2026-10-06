@@ -138,6 +138,7 @@ function renderSection(
         emptyIcon={overrides.emptyIcon}
         actionsMenu={overrides.actionsMenu}
         rowAction={overrides.rowAction}
+        canCollect={overrides.canCollect}
         getReviewSchedule={overrides.getReviewSchedule}
         mobileLayout={overrides.mobileLayout}
         focusRequest={overrides.focusRequest}
@@ -1043,6 +1044,113 @@ describe('results section', () => {
     );
 
     expect(screen.queryByText('Vocabulary tags')).not.toBeInTheDocument();
+  });
+});
+
+/**
+ * A coach/admin browsing the Finder without "Use as student" has no
+ * collection, so nothing on the page may add, remove, select, or describe a
+ * student's flashcards.
+ */
+describe('results section without a collection', () => {
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it('drops the select column and select-all', () => {
+    renderSection({
+      canCollect: false,
+      examples: [makeExample({ id: 11 }), makeExample({ id: 12 })],
+    });
+
+    const headers = screen
+      .getAllByRole('columnheader')
+      .map((header) => header.textContent);
+    expect(headers).toEqual(['English', 'Spanish', '']);
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    expect(
+      screen.queryByRole('button', { name: /Select all/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getAllByRole('row')[1].style.getPropertyValue('--dt-columns'),
+    ).toBe('minmax(240px, 1fr) minmax(240px, 1fr) 56px');
+  });
+
+  it('shows no Add on an uncollected row and no Owned on a collected one', () => {
+    const uncollected = makeExample({ id: 11 });
+    const collected = makeExample({
+      id: 12,
+      spanish: 'Sí, eso nada rápidamente.',
+      english: 'Yes, that swims quickly.',
+    });
+    renderSection({
+      canCollect: false,
+      examples: [uncollected, collected],
+      studentFlashcards: makeFlashcards({
+        isExampleCollected: vi.fn(
+          ({ exampleId }: { exampleId: number }) => exampleId === 12,
+        ),
+      }),
+    });
+
+    expect(
+      screen.queryByRole('button', { name: 'Add' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /from your collection/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: EXPAND_LABEL }),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps the expand panel but drops the Custom chip', async () => {
+    const user = userEvent.setup();
+    renderSection({
+      canCollect: false,
+      examples: [makeExample({ id: 11, spanglish: true })],
+      studentFlashcards: makeFlashcards({
+        isCustomFlashcard: vi.fn(() => true),
+      }),
+    });
+
+    await user.click(screen.getByRole('button', { name: EXPAND_LABEL }));
+
+    expect(screen.getByText('Vocabulary tags')).toBeInTheDocument();
+    expect(screen.getByText('Spanglish')).toBeInTheDocument();
+    expect(screen.queryByText('Custom flashcard')).not.toBeInTheDocument();
+  });
+
+  it('omits apply-filters from the actions menu but keeps the quiz', async () => {
+    const user = userEvent.setup();
+    const onCreateQuiz = vi.fn();
+    renderSection({ canCollect: false, onCreateQuiz });
+
+    await user.click(
+      screen.getByRole('button', { name: 'Do more with these' }),
+    );
+
+    expect(
+      screen.queryByRole('button', {
+        name: /Apply these filters to my flashcards/,
+      }),
+    ).not.toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', { name: /Create a quiz from these examples/ }),
+    );
+    expect(onCreateQuiz).toHaveBeenCalledOnce();
+  });
+
+  it('reflows below 768px without a select area', () => {
+    renderSection({ canCollect: false, mobileLayout: true });
+
+    const row = screen.getAllByRole('row')[1];
+
+    expect(row.style.getPropertyValue('--dt-mobile-columns')).toBe('1fr 44px');
+    expect(row.style.getPropertyValue('--dt-mobile-areas')).toBe(
+      '"english expand" "spanish expand"',
+    );
   });
 });
 

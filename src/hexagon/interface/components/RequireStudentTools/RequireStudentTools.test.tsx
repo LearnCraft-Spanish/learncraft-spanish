@@ -20,8 +20,16 @@ function renderAt(path: string) {
         <Route
           path="/flashcardfinder"
           element={
-            <RequireStudentTools>
+            <RequireStudentTools scope="catalog">
               <div>finder</div>
+            </RequireStudentTools>
+          }
+        />
+        <Route
+          path="/manage-flashcards"
+          element={
+            <RequireStudentTools>
+              <div>manager</div>
             </RequireStudentTools>
           }
         />
@@ -33,6 +41,20 @@ function renderAt(path: string) {
 describe('component RequireStudentTools', () => {
   afterEach(() => {
     resetMockUseStudentToolsAccess();
+    mockUseStudentToolsAccess.mockClear();
+  });
+
+  it('asks for catalog access on a catalog route', () => {
+    renderAt('/flashcardfinder');
+
+    expect(mockUseStudentToolsAccess).toHaveBeenCalledWith('catalog');
+  });
+
+  it('asks for the default student scope when none is given', () => {
+    renderAt('/manage-flashcards');
+
+    expect(screen.getByText('manager')).toBeInTheDocument();
+    expect(mockUseStudentToolsAccess).toHaveBeenCalledWith(undefined);
   });
 
   it('renders the route when student tools are allowed', () => {
@@ -44,10 +66,10 @@ describe('component RequireStudentTools', () => {
   it('redirects home when a coach is not using the app as a student', () => {
     overrideMockUseStudentToolsAccess({ allowed: false });
 
-    renderAt('/flashcardfinder');
+    renderAt('/manage-flashcards');
 
     expect(screen.getByText('home')).toBeInTheDocument();
-    expect(screen.queryByText('finder')).not.toBeInTheDocument();
+    expect(screen.queryByText('manager')).not.toBeInTheDocument();
   });
 
   it('renders nothing while auth is still loading', () => {

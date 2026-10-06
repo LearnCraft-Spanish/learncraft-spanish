@@ -108,6 +108,23 @@ describe('finder actions menu', () => {
     expect(screen.queryByText('Admin only')).not.toBeInTheDocument();
   });
 
+  it('omits apply-filters when there is no collection to apply them to', async () => {
+    renderMenu({ canCollect: false });
+    await openMenu();
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
+    expect(
+      screen.queryByRole('button', {
+        name: /Apply these filters to my flashcards/,
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: /Create a quiz from these examples/,
+      }),
+    ).toBeInTheDocument();
+  });
+
   it('fills live counts into the hints', async () => {
     renderMenu({ pageExampleCount: 5, totalExampleCount: 12 });
     await openMenu();

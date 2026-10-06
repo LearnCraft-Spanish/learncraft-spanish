@@ -1,28 +1,110 @@
 import type { ExampleTechnical } from '@learncraft-spanish/shared';
-import {
-  overrideMockExampleAdapter,
-  resetMockExampleAdapter,
-} from '@application/adapters/exampleAdapter.mock';
-import { useExamplesToEditQuery } from '@application/queries/ExampleQueries/useExamplesToEditQuery';
+import { useTableValidation as realUseTableValidation } from '@application/units/pasteTable/hooks/useTableValidation';
+import { useEditTableState as realUseEditTableState } from '@application/units/pasteTable/useEditTableState';
 import { useExampleEditor } from '@application/useCases/useExampleEditor/useExampleEditor';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { createMockExampleTechnicalList } from '@testing/factories/exampleFactory';
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock useExamplesToEditQuery
+const recordedExampleIds: number[][] = [];
+
+const {
+  mock: examplesToEdit,
+  override: overrideExamplesToEdit,
+  reset: resetExamplesToEdit,
+} = createOverrideableMock({
+  examples: createMockExampleTechnicalList(3) as ExampleTechnical[] | undefined,
+  isLoading: false,
+  error: null as Error | null,
+});
+
+const {
+  mock: exampleMutations,
+  override: overrideExampleMutations,
+  reset: resetExampleMutations,
+} = createOverrideableMock({
+  createExamples: async () => [],
+  examplesCreating: false,
+  examplesCreatingError: null as Error | null,
+  updateExamples: async () => [],
+  examplesUpdating: false,
+  examplesUpdatingError: null as Error | null,
+  deleteExamples: async () => 0,
+  examplesDeleting: false,
+  examplesDeletingError: null as Error | null,
+});
+
+const {
+  mock: selectedContext,
+  override: overrideSelectedContext,
+  reset: resetSelectedContext,
+} = createOverrideableMock({
+  selectedExampleIds: [] as number[],
+  updateSelectedExamples: (_exampleIds: number[]): void => undefined,
+  addSelectedExample: (_exampleId: number): void => undefined,
+  removeSelectedExample: (_exampleId: number): void => undefined,
+  clearSelectedExamples: (): void => undefined,
+});
+
+const { mock: editTableApi, reset: resetEditTable } = createOverrideableMock({
+  useEditTableState: (options: Parameters<typeof realUseEditTableState>[0]) =>
+    realUseEditTableState(options),
+});
+
+const { mock: validationApi, reset: resetValidation } = createOverrideableMock({
+  useTableValidation: (options: Parameters<typeof realUseTableValidation>[0]) =>
+    realUseTableValidation(options),
+});
+
 vi.mock('@application/queries/ExampleQueries/useExamplesToEditQuery', () => ({
-  useExamplesToEditQuery: vi.fn(() => ({
-    examples: createMockExampleTechnicalList(3),
-    isLoading: false,
-    error: null,
-  })),
+  useExamplesToEditQuery: (ids: number[]) => {
+    recordedExampleIds.push(ids);
+    return examplesToEdit;
+  },
 }));
+
+vi.mock('@application/queries/ExampleQueries/useExampleMutations', () => ({
+  useExampleMutations: () => exampleMutations,
+}));
+
+vi.mock('@application/coordinators/hooks/useSelectedExamplesContext', () => ({
+  useSelectedExamplesContext: () => selectedContext,
+}));
+
+vi.mock('@application/units/pasteTable', async () => {
+  const actual = (await vi.importActual(
+    '@application/units/pasteTable',
+  )) as Record<string, unknown>;
+  return {
+    ...actual,
+    useEditTableState: (options: Parameters<typeof realUseEditTableState>[0]) =>
+      editTableApi.useEditTableState(options),
+  };
+});
+
+vi.mock('@application/units/pasteTable/hooks', async () => {
+  const actual = (await vi.importActual(
+    '@application/units/pasteTable/hooks',
+  )) as Record<string, unknown>;
+  return {
+    ...actual,
+    useTableValidation: (
+      options: Parameters<typeof realUseTableValidation>[0],
+    ) => validationApi.useTableValidation(options),
+  };
+});
 
 describe('useExampleEditor', () => {
   beforeEach(() => {
-    resetMockExampleAdapter();
-    vi.mocked(useExamplesToEditQuery).mockReturnValue({
+    recordedExampleIds.length = 0;
+    resetExamplesToEdit();
+    resetExampleMutations();
+    resetSelectedContext();
+    resetEditTable();
+    resetValidation();
+    overrideExamplesToEdit({
       examples: createMockExampleTechnicalList(3),
       isLoading: false,
       error: null,
@@ -91,7 +173,7 @@ describe('useExampleEditor', () => {
 
   describe('audio URL to boolean mapping', () => {
     it('should map examples WITH audio to hasAudio=true', () => {
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExamplesToEdit({
         examples: createExamplesWithAudio([{ hasAudio: true, id: 1 }]),
         isLoading: false,
         error: null,
@@ -106,7 +188,7 @@ describe('useExampleEditor', () => {
     });
 
     it('should map examples WITHOUT audio to hasAudio=false', () => {
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExamplesToEdit({
         examples: createExamplesWithAudio([{ hasAudio: false, id: 1 }]),
         isLoading: false,
         error: null,
@@ -121,7 +203,7 @@ describe('useExampleEditor', () => {
     });
 
     it('should map examples with only spanishAudio to hasAudio=false', () => {
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExamplesToEdit({
         examples: createMockExampleTechnicalList(1, {
           spanishAudio: 'https://example.com/audio.mp3',
           englishAudio: '',
@@ -139,7 +221,7 @@ describe('useExampleEditor', () => {
     });
 
     it('should map examples with only englishAudio to hasAudio=false', () => {
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExamplesToEdit({
         examples: createMockExampleTechnicalList(1, {
           spanishAudio: '',
           englishAudio: 'https://example.com/audio.mp3',
@@ -157,7 +239,7 @@ describe('useExampleEditor', () => {
     });
 
     it('should correctly map mixed audio states', () => {
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExamplesToEdit({
         examples: createExamplesWithAudio([
           { hasAudio: true, id: 1 },
           { hasAudio: false, id: 2 },
@@ -180,7 +262,7 @@ describe('useExampleEditor', () => {
 
   describe('field mapping', () => {
     it('should map all ExampleTechnical fields correctly', () => {
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExamplesToEdit({
         examples: createMockExampleTechnicalList(1, {
           id: 42,
           spanish: 'Hola mundo',
@@ -243,7 +325,7 @@ describe('useExampleEditor', () => {
     });
 
     it('should mark row dirty when hasAudio is toggled', async () => {
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExamplesToEdit({
         examples: createExamplesWithAudio([{ hasAudio: true, id: 1 }]),
         isLoading: false,
         error: null,
@@ -267,7 +349,7 @@ describe('useExampleEditor', () => {
 
   describe('discardChanges', () => {
     it('should revert all changes to source data', async () => {
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExamplesToEdit({
         examples: createMockExampleTechnicalList(1, { spanish: 'Original' }),
         isLoading: false,
         error: null,
@@ -330,8 +412,8 @@ describe('useExampleEditor', () => {
   describe('applyChanges', () => {
     it('should call updateExamples with mapped UpdateExampleCommand', async () => {
       const updateExamplesSpy = vi.fn().mockResolvedValue([]);
-      overrideMockExampleAdapter({ updateExamples: updateExamplesSpy });
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExampleMutations({ updateExamples: updateExamplesSpy });
+      overrideExamplesToEdit({
         examples: createMockExampleTechnicalList(1, {
           id: 123,
           spanish: 'Original',
@@ -367,8 +449,8 @@ describe('useExampleEditor', () => {
 
     it('should generate audio URLs when hasAudio is true', async () => {
       const updateExamplesSpy = vi.fn().mockResolvedValue([]);
-      overrideMockExampleAdapter({ updateExamples: updateExamplesSpy });
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExampleMutations({ updateExamples: updateExamplesSpy });
+      overrideExamplesToEdit({
         examples: createExamplesWithAudio([{ hasAudio: false, id: 456 }]),
         isLoading: false,
         error: null,
@@ -399,8 +481,8 @@ describe('useExampleEditor', () => {
 
     it('should clear audio URLs when hasAudio is false', async () => {
       const updateExamplesSpy = vi.fn().mockResolvedValue([]);
-      overrideMockExampleAdapter({ updateExamples: updateExamplesSpy });
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExampleMutations({ updateExamples: updateExamplesSpy });
+      overrideExamplesToEdit({
         examples: createExamplesWithAudio([{ hasAudio: true, id: 789 }]),
         isLoading: false,
         error: null,
@@ -431,14 +513,14 @@ describe('useExampleEditor', () => {
 
     it('should only send dirty rows', async () => {
       const updateExamplesSpy = vi.fn().mockResolvedValue([]);
-      overrideMockExampleAdapter({ updateExamples: updateExamplesSpy });
+      overrideExampleMutations({ updateExamples: updateExamplesSpy });
 
       // Use stable examples with fixed IDs
       const stableExamples = createMockExampleTechnicalList(3);
       stableExamples[0].id = 100;
       stableExamples[1].id = 101;
       stableExamples[2].id = 102;
-      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+      overrideExamplesToEdit({
         examples: stableExamples,
         isLoading: false,
         error: null,
@@ -475,7 +557,7 @@ describe('useExampleEditor', () => {
       const slowSave = new Promise<[]>((resolve) => {
         resolvePromise = () => resolve([]);
       });
-      overrideMockExampleAdapter({ updateExamples: () => slowSave });
+      overrideExampleMutations({ updateExamples: () => slowSave });
 
       const { result } = renderHook(() => useExampleEditor(), {
         wrapper: MockAllProviders,
@@ -509,7 +591,7 @@ describe('useExampleEditor', () => {
 
   describe('error handling', () => {
     it('should set saveError on failed save', async () => {
-      overrideMockExampleAdapter({
+      overrideExampleMutations({
         updateExamples: async () => {
           throw new Error('Network error');
         },
@@ -546,7 +628,7 @@ describe('useExampleEditor', () => {
 
     it('should clear saveError on next save attempt', async () => {
       let callCount = 0;
-      overrideMockExampleAdapter({
+      overrideExampleMutations({
         updateExamples: async () => {
           callCount++;
           if (callCount === 1) {
@@ -633,7 +715,7 @@ describe('useExampleEditor', () => {
 
     it('should reflect validation errors in validationState when validation fails', async () => {
       const updateExamplesSpy = vi.fn().mockResolvedValue([]);
-      overrideMockExampleAdapter({ updateExamples: updateExamplesSpy });
+      overrideExampleMutations({ updateExamples: updateExamplesSpy });
 
       const { result } = renderHook(() => useExampleEditor(), {
         wrapper: MockAllProviders,
@@ -649,16 +731,438 @@ describe('useExampleEditor', () => {
         expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
 
-      // Validation state should reflect the error
       expect(result.current.tableProps.isValid).toBe(false);
       expect(result.current.tableProps.validationErrors[rowId]).toBeDefined();
       expect(
         result.current.tableProps.validationErrors[rowId].spanish,
       ).toBeDefined();
 
-      // Note: applyChanges does not throw - validation is handled at UI level
-      // (save button is disabled when isValid is false)
-      // If called directly (e.g., in tests), it will proceed
+      await expect(
+        act(async () => {
+          await result.current.tableProps.onSave?.();
+        }),
+      ).rejects.toThrow('validation failed');
+      expect(updateExamplesSpy).not.toHaveBeenCalled();
+      expect(result.current.tableProps.isSaving).toBe(false);
+    });
+  });
+
+  describe('audio cells', () => {
+    const audioBase =
+      'https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples';
+
+    it('derives playback urls from hasAudio and recomputes them when the cell changes', async () => {
+      overrideExamplesToEdit({
+        examples: createExamplesWithAudio([{ hasAudio: true, id: 42 }]),
+        isLoading: false,
+        error: null,
+      });
+      const { result } = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+      const row = result.current.tableProps.rows[0];
+
+      expect(row.cells.spanishAudio).toBe(`${audioBase}/ex42la.mp3`);
+      expect(row.cells.englishAudio).toBe(`${audioBase}/ex42en.mp3`);
+      expect(row.cells.spanglish).toBe('false');
+
+      act(() => {
+        result.current.tableProps.onCellChange(row.id, 'hasAudio', 'false');
+      });
+
+      await waitFor(() => {
+        expect(result.current.tableProps.rows[0].cells.spanishAudio).toBe('');
+        expect(result.current.tableProps.rows[0].cells.englishAudio).toBe('');
+      });
+
+      act(() => {
+        result.current.tableProps.onCellChange(row.id, 'hasAudio', 'TRUE');
+      });
+
+      await waitFor(() => {
+        expect(result.current.tableProps.rows[0].cells.hasAudio).toBe('TRUE');
+        expect(result.current.tableProps.rows[0].cells.spanishAudio).toBe('');
+      });
+    });
+
+    it('blocks save when audio fails to load for a row that has audio', async () => {
+      const updateExamples = vi.fn(async () => []);
+      overrideExampleMutations({ updateExamples });
+      overrideExamplesToEdit({
+        examples: createExamplesWithAudio([{ hasAudio: true, id: 5 }]),
+        isLoading: false,
+        error: null,
+      });
+      const { result } = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+      const rowId = result.current.tableProps.rows[0].id;
+
+      act(() => {
+        result.current.audioErrorHandlers.onAudioError(rowId, 'spanishAudio');
+        result.current.audioErrorHandlers.onAudioError(rowId, 'englishAudio');
+      });
+
+      await waitFor(() => {
+        expect(result.current.tableProps.isValid).toBe(false);
+      });
+      expect(
+        result.current.tableProps.validationErrors[rowId].spanishAudio,
+      ).toBe('Audio failed to load');
+      expect(
+        result.current.tableProps.validationErrors[rowId].englishAudio,
+      ).toBe('Audio failed to load');
+
+      await expect(
+        act(async () => {
+          await result.current.tableProps.onSave?.();
+        }),
+      ).rejects.toThrow('validation failed');
+      expect(updateExamples).not.toHaveBeenCalled();
+    });
+
+    it('clears one audio error and then the other', async () => {
+      overrideExamplesToEdit({
+        examples: createExamplesWithAudio([{ hasAudio: true, id: 5 }]),
+        isLoading: false,
+        error: null,
+      });
+      const { result } = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+      const rowId = result.current.tableProps.rows[0].id;
+
+      act(() => {
+        result.current.audioErrorHandlers.onAudioError(rowId, 'spanishAudio');
+        result.current.audioErrorHandlers.onAudioError(rowId, 'englishAudio');
+      });
+      await waitFor(() => {
+        expect(result.current.tableProps.isValid).toBe(false);
+      });
+
+      act(() => {
+        result.current.audioErrorHandlers.onAudioSuccess(rowId, 'spanishAudio');
+      });
+      await waitFor(() => {
+        expect(
+          result.current.tableProps.validationErrors[rowId].spanishAudio,
+        ).toBeUndefined();
+      });
+      expect(
+        result.current.tableProps.validationErrors[rowId].englishAudio,
+      ).toBe('Audio failed to load');
+      expect(result.current.tableProps.isValid).toBe(false);
+
+      act(() => {
+        result.current.audioErrorHandlers.onAudioSuccess(rowId, 'englishAudio');
+      });
+      await waitFor(() => {
+        expect(
+          result.current.tableProps.validationErrors[rowId],
+        ).toBeUndefined();
+      });
+      expect(result.current.tableProps.isValid).toBe(true);
+    });
+
+    it('ignores an audio error until the row actually has audio', async () => {
+      overrideExamplesToEdit({
+        examples: createExamplesWithAudio([{ hasAudio: false, id: 5 }]),
+        isLoading: false,
+        error: null,
+      });
+      const { result } = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+      const rowId = result.current.tableProps.rows[0].id;
+
+      act(() => {
+        result.current.audioErrorHandlers.onAudioError(rowId, 'spanishAudio');
+      });
+
+      expect(result.current.tableProps.isValid).toBe(true);
+      expect(
+        result.current.tableProps.validationErrors[rowId]?.spanishAudio,
+      ).toBeUndefined();
+
+      act(() => {
+        result.current.tableProps.onCellChange(rowId, 'hasAudio', 'True');
+      });
+
+      await waitFor(() => {
+        expect(
+          result.current.tableProps.validationErrors[rowId].spanishAudio,
+        ).toBe('Audio failed to load');
+      });
+      expect(result.current.tableProps.rows[0].cells.englishAudio).toBe('');
+    });
+
+    it('keeps field validation when an audio error is added', async () => {
+      overrideExamplesToEdit({
+        examples: createExamplesWithAudio([{ hasAudio: true, id: 5 }]),
+        isLoading: false,
+        error: null,
+      });
+      const { result } = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+      const rowId = result.current.tableProps.rows[0].id;
+
+      act(() => {
+        result.current.tableProps.onCellChange(rowId, 'english', '');
+        result.current.audioErrorHandlers.onAudioError(rowId, 'englishAudio');
+      });
+
+      await waitFor(() => {
+        expect(result.current.tableProps.validationErrors[rowId].english).toBe(
+          'Required',
+        );
+      });
+      expect(
+        result.current.tableProps.validationErrors[rowId].englishAudio,
+      ).toBe('Audio failed to load');
+    });
+  });
+
+  describe('spanish text and edit commands', () => {
+    it('marks spanglish when the spanish cell contains an asterisk', async () => {
+      overrideExamplesToEdit({
+        examples: createMockExampleTechnicalList(1, {
+          id: 3,
+          spanish: 'sin asterisco',
+          english: 'no asterisk',
+        }),
+        isLoading: false,
+        error: null,
+      });
+      const { result } = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+      const rowId = result.current.tableProps.rows[0].id;
+      expect(result.current.tableProps.rows[0].cells.spanglish).toBe('false');
+
+      act(() => {
+        result.current.tableProps.onCellChange(rowId, 'spanish', 'a*b');
+      });
+
+      await waitFor(() => {
+        expect(result.current.tableProps.rows[0].cells.spanglish).toBe('true');
+        expect(result.current.tableProps.rows[0].cells.spanish).toBe('a*b');
+      });
+
+      act(() => {
+        result.current.tableProps.onCellChange(rowId, 'spanish', '');
+      });
+      await waitFor(() => {
+        expect(result.current.tableProps.rows[0].cells.spanglish).toBe('false');
+        expect(result.current.tableProps.isValid).toBe(false);
+      });
+    });
+
+    it('sends the edited spanish text with regenerated audio and vocabulary', async () => {
+      const updateExamples = vi.fn(async () => []);
+      overrideExampleMutations({ updateExamples });
+      const [example] = createMockExampleTechnicalList(1, {
+        id: 15,
+        spanish: 'original',
+        english: 'original english',
+        vocabularyComplete: false,
+        spanishAudio: 'https://custom.example/keep.mp3',
+        englishAudio: 'https://custom.example/keep-en.mp3',
+      });
+      overrideExamplesToEdit({
+        examples: [example],
+        isLoading: false,
+        error: null,
+      });
+      overrideSelectedContext({ selectedExampleIds: [15, 16] });
+      const { result } = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+
+      expect(recordedExampleIds.at(-1)).toEqual([15, 16]);
+      expect(result.current.tableProps.columns).toEqual([
+        { id: 'id', type: 'read-only', editable: false },
+        { id: 'spanish', type: 'textarea', required: true },
+        { id: 'english', type: 'textarea', required: true },
+        { id: 'hasAudio', type: 'boolean' },
+        { id: 'spanishAudio', type: 'text', editable: false, derived: true },
+        { id: 'englishAudio', type: 'text', editable: false, derived: true },
+        {
+          id: 'relatedVocabulary',
+          type: 'custom',
+          editable: false,
+          derived: true,
+        },
+        { id: 'vocabularyComplete', type: 'boolean' },
+      ]);
+      expect(
+        JSON.parse(result.current.tableProps.rows[0].cells.relatedVocabulary),
+      ).toEqual(example.vocabulary.map((item) => item.id));
+
+      const rowId = result.current.tableProps.rows[0].id;
+      act(() => {
+        result.current.tableProps.onCellChange(rowId, 'spanish', 'cambiado');
+      });
+      await waitFor(() => {
+        expect(result.current.tableProps.rows[0].cells.spanish).toBe(
+          'cambiado',
+        );
+      });
+      act(() => {
+        result.current.tableProps.onCellChange(rowId, 'english', 'changed');
+      });
+      await waitFor(() => {
+        expect(result.current.tableProps.rows[0].cells.english).toBe('changed');
+      });
+
+      await act(async () => {
+        await result.current.tableProps.onSave?.();
+      });
+
+      expect(updateExamples).toHaveBeenCalledWith([
+        {
+          exampleId: 15,
+          spanish: 'cambiado',
+          english: 'changed',
+          spanishAudio:
+            'https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex15la.mp3',
+          englishAudio:
+            'https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex15en.mp3',
+          relatedVocabulary: example.vocabulary.map((item) => item.id),
+          vocabularyComplete: false,
+        },
+      ]);
+    });
+
+    it('turns a non-Error save failure into an Error and clears it on the next attempt', async () => {
+      let attempts = 0;
+      overrideExampleMutations({
+        updateExamples: async () => {
+          attempts += 1;
+          if (attempts === 1) {
+            const failure: unknown = 'disk full';
+            throw failure;
+          }
+          return [];
+        },
+      });
+      const { result } = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+      const rowId = result.current.tableProps.rows[0].id;
+      act(() => {
+        result.current.tableProps.onCellChange(rowId, 'spanish', 'cambiado');
+      });
+      await waitFor(() => {
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
+      });
+
+      try {
+        await act(async () => {
+          await result.current.tableProps.onSave?.();
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe('disk full');
+      }
+      await act(async () => {});
+      expect(result.current.saveError?.message).toBe('disk full');
+      expect(result.current.tableProps.isSaving).toBe(false);
+
+      await act(async () => {
+        await result.current.tableProps.onSave?.();
+      });
+      expect(result.current.saveError).toBeNull();
+    });
+
+    it('passes the loading flag and an empty row list when there is nothing to edit', () => {
+      overrideExamplesToEdit({
+        examples: undefined,
+        isLoading: true,
+        error: null,
+      });
+      const { result } = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+
+      expect(result.current.tableProps.isLoading).toBe(true);
+      expect(result.current.tableProps.rows).toEqual([]);
+    });
+  });
+
+  describe('related vocabulary cells', () => {
+    async function editVocabulary(value: string) {
+      overrideExamplesToEdit({
+        examples: createExamplesWithAudio([{ hasAudio: false, id: 9 }]),
+        isLoading: false,
+        error: null,
+      });
+      const view = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+      const rowId = view.result.current.tableProps.rows[0].id;
+      act(() => {
+        view.result.current.tableProps.onCellChange(
+          rowId,
+          'relatedVocabulary',
+          value,
+        );
+      });
+      await waitFor(() => {
+        expect(
+          view.result.current.tableProps.rows[0].cells.relatedVocabulary,
+        ).toBe(value);
+      });
+      return { view, rowId };
+    }
+
+    it('accepts a JSON array of numbers', async () => {
+      const { view, rowId } = await editVocabulary('[1, 2]');
+      expect(view.result.current.tableProps.isValid).toBe(true);
+      expect(
+        view.result.current.tableProps.validationErrors[rowId],
+      ).toBeUndefined();
+    });
+
+    it('rejects a value that is not an array', async () => {
+      const { view, rowId } = await editVocabulary('{"id":1}');
+      expect(view.result.current.tableProps.isValid).toBe(false);
+      expect(
+        view.result.current.tableProps.validationErrors[rowId]
+          .relatedVocabulary,
+      ).toBe('Related vocabulary must be an array');
+    });
+
+    it('rejects vocabulary ids that are not numbers', async () => {
+      const { view, rowId } = await editVocabulary('[1, "x"]');
+      expect(
+        view.result.current.tableProps.validationErrors[rowId]
+          .relatedVocabulary,
+      ).toBe('All vocabulary IDs must be valid numbers');
+    });
+
+    it('rejects invalid JSON', async () => {
+      const { view, rowId } = await editVocabulary('not-json');
+      expect(
+        view.result.current.tableProps.validationErrors[rowId]
+          .relatedVocabulary,
+      ).toBe('Invalid format: must be a valid array');
+    });
+
+    it('treats a blank vocabulary cell as having no custom vocabulary error', async () => {
+      const { view, rowId } = await editVocabulary('   ');
+      expect(
+        view.result.current.tableProps.validationErrors[rowId]
+          ?.relatedVocabulary,
+      ).not.toBe('Invalid format: must be a valid array');
+      expect(
+        view.result.current.tableProps.validationErrors[rowId]
+          ?.relatedVocabulary,
+      ).not.toBe('Related vocabulary must be an array');
+      expect(
+        view.result.current.tableProps.validationErrors[rowId]
+          ?.relatedVocabulary,
+      ).not.toBe('All vocabulary IDs must be valid numbers');
     });
   });
 });

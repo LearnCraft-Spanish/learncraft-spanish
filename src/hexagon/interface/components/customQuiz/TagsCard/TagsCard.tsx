@@ -42,6 +42,7 @@ export function TagsCard({
   showHeader = false,
 }: TagsCardProps): JSX.Element {
   const [mode, setMode] = useState<TagMode>('search');
+  const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
 
   const {
     selectedSkillTags,
@@ -56,7 +57,8 @@ export function TagsCard({
   const suggestions = skillTagSearch.tagSuggestions
     .filter((tag) => !appliedKeys.has(tag.key))
     .slice(0, SUGGESTION_CAP);
-  const searchOpen = skillTagSearch.tagSearchTerm.trim().length > 0;
+  const searchOpen =
+    skillTagSearch.tagSearchTerm.trim().length > 0 && !suggestionsDismissed;
 
   function setQuery(value: string): void {
     setTagQuery(skillTagSearch.updateTagSearchTerm, value);
@@ -114,14 +116,20 @@ export function TagsCard({
             >
               <Popover
                 open={searchOpen}
-                onDismiss={() => setQuery('')}
+                onDismiss={() => setSuggestionsDismissed(true)}
                 trigger={
                   <TextInput
                     id="custom-quiz-tag-search"
                     value={skillTagSearch.tagSearchTerm}
-                    onChange={setQuery}
+                    onChange={(value) => {
+                      setSuggestionsDismissed(false);
+                      setQuery(value);
+                    }}
+                    onFocus={() => setSuggestionsDismissed(false)}
                     placeholder="Search tags"
                     leadingIcon="search"
+                    onClear={() => setQuery('')}
+                    clearLabel="Clear tag search"
                   />
                 }
               >
@@ -130,7 +138,6 @@ export function TagsCard({
                   onSelect={(tag) => {
                     addSkillTagToFilters(tag.key);
                     skillTagSearch.removeTagFromSuggestions(tag.key);
-                    setQuery('');
                   }}
                 />
               </Popover>
