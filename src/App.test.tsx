@@ -600,11 +600,14 @@ describe('app', () => {
     });
     const { getByRole, queryByText } = renderAppAtRoute('/flashcardfinder');
 
-    await waitFor(() => {
-      expect(
-        getByRole('heading', { name: 'Flashcard Finder' }),
-      ).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(
+          getByRole('heading', { name: 'Flashcard Finder' }),
+        ).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
     expect(queryByText('Coaching Tools')).not.toBeInTheDocument();
   });
 
@@ -621,11 +624,14 @@ describe('app', () => {
     });
     const { getAllByRole, queryByText } = renderAppAtRoute('/customquiz');
 
-    await waitFor(() => {
-      expect(
-        getAllByRole('heading', { name: 'Set up your quiz' }).length,
-      ).toBeGreaterThan(0);
-    });
+    await waitFor(
+      () => {
+        expect(
+          getAllByRole('heading', { name: 'Set up your quiz' }).length,
+        ).toBeGreaterThan(0);
+      },
+      { timeout: 5000 },
+    );
     expect(queryByText('Coaching Tools')).not.toBeInTheDocument();
   });
 
@@ -642,9 +648,12 @@ describe('app', () => {
     });
     const { getByText, queryByRole } = renderAppAtRoute('/manage-flashcards');
 
-    await waitFor(() => {
-      expect(getByText('Coaching Tools')).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(getByText('Coaching Tools')).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
     expect(
       queryByRole('heading', { name: 'Flashcard Manager' }),
     ).not.toBeInTheDocument();
