@@ -469,6 +469,16 @@ describe('useAudioQuiz', () => {
 
       expect(result.current.addPendingRemoveProps).toBeUndefined();
     });
+
+    it('should not provide addPendingRemoveProps when collecting is not allowed', () => {
+      overrideMockAuthAdapter({ isStudent: true });
+
+      const { result } = renderHook(() =>
+        useAudioQuiz({ ...defaultProps, canCollect: false }),
+      );
+
+      expect(result.current.addPendingRemoveProps).toBeUndefined();
+    });
   });
 
   describe('buffer (autoplay) - silence audio after any step', () => {

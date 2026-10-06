@@ -28,10 +28,35 @@ export function canUseAsStudent(
 }
 
 /**
- * Student tools (flashcards, quizzes, finder) are off-limits to staff until
- * they choose a student to use the app as. Non-staff are gated elsewhere.
+ * `catalog` tools (Flashcard Finder, Custom Quiz) read the shared example
+ * catalog. Every other student tool (`student`) reads one student's records.
+ */
+export type StudentToolScope = 'student' | 'catalog';
+
+/**
+ * Student tools (flashcards, quizzes) are off-limits to staff until they
+ * choose a student to use the app as. Catalog tools are the exception: staff
+ * may browse them without one, read-only (see `canCollectFlashcards`).
+ * Non-staff are gated elsewhere.
  */
 export function canAccessStudentTools({
+  isStaff,
+  isUsingAsStudent,
+  scope = 'student',
+}: {
+  isStaff: boolean;
+  isUsingAsStudent: boolean;
+  scope?: StudentToolScope;
+}): boolean {
+  if (scope === 'catalog') return true;
+  return !isStaff || isUsingAsStudent;
+}
+
+/**
+ * Adding or removing flashcards needs a student to own them, so staff who
+ * are not using the app as a student only browse the catalog tools.
+ */
+export function canCollectFlashcards({
   isStaff,
   isUsingAsStudent,
 }: {

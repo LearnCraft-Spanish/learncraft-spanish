@@ -27,6 +27,8 @@ export interface AudioQuizProps {
   autoplay: boolean;
   ready: boolean; // Flag to prevent audio from playing in the background
   cleanupFunction: () => void;
+  /** False hides the add/remove flashcard controls. Defaults to true. */
+  canCollect?: boolean;
 }
 
 export interface AudioQuizReturn {
@@ -121,6 +123,7 @@ export function useAudioQuiz({
   autoplay,
   ready, // Flag to prevent audio from playing in the background
   cleanupFunction, // Function to clean up the quiz
+  canCollect = true,
 }: AudioQuizProps): AudioQuizReturn {
   const {
     play,
@@ -854,7 +857,7 @@ export function useAudioQuiz({
   }, [currentExampleMemo, deleteFlashcards, isExampleCollected]);
 
   const addPendingRemoveProps = useMemo(() => {
-    if (!isStudent) {
+    if (!isStudent || !canCollect) {
       return undefined;
     }
 
@@ -872,6 +875,7 @@ export function useAudioQuiz({
     };
   }, [
     isStudent,
+    canCollect,
     currentExampleMemo,
     addFlashcard,
     removeFlashcard,

@@ -81,6 +81,7 @@ vi.mock('@interface/components/studentFlashcards/ResultsSection', () => ({
     filteredExamplesLoading,
     mobileLayout,
     rowAction,
+    canCollect,
     onApplyFilters,
     onCreateQuiz,
     onCopyPage,
@@ -93,6 +94,7 @@ vi.mock('@interface/components/studentFlashcards/ResultsSection', () => ({
     filteredExamplesLoading?: boolean;
     mobileLayout?: boolean;
     rowAction?: string;
+    canCollect?: boolean;
     onApplyFilters?: () => void;
     onCreateQuiz?: () => void;
     onCopyPage?: () => void;
@@ -106,6 +108,7 @@ vi.mock('@interface/components/studentFlashcards/ResultsSection', () => ({
       data-filtered-loading={String(filteredExamplesLoading ?? false)}
       data-mobile-layout={String(mobileLayout ?? false)}
       data-row-action={String(rowAction)}
+      data-can-collect={String(canCollect)}
     >
       <button type="button" onClick={onApplyFilters}>
         mock-apply-filters
@@ -289,6 +292,34 @@ describe('flashcard finder page', () => {
     expect(screen.queryByTestId('example-table')).not.toBeInTheDocument();
   });
 
+  it('lets the results collect when the use case allows it', () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+
+    renderFinder();
+
+    expect(screen.getByTestId('results-section')).toHaveAttribute(
+      'data-can-collect',
+      'true',
+    );
+  });
+
+  it('renders read-only results when the use case does not allow collecting', () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideMockUseFlashcardFinder({ canCollect: false });
+
+    renderFinder();
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Flashcard Finder' }),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('filter-section')).toBeInTheDocument();
+    expect(screen.getByTestId('results-section')).toHaveAttribute(
+      'data-can-collect',
+      'false',
+    );
+    expect(screen.getByTestId('selected-count')).toHaveTextContent('0');
+  });
+
   it('keeps the v2 shell and uses skeleton loading, not a spinner page', () => {
     overrideMockUseStudentUiVersion({ version: 'v2' });
     overrideMockUseFlashcardFinder({ initialLoading: true });
@@ -394,6 +425,16 @@ describe('flashcard finder v2 interactions', () => {
     expect(mockNavigate).toHaveBeenCalledWith(
       '/manage-flashcards?enableFiltering=true',
     );
+  });
+
+  it('still creates a quiz from the filters when read-only', async () => {
+    const user = userEvent.setup();
+    overrideMockUseFlashcardFinder({ canCollect: false });
+    renderV2();
+
+    await user.click(screen.getByRole('button', { name: 'mock-create-quiz' }));
+
+    expect(mockNavigate).toHaveBeenCalledWith('/customquiz');
   });
 
   it('creates a quiz by navigating to custom quiz', async () => {

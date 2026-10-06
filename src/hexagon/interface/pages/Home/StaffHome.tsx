@@ -6,10 +6,10 @@ interface StaffHomeProps {
 }
 
 /**
- * Coach/admin home while they are not using the app as a student. Only the
- * internal tools: student tools stay behind "Use as student" in the header.
- * Keeps the legacy `Menu` look (global `menu` / `linkButton` classes) because
- * these tools have not been redesigned.
+ * Coach/admin home while they are not using the app as a student. Internal
+ * tools plus the read-only Flashcard Finder; every other student tool stays
+ * behind "Use as student" in the header. Keeps the legacy `Menu` look (global
+ * `menu` / `linkButton` classes) because these tools have not been redesigned.
  */
 export default function StaffHome({
   showAdminTools,
@@ -17,6 +17,13 @@ export default function StaffHome({
   return (
     <div className="menu">
       <div className="menuBox">
+        <h3>Student Tools</h3>
+        <div className="buttonBox">
+          <Link className="linkButton" to="/flashcardfinder">
+            Find Flashcards
+          </Link>
+        </div>
+
         <h3>Coaching Tools</h3>
         <div className="buttonBox">
           <Link className="linkButton" to="/frequensay">

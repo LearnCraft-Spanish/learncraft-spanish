@@ -93,6 +93,12 @@ export interface ResultsSectionProps {
   actionsMenu?: ReactNode;
   /** `remove` gives every row always-visible Remove (Manager). */
   rowAction?: ExampleRowAction;
+  /**
+   * False browses with no student collection: no select column, select-all,
+   * row Add/Owned/Remove, Custom chip, or apply-filters menu row. Defaults
+   * to true.
+   */
+  canCollect?: boolean;
   /** Supplies the expand panel's review-schedule column, per example. */
   getReviewSchedule?: (exampleId: number) => FlashcardReviewDates | undefined;
   /** Opt in to the sub-768px reflow. Off keeps the desktop grid at any width. */
@@ -120,6 +126,14 @@ const MOBILE_LAYOUT: DataTableMobileLayout = {
 };
 
 const COLUMN_TEMPLATE = '44px minmax(240px, 1fr) minmax(240px, 1fr) 132px';
+
+const READ_ONLY_MOBILE_LAYOUT: DataTableMobileLayout = {
+  columnTemplate: '1fr 44px',
+  templateAreas: '"english expand" "spanish expand"',
+};
+
+/* The actions column only holds the expand toggle without a collection. */
+const READ_ONLY_COLUMN_TEMPLATE = 'minmax(240px, 1fr) minmax(240px, 1fr) 56px';
 
 function ignoreAction(): void {}
 
@@ -164,6 +178,7 @@ export function ResultsSection({
   emptyIcon = 'searchOff',
   actionsMenu,
   rowAction = 'collect',
+  canCollect = true,
   getReviewSchedule,
   mobileLayout = false,
   focusRequest,
@@ -223,6 +238,13 @@ export function ResultsSection({
     examples.length > 0 &&
     examples.every((example) => selectedIds.has(example.id));
   const pageCount = Math.max(1, totalPages ?? pagination.maxPageNumber);
+  const allColumns = mobileLayout ? MOBILE_COLUMNS : COLUMNS;
+  const tableColumns = canCollect
+    ? allColumns
+    : allColumns.filter((column) => column.id !== 'select');
+  const activeMobileLayout = canCollect
+    ? MOBILE_LAYOUT
+    : READ_ONLY_MOBILE_LAYOUT;
 
   const rows = showSkeleton
     ? []
@@ -236,6 +258,7 @@ export function ResultsSection({
           studentFlashcards,
           lessonPopup,
           rowAction,
+          canCollect,
           reviewSchedule: getReviewSchedule?.(example.id),
           onRemoveRequested: recoversFocus ? focusResults : undefined,
           onToggleSelected: (exampleId, selected) => {
@@ -305,7 +328,7 @@ export function ResultsSection({
           )}
         </div>
         <div className={styles.countTools}>
-          {examples.length > 0 && (
+          {canCollect && examples.length > 0 && (
             <span className={styles.selectAll}>
               <Button variant="ghost" size="inline" onClick={handleSelectAll}>
                 {allPageSelected
@@ -318,6 +341,7 @@ export function ResultsSection({
             {actionsMenu ?? (
               <FinderActionsMenu
                 isAdmin={isAdmin}
+                canCollect={canCollect}
                 pageExampleCount={examples.length}
                 totalExampleCount={totalCount}
                 onApplyFilters={onApplyFilters ?? ignoreAction}
@@ -340,10 +364,12 @@ export function ResultsSection({
           }}
         />
         <DataTable
-          columns={mobileLayout ? MOBILE_COLUMNS : COLUMNS}
+          columns={tableColumns}
           rows={rows}
-          columnTemplate={COLUMN_TEMPLATE}
-          mobileLayout={mobileLayout ? MOBILE_LAYOUT : undefined}
+          columnTemplate={
+            canCollect ? COLUMN_TEMPLATE : READ_ONLY_COLUMN_TEMPLATE
+          }
+          mobileLayout={mobileLayout ? activeMobileLayout : undefined}
           caption={caption}
           expandTone="flush"
           groupSelection
