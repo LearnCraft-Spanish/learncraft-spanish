@@ -7,6 +7,7 @@ import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFl
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
+import { useUsingAsStudent } from '@application/coordinators/hooks/useUsingAsStudent';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
@@ -15,6 +16,7 @@ import useLessonPopup from '@application/units/useLessonPopup';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { lessonNumberAfterFilterReset } from '@domain/coursePrerequisites';
+import { canCollectFlashcards } from '@domain/studentAccess';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -33,6 +35,11 @@ export interface UseFlashcardFinderReturnType {
   selectedIds: ReadonlySet<number>;
   changeSelection: (next: ReadonlySet<number>) => void;
   clearSelection: () => void;
+  /**
+   * False for a coach/admin who is not using the app as a student: there is
+   * no collection to add to, so the page is search, filter, and quiz only.
+   */
+  canCollect: boolean;
   /** Creates flashcards for the selection, skipping ones the student already owns. */
   collectSelected: () => Promise<void>;
 
@@ -45,6 +52,11 @@ export interface UseFlashcardFinderReturnType {
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   // isCoach or isAdmin
   const { isCoach, isAdmin } = useAuthAdapter();
+  const { isUsingAsStudent } = useUsingAsStudent();
+  const canCollect = canCollectFlashcards({
+    isStaff: isCoach || isAdmin,
+    isUsingAsStudent,
+  });
   const { lessonPopup } = useLessonPopup({ scopeToRelevantCourses: true });
 
   const QUERY_PAGE_SIZE = 150;
@@ -179,6 +191,9 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   }, []);
 
   const collectSelected = useCallback(async (): Promise<void> => {
+    if (!canCollect) {
+      return;
+    }
     const toCollect = [...selectedIds]
       .map((id) => selectedExamplesRef.current.get(id))
       .filter(
@@ -195,7 +210,7 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
 
     selectedExamplesRef.current.clear();
     setSelectedIds(new Set());
-  }, [flashcardsQuery, selectedIds]);
+  }, [canCollect, flashcardsQuery, selectedIds]);
 
   const resetFilters = (): void => {
     exampleFilter.bulkUpdateSkillTagKeys([]);
@@ -225,6 +240,7 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     selectedIds,
     changeSelection,
     clearSelection,
+    canCollect,
     collectSelected,
 
     // Loading states similar to FlashcardManager

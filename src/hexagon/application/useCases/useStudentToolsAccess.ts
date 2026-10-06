@@ -1,3 +1,4 @@
+import type { StudentToolScope } from '@domain/studentAccess';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useUsingAsStudent } from '@application/coordinators/hooks/useUsingAsStudent';
 import { canAccessStudentTools } from '@domain/studentAccess';
@@ -7,8 +8,10 @@ export interface UseStudentToolsAccessResult {
   isLoading: boolean;
 }
 
-/** Whether student-only routes are open to the current session. */
-export function useStudentToolsAccess(): UseStudentToolsAccessResult {
+/** Whether student-only routes of this scope are open to the current session. */
+export function useStudentToolsAccess(
+  scope: StudentToolScope = 'student',
+): UseStudentToolsAccessResult {
   const { isAdmin, isCoach, isLoading } = useAuthAdapter();
   const { isUsingAsStudent } = useUsingAsStudent();
 
@@ -16,6 +19,7 @@ export function useStudentToolsAccess(): UseStudentToolsAccessResult {
     allowed: canAccessStudentTools({
       isStaff: isAdmin || isCoach,
       isUsingAsStudent,
+      scope,
     }),
     isLoading,
   };

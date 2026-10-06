@@ -37,6 +37,40 @@ function vocabInfoHook(vocab: Vocabulary): VocabInfo {
   } as unknown as VocabInfo;
 }
 
+const VERB_VOCABULARY = {
+  id: 204,
+  word: 'tengo',
+  descriptor: '"tengo": "I have"',
+  type: 'verb',
+  spellings: ['tengo'],
+  subcategory: {
+    id: 2004,
+    name: 'Present',
+    category: 'Present',
+    partOfSpeech: 'Verb',
+  },
+  verb: { id: 5, infinitive: 'tener' },
+  conjugationTags: ['Irregular', 'irreg: added letter'],
+  frequency: null,
+  createdAt: '2024-01-01T00:00:00.000Z',
+  updatedAt: '2024-01-01T00:00:00.000Z',
+} as unknown as Vocabulary;
+
+function verbVocabInfoHook(
+  conjugationTags: string[],
+): (vocab: Vocabulary) => VocabInfo {
+  return (vocab: Vocabulary): VocabInfo =>
+    ({
+      word: vocab.word,
+      descriptor: vocab.descriptor,
+      subcategory: vocab.subcategory,
+      verb: { id: 5, infinitive: 'tener' },
+      conjugationTags,
+      lessons: [],
+      lessonsLoading: false,
+    }) as unknown as VocabInfo;
+}
+
 describe('word panel', () => {
   afterEach(() => {
     cleanup();
@@ -50,6 +84,39 @@ describe('word panel', () => {
     expect(screen.getByText(/Conjunction/)).toBeTruthy();
     expect(screen.getByText(/LearnCraft Spanish lesson 28/)).toBeTruthy();
     expect(screen.getByText(/Subjunctives Challenge lesson 1/)).toBeTruthy();
+  });
+
+  it('renders no verb details for a non-verb', () => {
+    render(<WordPanel vocabulary={VOCABULARY} vocabInfoHook={vocabInfoHook} />);
+
+    expect(screen.queryByText(/Verb Infinitive/)).toBeNull();
+    expect(screen.queryByText(/Conjugation Notes/)).toBeNull();
+  });
+
+  it('renders the infinitive and conjugation notes for a verb', () => {
+    render(
+      <WordPanel
+        vocabulary={VERB_VOCABULARY}
+        vocabInfoHook={verbVocabInfoHook(['Irregular', 'irreg: added letter'])}
+      />,
+    );
+
+    expect(screen.getByText('Verb Infinitive: tener')).toBeTruthy();
+    expect(
+      screen.getByText('Conjugation Notes: Irregular, irreg: added letter'),
+    ).toBeTruthy();
+  });
+
+  it('omits conjugation notes for a verb with no conjugation tags', () => {
+    render(
+      <WordPanel
+        vocabulary={VERB_VOCABULARY}
+        vocabInfoHook={verbVocabInfoHook([])}
+      />,
+    );
+
+    expect(screen.getByText('Verb Infinitive: tener')).toBeTruthy();
+    expect(screen.queryByText(/Conjugation Notes/)).toBeNull();
   });
 
   it('renders no close button without an onClose prop', () => {

@@ -51,6 +51,16 @@ export function WordPanel({
         {' · '}
         {info.subcategory.category}
       </p>
+      {info.verb && (
+        <p className={styles.verbDetail}>
+          Verb Infinitive: {info.verb.infinitive}
+        </p>
+      )}
+      {info.conjugationTags && info.conjugationTags.length > 0 && (
+        <p className={styles.verbDetail}>
+          Conjugation Notes: {info.conjugationTags.join(', ')}
+        </p>
+      )}
 
       <div className={styles.divider} />
 

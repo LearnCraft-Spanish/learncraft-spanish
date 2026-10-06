@@ -1,5 +1,6 @@
 import {
   canAccessStudentTools,
+  canCollectFlashcards,
   canUseAsStudent,
   filterStudentsBySearch,
   resolveHomeView,
@@ -48,6 +49,66 @@ describe('canAccessStudentTools', () => {
   it('allows staff who are using the app as a student', () => {
     expect(
       canAccessStudentTools({ isStaff: true, isUsingAsStudent: true }),
+    ).toBe(true);
+  });
+
+  it('blocks staff from an explicitly student-scoped tool', () => {
+    expect(
+      canAccessStudentTools({
+        isStaff: true,
+        isUsingAsStudent: false,
+        scope: 'student',
+      }),
+    ).toBe(false);
+  });
+
+  it('lets staff open catalog tools without using the app as a student', () => {
+    expect(
+      canAccessStudentTools({
+        isStaff: true,
+        isUsingAsStudent: false,
+        scope: 'catalog',
+      }),
+    ).toBe(true);
+  });
+
+  it('keeps catalog tools open to staff using the app as a student', () => {
+    expect(
+      canAccessStudentTools({
+        isStaff: true,
+        isUsingAsStudent: true,
+        scope: 'catalog',
+      }),
+    ).toBe(true);
+  });
+
+  it('keeps catalog tools open to non-staff', () => {
+    expect(
+      canAccessStudentTools({
+        isStaff: false,
+        isUsingAsStudent: false,
+        scope: 'catalog',
+      }),
+    ).toBe(true);
+  });
+});
+
+describe('canCollectFlashcards', () => {
+  it('lets non-staff collect', () => {
+    expect(
+      canCollectFlashcards({ isStaff: false, isUsingAsStudent: false }),
+    ).toBe(true);
+  });
+
+  it('keeps staff who are not using the app as a student read-only', () => {
+    expect(
+      canCollectFlashcards({ isStaff: true, isUsingAsStudent: false }),
+    ).toBe(false);
+  });
+
+  it('lets staff collect while using the app as a student', () => {
+    expect(
+      canCollectFlashcards({ isStaff: true, isUsingAsStudent: true }),
     ).toBe(true);
   });
 });

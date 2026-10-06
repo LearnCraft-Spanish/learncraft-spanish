@@ -5,6 +5,7 @@ import {
 } from '@application/adapters/audioAdapter.mock';
 import { mockLastStudiedLessonAdapter } from '@application/adapters/lastStudiedLessonAdapter.mock';
 import { overrideMockSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+import { overrideMockUseUsingAsStudent } from '@application/coordinators/hooks/useUsingAsStudent.mock';
 import {
   mockUseExampleQuery,
   overrideMockUseExampleQuery,
@@ -311,6 +312,48 @@ describe('useCustomQuizV2', () => {
     });
 
     expect(result.current.audioQuizProps.autoplay).toBe(false);
+  });
+
+  describe('flashcard controls', () => {
+    function asCoach(): void {
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+          isAuthenticated: true,
+          isStudent: true,
+          isCoach: true,
+          isAdmin: false,
+          isLimited: false,
+        },
+        { appUser: student, isOwnUser: false },
+      );
+    }
+
+    it('lets a student add and remove flashcards in either quiz', () => {
+      const { result } = renderCustomQuiz();
+
+      expect(result.current.textQuizProps.canCollect).toBe(true);
+      expect(result.current.audioQuizProps.canCollect).toBe(true);
+    });
+
+    it('hides them for a coach who is not using the app as a student', () => {
+      asCoach();
+
+      const { result } = renderCustomQuiz();
+
+      expect(result.current.textQuizProps.canCollect).toBe(false);
+      expect(result.current.audioQuizProps.canCollect).toBe(false);
+    });
+
+    it('keeps them for a coach using the app as a student', () => {
+      asCoach();
+      overrideMockUseUsingAsStudent({ isUsingAsStudent: true });
+
+      const { result } = renderCustomQuiz();
+
+      expect(result.current.textQuizProps.canCollect).toBe(true);
+      expect(result.current.audioQuizProps.canCollect).toBe(true);
+    });
   });
 
   it('treats the first load as initial and a later filter load as a refresh', () => {

@@ -80,7 +80,21 @@ describe('home page', () => {
     ).toBeInTheDocument();
   });
 
-  it('never shows student tools in the staff view', () => {
+  it('leads the staff view with a Student Tools section linking to the Finder', () => {
+    overrideMockUseHomeView({ view: 'staffTools', showAdminTools: false });
+
+    renderHome();
+
+    const headings = screen
+      .getAllByRole('heading', { level: 3 })
+      .map((heading) => heading.textContent);
+    expect(headings.slice(0, 2)).toEqual(['Student Tools', 'Coaching Tools']);
+    expect(
+      screen.getByRole('link', { name: 'Find Flashcards' }),
+    ).toHaveAttribute('href', '/flashcardfinder');
+  });
+
+  it('shows no other student tools in the staff view', () => {
     overrideMockUseHomeView({ view: 'staffTools', showAdminTools: true });
 
     renderHome();
@@ -91,7 +105,6 @@ describe('home page', () => {
       /Official Quizzes/,
       /Custom Quiz/,
       /Audio Quiz/,
-      /Find Flashcards/,
       /How to Use This App/,
     ]) {
       expect(screen.queryByRole('link', { name })).not.toBeInTheDocument();

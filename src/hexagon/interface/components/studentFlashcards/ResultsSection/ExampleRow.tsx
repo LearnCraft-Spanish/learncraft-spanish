@@ -40,6 +40,11 @@ export interface ExampleRowModel {
   studentFlashcards: UseStudentFlashcardsReturn;
   lessonPopup: LessonPopup;
   rowAction?: ExampleRowAction;
+  /**
+   * False drops the select checkbox, the row action, and the Custom chip:
+   * nothing about a student's collection. Defaults to true.
+   */
+  canCollect?: boolean;
   /** Review dates for the expand panel. Omitted on the finder. */
   reviewSchedule?: FlashcardReviewDates;
   /**
@@ -250,6 +255,7 @@ function ActionsCell({
   expanded,
   studentFlashcards,
   rowAction,
+  canCollect,
   onToggleExpanded,
   onRemoveRequested,
 }: {
@@ -257,6 +263,7 @@ function ActionsCell({
   expanded: boolean;
   studentFlashcards: UseStudentFlashcardsReturn;
   rowAction: ExampleRowAction;
+  canCollect: boolean;
   onToggleExpanded: (exampleId: number) => void;
   onRemoveRequested?: () => void;
 }): JSX.Element {
@@ -294,6 +301,10 @@ function ActionsCell({
       />
     </span>
   );
+
+  if (!canCollect) {
+    return <div className={styles.actions}>{expandToggle}</div>;
+  }
 
   return (
     <div className={styles.actions}>
@@ -445,6 +456,8 @@ export interface ExampleExpandPanelProps {
   openVocabId: number | null;
   lessonPopup: LessonPopup;
   studentFlashcards: UseStudentFlashcardsReturn;
+  /** False never shows the Custom chip, which describes a student's card. */
+  canCollect?: boolean;
   /** Adds the review-schedule column. Omitted on the finder. */
   reviewSchedule?: FlashcardReviewDates;
   onToggleVocab: (vocabId: number) => void;
@@ -455,14 +468,17 @@ export function ExampleExpandPanel({
   openVocabId,
   lessonPopup,
   studentFlashcards,
+  canCollect = true,
   reviewSchedule,
   onToggleVocab,
 }: ExampleExpandPanelProps): JSX.Element {
   const isSpanglish = example.spanglish;
   const isAudio = example.spanishAudio.length > 0;
-  const isCustom = studentFlashcards.isCustomFlashcard({
-    exampleId: example.id,
-  });
+  const isCustom =
+    canCollect &&
+    studentFlashcards.isCustomFlashcard({
+      exampleId: example.id,
+    });
   const hasSpecial = isSpanglish || isAudio || isCustom;
 
   return (
@@ -553,22 +569,27 @@ export function ExampleExpandPanel({
 
 export function buildExampleRow(model: ExampleRowModel): DataTableRow {
   const { example } = model;
+  const canCollect = model.canCollect ?? true;
+
+  const selectCell = (
+    <Checkbox
+      id={`select-example-${example.id}`}
+      key="select"
+      checked={model.selected}
+      label={`Select ${exampleRowLabel(example)}`}
+      labelHidden
+      onChange={(checked) => {
+        model.onToggleSelected(example.id, checked);
+      }}
+    />
+  );
 
   return {
     id: String(example.id),
     selected: model.selected,
     expanded: model.expanded,
     cells: [
-      <Checkbox
-        id={`select-example-${example.id}`}
-        key="select"
-        checked={model.selected}
-        label={`Select ${exampleRowLabel(example)}`}
-        labelHidden
-        onChange={(checked) => {
-          model.onToggleSelected(example.id, checked);
-        }}
-      />,
+      ...(canCollect ? [selectCell] : []),
       <EnglishCell
         key="english"
         example={example}
@@ -587,6 +608,7 @@ export function buildExampleRow(model: ExampleRowModel): DataTableRow {
         expanded={model.expanded}
         studentFlashcards={model.studentFlashcards}
         rowAction={model.rowAction ?? 'collect'}
+        canCollect={canCollect}
         onToggleExpanded={model.onToggleExpanded}
         onRemoveRequested={model.onRemoveRequested}
       />,
@@ -597,6 +619,7 @@ export function buildExampleRow(model: ExampleRowModel): DataTableRow {
         openVocabId={model.expanded ? model.openVocabId : null}
         lessonPopup={model.lessonPopup}
         studentFlashcards={model.studentFlashcards}
+        canCollect={canCollect}
         reviewSchedule={model.reviewSchedule}
         onToggleVocab={model.onToggleVocab}
       />

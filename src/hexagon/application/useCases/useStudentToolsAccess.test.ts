@@ -30,6 +30,22 @@ describe('useStudentToolsAccess', () => {
     expect(result.current.allowed).toBe(true);
   });
 
+  it('allows a coach who is not using the app as a student into catalog tools', () => {
+    overrideMockAuthAdapter({ isAdmin: false, isCoach: true });
+
+    const { result } = renderHook(() => useStudentToolsAccess('catalog'));
+
+    expect(result.current.allowed).toBe(true);
+  });
+
+  it('still blocks that coach from explicitly student-scoped tools', () => {
+    overrideMockAuthAdapter({ isAdmin: false, isCoach: true });
+
+    const { result } = renderHook(() => useStudentToolsAccess('student'));
+
+    expect(result.current.allowed).toBe(false);
+  });
+
   it('passes auth loading through', () => {
     overrideMockAuthAdapter({ isLoading: true });
 

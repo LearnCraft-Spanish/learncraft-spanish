@@ -123,7 +123,7 @@ export default function AppRoutes() {
           path="/customquiz"
           element={
             (isLimited || isStudent || isCoach || isAdmin) && (
-              <RequireStudentTools>
+              <RequireStudentTools scope="catalog">
                 {isLimited ? (
                   <LimitedCustomQuiz />
                 ) : (
@@ -139,7 +139,7 @@ export default function AppRoutes() {
           path="/flashcardfinder"
           element={
             (isStudent || isAdmin || isCoach) && (
-              <RequireStudentTools>
+              <RequireStudentTools scope="catalog">
                 <UiScope>
                   <FlashcardFinderPage />
                 </UiScope>

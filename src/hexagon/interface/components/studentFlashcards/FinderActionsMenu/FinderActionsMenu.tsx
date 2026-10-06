@@ -6,6 +6,11 @@ import styles from './FinderActionsMenu.module.scss';
 export interface FinderActionsMenuProps {
   /** When false, the admin-only "Copy all examples" row is omitted. */
   isAdmin: boolean;
+  /**
+   * When false (no student collection to act on), the "Apply these filters
+   * to my flashcards" row is omitted. Defaults to true.
+   */
+  canCollect?: boolean;
   /** Rows on the current results page — used in the copy-page hint and notice. */
   pageExampleCount: number;
   /** Matches across every page — used in the quiz / copy-all hint and notice. */
@@ -24,6 +29,7 @@ export interface FinderActionsMenuProps {
  */
 export function FinderActionsMenu({
   isAdmin,
+  canCollect = true,
   pageExampleCount,
   totalExampleCount,
   onApplyFilters,
@@ -37,16 +43,18 @@ export function FinderActionsMenu({
     onNotice(message);
   };
 
-  const items: MenuItem[] = [
-    {
-      id: 'apply-filters',
-      icon: 'filter',
-      label: 'Apply these filters to my flashcards',
-      hint: 'Filter your owned flashcards the same way.',
-      onSelect: () => {
-        run(onApplyFilters, 'Filters applied to your flashcards.');
-      },
+  const applyFiltersItem: MenuItem = {
+    id: 'apply-filters',
+    icon: 'filter',
+    label: 'Apply these filters to my flashcards',
+    hint: 'Filter your owned flashcards the same way.',
+    onSelect: () => {
+      run(onApplyFilters, 'Filters applied to your flashcards.');
     },
+  };
+
+  const items: MenuItem[] = [
+    ...(canCollect ? [applyFiltersItem] : []),
     {
       id: 'create-quiz',
       icon: 'checklist',

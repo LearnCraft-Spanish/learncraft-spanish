@@ -4,6 +4,7 @@ import type { UseTextQuizProps } from '@application/units/useTextQuiz/useTextQui
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useAudioAdapter } from '@application/adapters/audioAdapter';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useUsingAsStudent } from '@application/coordinators/hooks/useUsingAsStudent';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useLastStudiedLessonQuery } from '@application/queries/useLastStudiedLessonQuery';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
@@ -19,6 +20,7 @@ import {
   availableQuizLengths,
   snapQuizLength,
 } from '@domain/functions/quizLength';
+import { canCollectFlashcards } from '@domain/studentAccess';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import silence1s from 'src/assets/audio/1s.mp3';
 
@@ -69,6 +71,10 @@ export interface UseCustomQuizV2Return {
   quizReady: boolean;
   quizNotReady: boolean;
   readyQuiz: () => void;
+  /**
+   * Both carry `canCollect`, false for a coach/admin who is not using the
+   * app as a student, so the quiz shows no add/remove flashcard controls.
+   */
   textQuizProps: UseTextQuizProps;
   audioQuizProps: AudioQuizProps;
 }
@@ -76,6 +82,11 @@ export interface UseCustomQuizV2Return {
 export function useCustomQuizV2(): UseCustomQuizV2Return {
   const { primeAudioElement } = useAudioAdapter();
   const { isCoach, isAdmin } = useAuthAdapter();
+  const { isUsingAsStudent } = useUsingAsStudent();
+  const canCollect = canCollectFlashcards({
+    isStaff: isCoach || isAdmin,
+    isUsingAsStudent,
+  });
   const { recordLastStudiedLesson } = useLastStudiedLessonQuery();
 
   const [quizType, setQuizType] = useState<CustomQuizType>(
@@ -181,6 +192,7 @@ export function useCustomQuizV2(): UseCustomQuizV2Return {
     examples: quizReady ? staticExamples.current : [],
     startWithSpanish,
     cleanupFunction: cleanupQuiz,
+    canCollect,
   };
 
   const audioQuizProps: AudioQuizProps = {
@@ -189,6 +201,7 @@ export function useCustomQuizV2(): UseCustomQuizV2Return {
     autoplay,
     ready: quizReady,
     cleanupFunction: cleanupQuiz,
+    canCollect,
   };
 
   return {

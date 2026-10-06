@@ -1,4 +1,5 @@
 import type { UseStudentToolsAccessResult } from '@application/useCases/useStudentToolsAccess';
+import type { StudentToolScope } from '@domain/studentAccess';
 import { createOverrideableMockHook } from '@testing/utils/createOverrideableMockHook';
 
 const defaultMockResult: UseStudentToolsAccessResult = {
@@ -10,8 +11,9 @@ export const {
   mock: mockUseStudentToolsAccess,
   override: overrideMockUseStudentToolsAccess,
   reset: resetMockUseStudentToolsAccess,
-} = createOverrideableMockHook<[], UseStudentToolsAccessResult>(
-  defaultMockResult,
-);
+} = createOverrideableMockHook<
+  [scope?: StudentToolScope],
+  UseStudentToolsAccessResult
+>(defaultMockResult);
 
 export default mockUseStudentToolsAccess;
