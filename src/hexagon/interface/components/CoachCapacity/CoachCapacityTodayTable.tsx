@@ -3,14 +3,16 @@ import { useCoachCapacityTodayReport } from '@application/useCases/useCoachCapac
 import { CoachCapacityTable } from '@interface/components/CoachCapacity/CoachCapacityTable';
 
 export function CoachCapacityTodayTable(): JSX.Element {
-  const { rows, columns, isLoading, isError } = useCoachCapacityTodayReport();
+  const { tableProps, isError, saveError, openNotes, notesPanel } =
+    useCoachCapacityTodayReport();
 
   return (
     <CoachCapacityTable
-      rows={rows}
-      columns={columns}
-      isLoading={isLoading}
+      tableProps={tableProps}
       isError={isError}
+      saveError={saveError}
+      onOpenNotes={openNotes}
+      notesPanel={notesPanel}
     />
   );
 }
