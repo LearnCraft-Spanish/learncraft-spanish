@@ -3,6 +3,7 @@ import type { AuthPort } from '@application/ports/authPort';
 import type {
   ActiveMembershipsByCourse,
   AssignmentsCompletedByWeek,
+  CoachCapacityReportRow,
   CoachSummary,
   CoachSummaryDrilldown,
   GroupCallsByCoach,
@@ -15,6 +16,7 @@ import { createHttpClient } from '@infrastructure/http/client';
 import {
   getActiveMembershipsReportEndpoint,
   getAssignmentsCompletedByWeekReportEndpoint,
+  getCoachCapacityTodayReportEndpoint,
   getDropoutsByLevelReportEndpoint,
   getGroupCallsByCoachReportEndpoint,
   getLastWeekCoachSummaryReportEndpoint,
@@ -115,6 +117,11 @@ export function createAdminReportsInfrastructure(
       httpClient.get<LeadsToReEngage[]>(
         getLeadsToReEngageReportEndpoint.path,
         getLeadsToReEngageReportEndpoint.requiredScopes,
+      ),
+    getCoachCapacityTodayReport: () =>
+      httpClient.get<CoachCapacityReportRow[]>(
+        getCoachCapacityTodayReportEndpoint.path,
+        getCoachCapacityTodayReportEndpoint.requiredScopes,
       ),
   };
 }
