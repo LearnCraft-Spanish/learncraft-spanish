@@ -24,6 +24,28 @@
   font-variant-numeric: tabular-nums;
 }
 
+.coachButton {
+  display: block;
+  inline-size: 100%;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--lcs-tint-hover);
+  }
+
+  &:focus-visible {
+    outline: var(--lcs-focus-ring);
+    outline-offset: calc(-1 * var(--lcs-focus-offset));
+  }
+}
+
 .notesButton {
   display: block;
   inline-size: 100%;

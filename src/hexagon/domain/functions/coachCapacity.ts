@@ -2,7 +2,9 @@ import type { TableRow } from '@domain/PasteTable';
 import type {
   CoachCapacityReportRow,
   CoachCapacitySettings,
+  CountedMembership,
 } from '@learncraft-spanish/shared';
+import { fromISODate, toReadableDate } from '@domain/functions/dateUtils';
 import { coachCapacitySettingsSchema } from '@learncraft-spanish/shared';
 
 /** Shown in place of a value a coach has not been set up with */
@@ -100,6 +102,42 @@ export function mapCoachCapacityRowToTableRow(
     notes: settings.notes,
   };
   return { id: String(row.coach.coach_id), cells };
+}
+
+/** One counted membership as the Coaching Hours drilldown shows it */
+export interface CountedMembershipDisplayRow {
+  id: string;
+  student: string;
+  course: string;
+  startDate: string;
+  endDate: string;
+  weeklyPrivateCalls: string;
+  /** In hours, so it adds up with the report's Coaching Hours */
+  weeklyAdminTime: string;
+}
+
+function formatMembershipDate(date: string | null): string {
+  if (!date) return NOT_SET_DISPLAY;
+  return /^\d{4}-\d{2}-\d{2}$/.test(date)
+    ? toReadableDate(fromISODate(date))
+    : date;
+}
+
+/** Memberships have no ID in the report, so rows are keyed by position */
+export function mapCountedMembershipsToDisplayRows(
+  memberships: readonly CountedMembership[],
+): CountedMembershipDisplayRow[] {
+  return memberships.map((membership, index) => ({
+    id: String(index),
+    student: membership.studentName,
+    course: membership.courseName,
+    startDate: formatMembershipDate(membership.startDate),
+    endDate: formatMembershipDate(membership.endDate),
+    weeklyPrivateCalls: String(membership.courseWeeklyPrivateCalls),
+    weeklyAdminTime: formatCoachCapacityHours(
+      membership.courseWeeklyAdminTimeMinutes / 60,
+    ),
+  }));
 }
 
 export type CoachCapacitySettingsParseResult =

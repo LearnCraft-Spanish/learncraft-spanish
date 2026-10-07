@@ -1,0 +1,20 @@
+.drilldown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-5);
+  margin-block-start: var(--lcs-space-6);
+  overflow-x: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lcs-space-5);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lcs-text-h3);
+  text-align: start;
+}

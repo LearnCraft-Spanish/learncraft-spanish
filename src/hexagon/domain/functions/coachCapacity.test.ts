@@ -1,8 +1,12 @@
-import type { CoachCapacityReportRow } from '@learncraft-spanish/shared';
+import type {
+  CoachCapacityReportRow,
+  CountedMembership,
+} from '@learncraft-spanish/shared';
 import {
   formatBookedPercent,
   formatCoachCapacityHours,
   mapCoachCapacityRowToTableRow,
+  mapCountedMembershipsToDisplayRows,
   NOT_SET_DISPLAY,
   parseCoachCapacitySettingsCells,
   sortCoachCapacityRows,
@@ -152,6 +156,55 @@ describe('mapCoachCapacityRowToTableRow', () => {
 
     expect(cells.desiredHours).toBe('');
     expect(cells.bookedPercent).toBe('—');
+  });
+});
+
+describe('mapCountedMembershipsToDisplayRows', () => {
+  const membership: CountedMembership = {
+    studentName: 'Ana Student',
+    courseName: 'Premier',
+    startDate: '2026-01-05',
+    endDate: '2026-12-31',
+    courseWeeklyPrivateCalls: 2,
+    courseWeeklyAdminTimeMinutes: 25,
+  };
+
+  it('shows each membership with readable dates and Admin Time in hours', () => {
+    expect(mapCountedMembershipsToDisplayRows([membership])).toEqual([
+      {
+        id: '0',
+        student: 'Ana Student',
+        course: 'Premier',
+        startDate: 'Jan 05, 2026',
+        endDate: 'Dec 31, 2026',
+        weeklyPrivateCalls: '2',
+        weeklyAdminTime: '0.42',
+      },
+    ]);
+  });
+
+  it('shows a dash for a membership with no end date', () => {
+    const [row] = mapCountedMembershipsToDisplayRows([
+      { ...membership, endDate: null },
+    ]);
+
+    expect(row.endDate).toBe(NOT_SET_DISPLAY);
+  });
+
+  it('keeps the order it was given, keyed by position', () => {
+    const rows = mapCountedMembershipsToDisplayRows([
+      membership,
+      { ...membership, studentName: 'Beto Student' },
+    ]);
+
+    expect(rows.map((row) => [row.id, row.student])).toEqual([
+      ['0', 'Ana Student'],
+      ['1', 'Beto Student'],
+    ]);
+  });
+
+  it('returns no rows for a coach with no counted memberships', () => {
+    expect(mapCountedMembershipsToDisplayRows([])).toEqual([]);
   });
 });
 

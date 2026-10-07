@@ -406,4 +406,99 @@ describe('useCoachCapacityReport', () => {
       expect(updateSettings).not.toHaveBeenCalled();
     });
   });
+
+  describe('drilldown', () => {
+    const membership = {
+      studentName: 'Ana Student',
+      courseName: 'Premier',
+      startDate: '2026-01-05',
+      endDate: null,
+      courseWeeklyPrivateCalls: 2,
+      courseWeeklyAdminTimeMinutes: 30,
+    };
+
+    it('is closed until a coach is opened', () => {
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
+
+      expect(result.current.drilldown.coachName).toBeNull();
+      expect(result.current.drilldown.memberships).toEqual([]);
+    });
+
+    it('opens on a coach with their counted memberships', () => {
+      showReport([
+        { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [] },
+        {
+          ...coachRow(2, 'Lightly Booked', 15),
+          countedMemberships: [membership],
+        },
+      ]);
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
+
+      act(() => result.current.openDrilldown('2'));
+
+      expect(result.current.drilldown.coachName).toBe('Lightly Booked');
+      expect(result.current.drilldown.memberships).toEqual([
+        {
+          id: '0',
+          student: 'Ana Student',
+          course: 'Premier',
+          startDate: 'Jan 05, 2026',
+          endDate: '—',
+          weeklyPrivateCalls: '2',
+          weeklyAdminTime: '0.50',
+        },
+      ]);
+    });
+
+    it('opens on a coach with no counted memberships', () => {
+      showReport([
+        { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [] },
+      ]);
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
+
+      act(() => result.current.openDrilldown('1'));
+
+      expect(result.current.drilldown.coachName).toBe('Mostly Booked');
+      expect(result.current.drilldown.memberships).toEqual([]);
+    });
+
+    it('shows the refetched memberships of the open coach', () => {
+      showReport([
+        { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [] },
+      ]);
+      const { result, rerender } = renderHook(() =>
+        useCoachCapacityReport('today'),
+      );
+      act(() => result.current.openDrilldown('1'));
+
+      showReport([
+        {
+          ...coachRow(1, 'Mostly Booked', 90),
+          countedMemberships: [membership],
+        },
+      ]);
+      rerender();
+
+      expect(
+        result.current.drilldown.memberships.map((row) => row.student),
+      ).toEqual(['Ana Student']);
+    });
+
+    it('ignores a coach who is not in the report', () => {
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
+
+      act(() => result.current.openDrilldown('99'));
+
+      expect(result.current.drilldown.coachName).toBeNull();
+    });
+
+    it('closes', () => {
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
+
+      act(() => result.current.openDrilldown('1'));
+      act(() => result.current.drilldown.close());
+
+      expect(result.current.drilldown.coachName).toBeNull();
+    });
+  });
 });
