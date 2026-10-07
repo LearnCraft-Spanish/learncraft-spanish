@@ -2,7 +2,7 @@ import type { UpdateCoachCapacitySettingsCommand } from '@application/ports/Admi
 import type { CoachCapacitySettings } from '@learncraft-spanish/shared';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useAdminReportsAdapter } from '@application/adapters/AdminReports/adminReportsAdapter';
-import { COACH_CAPACITY_TODAY_REPORT_QUERY_KEY } from '@application/queries/AdminReportQueries/useCoachCapacityTodayReportQuery';
+import { COACH_CAPACITY_REPORT_QUERY_KEY } from '@application/queries/AdminReportQueries/useCoachCapacityReportQuery';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export interface UseUpdateCoachCapacitySettingsMutationReturn {
@@ -20,10 +20,12 @@ export function useUpdateCoachCapacitySettingsMutation(): UseUpdateCoachCapacity
   const updateCoachCapacitySettingsMutation = useMutation({
     mutationFn: (command: UpdateCoachCapacitySettingsCommand) =>
       adapter.updateCoachCapacitySettings(command),
-    // Returned so the save resolves only once the report shows the new values
+    // A coach's settings feed every Coach Capacity report, so all of them
+    // refetch. Returned so the save resolves only once the open reports show
+    // the new values.
     onSuccess: () =>
       queryClient.invalidateQueries({
-        queryKey: COACH_CAPACITY_TODAY_REPORT_QUERY_KEY,
+        queryKey: COACH_CAPACITY_REPORT_QUERY_KEY,
       }),
   });
 

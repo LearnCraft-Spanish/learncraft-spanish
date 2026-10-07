@@ -1,1 +1,1 @@
-export { CoachCapacityTodayReport } from '@interface/components/CoachCapacity/CoachCapacityTodayReport';
+export { CoachCapacityReport } from '@interface/components/CoachCapacity/CoachCapacityReport';

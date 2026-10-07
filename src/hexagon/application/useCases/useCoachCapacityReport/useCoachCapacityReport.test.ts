@@ -1,21 +1,22 @@
 import type { UpdateCoachCapacitySettingsCommand } from '@application/ports/AdminReports/adminReportsPort';
-import type { UseCoachCapacityTodayReportResult } from '@application/useCases/useCoachCapacityTodayReport/useCoachCapacityTodayReport';
+import type { UseCoachCapacityReportResult } from '@application/useCases/useCoachCapacityReport/useCoachCapacityReport';
 import type {
   CoachCapacityReportRow,
   CoachCapacitySettings,
 } from '@learncraft-spanish/shared';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
+import { useCoachCapacityReportQuery } from '@application/queries/AdminReportQueries/useCoachCapacityReportQuery';
 import {
-  mockUseCoachCapacityTodayReportQuery,
-  overrideMockUseCoachCapacityTodayReportQuery,
-  resetMockUseCoachCapacityTodayReportQuery,
-} from '@application/queries/AdminReportQueries/useCoachCapacityTodayReportQuery.mock';
+  mockUseCoachCapacityReportQuery,
+  overrideMockUseCoachCapacityReportQuery,
+  resetMockUseCoachCapacityReportQuery,
+} from '@application/queries/AdminReportQueries/useCoachCapacityReportQuery.mock';
 import {
   mockUseUpdateCoachCapacitySettingsMutation,
   overrideMockUseUpdateCoachCapacitySettingsMutation,
   resetMockUseUpdateCoachCapacitySettingsMutation,
 } from '@application/queries/AdminReportQueries/useUpdateCoachCapacitySettingsMutation.mock';
-import { useCoachCapacityTodayReport } from '@application/useCases/useCoachCapacityTodayReport/useCoachCapacityTodayReport';
+import { useCoachCapacityReport } from '@application/useCases/useCoachCapacityReport/useCoachCapacityReport';
 import { act, renderHook } from '@testing-library/react';
 import {
   createMockCoachCapacityReportRow,
@@ -24,10 +25,9 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock(
-  '@application/queries/AdminReportQueries/useCoachCapacityTodayReportQuery',
+  '@application/queries/AdminReportQueries/useCoachCapacityReportQuery',
   () => ({
-    useCoachCapacityTodayReportQuery: () =>
-      mockUseCoachCapacityTodayReportQuery,
+    useCoachCapacityReportQuery: vi.fn(() => mockUseCoachCapacityReportQuery),
   }),
 );
 
@@ -74,8 +74,8 @@ function coachRow(
 }
 
 function showReport(rows: CoachCapacityReportRow[]): void {
-  overrideMockUseCoachCapacityTodayReportQuery({
-    coachCapacityTodayReportQuery: queryResult({
+  overrideMockUseCoachCapacityReportQuery({
+    coachCapacityReportQuery: queryResult({
       data: rows,
       isSuccess: true,
       status: 'success',
@@ -103,7 +103,7 @@ function mockUpdateSettings(implementation: UpdateSettings) {
 }
 
 function cellsOf(
-  result: { current: UseCoachCapacityTodayReportResult },
+  result: { current: UseCoachCapacityReportResult },
   rowId: string,
 ): Record<string, string> {
   const row = result.current.tableProps.rows.find((r) => r.id === rowId);
@@ -111,7 +111,7 @@ function cellsOf(
   return row.cells;
 }
 
-describe('useCoachCapacityTodayReport', () => {
+describe('useCoachCapacityReport', () => {
   beforeEach(() => {
     showReport([
       coachRow(1, 'Mostly Booked', 90),
@@ -121,13 +121,24 @@ describe('useCoachCapacityTodayReport', () => {
   });
 
   afterEach(() => {
-    resetMockUseCoachCapacityTodayReportQuery();
+    resetMockUseCoachCapacityReportQuery();
     resetMockUseUpdateCoachCapacitySettingsMutation();
+  });
+
+  describe('period', () => {
+    it.each(['today', 'twoWeeksOut'] as const)(
+      'reports on the %s Coach Capacity report',
+      (period) => {
+        renderHook(() => useCoachCapacityReport(period));
+
+        expect(useCoachCapacityReportQuery).toHaveBeenLastCalledWith(period);
+      },
+    );
   });
 
   describe('report', () => {
     it('returns one row per coach, least booked first', () => {
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       expect(result.current.tableProps.rows.map((row) => row.id)).toEqual([
         '3',
@@ -140,7 +151,7 @@ describe('useCoachCapacityTodayReport', () => {
     });
 
     it('makes the five settings editable and the rest read-only', () => {
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       expect(
         result.current.tableProps.columns.map((column) => [
@@ -162,11 +173,11 @@ describe('useCoachCapacityTodayReport', () => {
     });
 
     it('returns no rows while the report is loading', () => {
-      overrideMockUseCoachCapacityTodayReportQuery({
-        coachCapacityTodayReportQuery: queryResult({ isLoading: true }),
+      overrideMockUseCoachCapacityReportQuery({
+        coachCapacityReportQuery: queryResult({ isLoading: true }),
       });
 
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       expect(result.current.tableProps.isLoading).toBe(true);
       expect(result.current.isError).toBe(false);
@@ -174,14 +185,14 @@ describe('useCoachCapacityTodayReport', () => {
     });
 
     it('exposes the error state when the report fails to load', () => {
-      overrideMockUseCoachCapacityTodayReportQuery({
-        coachCapacityTodayReportQuery: queryResult({
+      overrideMockUseCoachCapacityReportQuery({
+        coachCapacityReportQuery: queryResult({
           isError: true,
           status: 'error',
         }),
       });
 
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       expect(result.current.isError).toBe(true);
       expect(result.current.tableProps.isLoading).toBe(false);
@@ -191,7 +202,7 @@ describe('useCoachCapacityTodayReport', () => {
 
   describe('editing settings', () => {
     it('marks an edited coach as having unsaved changes', () => {
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
@@ -204,7 +215,7 @@ describe('useCoachCapacityTodayReport', () => {
     });
 
     it('flags invalid input on its cell and blocks saving', () => {
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '1.1'),
@@ -228,7 +239,7 @@ describe('useCoachCapacityTodayReport', () => {
       const updateSettings = mockUpdateSettings(
         async ({ settings }) => settings,
       );
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
@@ -270,7 +281,7 @@ describe('useCoachCapacityTodayReport', () => {
       const updateSettings = mockUpdateSettings(
         async ({ settings }) => settings,
       );
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       act(() =>
         result.current.tableProps.onCellChange('1', 'desiredHours', ''),
@@ -288,7 +299,7 @@ describe('useCoachCapacityTodayReport', () => {
         if (coachId === 2) throw new Error('Failed to save');
         return settings;
       });
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
@@ -310,7 +321,7 @@ describe('useCoachCapacityTodayReport', () => {
       mockUpdateSettings(async () => {
         throw new Error('Failed to save');
       });
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
@@ -327,7 +338,7 @@ describe('useCoachCapacityTodayReport', () => {
 
   describe('notes panel', () => {
     it('opens on a coach with their saved notes', () => {
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       expect(result.current.notesPanel.coachName).toBeNull();
       act(() => result.current.openNotes('2'));
@@ -340,7 +351,7 @@ describe('useCoachCapacityTodayReport', () => {
       const updateSettings = mockUpdateSettings(
         async ({ settings }) => settings,
       );
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
@@ -368,7 +379,7 @@ describe('useCoachCapacityTodayReport', () => {
       mockUpdateSettings(async () => {
         throw new Error('Failed to save');
       });
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       act(() => result.current.openNotes('1'));
       act(() => result.current.notesPanel.setDraft('New note'));
@@ -386,7 +397,7 @@ describe('useCoachCapacityTodayReport', () => {
       const updateSettings = mockUpdateSettings(
         async ({ settings }) => settings,
       );
-      const { result } = renderHook(() => useCoachCapacityTodayReport());
+      const { result } = renderHook(() => useCoachCapacityReport('today'));
 
       act(() => result.current.openNotes('1'));
       act(() => result.current.notesPanel.close());

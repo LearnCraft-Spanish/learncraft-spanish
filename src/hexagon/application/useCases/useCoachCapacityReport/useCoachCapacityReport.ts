@@ -1,8 +1,11 @@
-import type { CoachCapacityColumnId } from '@domain/functions/coachCapacity';
+import type {
+  CoachCapacityColumnId,
+  CoachCapacityPeriod,
+} from '@domain/functions/coachCapacity';
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { EditableTableUseCaseProps } from '@interface/components/EditableTable/types';
 import type { CoachCapacitySettings } from '@learncraft-spanish/shared';
-import { useCoachCapacityTodayReportQuery } from '@application/queries/AdminReportQueries/useCoachCapacityTodayReportQuery';
+import { useCoachCapacityReportQuery } from '@application/queries/AdminReportQueries/useCoachCapacityReportQuery';
 import { useUpdateCoachCapacitySettingsMutation } from '@application/queries/AdminReportQueries/useUpdateCoachCapacitySettingsMutation';
 import { useEditTableState } from '@application/units/pasteTable';
 import { useTableValidation } from '@application/units/pasteTable/hooks';
@@ -24,7 +27,7 @@ export interface CoachCapacityNotesPanelState {
   error: string | null;
 }
 
-export interface UseCoachCapacityTodayReportResult {
+export interface UseCoachCapacityReportResult {
   tableProps: EditableTableUseCaseProps;
   isError: boolean;
   /** Names the coaches whose settings failed to save, if any did */
@@ -55,11 +58,13 @@ function validateSettingsRow(row: TableRow): Record<string, string> {
   return result.success ? {} : result.errors;
 }
 
-export function useCoachCapacityTodayReport(): UseCoachCapacityTodayReportResult {
-  const { coachCapacityTodayReportQuery } = useCoachCapacityTodayReportQuery();
+export function useCoachCapacityReport(
+  period: CoachCapacityPeriod,
+): UseCoachCapacityReportResult {
+  const { coachCapacityReportQuery } = useCoachCapacityReportQuery(period);
   const { updateCoachCapacitySettingsMutation } =
     useUpdateCoachCapacitySettingsMutation();
-  const { data, isLoading, isError } = coachCapacityTodayReportQuery;
+  const { data, isLoading, isError } = coachCapacityReportQuery;
   const { mutateAsync: updateSettings } = updateCoachCapacitySettingsMutation;
 
   const [isSaving, setIsSaving] = useState(false);

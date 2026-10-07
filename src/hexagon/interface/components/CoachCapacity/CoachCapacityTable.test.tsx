@@ -1,4 +1,4 @@
-import type { CoachCapacityNotesPanelState } from '@application/useCases/useCoachCapacityTodayReport';
+import type { CoachCapacityNotesPanelState } from '@application/useCases/useCoachCapacityReport';
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { CoachCapacityTableProps } from '@interface/components/CoachCapacity/CoachCapacityTable';
 import type { EditableTableUseCaseProps } from '@interface/components/EditableTable/types';

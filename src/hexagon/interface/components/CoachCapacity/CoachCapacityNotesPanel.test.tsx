@@ -1,4 +1,4 @@
-import type { CoachCapacityNotesPanelState } from '@application/useCases/useCoachCapacityTodayReport';
+import type { CoachCapacityNotesPanelState } from '@application/useCases/useCoachCapacityReport';
 import { CoachCapacityNotesPanel } from '@interface/components/CoachCapacity/CoachCapacityNotesPanel';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';

@@ -1,4 +1,4 @@
-import type { CoachCapacityNotesPanelState } from '@application/useCases/useCoachCapacityTodayReport';
+import type { CoachCapacityNotesPanelState } from '@application/useCases/useCoachCapacityReport';
 import type { JSX, KeyboardEvent } from 'react';
 import { Button } from '@interface/components/general/Buttons';
 import { useId } from 'react';
