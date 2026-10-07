@@ -1,4 +1,7 @@
-import type { CoachCapacityNotesPanelState } from '@application/useCases/useCoachCapacityReport';
+import type {
+  CoachCapacityDrilldownState,
+  CoachCapacityNotesPanelState,
+} from '@application/useCases/useCoachCapacityReport';
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { CoachCapacityTableProps } from '@interface/components/CoachCapacity/CoachCapacityTable';
 import type { EditableTableUseCaseProps } from '@interface/components/EditableTable/types';
@@ -61,6 +64,12 @@ const closedNotesPanel: CoachCapacityNotesPanelState = {
   error: null,
 };
 
+const closedDrilldown: CoachCapacityDrilldownState = {
+  coachName: null,
+  memberships: [],
+  close: () => {},
+};
+
 function renderTable(overrides: Partial<CoachCapacityTableProps> = {}) {
   return render(
     <CoachCapacityTable
@@ -69,6 +78,8 @@ function renderTable(overrides: Partial<CoachCapacityTableProps> = {}) {
       saveError={null}
       onOpenNotes={() => {}}
       notesPanel={closedNotesPanel}
+      onOpenDrilldown={() => {}}
+      drilldown={closedDrilldown}
       {...overrides}
     />,
   );
@@ -111,6 +122,25 @@ describe('coach capacity table', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add notes' }));
 
     expect(onOpenNotes).toHaveBeenCalledExactlyOnceWith('8');
+  });
+
+  it('opens the drilldown of the coach whose name is clicked', () => {
+    const onOpenDrilldown = vi.fn();
+    renderTable({ onOpenDrilldown });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Coach Beto' }));
+
+    expect(onOpenDrilldown).toHaveBeenCalledExactlyOnceWith('8');
+  });
+
+  it('shows the drilldown below the table when it is open', () => {
+    renderTable({
+      drilldown: { ...closedDrilldown, coachName: 'Coach Ana' },
+    });
+
+    expect(
+      screen.getByRole('region', { name: 'Memberships counted for Coach Ana' }),
+    ).toBeInTheDocument();
   });
 
   it('shows the save error above the table', () => {

@@ -1,4 +1,7 @@
-import type { CoachCapacityNotesPanelState } from '@application/useCases/useCoachCapacityReport';
+import type {
+  CoachCapacityDrilldownState,
+  CoachCapacityNotesPanelState,
+} from '@application/useCases/useCoachCapacityReport';
 import type {
   CellRenderProps,
   ColumnDisplayConfig,
@@ -6,6 +9,7 @@ import type {
 } from '@interface/components/EditableTable/types';
 import type { JSX, ReactNode } from 'react';
 import { NOT_SET_DISPLAY } from '@domain/functions/coachCapacity';
+import { CoachCapacityDrilldown } from '@interface/components/CoachCapacity/CoachCapacityDrilldown';
 import { CoachCapacityNotesPanel } from '@interface/components/CoachCapacity/CoachCapacityNotesPanel';
 import {
   EditableTable,
@@ -20,6 +24,8 @@ export interface CoachCapacityTableProps {
   saveError: string | null;
   onOpenNotes: (rowId: string) => void;
   notesPanel: CoachCapacityNotesPanelState;
+  onOpenDrilldown: (rowId: string) => void;
+  drilldown: CoachCapacityDrilldownState;
 }
 
 const coachCapacityDisplayConfig: ColumnDisplayConfig[] = [
@@ -52,10 +58,23 @@ export function CoachCapacityTable({
   saveError,
   onOpenNotes,
   notesPanel,
+  onOpenDrilldown,
+  drilldown,
 }: CoachCapacityTableProps): JSX.Element {
   const renderCell = useCallback(
     (props: CellRenderProps): ReactNode => {
       const { column, row, value, isEditable } = props;
+      if (column.id === 'coach') {
+        return (
+          <button
+            type="button"
+            className={`${styles.readOnlyCell} ${styles.textCell} ${styles.coachButton}`}
+            onClick={() => onOpenDrilldown(row.id)}
+          >
+            {value}
+          </button>
+        );
+      }
       if (column.id === 'notes') {
         return (
           <button
@@ -77,16 +96,12 @@ export function CoachCapacityTable({
         );
       }
       return (
-        <div
-          className={`${styles.readOnlyCell} ${
-            column.id === 'coach' ? styles.textCell : styles.numberCell
-          }`}
-        >
+        <div className={`${styles.readOnlyCell} ${styles.numberCell}`}>
           {value}
         </div>
       );
     },
-    [onOpenNotes],
+    [onOpenNotes, onOpenDrilldown],
   );
 
   if (isError) {
@@ -113,6 +128,7 @@ export function CoachCapacityTable({
         displayConfig={coachCapacityDisplayConfig}
         renderCell={renderCell}
       />
+      <CoachCapacityDrilldown {...drilldown} />
       <CoachCapacityNotesPanel {...notesPanel} />
     </>
   );

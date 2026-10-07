@@ -1,4 +1,5 @@
 export type {
+  CoachCapacityDrilldownState,
   CoachCapacityNotesPanelState,
   UseCoachCapacityReportResult,
 } from '@application/useCases/useCoachCapacityReport/useCoachCapacityReport';

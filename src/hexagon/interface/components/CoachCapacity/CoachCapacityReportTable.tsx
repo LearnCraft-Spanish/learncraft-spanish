@@ -10,8 +10,15 @@ export interface CoachCapacityReportTableProps {
 export function CoachCapacityReportTable({
   period,
 }: CoachCapacityReportTableProps): JSX.Element {
-  const { tableProps, isError, saveError, openNotes, notesPanel } =
-    useCoachCapacityReport(period);
+  const {
+    tableProps,
+    isError,
+    saveError,
+    openNotes,
+    notesPanel,
+    openDrilldown,
+    drilldown,
+  } = useCoachCapacityReport(period);
 
   return (
     <CoachCapacityTable
@@ -20,6 +27,8 @@ export function CoachCapacityReportTable({
       saveError={saveError}
       onOpenNotes={openNotes}
       notesPanel={notesPanel}
+      onOpenDrilldown={openDrilldown}
+      drilldown={drilldown}
     />
   );
 }

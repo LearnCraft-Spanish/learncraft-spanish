@@ -1,6 +1,7 @@
 import type {
   CoachCapacityColumnId,
   CoachCapacityPeriod,
+  CountedMembershipDisplayRow,
 } from '@domain/functions/coachCapacity';
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { EditableTableUseCaseProps } from '@interface/components/EditableTable/types';
@@ -11,6 +12,7 @@ import { useEditTableState } from '@application/units/pasteTable';
 import { useTableValidation } from '@application/units/pasteTable/hooks';
 import {
   mapCoachCapacityRowToTableRow,
+  mapCountedMembershipsToDisplayRows,
   parseCoachCapacitySettingsCells,
   sortCoachCapacityRows,
 } from '@domain/functions/coachCapacity';
@@ -27,6 +29,13 @@ export interface CoachCapacityNotesPanelState {
   error: string | null;
 }
 
+export interface CoachCapacityDrilldownState {
+  /** The coach whose counted memberships are shown, or null when closed */
+  coachName: string | null;
+  memberships: CountedMembershipDisplayRow[];
+  close: () => void;
+}
+
 export interface UseCoachCapacityReportResult {
   tableProps: EditableTableUseCaseProps;
   isError: boolean;
@@ -34,6 +43,8 @@ export interface UseCoachCapacityReportResult {
   saveError: string | null;
   openNotes: (rowId: string) => void;
   notesPanel: CoachCapacityNotesPanelState;
+  openDrilldown: (rowId: string) => void;
+  drilldown: CoachCapacityDrilldownState;
 }
 
 const settingsInput = { type: 'number', min: 0, max: 40 } as const;
@@ -73,6 +84,7 @@ export function useCoachCapacityReport(
   const [notesDraft, setNotesDraft] = useState('');
   const [isSavingNotes, setIsSavingNotes] = useState(false);
   const [notesError, setNotesError] = useState<string | null>(null);
+  const [drilldownRowId, setDrilldownRowId] = useState<string | null>(null);
 
   const reportRows = useMemo(() => sortCoachCapacityRows(data ?? []), [data]);
   const reportRowsById = useMemo(
@@ -181,6 +193,25 @@ export function useCoachCapacityReport(
     }
   }, [notesRow, notesDraft, saveSettings]);
 
+  const drilldownRow =
+    drilldownRowId === null ? undefined : reportRowsById.get(drilldownRowId);
+  const drilldownMemberships = useMemo(
+    () =>
+      mapCountedMembershipsToDisplayRows(
+        drilldownRow?.countedMemberships ?? [],
+      ),
+    [drilldownRow],
+  );
+
+  const openDrilldown = useCallback(
+    (rowId: string) => {
+      if (reportRowsById.has(rowId)) setDrilldownRowId(rowId);
+    },
+    [reportRowsById],
+  );
+
+  const closeDrilldown = useCallback(() => setDrilldownRowId(null), []);
+
   const tableProps = useMemo<EditableTableUseCaseProps>(
     () => ({
       rows: editTableState.data.rows,
@@ -227,6 +258,12 @@ export function useCoachCapacityReport(
       save: saveNotes,
       isSaving: isSavingNotes,
       error: notesError,
+    },
+    openDrilldown,
+    drilldown: {
+      coachName: drilldownRow?.coach.fullName ?? null,
+      memberships: drilldownMemberships,
+      close: closeDrilldown,
     },
   };
 }

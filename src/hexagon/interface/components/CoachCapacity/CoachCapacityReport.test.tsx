@@ -1,5 +1,8 @@
 import type { CoachCapacityPeriod } from '@domain/functions/coachCapacity';
-import type { CoachCapacityReportRow } from '@learncraft-spanish/shared';
+import type {
+  CoachCapacityReportRow,
+  CountedMembership,
+} from '@learncraft-spanish/shared';
 import {
   mockAdminReportsAdapter,
   overrideMockAdminReportsAdapter,
@@ -75,6 +78,47 @@ const twoWeeksOutReport: CoachCapacityReportRow[] = report.map((row) => ({
   coachingHours: 4,
   committedHours: 6.75,
 }));
+
+const anaMembership: CountedMembership = {
+  studentName: 'Ana Student',
+  courseName: 'Premier',
+  startDate: '2026-01-05',
+  endDate: null,
+  courseWeeklyPrivateCalls: 2,
+  courseWeeklyAdminTimeMinutes: 30,
+};
+
+const betoMembership: CountedMembership = {
+  studentName: 'Beto Student',
+  courseName: 'Membership',
+  startDate: '2026-10-12',
+  endDate: '2027-04-12',
+  courseWeeklyPrivateCalls: 1,
+  courseWeeklyAdminTimeMinutes: 15,
+};
+
+/** Only Mostly Booked has counted memberships */
+function withMemberships(
+  rows: CoachCapacityReportRow[],
+  memberships: CountedMembership[],
+): CoachCapacityReportRow[] {
+  return rows.map((row) => ({
+    ...row,
+    countedMemberships:
+      row.coach.fullName === 'Mostly Booked' ? memberships : [],
+  }));
+}
+
+function drilldownRows(container: HTMLElement): string[][] {
+  return within(within(container).getByRole('table'))
+    .getAllByRole('row')
+    .slice(1)
+    .map((row) =>
+      within(row)
+        .getAllByRole('cell')
+        .map((cell) => cell.textContent ?? ''),
+    );
+}
 
 function renderReport(period: CoachCapacityPeriod) {
   return render(
@@ -495,6 +539,78 @@ describe.each(reports)(
         ).toBeInTheDocument();
       });
     });
+
+    describe('counted memberships drilldown', () => {
+      it('opens on a clicked coach and lists the memberships behind their Coaching Hours', async () => {
+        overrideMockAdminReportsAdapter({
+          [fetch]: async () =>
+            withMemberships(report, [anaMembership, betoMembership]),
+        });
+        renderReport(period);
+        await openReport(title);
+
+        expect(screen.queryByText(/Memberships counted for/)).toBeNull();
+        fireEvent.click(screen.getByRole('button', { name: 'Mostly Booked' }));
+
+        const drilldown = screen.getByRole('region', {
+          name: 'Memberships counted for Mostly Booked',
+        });
+        expect(drilldownRows(drilldown)).toEqual([
+          ['Ana Student', 'Premier', 'Jan 05, 2026', '—', '2', '0.50'],
+          [
+            'Beto Student',
+            'Membership',
+            'Oct 12, 2026',
+            'Apr 12, 2027',
+            '1',
+            '0.25',
+          ],
+        ]);
+      });
+
+      it('shows an empty state for a coach with no counted memberships', async () => {
+        overrideMockAdminReportsAdapter({
+          [fetch]: async () => withMemberships(report, [anaMembership]),
+        });
+        renderReport(period);
+        await openReport(title);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Not Set Up' }));
+
+        const drilldown = screen.getByRole('region', {
+          name: 'Memberships counted for Not Set Up',
+        });
+        expect(
+          within(drilldown).getByText('No counted memberships'),
+        ).toBeInTheDocument();
+        expect(within(drilldown).queryByRole('table')).not.toBeInTheDocument();
+      });
+
+      it('switches to another clicked coach and closes on Close', async () => {
+        overrideMockAdminReportsAdapter({
+          [fetch]: async () => withMemberships(report, [anaMembership]),
+        });
+        renderReport(period);
+        await openReport(title);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Mostly Booked' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Lightly Booked' }));
+
+        const drilldown = screen.getByRole('region', {
+          name: 'Memberships counted for Lightly Booked',
+        });
+        expect(
+          screen.queryByRole('region', {
+            name: 'Memberships counted for Mostly Booked',
+          }),
+        ).not.toBeInTheDocument();
+
+        fireEvent.click(
+          within(drilldown).getByRole('button', { name: 'Close' }),
+        );
+        expect(screen.queryByText(/Memberships counted for/)).toBeNull();
+      });
+    });
   },
 );
 
@@ -627,6 +743,35 @@ describe('both coach capacity reports on one page', () => {
       ).toHaveValue(3);
     },
   );
+
+  it('shows each report’s own counted memberships for a coach', async () => {
+    overrideMockAdminReportsAdapter({
+      getCoachCapacityTodayReport: async () =>
+        withMemberships(report, [anaMembership]),
+      getCoachCapacityTwoWeeksOutReport: async () =>
+        withMemberships(twoWeeksOutReport, [anaMembership, betoMembership]),
+    });
+    renderBothReports();
+    await openBothReports();
+
+    for (const title of [TODAY_TITLE, TWO_WEEKS_OUT_TITLE]) {
+      fireEvent.click(
+        within(section(title)).getByRole('button', { name: 'Mostly Booked' }),
+      );
+    }
+
+    const studentsIn = (title: string): string[] =>
+      drilldownRows(
+        within(section(title)).getByRole('region', {
+          name: 'Memberships counted for Mostly Booked',
+        }),
+      ).map(([student]) => student);
+    expect(studentsIn(TODAY_TITLE)).toEqual(['Ana Student']);
+    expect(studentsIn(TWO_WEEKS_OUT_TITLE)).toEqual([
+      'Ana Student',
+      'Beto Student',
+    ]);
+  });
 
   it('shows notes saved from one report in the other', async () => {
     serveReportsSharingSettings();

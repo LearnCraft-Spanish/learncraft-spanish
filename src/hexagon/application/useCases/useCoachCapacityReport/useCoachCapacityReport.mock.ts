@@ -28,6 +28,12 @@ const defaultMockResult: UseCoachCapacityReportResult = {
     isSaving: false,
     error: null,
   },
+  openDrilldown: () => {},
+  drilldown: {
+    coachName: null,
+    memberships: [],
+    close: () => {},
+  },
 };
 
 export const {
