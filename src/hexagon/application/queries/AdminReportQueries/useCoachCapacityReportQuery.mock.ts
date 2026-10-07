@@ -7,7 +7,7 @@ const defaultMockData: CoachCapacityReportRow[] =
   createMockCoachCapacityReportRowList(2);
 
 const defaultMockReturn = {
-  coachCapacityTodayReportQuery: {
+  coachCapacityReportQuery: {
     data: defaultMockData,
     isLoading: false,
     isError: false,
@@ -17,9 +17,9 @@ const defaultMockReturn = {
 };
 
 export const {
-  mock: mockUseCoachCapacityTodayReportQuery,
-  override: overrideMockUseCoachCapacityTodayReportQuery,
-  reset: resetMockUseCoachCapacityTodayReportQuery,
+  mock: mockUseCoachCapacityReportQuery,
+  override: overrideMockUseCoachCapacityReportQuery,
+  reset: resetMockUseCoachCapacityReportQuery,
 } = createOverrideableMock(defaultMockReturn);
 
-export default mockUseCoachCapacityTodayReportQuery;
+export default mockUseCoachCapacityReportQuery;

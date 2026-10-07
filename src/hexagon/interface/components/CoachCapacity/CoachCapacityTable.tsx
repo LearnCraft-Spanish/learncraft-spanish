@@ -1,4 +1,4 @@
-import type { CoachCapacityNotesPanelState } from '@application/useCases/useCoachCapacityTodayReport';
+import type { CoachCapacityNotesPanelState } from '@application/useCases/useCoachCapacityReport';
 import type {
   CellRenderProps,
   ColumnDisplayConfig,

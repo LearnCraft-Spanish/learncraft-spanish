@@ -1,7 +1,8 @@
-import type { UseCoachCapacityTodayReportResult } from '@application/useCases/useCoachCapacityTodayReport/useCoachCapacityTodayReport';
+import type { UseCoachCapacityReportResult } from '@application/useCases/useCoachCapacityReport/useCoachCapacityReport';
+import type { CoachCapacityPeriod } from '@domain/functions/coachCapacity';
 import { createOverrideableMockHook } from '@testing/utils/createOverrideableMockHook';
 
-const defaultMockResult: UseCoachCapacityTodayReportResult = {
+const defaultMockResult: UseCoachCapacityReportResult = {
   tableProps: {
     rows: [],
     columns: [],
@@ -30,11 +31,12 @@ const defaultMockResult: UseCoachCapacityTodayReportResult = {
 };
 
 export const {
-  mock: mockUseCoachCapacityTodayReport,
-  override: overrideMockUseCoachCapacityTodayReport,
-  reset: resetMockUseCoachCapacityTodayReport,
-} = createOverrideableMockHook<[], UseCoachCapacityTodayReportResult>(
-  defaultMockResult,
-);
+  mock: mockUseCoachCapacityReport,
+  override: overrideMockUseCoachCapacityReport,
+  reset: resetMockUseCoachCapacityReport,
+} = createOverrideableMockHook<
+  [CoachCapacityPeriod],
+  UseCoachCapacityReportResult
+>(defaultMockResult);
 
-export default mockUseCoachCapacityTodayReport;
+export default mockUseCoachCapacityReport;

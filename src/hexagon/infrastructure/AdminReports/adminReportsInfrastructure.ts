@@ -21,6 +21,7 @@ import {
   getActiveMembershipsReportEndpoint,
   getAssignmentsCompletedByWeekReportEndpoint,
   getCoachCapacityTodayReportEndpoint,
+  getCoachCapacityTwoWeeksOutReportEndpoint,
   getDropoutsByLevelReportEndpoint,
   getGroupCallsByCoachReportEndpoint,
   getLastWeekCoachSummaryReportEndpoint,
@@ -127,6 +128,11 @@ export function createAdminReportsInfrastructure(
       httpClient.get<CoachCapacityReportRow[]>(
         getCoachCapacityTodayReportEndpoint.path,
         getCoachCapacityTodayReportEndpoint.requiredScopes,
+      ),
+    getCoachCapacityTwoWeeksOutReport: () =>
+      httpClient.get<CoachCapacityReportRow[]>(
+        getCoachCapacityTwoWeeksOutReportEndpoint.path,
+        getCoachCapacityTwoWeeksOutReportEndpoint.requiredScopes,
       ),
     updateCoachCapacitySettings: (
       command: UpdateCoachCapacitySettingsCommand,

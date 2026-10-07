@@ -48,6 +48,7 @@ export interface AdminReportsPort {
   >;
   getLeadsToReEngageReport: () => Promise<LeadsToReEngage[]>;
   getCoachCapacityTodayReport: () => Promise<CoachCapacityReportRow[]>;
+  getCoachCapacityTwoWeeksOutReport: () => Promise<CoachCapacityReportRow[]>;
   updateCoachCapacitySettings: (
     command: UpdateCoachCapacitySettingsCommand,
   ) => Promise<CoachCapacitySettings>;

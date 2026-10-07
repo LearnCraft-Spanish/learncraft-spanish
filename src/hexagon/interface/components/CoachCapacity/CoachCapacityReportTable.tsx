@@ -1,10 +1,17 @@
+import type { CoachCapacityPeriod } from '@domain/functions/coachCapacity';
 import type { JSX } from 'react';
-import { useCoachCapacityTodayReport } from '@application/useCases/useCoachCapacityTodayReport';
+import { useCoachCapacityReport } from '@application/useCases/useCoachCapacityReport';
 import { CoachCapacityTable } from '@interface/components/CoachCapacity/CoachCapacityTable';
 
-export function CoachCapacityTodayTable(): JSX.Element {
+export interface CoachCapacityReportTableProps {
+  period: CoachCapacityPeriod;
+}
+
+export function CoachCapacityReportTable({
+  period,
+}: CoachCapacityReportTableProps): JSX.Element {
   const { tableProps, isError, saveError, openNotes, notesPanel } =
-    useCoachCapacityTodayReport();
+    useCoachCapacityReport(period);
 
   return (
     <CoachCapacityTable

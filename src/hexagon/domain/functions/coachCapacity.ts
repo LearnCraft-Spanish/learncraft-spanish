@@ -8,6 +8,13 @@ import { coachCapacitySettingsSchema } from '@learncraft-spanish/shared';
 /** Shown in place of a value a coach has not been set up with */
 export const NOT_SET_DISPLAY = '—';
 
+/**
+ * The time frames Coach Capacity is reported for. Both reports have the same
+ * rows and settings; only the Coaching Hours (and so Committed Hours and
+ * Booked %) differ.
+ */
+export type CoachCapacityPeriod = 'today' | 'twoWeeksOut';
+
 export type CoachCapacityColumnId =
   | 'coach'
   | 'coachingHours'
