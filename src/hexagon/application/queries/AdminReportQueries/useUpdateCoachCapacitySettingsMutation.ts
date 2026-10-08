@@ -20,13 +20,19 @@ export function useUpdateCoachCapacitySettingsMutation(): UseUpdateCoachCapacity
   const updateCoachCapacitySettingsMutation = useMutation({
     mutationFn: (command: UpdateCoachCapacitySettingsCommand) =>
       adapter.updateCoachCapacitySettings(command),
-    // A coach's settings feed every Coach Capacity report, so all of them
-    // refetch. Returned so the save resolves only once the open reports show
-    // the new values.
-    onSuccess: () =>
-      queryClient.invalidateQueries({
+    // A coach's settings feed every Coach Capacity report. The open ones
+    // refetch; returned so the save resolves only once they show the new
+    // values. A cached report that is not open is dropped, so switching to it
+    // loads the new values rather than showing the old ones while it refetches.
+    onSuccess: () => {
+      queryClient.removeQueries({
         queryKey: COACH_CAPACITY_REPORT_QUERY_KEY,
-      }),
+        type: 'inactive',
+      });
+      return queryClient.invalidateQueries({
+        queryKey: COACH_CAPACITY_REPORT_QUERY_KEY,
+      });
+    },
   });
 
   return { updateCoachCapacitySettingsMutation };

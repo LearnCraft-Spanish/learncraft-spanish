@@ -180,4 +180,49 @@ describe('useCoachCapacityReportQuery across periods', () => {
       ),
     );
   });
+
+  it('refetches a period every time it is switched back to, even when the app caches queries forever', async () => {
+    overrideMockAdminReportsAdapter({
+      getCoachCapacityTodayReport: async () =>
+        createMockCoachCapacityReportRowList(1),
+      getCoachCapacityTwoWeeksOutReport: async () =>
+        createMockCoachCapacityReportRowList(1),
+    });
+    const appLikeQueryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false, staleTime: Infinity, gcTime: Infinity },
+      },
+    });
+    const wrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(
+        QueryClientProvider,
+        { client: appLikeQueryClient },
+        children,
+      );
+    const { result, rerender } = renderHook(
+      ({ period }: { period: CoachCapacityPeriod }) =>
+        useCoachCapacityReportQuery(period),
+      { wrapper, initialProps: { period: 'today' } },
+    );
+    const settled = () =>
+      waitFor(() =>
+        expect(result.current.coachCapacityReportQuery.isFetching).toBe(false),
+      );
+
+    await settled();
+    rerender({ period: 'twoWeeksOut' });
+    await settled();
+    rerender({ period: 'today' });
+    await settled();
+    rerender({ period: 'twoWeeksOut' });
+    await settled();
+
+    expect(
+      mockAdminReportsAdapter.getCoachCapacityTodayReport,
+    ).toHaveBeenCalledTimes(2);
+    expect(
+      mockAdminReportsAdapter.getCoachCapacityTwoWeeksOutReport,
+    ).toHaveBeenCalledTimes(2);
+    appLikeQueryClient.clear();
+  });
 });
