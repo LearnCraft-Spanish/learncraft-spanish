@@ -68,6 +68,69 @@ export function sortCoachCapacityRows(
   });
 }
 
+/**
+ * Rows in `keptOrder` stay in that order; rows it does not have follow in
+ * `sortedIds` order. Lets rows hold still while an admin edits them.
+ */
+export function keepRowOrder(
+  sortedIds: readonly string[],
+  keptOrder: readonly string[],
+): string[] {
+  const current = new Set(sortedIds);
+  const kept = keptOrder.filter((id) => current.has(id));
+  const keptIds = new Set(kept);
+  return [...kept, ...sortedIds.filter((id) => !keptIds.has(id))];
+}
+
+/** Each weekly group session counts as this many Coaching Hours */
+export const GROUP_SESSION_HOURS = 1;
+
+/** The report values that follow from a coach's hours and settings */
+export type CoachCapacityTotals = Pick<
+  CoachCapacityReportRow,
+  | 'groupSessionHours'
+  | 'coachingHours'
+  | 'nonCoachingHours'
+  | 'committedHours'
+  | 'bookedPercent'
+>;
+
+/**
+ * Private Call and Admin Time hours come from the report; everything else
+ * follows from the settings. Booked % is null when Desired Hours is null or 0.
+ */
+export function computeCoachCapacityTotals(
+  hours: Pick<CoachCapacityReportRow, 'privateCallHours' | 'adminTimeHours'>,
+  settings: CoachCapacitySettings,
+): CoachCapacityTotals {
+  const groupSessionHours = settings.groupSessionsPerWeek * GROUP_SESSION_HOURS;
+  const coachingHours =
+    hours.privateCallHours + hours.adminTimeHours + groupSessionHours;
+  const nonCoachingHours =
+    settings.projectsHours +
+    settings.internalTimeHours +
+    settings.teamMeetingHours;
+  const committedHours = coachingHours + nonCoachingHours;
+  const bookedPercent = settings.desiredHours
+    ? (committedHours * 100) / settings.desiredHours
+    : null;
+  return {
+    groupSessionHours,
+    coachingHours,
+    nonCoachingHours,
+    committedHours,
+    bookedPercent,
+  };
+}
+
+/** The row as the report would show it with `settings` saved */
+export function applyCoachCapacitySettings(
+  row: CoachCapacityReportRow,
+  settings: CoachCapacitySettings,
+): CoachCapacityReportRow {
+  return { ...row, settings, ...computeCoachCapacityTotals(row, settings) };
+}
+
 export function formatCoachCapacityHours(hours: number | null): string {
   return hours === null ? NOT_SET_DISPLAY : hours.toFixed(2);
 }
@@ -78,28 +141,51 @@ export function formatBookedPercent(bookedPercent: number | null): string {
     : `${Math.round(bookedPercent)}%`;
 }
 
+export type CoachCapacityTotalsColumnId = Extract<
+  CoachCapacityColumnId,
+  'coachingHours' | 'committedHours' | 'bookedPercent'
+>;
+
+export function formatCoachCapacityTotalsCells(
+  row: Pick<
+    CoachCapacityReportRow,
+    'coachingHours' | 'committedHours' | 'bookedPercent'
+  >,
+): Record<CoachCapacityTotalsColumnId, string> {
+  return {
+    coachingHours: formatCoachCapacityHours(row.coachingHours),
+    committedHours: formatCoachCapacityHours(row.committedHours),
+    bookedPercent: formatBookedPercent(row.bookedPercent),
+  };
+}
+
 /**
  * Editable cells hold input values, so a coach without Desired Hours gets an
  * empty Desired Hours cell rather than the "not set" dash.
  */
-export function mapCoachCapacityRowToTableRow(
-  row: CoachCapacityReportRow,
-): TableRow {
-  const { settings } = row;
-  const cells: Record<CoachCapacityColumnId, string> = {
-    coach: row.coach.fullName,
-    coachingHours: formatCoachCapacityHours(row.coachingHours),
+export function formatCoachCapacitySettingsCells(
+  settings: CoachCapacitySettings,
+): Record<CoachCapacitySettingsColumnId, string> {
+  return {
     groupSessionsPerWeek: String(settings.groupSessionsPerWeek),
     projectsHours: formatCoachCapacityHours(settings.projectsHours),
     internalTimeHours: formatCoachCapacityHours(settings.internalTimeHours),
     teamMeetingHours: formatCoachCapacityHours(settings.teamMeetingHours),
-    committedHours: formatCoachCapacityHours(row.committedHours),
     desiredHours:
       settings.desiredHours === null
         ? ''
         : formatCoachCapacityHours(settings.desiredHours),
-    bookedPercent: formatBookedPercent(row.bookedPercent),
-    notes: settings.notes,
+  };
+}
+
+export function mapCoachCapacityRowToTableRow(
+  row: CoachCapacityReportRow,
+): TableRow {
+  const cells: Record<CoachCapacityColumnId, string> = {
+    coach: row.coach.fullName,
+    ...formatCoachCapacityTotalsCells(row),
+    ...formatCoachCapacitySettingsCells(row.settings),
+    notes: row.settings.notes,
   };
   return { id: String(row.coach.coach_id), cells };
 }
@@ -152,6 +238,20 @@ function parseCellNumber(value: string | undefined): number {
   return trimmed === '' ? Number.NaN : Number(trimmed);
 }
 
+/** The cells' values as numbers, not yet validated */
+function readSettingsCells(
+  cells: Record<string, string>,
+): Omit<CoachCapacitySettings, 'notes'> {
+  const desiredHours = (cells.desiredHours ?? '').trim();
+  return {
+    groupSessionsPerWeek: parseCellNumber(cells.groupSessionsPerWeek),
+    projectsHours: parseCellNumber(cells.projectsHours),
+    internalTimeHours: parseCellNumber(cells.internalTimeHours),
+    teamMeetingHours: parseCellNumber(cells.teamMeetingHours),
+    desiredHours: desiredHours === '' ? null : parseCellNumber(desiredHours),
+  };
+}
+
 /**
  * Reads a coach's full settings from their row's cells, validated by the
  * shared schema. An empty Desired Hours cell means Desired Hours is not set.
@@ -161,13 +261,8 @@ export function parseCoachCapacitySettingsCells(
   cells: Record<string, string>,
   notes: string,
 ): CoachCapacitySettingsParseResult {
-  const desiredHours = (cells.desiredHours ?? '').trim();
   const result = coachCapacitySettingsSchema.safeParse({
-    groupSessionsPerWeek: parseCellNumber(cells.groupSessionsPerWeek),
-    projectsHours: parseCellNumber(cells.projectsHours),
-    internalTimeHours: parseCellNumber(cells.internalTimeHours),
-    teamMeetingHours: parseCellNumber(cells.teamMeetingHours),
-    desiredHours: desiredHours === '' ? null : parseCellNumber(desiredHours),
+    ...readSettingsCells(cells),
     notes,
   });
 
@@ -183,4 +278,34 @@ export function parseCoachCapacitySettingsCells(
     }
   }
   return { success: false, errors };
+}
+
+/**
+ * Settings from the cells that are valid, taking each invalid cell's value
+ * (and the notes) from `fallback`. Passing the settings last resolved for a
+ * row keeps an invalid cell at the last valid value it had.
+ */
+export function resolveCoachCapacitySettingsCells(
+  cells: Record<string, string>,
+  fallback: CoachCapacitySettings,
+): CoachCapacitySettings {
+  const parsed = parseCoachCapacitySettingsCells(cells, fallback.notes);
+  if (parsed.success) return parsed.settings;
+
+  const values: CoachCapacitySettings = {
+    ...readSettingsCells(cells),
+    notes: fallback.notes,
+  };
+  const pick = <Field extends CoachCapacitySettingsColumnId>(
+    field: Field,
+  ): CoachCapacitySettings[Field] =>
+    field in parsed.errors ? fallback[field] : values[field];
+  return {
+    groupSessionsPerWeek: pick('groupSessionsPerWeek'),
+    projectsHours: pick('projectsHours'),
+    internalTimeHours: pick('internalTimeHours'),
+    teamMeetingHours: pick('teamMeetingHours'),
+    desiredHours: pick('desiredHours'),
+    notes: fallback.notes,
+  };
 }
