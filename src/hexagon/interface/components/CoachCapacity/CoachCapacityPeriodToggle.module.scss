@@ -1,5 +1,8 @@
+// Sits beside the section title rather than at the far end of the header,
+// where the fixed Notes panel would cover it
 .root {
   display: inline-flex;
+  margin-inline-end: auto;
   padding: var(--lcs-space-1);
   gap: var(--lcs-space-1);
   border-radius: var(--lcs-radius-pill);
