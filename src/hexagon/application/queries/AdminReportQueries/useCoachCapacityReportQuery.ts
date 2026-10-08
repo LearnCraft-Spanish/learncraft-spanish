@@ -6,7 +6,7 @@ import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useQuery } from '@tanstack/react-query';
 
 /**
- * Every Coach Capacity report's key starts with this, so one invalidation
+ * Every Coach Capacity report's key starts with this, so one cache update
  * covers them all (a coach's settings show up in each report).
  */
 export const COACH_CAPACITY_REPORT_QUERY_KEY = ['coachCapacityReport'] as const;

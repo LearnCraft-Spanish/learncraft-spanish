@@ -1,14 +1,17 @@
 import type {
   CoachCapacityReportRow,
+  CoachCapacitySettings,
   CountedMembership,
 } from '@learncraft-spanish/shared';
 import {
   mockAdminReportsAdapter,
   overrideMockAdminReportsAdapter,
 } from '@application/adapters/AdminReports/adminReportsAdapter.mock';
+import { applyCoachCapacitySettings } from '@domain/functions/coachCapacity';
 import { CoachCapacityReport } from '@interface/components/CoachCapacity';
 import editableTableStyles from '@interface/components/EditableTable/EditableTable.module.scss';
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -28,17 +31,25 @@ const periods = [
 
 type PeriodLabel = (typeof periods)[number]['label'];
 
+/**
+ * A coach as the API reports them: 0.5 Admin Time hours plus 2 group
+ * sessions, so their Coaching Hours are `privateCallHours` + 2.5.
+ */
 function coachRow(
   coachId: number,
   fullName: string,
-  overrides: Partial<CoachCapacityReportRow> & {
-    desiredHours: number | null;
-  },
+  {
+    desiredHours,
+    privateCallHours,
+  }: { desiredHours: number | null; privateCallHours: number },
 ): CoachCapacityReportRow {
-  const { desiredHours, ...rowOverrides } = overrides;
-  return createMockCoachCapacityReportRow({
-    coach: { coach_id: coachId, fullName, email: 'coach@example.test' },
-    settings: {
+  return applyCoachCapacitySettings(
+    createMockCoachCapacityReportRow({
+      coach: { coach_id: coachId, fullName, email: 'coach@example.test' },
+      privateCallHours,
+      adminTimeHours: 0.5,
+    }),
+    {
       groupSessionsPerWeek: 2,
       projectsHours: 1.25,
       internalTimeHours: 0.5,
@@ -46,28 +57,35 @@ function coachRow(
       desiredHours,
       notes: `${fullName} notes`,
     },
-    coachingHours: 6,
-    committedHours: 8.75,
-    ...rowOverrides,
-  });
+  );
 }
 
 const report: CoachCapacityReportRow[] = [
-  coachRow(1, 'Mostly Booked', { desiredHours: 10, bookedPercent: 87.5 }),
-  coachRow(2, 'Not Set Up', { desiredHours: null, bookedPercent: null }),
+  // 6 Coaching Hours, 8.75 Committed Hours, 88%
+  coachRow(1, 'Mostly Booked', { desiredHours: 10, privateCallHours: 3.5 }),
+  coachRow(2, 'Not Set Up', { desiredHours: null, privateCallHours: 3.5 }),
+  // 5.3333 Coaching Hours, 8.0833 Committed Hours, 40%
   coachRow(3, 'Lightly Booked', {
     desiredHours: 20,
-    bookedPercent: 43.75,
-    coachingHours: 5.3333,
+    privateCallHours: 2.8333,
   }),
 ];
 
-/** The same coaches two weeks out, with fewer Coaching Hours booked so far */
-const twoWeeksOutReport: CoachCapacityReportRow[] = report.map((row) => ({
-  ...row,
-  coachingHours: 4,
-  committedHours: 6.75,
-}));
+/** The same coaches two weeks out, with 4 Coaching Hours booked so far */
+const twoWeeksOutReport: CoachCapacityReportRow[] = report.map((row) =>
+  applyCoachCapacitySettings({ ...row, privateCallHours: 1.5 }, row.settings),
+);
+
+/** Serves `rows`, applying saved settings the way the API would */
+function withSavedSettings(
+  rows: CoachCapacityReportRow[],
+  settingsByCoach: Map<number, CoachCapacitySettings>,
+): CoachCapacityReportRow[] {
+  return rows.map((row) => {
+    const settings = settingsByCoach.get(row.coach.coach_id);
+    return settings ? applyCoachCapacitySettings(row, settings) : row;
+  });
+}
 
 const anaMembership: CountedMembership = {
   studentName: 'Ana Student',
@@ -138,6 +156,39 @@ function settingInput(fullName: string, label: string): HTMLInputElement {
   return within(coachTableRow(fullName)).getByRole('spinbutton', {
     name: label,
   });
+}
+
+/** Coaching Hours, Committed Hours, and Booked % */
+function totals(fullName: string): string[] {
+  const cells = within(coachTableRow(fullName)).getAllByRole('cell');
+  return [1, 6, 8].map((index) => cells[index].textContent ?? '');
+}
+
+function isMarkedEdited(fullName: string): boolean {
+  return (
+    coachTableRow(fullName).querySelector(
+      '.paste-table__cell-container--dirty',
+    ) !== null
+  );
+}
+
+function coachOrder(): string[] {
+  return bodyRows().map(
+    (row) => within(row).getAllByRole('cell')[0].textContent ?? '',
+  );
+}
+
+/** Types into a coach's setting, keeping focus in it */
+function typeSetting(fullName: string, label: string, value: string): void {
+  const input = settingInput(fullName, label);
+  act(() => input.focus());
+  fireEvent.change(input, { target: { value } });
+}
+
+/** Moves focus out of the table, as clicking elsewhere on the page would */
+function leaveTable(): void {
+  const focused = document.activeElement;
+  if (focused instanceof HTMLElement) act(() => focused.blur());
 }
 
 function periodToggle(): HTMLElement {
@@ -213,9 +264,9 @@ describe.each(periods)(
           '1.25',
           '0.50',
           '1.00',
-          '8.75',
+          '8.08',
           '20.00',
-          '44%',
+          '40%',
           'Lightly Booked notes',
         ],
         [
@@ -310,47 +361,71 @@ describe.each(periods)(
     });
 
     describe('editing coach capacity settings', () => {
+      /** Lightly Booked's totals with 3 Projects hours in this period */
+      const lightlyBookedWithThreeProjectsHours = {
+        Today: ['5.33', '9.83', '49%'],
+        'Two Weeks Out': ['4.00', '8.50', '43%'],
+      }[label];
+      const mostlyBookedTotals = {
+        Today: ['6.00', '8.75', '88%'],
+        'Two Weeks Out': ['4.00', '6.75', '68%'],
+      }[label];
+
       /** Serves the report, applying saved settings the way the API would */
       function serveEditableReport(): void {
-        let current = report;
+        const settingsByCoach = new Map<number, CoachCapacitySettings>();
+        const rows = label === 'Today' ? report : twoWeeksOutReport;
         overrideMockAdminReportsAdapter({
-          [fetch]: async () => current,
+          [fetch]: async () => withSavedSettings(rows, settingsByCoach),
           updateCoachCapacitySettings: async ({ coachId, settings }) => {
-            current = current.map((row) =>
-              row.coach.coach_id === coachId
-                ? {
-                    ...row,
-                    settings,
-                    committedHours:
-                      row.coachingHours +
-                      settings.projectsHours +
-                      settings.internalTimeHours +
-                      settings.teamMeetingHours,
-                  }
-                : row,
-            );
+            settingsByCoach.set(coachId, settings);
             return settings;
           },
         });
       }
 
-      it('saves the coach’s full settings and shows the refetched Committed Hours', async () => {
+      it('has no Save or Discard buttons', async () => {
         serveEditableReport();
         renderReport();
         await openReport(label);
 
-        fireEvent.change(settingInput('Lightly Booked', 'Projects'), {
-          target: { value: '3' },
-        });
+        typeSetting('Lightly Booked', 'Projects', '3');
+
         expect(
-          screen.getByText('You have unsaved changes'),
-        ).toBeInTheDocument();
-        fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+          screen.queryByRole('button', { name: 'Save' }),
+        ).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole('button', { name: 'Discard' }),
+        ).not.toBeInTheDocument();
+      });
+
+      it('updates the coach’s totals while the admin types, without saving', async () => {
+        serveEditableReport();
+        renderReport();
+        await openReport(label);
+
+        typeSetting('Lightly Booked', 'Projects', '3');
+
+        expect(totals('Lightly Booked')).toEqual(
+          lightlyBookedWithThreeProjectsHours,
+        );
+        expect(totals('Mostly Booked')).toEqual(mostlyBookedTotals);
+        expect(isMarkedEdited('Lightly Booked')).toBe(true);
+        expect(
+          mockAdminReportsAdapter.updateCoachCapacitySettings,
+        ).not.toHaveBeenCalled();
+      });
+
+      it('saves the coach’s full settings once when the admin leaves the cell, without refetching', async () => {
+        serveEditableReport();
+        renderReport();
+        await openReport(label);
+
+        typeSetting('Lightly Booked', 'Projects', '3');
+        leaveTable();
 
         await waitFor(() =>
-          expect(
-            within(coachTableRow('Lightly Booked')).getByText('9.83'),
-          ).toBeInTheDocument(),
+          expect(isMarkedEdited('Lightly Booked')).toBe(false),
         );
         expect(
           mockAdminReportsAdapter.updateCoachCapacitySettings,
@@ -365,39 +440,53 @@ describe.each(periods)(
             notes: 'Lightly Booked notes',
           },
         });
-        expect(mockAdminReportsAdapter[fetch]).toHaveBeenCalledTimes(2);
         expect(settingInput('Lightly Booked', 'Projects')).toHaveValue(3);
-        expect(
-          screen.queryByText('You have unsaved changes'),
-        ).not.toBeInTheDocument();
+        expect(totals('Lightly Booked')).toEqual(
+          lightlyBookedWithThreeProjectsHours,
+        );
+        expect(mockAdminReportsAdapter[fetch]).toHaveBeenCalledOnce();
       });
 
-      it('shows why input is invalid and does not save it', async () => {
+      it('saves once when the admin presses Enter, even as focus moves on', async () => {
         serveEditableReport();
         renderReport();
         await openReport(label);
 
-        const groupSessions = settingInput('Mostly Booked', 'Group Sessions');
-        fireEvent.change(groupSessions, { target: { value: '1.5' } });
-        fireEvent.focus(groupSessions);
+        typeSetting('Lightly Booked', 'Projects', '3');
+        fireEvent.keyDown(settingInput('Lightly Booked', 'Projects'), {
+          key: 'Enter',
+        });
+        leaveTable();
+
+        await waitFor(() =>
+          expect(isMarkedEdited('Lightly Booked')).toBe(false),
+        );
+        expect(
+          mockAdminReportsAdapter.updateCoachCapacitySettings,
+        ).toHaveBeenCalledOnce();
+      });
+
+      it('shows why input is invalid and neither saves it nor counts it', async () => {
+        serveEditableReport();
+        renderReport();
+        await openReport(label);
+
+        typeSetting('Mostly Booked', 'Group Sessions', '1.5');
 
         expect(await screen.findByRole('alert')).toHaveTextContent(
           'Enter a whole number from 0 to 40',
         );
-        expect(
-          screen.getByText('Please fix validation errors before saving'),
-        ).toBeInTheDocument();
-        const save = screen.getByRole('button', { name: 'Save' });
-        expect(save).toBeDisabled();
-        fireEvent.click(save);
+        expect(totals('Mostly Booked')).toEqual(mostlyBookedTotals);
+        leaveTable();
         expect(
           mockAdminReportsAdapter.updateCoachCapacitySettings,
         ).not.toHaveBeenCalled();
+        expect(totals('Mostly Booked')).toEqual(mostlyBookedTotals);
       });
 
-      it('shows an error and keeps the saved values when a save fails', async () => {
+      it('keeps a value that failed to save, names the coach, and retries it on the next edit', async () => {
+        serveEditableReport();
         overrideMockAdminReportsAdapter({
-          [fetch]: async () => report,
           updateCoachCapacitySettings: async () => {
             throw new Error('Failed to save Coach Capacity settings');
           },
@@ -405,30 +494,61 @@ describe.each(periods)(
         renderReport();
         await openReport(label);
 
-        fireEvent.change(settingInput('Lightly Booked', 'Projects'), {
-          target: { value: '3' },
-        });
-        fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+        typeSetting('Lightly Booked', 'Projects', '3');
+        leaveTable();
 
         expect(await screen.findByRole('alert')).toHaveTextContent(
           'Could not save settings for Lightly Booked. Your changes are still in the table.',
         );
-        const lightlyBooked = coachTableRow('Lightly Booked');
-        expect(within(lightlyBooked).getByText('8.75')).toBeInTheDocument();
-        expect(within(lightlyBooked).getByText('44%')).toBeInTheDocument();
         expect(settingInput('Lightly Booked', 'Projects')).toHaveValue(3);
+        expect(isMarkedEdited('Lightly Booked')).toBe(true);
+        expect(totals('Lightly Booked')).toEqual(
+          lightlyBookedWithThreeProjectsHours,
+        );
+        expect(mockAdminReportsAdapter[fetch]).toHaveBeenCalledOnce();
+
+        serveEditableReport();
+        typeSetting('Lightly Booked', 'Projects', '3.5');
+        leaveTable();
+
+        await waitFor(() =>
+          expect(screen.queryByRole('alert')).not.toBeInTheDocument(),
+        );
         expect(
-          screen.getByText('You have unsaved changes'),
-        ).toBeInTheDocument();
-        expect(mockAdminReportsAdapter[fetch]).toHaveBeenCalledTimes(1);
-
-        fireEvent.click(screen.getByRole('button', { name: 'Discard' }));
-
-        expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-        expect(settingInput('Lightly Booked', 'Projects')).toHaveValue(1.25);
+          mockAdminReportsAdapter.updateCoachCapacitySettings,
+        ).toHaveBeenLastCalledWith({
+          coachId: 3,
+          settings: expect.objectContaining({ projectsHours: 3.5 }),
+        });
+        expect(isMarkedEdited('Lightly Booked')).toBe(false);
       });
 
-      it('edits a coach’s notes in a side panel and saves them with their settings', async () => {
+      it('keeps rows in place while focus is in the table and re-sorts them once it leaves', async () => {
+        serveEditableReport();
+        renderReport();
+        await openReport(label);
+        const order = ['Not Set Up', 'Lightly Booked', 'Mostly Booked'];
+        expect(coachOrder()).toEqual(order);
+
+        // Over 100% booked on 5 Desired Hours, so most booked of all
+        typeSetting('Lightly Booked', 'Desired Hours', '5');
+        typeSetting('Not Set Up', 'Projects', '2');
+        expect(coachOrder()).toEqual(order);
+
+        leaveTable();
+        expect(coachOrder()).toEqual([
+          'Not Set Up',
+          'Mostly Booked',
+          'Lightly Booked',
+        ]);
+        await waitFor(() =>
+          expect(
+            mockAdminReportsAdapter.updateCoachCapacitySettings,
+          ).toHaveBeenCalledTimes(2),
+        );
+      });
+
+      it('edits a coach’s notes in a side panel and saves them with their settings, without refetching', async () => {
         serveEditableReport();
         renderReport();
         await openReport(label);
@@ -467,6 +587,7 @@ describe.each(periods)(
             name: 'Full until August',
           }),
         ).toBeInTheDocument();
+        expect(mockAdminReportsAdapter[fetch]).toHaveBeenCalledOnce();
       });
 
       it('keeps the notes panel open with the draft when saving notes fails', async () => {
@@ -585,31 +706,12 @@ describe('switching between Today and Two Weeks Out', () => {
    * period keeps its own Coaching Hours.
    */
   function serveReportsSharingSettings(): void {
-    const settingsByCoach = new Map(
-      report.map((row) => [row.coach.coach_id, row.settings]),
-    );
-    const withSavedSettings = (
-      rows: CoachCapacityReportRow[],
-    ): CoachCapacityReportRow[] =>
-      rows.map((row) => {
-        const settings = settingsByCoach.get(row.coach.coach_id);
-        return settings
-          ? {
-              ...row,
-              settings,
-              committedHours:
-                row.coachingHours +
-                settings.projectsHours +
-                settings.internalTimeHours +
-                settings.teamMeetingHours,
-            }
-          : row;
-      });
-
+    const settingsByCoach = new Map<number, CoachCapacitySettings>();
     overrideMockAdminReportsAdapter({
-      getCoachCapacityTodayReport: async () => withSavedSettings(report),
+      getCoachCapacityTodayReport: async () =>
+        withSavedSettings(report, settingsByCoach),
       getCoachCapacityTwoWeeksOutReport: async () =>
-        withSavedSettings(twoWeeksOutReport),
+        withSavedSettings(twoWeeksOutReport, settingsByCoach),
       updateCoachCapacitySettings: async ({ coachId, settings }) => {
         settingsByCoach.set(coachId, settings);
         return settings;
@@ -730,7 +832,9 @@ describe('switching between Today and Two Weeks Out', () => {
     await waitForPeriod(TWO_WEEKS_OUT_HOURS);
 
     expect(settingInput('Lightly Booked', 'Projects')).toHaveValue(3);
-    expect(screen.getByText('You have unsaved changes')).toBeInTheDocument();
+    expect(isMarkedEdited('Lightly Booked')).toBe(true);
+    // 4 + 3 + 0.5 + 1
+    expect(totals('Lightly Booked')).toEqual(['4.00', '8.50', '43%']);
     selectPeriod('Today');
     await waitForPeriod(TODAY_HOURS);
     expect(settingInput('Lightly Booked', 'Projects')).toHaveValue(3);
@@ -739,40 +843,55 @@ describe('switching between Today and Two Weeks Out', () => {
     ).not.toHaveBeenCalled();
   });
 
-  it('refreshes the period being viewed on save, and shows the saved values in the other when switched to', async () => {
+  it('keeps a value that failed to save, with its error, across a switch', async () => {
+    serveReportsSharingSettings();
+    overrideMockAdminReportsAdapter({
+      updateCoachCapacitySettings: async () => {
+        throw new Error('Failed to save Coach Capacity settings');
+      },
+    });
+    renderReport();
+    await openReport();
+
+    typeSetting('Lightly Booked', 'Projects', '3');
+    leaveTable();
+    await screen.findByRole('alert');
+    selectPeriod('Two Weeks Out');
+    await waitForPeriod(TWO_WEEKS_OUT_HOURS);
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Could not save settings for Lightly Booked.',
+    );
+    expect(settingInput('Lightly Booked', 'Projects')).toHaveValue(3);
+    expect(isMarkedEdited('Lightly Booked')).toBe(true);
+    expect(totals('Lightly Booked')).toEqual(['4.00', '8.50', '43%']);
+  });
+
+  it('does not refetch on save, and shows the saved values in the other period when switched to', async () => {
     serveReportsSharingSettings();
     renderReport();
     await openReport('Two Weeks Out');
     selectPeriod('Today');
     await waitForPeriod(TODAY_HOURS);
 
-    fireEvent.change(settingInput('Lightly Booked', 'Projects'), {
-      target: { value: '3' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    typeSetting('Lightly Booked', 'Projects', '3');
+    leaveTable();
 
+    await waitFor(() => expect(isMarkedEdited('Lightly Booked')).toBe(false));
     // Today has 5.3333 Coaching Hours: 5.3333 + 3 + 0.5 + 1
-    await waitFor(() =>
-      expect(
-        within(coachTableRow('Lightly Booked')).getByText('9.83'),
-      ).toBeInTheDocument(),
-    );
-    // Opened, switched back to, then refetched by the save
+    expect(totals('Lightly Booked')).toEqual(['5.33', '9.83', '49%']);
+    // Opened and switched back to, but not refetched by the save
     expect(
       mockAdminReportsAdapter.getCoachCapacityTodayReport,
-    ).toHaveBeenCalledTimes(3);
+    ).toHaveBeenCalledTimes(2);
 
     selectPeriod('Two Weeks Out');
     await waitForPeriod(TWO_WEEKS_OUT_HOURS);
 
     // Two Weeks Out has 4 Coaching Hours: 4 + 3 + 0.5 + 1
-    expect(
-      within(coachTableRow('Lightly Booked')).getByText('8.50'),
-    ).toBeInTheDocument();
+    expect(totals('Lightly Booked')).toEqual(['4.00', '8.50', '43%']);
     expect(settingInput('Lightly Booked', 'Projects')).toHaveValue(3);
-    expect(
-      screen.queryByText('You have unsaved changes'),
-    ).not.toBeInTheDocument();
+    expect(isMarkedEdited('Lightly Booked')).toBe(false);
     expect(
       mockAdminReportsAdapter.updateCoachCapacitySettings,
     ).toHaveBeenCalledOnce();
