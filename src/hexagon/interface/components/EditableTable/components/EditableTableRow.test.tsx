@@ -127,4 +127,41 @@ describe('editableTableRow', () => {
       }),
     );
   });
+
+  it('applies the pinned class and style to pinned cells only', () => {
+    const getPinnedCell = (columnId: string) =>
+      columnId === 'active'
+        ? { className: 'pinnedRight', style: { right: '0px' } }
+        : undefined;
+
+    const { container } = render(
+      <table>
+        <tbody>
+          <EditableTableRow
+            row={row}
+            rowIndex={0}
+            columns={columns}
+            getDisplay={getDisplay}
+            dirtyRowIds={new Set()}
+            validationErrors={{}}
+            activeCell={null}
+            onCellChange={vi.fn()}
+            onFocus={vi.fn()}
+            onBlur={vi.fn()}
+            createCellRef={vi.fn(() => vi.fn())}
+            renderCell={() => <div>Cell</div>}
+            getPinnedCell={getPinnedCell}
+          />
+        </tbody>
+      </table>,
+    );
+
+    const [nameCell, activeCell] = container.querySelectorAll('td');
+    expect(nameCell).not.toHaveClass('pinnedRight');
+    expect(activeCell).toHaveClass(
+      'paste-table__cell-container',
+      'pinnedRight',
+    );
+    expect(activeCell).toHaveStyle({ right: '0px' });
+  });
 });

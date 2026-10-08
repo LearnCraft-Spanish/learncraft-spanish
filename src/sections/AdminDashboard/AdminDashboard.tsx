@@ -1,3 +1,4 @@
+import { CoachCapacityReport } from '@interface/components/CoachCapacity';
 import { Loading } from '@interface/components/Loading';
 import {
   ActiveMemberships,
@@ -28,6 +29,8 @@ export default function AdminDashboard() {
           <StudentsBySalariedCoach />
           <MembershipsByCoachReports />
           <WeeklyTimeCommitmentByCoach />
+          <CoachCapacityReport period="today" />
+          <CoachCapacityReport period="twoWeeksOut" />
           <LeadsToReEngage />
           <div className="admin-dashboard-grid">
             <ActiveMemberships />
