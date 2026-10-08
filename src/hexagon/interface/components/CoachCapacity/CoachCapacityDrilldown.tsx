@@ -19,9 +19,42 @@ const membershipColumns: DataTableColumn[] = [
   { id: 'weeklyAdminTime', header: 'Weekly Admin Time (hrs)', align: 'end' },
 ];
 
+function drilldownBody(
+  coachName: string,
+  rows: DataTableRow[],
+  isLoading: boolean,
+): JSX.Element {
+  if (isLoading) {
+    return (
+      <p className={styles.message} role="status">
+        Loading memberships...
+      </p>
+    );
+  }
+  if (rows.length === 0) {
+    return (
+      <EmptyState
+        icon="user"
+        title="No counted memberships"
+        guidance={`None of ${coachName}'s memberships count toward their Coaching Hours in this report.`}
+      />
+    );
+  }
+  return (
+    <DataTable
+      caption={`Memberships counted for ${coachName}`}
+      columns={membershipColumns}
+      rows={rows}
+      columnTemplate="minmax(10rem, 2fr) minmax(10rem, 2fr) 8rem 8rem 8rem 8rem"
+      disableRowHover
+    />
+  );
+}
+
 export function CoachCapacityDrilldown({
   coachName,
   memberships,
+  isLoading,
   close,
 }: CoachCapacityDrilldownState): JSX.Element | null {
   const titleId = useId();
@@ -52,21 +85,7 @@ export function CoachCapacityDrilldown({
           Close
         </Button>
       </div>
-      {rows.length === 0 ? (
-        <EmptyState
-          icon="user"
-          title="No counted memberships"
-          guidance={`None of ${coachName}'s memberships count toward their Coaching Hours in this report.`}
-        />
-      ) : (
-        <DataTable
-          caption={`Memberships counted for ${coachName}`}
-          columns={membershipColumns}
-          rows={rows}
-          columnTemplate="minmax(10rem, 2fr) minmax(10rem, 2fr) 8rem 8rem 8rem 8rem"
-          disableRowHover
-        />
-      )}
+      {drilldownBody(coachName, rows, isLoading)}
     </section>
   );
 }

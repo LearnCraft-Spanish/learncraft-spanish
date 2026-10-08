@@ -13,6 +13,11 @@
   gap: var(--lcs-space-5);
 }
 
+.message {
+  margin: 0;
+  color: var(--lcs-color-muted);
+}
+
 .title {
   margin: 0;
   font-size: var(--lcs-text-h3);

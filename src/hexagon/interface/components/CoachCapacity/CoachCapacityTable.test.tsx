@@ -67,6 +67,7 @@ const closedNotesPanel: CoachCapacityNotesPanelState = {
 const closedDrilldown: CoachCapacityDrilldownState = {
   coachName: null,
   memberships: [],
+  isLoading: false,
   close: () => {},
 };
 

@@ -33,10 +33,15 @@ export interface CoachCapacityDrilldownState {
   /** The coach whose counted memberships are shown, or null when closed */
   coachName: string | null;
   memberships: CountedMembershipDisplayRow[];
+  /** True while the selected period is loading, so its memberships are not known yet */
+  isLoading: boolean;
   close: () => void;
 }
 
 export interface UseCoachCapacityReportResult {
+  /** The period shown, which starts on Today each time the report mounts */
+  period: CoachCapacityPeriod;
+  selectPeriod: (period: CoachCapacityPeriod) => void;
   tableProps: EditableTableUseCaseProps;
   isError: boolean;
   /** Names the coaches whose settings failed to save, if any did */
@@ -64,14 +69,24 @@ const coachCapacityColumns: (ColumnDefinition & {
   { id: 'notes', type: 'custom', editable: false },
 ];
 
+const NOTES_SAVE_ERROR = 'Notes could not be saved. Try again.';
+
+/**
+ * A coach the notes panel or drilldown is open on. The name is kept so the
+ * panel stays open while a newly selected period loads.
+ */
+interface OpenCoach {
+  rowId: string;
+  coachName: string;
+}
+
 function validateSettingsRow(row: TableRow): Record<string, string> {
   const result = parseCoachCapacitySettingsCells(row.cells, '');
   return result.success ? {} : result.errors;
 }
 
-export function useCoachCapacityReport(
-  period: CoachCapacityPeriod,
-): UseCoachCapacityReportResult {
+export function useCoachCapacityReport(): UseCoachCapacityReportResult {
+  const [period, setPeriod] = useState<CoachCapacityPeriod>('today');
   const { coachCapacityReportQuery } = useCoachCapacityReportQuery(period);
   const { updateCoachCapacitySettingsMutation } =
     useUpdateCoachCapacitySettingsMutation();
@@ -80,11 +95,11 @@ export function useCoachCapacityReport(
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [notesRowId, setNotesRowId] = useState<string | null>(null);
+  const [notesCoach, setNotesCoach] = useState<OpenCoach | null>(null);
   const [notesDraft, setNotesDraft] = useState('');
   const [isSavingNotes, setIsSavingNotes] = useState(false);
   const [notesError, setNotesError] = useState<string | null>(null);
-  const [drilldownRowId, setDrilldownRowId] = useState<string | null>(null);
+  const [drilldownCoach, setDrilldownCoach] = useState<OpenCoach | null>(null);
 
   const reportRows = useMemo(() => sortCoachCapacityRows(data ?? []), [data]);
   const reportRowsById = useMemo(
@@ -157,13 +172,13 @@ export function useCoachCapacityReport(
   }, [discardChanges]);
 
   const notesRow =
-    notesRowId === null ? undefined : reportRowsById.get(notesRowId);
+    notesCoach === null ? undefined : reportRowsById.get(notesCoach.rowId);
 
   const openNotes = useCallback(
     (rowId: string) => {
       const reportRow = reportRowsById.get(rowId);
       if (!reportRow) return;
-      setNotesRowId(rowId);
+      setNotesCoach({ rowId, coachName: reportRow.coach.fullName });
       setNotesDraft(reportRow.settings.notes);
       setNotesError(null);
     },
@@ -171,30 +186,36 @@ export function useCoachCapacityReport(
   );
 
   const closeNotes = useCallback(() => {
-    setNotesRowId(null);
+    setNotesCoach(null);
     setNotesError(null);
   }, []);
 
   // Sends the coach's saved settings, not any unsaved edits in their row
   const saveNotes = useCallback(async (): Promise<void> => {
-    if (!notesRow) return;
+    if (notesCoach === null) return;
+    if (!notesRow) {
+      setNotesError(NOTES_SAVE_ERROR);
+      return;
+    }
     setIsSavingNotes(true);
     setNotesError(null);
     try {
-      await saveSettings(String(notesRow.coach.coach_id), {
+      await saveSettings(notesCoach.rowId, {
         ...notesRow.settings,
         notes: notesDraft,
       });
-      setNotesRowId(null);
+      setNotesCoach(null);
     } catch {
-      setNotesError('Notes could not be saved. Try again.');
+      setNotesError(NOTES_SAVE_ERROR);
     } finally {
       setIsSavingNotes(false);
     }
-  }, [notesRow, notesDraft, saveSettings]);
+  }, [notesCoach, notesRow, notesDraft, saveSettings]);
 
   const drilldownRow =
-    drilldownRowId === null ? undefined : reportRowsById.get(drilldownRowId);
+    drilldownCoach === null
+      ? undefined
+      : reportRowsById.get(drilldownCoach.rowId);
   const drilldownMemberships = useMemo(
     () =>
       mapCountedMembershipsToDisplayRows(
@@ -205,12 +226,15 @@ export function useCoachCapacityReport(
 
   const openDrilldown = useCallback(
     (rowId: string) => {
-      if (reportRowsById.has(rowId)) setDrilldownRowId(rowId);
+      const reportRow = reportRowsById.get(rowId);
+      if (reportRow) {
+        setDrilldownCoach({ rowId, coachName: reportRow.coach.fullName });
+      }
     },
     [reportRowsById],
   );
 
-  const closeDrilldown = useCallback(() => setDrilldownRowId(null), []);
+  const closeDrilldown = useCallback(() => setDrilldownCoach(null), []);
 
   const tableProps = useMemo<EditableTableUseCaseProps>(
     () => ({
@@ -246,12 +270,14 @@ export function useCoachCapacityReport(
   );
 
   return {
+    period,
+    selectPeriod: setPeriod,
     tableProps,
     isError,
     saveError,
     openNotes,
     notesPanel: {
-      coachName: notesRow?.coach.fullName ?? null,
+      coachName: notesCoach?.coachName ?? null,
       draft: notesDraft,
       setDraft: setNotesDraft,
       close: closeNotes,
@@ -261,8 +287,9 @@ export function useCoachCapacityReport(
     },
     openDrilldown,
     drilldown: {
-      coachName: drilldownRow?.coach.fullName ?? null,
+      coachName: drilldownCoach?.coachName ?? null,
       memberships: drilldownMemberships,
+      isLoading,
       close: closeDrilldown,
     },
   };

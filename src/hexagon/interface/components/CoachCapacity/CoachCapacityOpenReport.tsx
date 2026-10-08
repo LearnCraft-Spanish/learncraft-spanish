@@ -1,16 +1,21 @@
-import type { CoachCapacityPeriod } from '@domain/functions/coachCapacity';
 import type { JSX } from 'react';
 import { useCoachCapacityReport } from '@application/useCases/useCoachCapacityReport';
+import { CoachCapacityPeriodToggle } from '@interface/components/CoachCapacity/CoachCapacityPeriodToggle';
 import { CoachCapacityTable } from '@interface/components/CoachCapacity/CoachCapacityTable';
+import SectionHeader from '@interface/components/general/SectionHeader/SectionHeader';
 
-export interface CoachCapacityReportTableProps {
-  period: CoachCapacityPeriod;
+export interface CoachCapacityOpenReportProps {
+  title: string;
+  onClose: () => void;
 }
 
-export function CoachCapacityReportTable({
-  period,
-}: CoachCapacityReportTableProps): JSX.Element {
+export function CoachCapacityOpenReport({
+  title,
+  onClose,
+}: CoachCapacityOpenReportProps): JSX.Element {
   const {
+    period,
+    selectPeriod,
     tableProps,
     isError,
     saveError,
@@ -18,17 +23,27 @@ export function CoachCapacityReportTable({
     notesPanel,
     openDrilldown,
     drilldown,
-  } = useCoachCapacityReport(period);
+  } = useCoachCapacityReport();
 
   return (
-    <CoachCapacityTable
-      tableProps={tableProps}
-      isError={isError}
-      saveError={saveError}
-      onOpenNotes={openNotes}
-      notesPanel={notesPanel}
-      onOpenDrilldown={openDrilldown}
-      drilldown={drilldown}
-    />
+    <>
+      <SectionHeader
+        title={title}
+        isOpen
+        openFunction={onClose}
+        button={
+          <CoachCapacityPeriodToggle period={period} onSelect={selectPeriod} />
+        }
+      />
+      <CoachCapacityTable
+        tableProps={tableProps}
+        isError={isError}
+        saveError={saveError}
+        onOpenNotes={openNotes}
+        notesPanel={notesPanel}
+        onOpenDrilldown={openDrilldown}
+        drilldown={drilldown}
+      />
+    </>
   );
 }

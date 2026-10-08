@@ -1,5 +1,6 @@
 import type { UpdateCoachCapacitySettingsCommand } from '@application/ports/AdminReports/adminReportsPort';
 import type { UseCoachCapacityReportResult } from '@application/useCases/useCoachCapacityReport/useCoachCapacityReport';
+import type { CoachCapacityPeriod } from '@domain/functions/coachCapacity';
 import type {
   CoachCapacityReportRow,
   CoachCapacitySettings,
@@ -126,19 +127,141 @@ describe('useCoachCapacityReport', () => {
   });
 
   describe('period', () => {
-    it.each(['today', 'twoWeeksOut'] as const)(
-      'reports on the %s Coach Capacity report',
-      (period) => {
-        renderHook(() => useCoachCapacityReport(period));
+    const membership = {
+      studentName: 'Ana Student',
+      courseName: 'Premier',
+      startDate: '2026-01-05',
+      endDate: null,
+      courseWeeklyPrivateCalls: 2,
+      courseWeeklyAdminTimeMinutes: 30,
+    };
 
-        expect(useCoachCapacityReportQuery).toHaveBeenLastCalledWith(period);
-      },
-    );
+    const todayRows = [
+      { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [membership] },
+      { ...coachRow(2, 'Lightly Booked', 15), coachingHours: 5 },
+    ];
+    const twoWeeksOutRows = [
+      { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [] },
+      { ...coachRow(2, 'Lightly Booked', 15), coachingHours: 3 },
+    ];
+
+    /** Serves each period its own report; a period missing from `loaded` is still loading */
+    function showReportsByPeriod(
+      loaded: Partial<Record<CoachCapacityPeriod, CoachCapacityReportRow[]>>,
+    ): void {
+      vi.mocked(useCoachCapacityReportQuery).mockImplementation((period) => {
+        const rows = loaded[period];
+        return {
+          coachCapacityReportQuery: rows
+            ? queryResult({ data: rows, isSuccess: true, status: 'success' })
+            : queryResult({ isLoading: true }),
+        };
+      });
+    }
+
+    it('starts on Today', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      expect(result.current.period).toBe('today');
+      expect(useCoachCapacityReportQuery).toHaveBeenLastCalledWith('today');
+    });
+
+    it('reports on the selected period', () => {
+      showReportsByPeriod({ today: todayRows, twoWeeksOut: twoWeeksOutRows });
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      act(() => result.current.selectPeriod('twoWeeksOut'));
+
+      expect(result.current.period).toBe('twoWeeksOut');
+      expect(useCoachCapacityReportQuery).toHaveBeenLastCalledWith(
+        'twoWeeksOut',
+      );
+      expect(cellsOf(result, '2').coachingHours).toBe('3.00');
+    });
+
+    it('keeps unsaved edits across a switch, including while the new period loads', () => {
+      showReportsByPeriod({ today: todayRows });
+      const { result, rerender } = renderHook(() => useCoachCapacityReport());
+      act(() =>
+        result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
+      );
+
+      act(() => result.current.selectPeriod('twoWeeksOut'));
+      expect(result.current.tableProps.isLoading).toBe(true);
+
+      showReportsByPeriod({ today: todayRows, twoWeeksOut: twoWeeksOutRows });
+      rerender();
+
+      expect(cellsOf(result, '2').projectsHours).toBe('3');
+      expect(cellsOf(result, '2').coachingHours).toBe('3.00');
+      expect(result.current.tableProps.dirtyRowIds).toEqual(new Set(['2']));
+      act(() => result.current.selectPeriod('today'));
+      expect(cellsOf(result, '2').projectsHours).toBe('3');
+    });
+
+    it('keeps the notes panel open with its draft across a switch', async () => {
+      const updateSettings = mockUpdateSettings(
+        async ({ settings }) => settings,
+      );
+      showReportsByPeriod({ today: todayRows });
+      const { result, rerender } = renderHook(() => useCoachCapacityReport());
+      act(() => result.current.openNotes('1'));
+      act(() => result.current.notesPanel.setDraft('Full until August'));
+
+      act(() => result.current.selectPeriod('twoWeeksOut'));
+      expect(result.current.notesPanel.coachName).toBe('Mostly Booked');
+      expect(result.current.notesPanel.draft).toBe('Full until August');
+
+      showReportsByPeriod({ today: todayRows, twoWeeksOut: twoWeeksOutRows });
+      rerender();
+      await act(() => result.current.notesPanel.save());
+
+      expect(updateSettings).toHaveBeenCalledExactlyOnceWith({
+        coachId: 1,
+        settings: expect.objectContaining({ notes: 'Full until August' }),
+      });
+      expect(result.current.notesPanel.coachName).toBeNull();
+    });
+
+    it('does not save notes before the selected period has loaded', async () => {
+      const updateSettings = mockUpdateSettings(
+        async ({ settings }) => settings,
+      );
+      showReportsByPeriod({ today: todayRows });
+      const { result } = renderHook(() => useCoachCapacityReport());
+      act(() => result.current.openNotes('1'));
+      act(() => result.current.selectPeriod('twoWeeksOut'));
+
+      await act(() => result.current.notesPanel.save());
+
+      expect(updateSettings).not.toHaveBeenCalled();
+      expect(result.current.notesPanel.coachName).toBe('Mostly Booked');
+      expect(result.current.notesPanel.error).toBe(
+        'Notes could not be saved. Try again.',
+      );
+    });
+
+    it('keeps the drilldown on the coach, loading, then showing their memberships in the new period', () => {
+      showReportsByPeriod({ today: todayRows });
+      const { result, rerender } = renderHook(() => useCoachCapacityReport());
+      act(() => result.current.openDrilldown('1'));
+      expect(result.current.drilldown.memberships).toHaveLength(1);
+
+      act(() => result.current.selectPeriod('twoWeeksOut'));
+      expect(result.current.drilldown.coachName).toBe('Mostly Booked');
+      expect(result.current.drilldown.isLoading).toBe(true);
+
+      showReportsByPeriod({ today: todayRows, twoWeeksOut: twoWeeksOutRows });
+      rerender();
+      expect(result.current.drilldown.coachName).toBe('Mostly Booked');
+      expect(result.current.drilldown.isLoading).toBe(false);
+      expect(result.current.drilldown.memberships).toEqual([]);
+    });
   });
 
   describe('report', () => {
     it('returns one row per coach, least booked first', () => {
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       expect(result.current.tableProps.rows.map((row) => row.id)).toEqual([
         '3',
@@ -151,7 +274,7 @@ describe('useCoachCapacityReport', () => {
     });
 
     it('makes the five settings editable and the rest read-only', () => {
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       expect(
         result.current.tableProps.columns.map((column) => [
@@ -177,7 +300,7 @@ describe('useCoachCapacityReport', () => {
         coachCapacityReportQuery: queryResult({ isLoading: true }),
       });
 
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       expect(result.current.tableProps.isLoading).toBe(true);
       expect(result.current.isError).toBe(false);
@@ -192,7 +315,7 @@ describe('useCoachCapacityReport', () => {
         }),
       });
 
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       expect(result.current.isError).toBe(true);
       expect(result.current.tableProps.isLoading).toBe(false);
@@ -202,7 +325,7 @@ describe('useCoachCapacityReport', () => {
 
   describe('editing settings', () => {
     it('marks an edited coach as having unsaved changes', () => {
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
@@ -215,7 +338,7 @@ describe('useCoachCapacityReport', () => {
     });
 
     it('flags invalid input on its cell and blocks saving', () => {
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '1.1'),
@@ -239,7 +362,7 @@ describe('useCoachCapacityReport', () => {
       const updateSettings = mockUpdateSettings(
         async ({ settings }) => settings,
       );
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
@@ -281,7 +404,7 @@ describe('useCoachCapacityReport', () => {
       const updateSettings = mockUpdateSettings(
         async ({ settings }) => settings,
       );
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() =>
         result.current.tableProps.onCellChange('1', 'desiredHours', ''),
@@ -299,7 +422,7 @@ describe('useCoachCapacityReport', () => {
         if (coachId === 2) throw new Error('Failed to save');
         return settings;
       });
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
@@ -321,7 +444,7 @@ describe('useCoachCapacityReport', () => {
       mockUpdateSettings(async () => {
         throw new Error('Failed to save');
       });
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
@@ -338,7 +461,7 @@ describe('useCoachCapacityReport', () => {
 
   describe('notes panel', () => {
     it('opens on a coach with their saved notes', () => {
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       expect(result.current.notesPanel.coachName).toBeNull();
       act(() => result.current.openNotes('2'));
@@ -351,7 +474,7 @@ describe('useCoachCapacityReport', () => {
       const updateSettings = mockUpdateSettings(
         async ({ settings }) => settings,
       );
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() =>
         result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
@@ -379,7 +502,7 @@ describe('useCoachCapacityReport', () => {
       mockUpdateSettings(async () => {
         throw new Error('Failed to save');
       });
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() => result.current.openNotes('1'));
       act(() => result.current.notesPanel.setDraft('New note'));
@@ -397,7 +520,7 @@ describe('useCoachCapacityReport', () => {
       const updateSettings = mockUpdateSettings(
         async ({ settings }) => settings,
       );
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() => result.current.openNotes('1'));
       act(() => result.current.notesPanel.close());
@@ -418,7 +541,7 @@ describe('useCoachCapacityReport', () => {
     };
 
     it('is closed until a coach is opened', () => {
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       expect(result.current.drilldown.coachName).toBeNull();
       expect(result.current.drilldown.memberships).toEqual([]);
@@ -432,7 +555,7 @@ describe('useCoachCapacityReport', () => {
           countedMemberships: [membership],
         },
       ]);
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() => result.current.openDrilldown('2'));
 
@@ -454,7 +577,7 @@ describe('useCoachCapacityReport', () => {
       showReport([
         { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [] },
       ]);
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() => result.current.openDrilldown('1'));
 
@@ -466,9 +589,7 @@ describe('useCoachCapacityReport', () => {
       showReport([
         { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [] },
       ]);
-      const { result, rerender } = renderHook(() =>
-        useCoachCapacityReport('today'),
-      );
+      const { result, rerender } = renderHook(() => useCoachCapacityReport());
       act(() => result.current.openDrilldown('1'));
 
       showReport([
@@ -485,7 +606,7 @@ describe('useCoachCapacityReport', () => {
     });
 
     it('ignores a coach who is not in the report', () => {
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() => result.current.openDrilldown('99'));
 
@@ -493,7 +614,7 @@ describe('useCoachCapacityReport', () => {
     });
 
     it('closes', () => {
-      const { result } = renderHook(() => useCoachCapacityReport('today'));
+      const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() => result.current.openDrilldown('1'));
       act(() => result.current.drilldown.close());
