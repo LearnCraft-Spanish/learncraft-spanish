@@ -1,15 +1,18 @@
+import type { CoachCapacityPeriod } from '@domain/functions/coachCapacity';
 import {
   mockAdminReportsAdapter,
   overrideMockAdminReportsAdapter,
 } from '@application/adapters/AdminReports/adminReportsAdapter.mock';
 import { useCoachCapacityReportQuery } from '@application/queries/AdminReportQueries/useCoachCapacityReportQuery';
 import { useUpdateCoachCapacitySettingsMutation } from '@application/queries/AdminReportQueries/useUpdateCoachCapacitySettingsMutation';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import {
   createMockCoachCapacityReportRowList,
   createMockCoachCapacitySettings,
 } from '@testing/factories/adminReportsFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
+import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 function serveReports(): void {
@@ -114,6 +117,61 @@ describe('useUpdateCoachCapacitySettingsMutation', () => {
     expect(
       mockAdminReportsAdapter.getCoachCapacityTwoWeeksOutReport,
     ).not.toHaveBeenCalled();
+  });
+
+  it('drops a cached report that is not open, so switching to it loads the saved values', async () => {
+    serveReports();
+    const appLikeQueryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false, staleTime: Infinity, gcTime: Infinity },
+      },
+    });
+    const wrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(
+        QueryClientProvider,
+        { client: appLikeQueryClient },
+        children,
+      );
+    const { result, rerender } = renderHook(
+      ({ period }: { period: CoachCapacityPeriod }) => ({
+        report: useCoachCapacityReportQuery(period),
+        ...useUpdateCoachCapacitySettingsMutation(),
+      }),
+      { wrapper, initialProps: { period: 'twoWeeksOut' } },
+    );
+    await waitFor(() =>
+      expect(result.current.report.coachCapacityReportQuery.isSuccess).toBe(
+        true,
+      ),
+    );
+    rerender({ period: 'today' });
+    await waitFor(() =>
+      expect(result.current.report.coachCapacityReportQuery.isSuccess).toBe(
+        true,
+      ),
+    );
+
+    await act(() =>
+      result.current.updateCoachCapacitySettingsMutation.mutateAsync({
+        coachId: 7,
+        settings: createMockCoachCapacitySettings(),
+      }),
+    );
+    expect(
+      mockAdminReportsAdapter.getCoachCapacityTwoWeeksOutReport,
+    ).toHaveBeenCalledTimes(1);
+
+    rerender({ period: 'twoWeeksOut' });
+    expect(result.current.report.coachCapacityReportQuery.data).toBeUndefined();
+    await waitFor(() =>
+      expect(result.current.report.coachCapacityReportQuery.isSuccess).toBe(
+        true,
+      ),
+    );
+    expect(
+      mockAdminReportsAdapter.getCoachCapacityTwoWeeksOutReport,
+    ).toHaveBeenCalledTimes(2);
+    appLikeQueryClient.clear();
   });
 
   it('still resolves the save when a report fails to refetch', async () => {

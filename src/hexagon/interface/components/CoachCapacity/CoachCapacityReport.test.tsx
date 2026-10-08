@@ -1,4 +1,3 @@
-import type { CoachCapacityPeriod } from '@domain/functions/coachCapacity';
 import type {
   CoachCapacityReportRow,
   CountedMembership,
@@ -20,23 +19,14 @@ import { createMockCoachCapacityReportRow } from '@testing/factories/adminReport
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { describe, expect, it } from 'vitest';
 
-const TODAY_TITLE = 'Coach Capacity: Today';
-const TWO_WEEKS_OUT_TITLE = 'Coach Capacity: Two Weeks Out';
+const TITLE = 'Coach Capacity';
 
-const reports = [
-  {
-    period: 'today',
-    title: TODAY_TITLE,
-    fetch: 'getCoachCapacityTodayReport',
-    otherFetch: 'getCoachCapacityTwoWeeksOutReport',
-  },
-  {
-    period: 'twoWeeksOut',
-    title: TWO_WEEKS_OUT_TITLE,
-    fetch: 'getCoachCapacityTwoWeeksOutReport',
-    otherFetch: 'getCoachCapacityTodayReport',
-  },
+const periods = [
+  { label: 'Today', fetch: 'getCoachCapacityTodayReport' },
+  { label: 'Two Weeks Out', fetch: 'getCoachCapacityTwoWeeksOutReport' },
 ] as const;
+
+type PeriodLabel = (typeof periods)[number]['label'];
 
 function coachRow(
   coachId: number,
@@ -120,19 +110,10 @@ function drilldownRows(container: HTMLElement): string[][] {
     );
 }
 
-function renderReport(period: CoachCapacityPeriod) {
+function renderReport() {
   return render(
     <TestQueryClientProvider>
-      <CoachCapacityReport period={period} />
-    </TestQueryClientProvider>,
-  );
-}
-
-function renderBothReports() {
-  return render(
-    <TestQueryClientProvider>
-      <CoachCapacityReport period="today" />
-      <CoachCapacityReport period="twoWeeksOut" />
+      <CoachCapacityReport />
     </TestQueryClientProvider>,
   );
 }
@@ -147,52 +128,50 @@ function cellValue(cell: HTMLElement): string {
   return input ? input.value : (cell.textContent ?? '');
 }
 
-/** Scopes queries to one report when more than one is on the page */
-function section(title: string): HTMLElement {
-  return screen.getByRole('region', { name: title });
-}
-
-function coachTableRow(
-  fullName: string,
-  container: HTMLElement = document.body,
-): HTMLElement {
-  const row = within(container).getByText(fullName).closest('tr');
+function coachTableRow(fullName: string): HTMLElement {
+  const row = screen.getByText(fullName).closest('tr');
   if (!row) throw new Error(`${fullName} is not in the table`);
   return row;
 }
 
-function settingInput(
-  fullName: string,
-  label: string,
-  container: HTMLElement = document.body,
-): HTMLInputElement {
-  return within(coachTableRow(fullName, container)).getByRole('spinbutton', {
+function settingInput(fullName: string, label: string): HTMLInputElement {
+  return within(coachTableRow(fullName)).getByRole('spinbutton', {
     name: label,
   });
 }
 
-async function openReport(title: string): Promise<void> {
-  fireEvent.click(screen.getByText(title));
+function periodToggle(): HTMLElement {
+  return screen.getByRole('group', { name: 'Report period' });
+}
+
+function selectPeriod(label: PeriodLabel): void {
+  fireEvent.click(within(periodToggle()).getByRole('button', { name: label }));
+}
+
+function selectedPeriod(): string | null {
+  return within(periodToggle()).getByRole('button', { pressed: true })
+    .textContent;
+}
+
+function toggleSection(): void {
+  fireEvent.click(screen.getByText(TITLE));
+}
+
+/** Opens the section, switches to `label` unless it is Today, and waits for the coaches */
+async function openReport(label: PeriodLabel = 'Today'): Promise<void> {
+  toggleSection();
+  if (label !== 'Today') selectPeriod(label);
   await screen.findByText('Mostly Booked');
 }
 
-describe.each(reports)(
-  '$title report',
-  ({ period, title, fetch, otherFetch }) => {
-    it('is collapsed by default and does not fetch the report', () => {
-      renderReport(period);
-
-      expect(screen.getByText(title)).toBeInTheDocument();
-      expect(screen.queryByRole('table')).not.toBeInTheDocument();
-      expect(mockAdminReportsAdapter[fetch]).not.toHaveBeenCalled();
-    });
-
+describe.each(periods)(
+  'coach Capacity report showing $label',
+  ({ label, fetch }) => {
     it('lists coaches least booked first with formatted values', async () => {
       overrideMockAdminReportsAdapter({ [fetch]: async () => report });
-      renderReport(period);
+      renderReport();
 
-      fireEvent.click(screen.getByText(title));
-      await screen.findByText('Mostly Booked');
+      await openReport(label);
 
       expect(
         within(screen.getByRole('table'))
@@ -253,15 +232,13 @@ describe.each(reports)(
         ],
       ]);
       expect(mockAdminReportsAdapter[fetch]).toHaveBeenCalledTimes(1);
-      expect(mockAdminReportsAdapter[otherFetch]).not.toHaveBeenCalled();
     });
 
     it('pins Coach, Committed Hours, Desired Hours, and Booked % while the rest scroll', async () => {
       overrideMockAdminReportsAdapter({ [fetch]: async () => report });
-      renderReport(period);
+      renderReport();
 
-      fireEvent.click(screen.getByText(title));
-      await screen.findByText('Mostly Booked');
+      await openReport(label);
 
       const table = screen.getByRole('table');
       expect(table.parentElement).toHaveClass(
@@ -306,29 +283,16 @@ describe.each(reports)(
       }
     });
 
-    it('refetches the report every time the section is opened', async () => {
-      overrideMockAdminReportsAdapter({ [fetch]: async () => report });
-      renderReport(period);
-
-      fireEvent.click(screen.getByText(title));
-      await screen.findByText('Mostly Booked');
-      fireEvent.click(screen.getByText(title));
-      expect(screen.queryByRole('table')).not.toBeInTheDocument();
-      fireEvent.click(screen.getByText(title));
-      await screen.findByText('Mostly Booked');
-
-      expect(mockAdminReportsAdapter[fetch]).toHaveBeenCalledTimes(2);
-    });
-
     it('shows an error when the report fails to load', async () => {
       overrideMockAdminReportsAdapter({
         [fetch]: async () => {
           throw new Error('Failed to fetch Coach Capacity');
         },
       });
-      renderReport(period);
+      renderReport();
 
-      fireEvent.click(screen.getByText(title));
+      toggleSection();
+      if (label !== 'Today') selectPeriod(label);
 
       expect(await screen.findByRole('alert')).toHaveTextContent(
         'Coach Capacity could not be loaded.',
@@ -337,8 +301,8 @@ describe.each(reports)(
 
     it('shows an empty Desired Hours input with a dash for coaches who are not set up', async () => {
       overrideMockAdminReportsAdapter({ [fetch]: async () => report });
-      renderReport(period);
-      await openReport(title);
+      renderReport();
+      await openReport(label);
 
       const desiredHours = settingInput('Not Set Up', 'Desired Hours');
       expect(desiredHours).toHaveValue(null);
@@ -372,8 +336,8 @@ describe.each(reports)(
 
       it('saves the coach’s full settings and shows the refetched Committed Hours', async () => {
         serveEditableReport();
-        renderReport(period);
-        await openReport(title);
+        renderReport();
+        await openReport(label);
 
         fireEvent.change(settingInput('Lightly Booked', 'Projects'), {
           target: { value: '3' },
@@ -410,8 +374,8 @@ describe.each(reports)(
 
       it('shows why input is invalid and does not save it', async () => {
         serveEditableReport();
-        renderReport(period);
-        await openReport(title);
+        renderReport();
+        await openReport(label);
 
         const groupSessions = settingInput('Mostly Booked', 'Group Sessions');
         fireEvent.change(groupSessions, { target: { value: '1.5' } });
@@ -438,8 +402,8 @@ describe.each(reports)(
             throw new Error('Failed to save Coach Capacity settings');
           },
         });
-        renderReport(period);
-        await openReport(title);
+        renderReport();
+        await openReport(label);
 
         fireEvent.change(settingInput('Lightly Booked', 'Projects'), {
           target: { value: '3' },
@@ -466,8 +430,8 @@ describe.each(reports)(
 
       it('edits a coach’s notes in a side panel and saves them with their settings', async () => {
         serveEditableReport();
-        renderReport(period);
-        await openReport(title);
+        renderReport();
+        await openReport(label);
 
         fireEvent.click(
           screen.getByRole('button', { name: 'Mostly Booked notes' }),
@@ -512,8 +476,8 @@ describe.each(reports)(
             throw new Error('Failed to save Coach Capacity settings');
           },
         });
-        renderReport(period);
-        await openReport(title);
+        renderReport();
+        await openReport(label);
 
         fireEvent.click(
           screen.getByRole('button', { name: 'Mostly Booked notes' }),
@@ -546,8 +510,8 @@ describe.each(reports)(
           [fetch]: async () =>
             withMemberships(report, [anaMembership, betoMembership]),
         });
-        renderReport(period);
-        await openReport(title);
+        renderReport();
+        await openReport(label);
 
         expect(screen.queryByText(/Memberships counted for/)).toBeNull();
         fireEvent.click(screen.getByRole('button', { name: 'Mostly Booked' }));
@@ -572,8 +536,8 @@ describe.each(reports)(
         overrideMockAdminReportsAdapter({
           [fetch]: async () => withMemberships(report, [anaMembership]),
         });
-        renderReport(period);
-        await openReport(title);
+        renderReport();
+        await openReport(label);
 
         fireEvent.click(screen.getByRole('button', { name: 'Not Set Up' }));
 
@@ -590,8 +554,8 @@ describe.each(reports)(
         overrideMockAdminReportsAdapter({
           [fetch]: async () => withMemberships(report, [anaMembership]),
         });
-        renderReport(period);
-        await openReport(title);
+        renderReport();
+        await openReport(label);
 
         fireEvent.click(screen.getByRole('button', { name: 'Mostly Booked' }));
         fireEvent.click(screen.getByRole('button', { name: 'Lightly Booked' }));
@@ -614,11 +578,11 @@ describe.each(reports)(
   },
 );
 
-describe('both coach capacity reports on one page', () => {
+describe('switching between Today and Two Weeks Out', () => {
   /**
-   * Serves both reports from one set of per-coach settings, the way the API
-   * does: saving a coach's settings changes them in either report, while each
-   * report keeps its own Coaching Hours.
+   * Serves both periods from one set of per-coach settings, the way the API
+   * does: saving a coach's settings changes them in either period, while each
+   * period keeps its own Coaching Hours.
    */
   function serveReportsSharingSettings(): void {
     const settingsByCoach = new Map(
@@ -653,21 +617,29 @@ describe('both coach capacity reports on one page', () => {
     });
   }
 
-  async function openBothReports(): Promise<void> {
-    fireEvent.click(screen.getByText(TODAY_TITLE));
-    fireEvent.click(screen.getByText(TWO_WEEKS_OUT_TITLE));
-    await waitFor(() => {
-      expect(screen.getAllByText('Mostly Booked')).toHaveLength(2);
-    });
+  /** Waits for the period whose Coaching Hours for Lightly Booked are `coachingHours` */
+  async function waitForPeriod(coachingHours: string): Promise<void> {
+    await waitFor(() =>
+      expect(
+        within(coachTableRow('Lightly Booked')).getByText(coachingHours),
+      ).toBeInTheDocument(),
+    );
   }
 
-  it('shows Two Weeks Out after Today, both collapsed and not fetched', () => {
-    renderBothReports();
+  const TODAY_HOURS = '5.33';
+  const TWO_WEEKS_OUT_HOURS = '4.00';
 
-    const titles = screen
-      .getAllByRole('region')
-      .map((region) => region.getAttribute('aria-label'));
-    expect(titles).toEqual([TODAY_TITLE, TWO_WEEKS_OUT_TITLE]);
+  it('is one collapsed Coach Capacity section that fetches nothing and shows no toggle', () => {
+    renderReport();
+
+    expect(
+      screen
+        .getAllByRole('region')
+        .map((region) => region.getAttribute('aria-label')),
+    ).toEqual([TITLE]);
+    expect(
+      screen.queryByRole('group', { name: 'Report period' }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(
       mockAdminReportsAdapter.getCoachCapacityTodayReport,
@@ -677,168 +649,233 @@ describe('both coach capacity reports on one page', () => {
     ).not.toHaveBeenCalled();
   });
 
-  it('shows each report its own Coaching Hours and Committed Hours', async () => {
+  it('opens on Today with a Today | Two Weeks Out toggle in its header', async () => {
     serveReportsSharingSettings();
-    renderBothReports();
-    await openBothReports();
+    renderReport();
 
-    // Committed Hours is Coaching Hours plus Projects, Internal Time, and Team
-    // Meeting (1.25 + 0.5 + 1), so the two reports differ by their Coaching Hours
-    const today = within(coachTableRow('Lightly Booked', section(TODAY_TITLE)));
-    expect(today.getByText('5.33')).toBeInTheDocument();
-    expect(today.getByText('8.08')).toBeInTheDocument();
-    const twoWeeksOut = within(
-      coachTableRow('Lightly Booked', section(TWO_WEEKS_OUT_TITLE)),
-    );
-    expect(twoWeeksOut.getByText('4.00')).toBeInTheDocument();
-    expect(twoWeeksOut.getByText('6.75')).toBeInTheDocument();
+    await openReport();
+    await waitForPeriod(TODAY_HOURS);
+
+    expect(
+      within(periodToggle())
+        .getAllByRole('button')
+        .map((button) => button.textContent),
+    ).toEqual(['Today', 'Two Weeks Out']);
+    expect(selectedPeriod()).toBe('Today');
+    expect(
+      mockAdminReportsAdapter.getCoachCapacityTodayReport,
+    ).toHaveBeenCalledOnce();
+    expect(
+      mockAdminReportsAdapter.getCoachCapacityTwoWeeksOutReport,
+    ).not.toHaveBeenCalled();
   });
 
-  it.each([
-    {
-      saveIn: TODAY_TITLE,
-      refetched: TWO_WEEKS_OUT_TITLE,
-      // Two Weeks Out has 4 Coaching Hours: 4 + 3 + 0.5 + 1
-      refetchedCommittedHours: '8.50',
-    },
-    {
-      saveIn: TWO_WEEKS_OUT_TITLE,
-      refetched: TODAY_TITLE,
-      // Today has 5.3333 Coaching Hours: 5.3333 + 3 + 0.5 + 1
-      refetchedCommittedHours: '9.83',
-    },
-  ])(
-    'refetches $refetched when a save in $saveIn succeeds',
-    async ({ saveIn, refetched, refetchedCommittedHours }) => {
-      serveReportsSharingSettings();
-      renderBothReports();
-      await openBothReports();
+  it('fetches the selected period on every switch', async () => {
+    serveReportsSharingSettings();
+    renderReport();
+    await openReport();
 
-      fireEvent.change(
-        settingInput('Lightly Booked', 'Projects', section(saveIn)),
-        { target: { value: '3' } },
-      );
-      fireEvent.click(
-        within(section(saveIn)).getByRole('button', { name: 'Save' }),
-      );
+    selectPeriod('Two Weeks Out');
+    expect(selectedPeriod()).toBe('Two Weeks Out');
+    await waitForPeriod(TWO_WEEKS_OUT_HOURS);
+    // Committed Hours is Coaching Hours plus Projects, Internal Time, and Team
+    // Meeting (1.25 + 0.5 + 1)
+    expect(
+      within(coachTableRow('Lightly Booked')).getByText('6.75'),
+    ).toBeInTheDocument();
+    selectPeriod('Today');
+    await waitForPeriod(TODAY_HOURS);
+    selectPeriod('Two Weeks Out');
+    await waitForPeriod(TWO_WEEKS_OUT_HOURS);
 
-      await waitFor(() =>
-        expect(
-          within(coachTableRow('Lightly Booked', section(refetched))).getByText(
-            refetchedCommittedHours,
-          ),
-        ).toBeInTheDocument(),
-      );
-      expect(
-        mockAdminReportsAdapter.updateCoachCapacitySettings,
-      ).toHaveBeenCalledOnce();
-      expect(
-        mockAdminReportsAdapter.getCoachCapacityTodayReport,
-      ).toHaveBeenCalledTimes(2);
-      expect(
-        mockAdminReportsAdapter.getCoachCapacityTwoWeeksOutReport,
-      ).toHaveBeenCalledTimes(2);
-      expect(
-        settingInput('Lightly Booked', 'Projects', section(refetched)),
-      ).toHaveValue(3);
-    },
-  );
+    expect(
+      mockAdminReportsAdapter.getCoachCapacityTodayReport,
+    ).toHaveBeenCalledTimes(2);
+    expect(
+      mockAdminReportsAdapter.getCoachCapacityTwoWeeksOutReport,
+    ).toHaveBeenCalledTimes(2);
+  });
 
-  it('shows each report’s own counted memberships for a coach', async () => {
+  it('opens on Today every time it is opened, refetching it', async () => {
+    serveReportsSharingSettings();
+    renderReport();
+    await openReport('Two Weeks Out');
+
+    toggleSection();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('group', { name: 'Report period' }),
+    ).not.toBeInTheDocument();
+    toggleSection();
+
+    expect(selectedPeriod()).toBe('Today');
+    await waitForPeriod(TODAY_HOURS);
+    expect(
+      mockAdminReportsAdapter.getCoachCapacityTodayReport,
+    ).toHaveBeenCalledTimes(2);
+    expect(
+      mockAdminReportsAdapter.getCoachCapacityTwoWeeksOutReport,
+    ).toHaveBeenCalledOnce();
+  });
+
+  it('keeps unsaved edits across a switch', async () => {
+    serveReportsSharingSettings();
+    renderReport();
+    await openReport();
+
+    fireEvent.change(settingInput('Lightly Booked', 'Projects'), {
+      target: { value: '3' },
+    });
+    selectPeriod('Two Weeks Out');
+    await waitForPeriod(TWO_WEEKS_OUT_HOURS);
+
+    expect(settingInput('Lightly Booked', 'Projects')).toHaveValue(3);
+    expect(screen.getByText('You have unsaved changes')).toBeInTheDocument();
+    selectPeriod('Today');
+    await waitForPeriod(TODAY_HOURS);
+    expect(settingInput('Lightly Booked', 'Projects')).toHaveValue(3);
+    expect(
+      mockAdminReportsAdapter.updateCoachCapacitySettings,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('refreshes the period being viewed on save, and shows the saved values in the other when switched to', async () => {
+    serveReportsSharingSettings();
+    renderReport();
+    await openReport('Two Weeks Out');
+    selectPeriod('Today');
+    await waitForPeriod(TODAY_HOURS);
+
+    fireEvent.change(settingInput('Lightly Booked', 'Projects'), {
+      target: { value: '3' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    // Today has 5.3333 Coaching Hours: 5.3333 + 3 + 0.5 + 1
+    await waitFor(() =>
+      expect(
+        within(coachTableRow('Lightly Booked')).getByText('9.83'),
+      ).toBeInTheDocument(),
+    );
+    // Opened, switched back to, then refetched by the save
+    expect(
+      mockAdminReportsAdapter.getCoachCapacityTodayReport,
+    ).toHaveBeenCalledTimes(3);
+
+    selectPeriod('Two Weeks Out');
+    await waitForPeriod(TWO_WEEKS_OUT_HOURS);
+
+    // Two Weeks Out has 4 Coaching Hours: 4 + 3 + 0.5 + 1
+    expect(
+      within(coachTableRow('Lightly Booked')).getByText('8.50'),
+    ).toBeInTheDocument();
+    expect(settingInput('Lightly Booked', 'Projects')).toHaveValue(3);
+    expect(
+      screen.queryByText('You have unsaved changes'),
+    ).not.toBeInTheDocument();
+    expect(
+      mockAdminReportsAdapter.updateCoachCapacitySettings,
+    ).toHaveBeenCalledOnce();
+  });
+
+  it('keeps the Notes panel open with its unsaved draft across a switch', async () => {
+    serveReportsSharingSettings();
+    renderReport();
+    await openReport();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Mostly Booked notes' }),
+    );
+    fireEvent.change(
+      within(
+        screen.getByRole('dialog', { name: 'Notes: Mostly Booked' }),
+      ).getByRole('textbox'),
+      { target: { value: 'Full until August' } },
+    );
+    selectPeriod('Two Weeks Out');
+
+    const panel = screen.getByRole('dialog', { name: 'Notes: Mostly Booked' });
+    expect(within(panel).getByRole('textbox')).toHaveValue('Full until August');
+    await waitForPeriod(TWO_WEEKS_OUT_HOURS);
+    expect(
+      within(
+        screen.getByRole('dialog', { name: 'Notes: Mostly Booked' }),
+      ).getByRole('textbox'),
+    ).toHaveValue('Full until August');
+
+    fireEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', {
+        name: 'Save notes',
+      }),
+    );
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    );
+    expect(
+      mockAdminReportsAdapter.updateCoachCapacitySettings,
+    ).toHaveBeenCalledExactlyOnceWith({
+      coachId: 1,
+      settings: expect.objectContaining({ notes: 'Full until August' }),
+    });
+    expect(
+      within(coachTableRow('Mostly Booked')).getByRole('button', {
+        name: 'Full until August',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps the drilldown on the same coach, showing their memberships in the newly selected period', async () => {
     overrideMockAdminReportsAdapter({
       getCoachCapacityTodayReport: async () =>
         withMemberships(report, [anaMembership]),
       getCoachCapacityTwoWeeksOutReport: async () =>
         withMemberships(twoWeeksOutReport, [anaMembership, betoMembership]),
     });
-    renderBothReports();
-    await openBothReports();
+    renderReport();
+    await openReport();
+    fireEvent.click(screen.getByRole('button', { name: 'Mostly Booked' }));
 
-    for (const title of [TODAY_TITLE, TWO_WEEKS_OUT_TITLE]) {
-      fireEvent.click(
-        within(section(title)).getByRole('button', { name: 'Mostly Booked' }),
-      );
-    }
-
-    const studentsIn = (title: string): string[] =>
+    const studentsShown = (): string[] =>
       drilldownRows(
-        within(section(title)).getByRole('region', {
+        screen.getByRole('region', {
           name: 'Memberships counted for Mostly Booked',
         }),
       ).map(([student]) => student);
-    expect(studentsIn(TODAY_TITLE)).toEqual(['Ana Student']);
-    expect(studentsIn(TWO_WEEKS_OUT_TITLE)).toEqual([
-      'Ana Student',
-      'Beto Student',
-    ]);
-  });
+    expect(studentsShown()).toEqual(['Ana Student']);
 
-  it('shows notes saved from one report in the other', async () => {
-    serveReportsSharingSettings();
-    renderBothReports();
-    await openBothReports();
-
-    fireEvent.click(
-      within(section(TODAY_TITLE)).getByRole('button', {
-        name: 'Mostly Booked notes',
-      }),
-    );
-    const panel = screen.getByRole('dialog', { name: 'Notes: Mostly Booked' });
-    fireEvent.change(within(panel).getByRole('textbox'), {
-      target: { value: 'Full until August' },
-    });
-    fireEvent.click(within(panel).getByRole('button', { name: 'Save notes' }));
-
-    await waitFor(() =>
-      expect(
-        within(
-          coachTableRow('Mostly Booked', section(TWO_WEEKS_OUT_TITLE)),
-        ).getByRole('button', { name: 'Full until August' }),
-      ).toBeInTheDocument(),
-    );
-  });
-
-  it('keeps unsaved edits in one report when a save in the other refetches it', async () => {
-    serveReportsSharingSettings();
-    renderBothReports();
-    await openBothReports();
-
-    fireEvent.change(
-      settingInput('Lightly Booked', 'Projects', section(TODAY_TITLE)),
-      { target: { value: '3' } },
-    );
-    fireEvent.change(
-      settingInput(
-        'Mostly Booked',
-        'Internal Time',
-        section(TWO_WEEKS_OUT_TITLE),
-      ),
-      { target: { value: '2' } },
-    );
-    fireEvent.click(
-      within(section(TWO_WEEKS_OUT_TITLE)).getByRole('button', {
-        name: 'Save',
-      }),
-    );
-
-    await waitFor(() =>
-      expect(
-        mockAdminReportsAdapter.getCoachCapacityTodayReport,
-      ).toHaveBeenCalledTimes(2),
-    );
-    // Today refetched, but its unsaved Projects edit is still waiting to be saved
-    await waitFor(() =>
-      expect(
-        within(section(TWO_WEEKS_OUT_TITLE)).queryByText(
-          'You have unsaved changes',
-        ),
-      ).not.toBeInTheDocument(),
-    );
+    selectPeriod('Two Weeks Out');
     expect(
-      settingInput('Lightly Booked', 'Projects', section(TODAY_TITLE)),
-    ).toHaveValue(3);
-    expect(
-      within(section(TODAY_TITLE)).getByText('You have unsaved changes'),
+      within(
+        screen.getByRole('region', {
+          name: 'Memberships counted for Mostly Booked',
+        }),
+      ).getByText('Loading memberships...'),
     ).toBeInTheDocument();
+
+    await waitFor(() =>
+      expect(studentsShown()).toEqual(['Ana Student', 'Beto Student']),
+    );
+  });
+
+  it('keeps the drilldown open with an empty state when the coach has no memberships in the newly selected period', async () => {
+    overrideMockAdminReportsAdapter({
+      getCoachCapacityTodayReport: async () =>
+        withMemberships(report, [anaMembership]),
+      getCoachCapacityTwoWeeksOutReport: async () =>
+        withMemberships(twoWeeksOutReport, []),
+    });
+    renderReport();
+    await openReport();
+    fireEvent.click(screen.getByRole('button', { name: 'Mostly Booked' }));
+
+    selectPeriod('Two Weeks Out');
+
+    const drilldown = screen.getByRole('region', {
+      name: 'Memberships counted for Mostly Booked',
+    });
+    expect(
+      await within(drilldown).findByText('No counted memberships'),
+    ).toBeInTheDocument();
+    expect(within(drilldown).queryByRole('table')).not.toBeInTheDocument();
   });
 });

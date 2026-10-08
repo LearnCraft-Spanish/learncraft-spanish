@@ -30,7 +30,8 @@ export function useCoachCapacityReportQuery(
   };
 
   // Capacity changes during the day, so unlike the other admin reports this one
-  // refetches every time it mounts (each time its section is opened).
+  // refetches every time it mounts (each time its section is opened) and every
+  // time its period is switched to.
   const coachCapacityReportQuery = useQuery({
     queryKey: [...COACH_CAPACITY_REPORT_QUERY_KEY, period],
     queryFn: fetchReport[period],

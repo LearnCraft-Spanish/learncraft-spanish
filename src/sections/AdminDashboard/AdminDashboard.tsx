@@ -29,8 +29,7 @@ export default function AdminDashboard() {
           <StudentsBySalariedCoach />
           <MembershipsByCoachReports />
           <WeeklyTimeCommitmentByCoach />
-          <CoachCapacityReport period="today" />
-          <CoachCapacityReport period="twoWeeksOut" />
+          <CoachCapacityReport />
           <LeadsToReEngage />
           <div className="admin-dashboard-grid">
             <ActiveMemberships />

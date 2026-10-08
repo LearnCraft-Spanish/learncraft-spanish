@@ -31,6 +31,7 @@ function drilldownState(
   return {
     coachName: 'Coach Ana',
     memberships,
+    isLoading: false,
     close: vi.fn(),
     ...overrides,
   };
@@ -85,6 +86,25 @@ describe('coach capacity drilldown', () => {
     render(<CoachCapacityDrilldown {...drilldownState({ memberships: [] })} />);
 
     expect(screen.getByText('No counted memberships')).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+  });
+
+  it('stays open on the coach and shows loading while their memberships load', () => {
+    render(
+      <CoachCapacityDrilldown
+        {...drilldownState({ memberships: [], isLoading: true })}
+      />,
+    );
+
+    expect(
+      screen.getByRole('region', { name: 'Memberships counted for Coach Ana' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Loading memberships...',
+    );
+    expect(
+      screen.queryByText('No counted memberships'),
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 

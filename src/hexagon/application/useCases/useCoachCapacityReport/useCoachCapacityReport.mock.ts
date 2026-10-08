@@ -1,8 +1,9 @@
 import type { UseCoachCapacityReportResult } from '@application/useCases/useCoachCapacityReport/useCoachCapacityReport';
-import type { CoachCapacityPeriod } from '@domain/functions/coachCapacity';
 import { createOverrideableMockHook } from '@testing/utils/createOverrideableMockHook';
 
 const defaultMockResult: UseCoachCapacityReportResult = {
+  period: 'today',
+  selectPeriod: () => {},
   tableProps: {
     rows: [],
     columns: [],
@@ -32,6 +33,7 @@ const defaultMockResult: UseCoachCapacityReportResult = {
   drilldown: {
     coachName: null,
     memberships: [],
+    isLoading: false,
     close: () => {},
   },
 };
@@ -40,9 +42,8 @@ export const {
   mock: mockUseCoachCapacityReport,
   override: overrideMockUseCoachCapacityReport,
   reset: resetMockUseCoachCapacityReport,
-} = createOverrideableMockHook<
-  [CoachCapacityPeriod],
-  UseCoachCapacityReportResult
->(defaultMockResult);
+} = createOverrideableMockHook<[], UseCoachCapacityReportResult>(
+  defaultMockResult,
+);
 
 export default mockUseCoachCapacityReport;
