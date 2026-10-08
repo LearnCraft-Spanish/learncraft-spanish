@@ -1,10 +1,10 @@
+import type { EditableTableUseCaseProps } from '@application/useCases/types';
 import type {
   CoachCapacityColumnId,
   CoachCapacityPeriod,
   CountedMembershipDisplayRow,
 } from '@domain/functions/coachCapacity';
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
-import type { EditableTableUseCaseProps } from '@interface/components/EditableTable/types';
 import type { CoachCapacitySettings } from '@learncraft-spanish/shared';
 import { useCoachCapacityReportQuery } from '@application/queries/AdminReportQueries/useCoachCapacityReportQuery';
 import { useUpdateCoachCapacitySettingsMutation } from '@application/queries/AdminReportQueries/useUpdateCoachCapacitySettingsMutation';

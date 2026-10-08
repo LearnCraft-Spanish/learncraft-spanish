@@ -79,3 +79,59 @@ export interface CreateTableUseCaseProps {
   /** Clear active cell info */
   clearActiveCellInfo?: () => void;
 }
+
+/**
+ * Contract for what a use case must provide to use EditableTable
+ * Defines the data, state, and actions that come from the use case layer
+ *
+ * Organized by concern:
+ * - Data: Core table data (rows, columns)
+ * - State: Derived state (dirty tracking, validation, loading states)
+ * - Actions: User interactions (cell changes, paste, save, discard)
+ * - Focus: Focus management for paste operations
+ */
+export interface EditableTableUseCaseProps {
+  // =============================================================================
+  // DATA
+  // =============================================================================
+  /** Table rows with current cell values */
+  rows: TableRow[];
+  /** Column definitions (domain layer) */
+  columns: ColumnDefinition[];
+
+  // =============================================================================
+  // STATE
+  // =============================================================================
+  /** Set of row IDs that have unsaved changes */
+  dirtyRowIds: Set<string>;
+  /** Validation errors by rowId -> columnId -> error message */
+  validationErrors: Record<string, Record<string, string>>;
+  /** Whether data is currently loading from server */
+  isLoading: boolean;
+  /** Whether save operation is in progress */
+  isSaving: boolean;
+  /** Whether all rows pass validation */
+  isValid: boolean;
+  /** Whether there are any unsaved changes */
+  hasUnsavedChanges?: boolean;
+
+  // =============================================================================
+  // ACTIONS
+  // =============================================================================
+  /** Handler for cell value changes */
+  onCellChange: (rowId: string, columnId: string, value: string) => void;
+  /** Handler for paste operations */
+  onPaste?: (e: ClipboardEvent<Element>) => void;
+  /** Handler to save changes */
+  onSave?: () => Promise<void>;
+  /** Handler to discard unsaved changes */
+  onDiscard?: () => void;
+
+  // =============================================================================
+  // FOCUS MANAGEMENT
+  // =============================================================================
+  /** Set active cell info (for paste operations) */
+  setActiveCellInfo?: (rowId: string, columnId: string) => void;
+  /** Clear active cell info */
+  clearActiveCellInfo?: () => void;
+}
