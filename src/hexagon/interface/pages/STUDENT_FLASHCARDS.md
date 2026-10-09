@@ -63,7 +63,7 @@ flowchart TB
   FilterCoord --> CourseCoord
 ```
 
-**Staff browse the Finder read-only.** A coach/admin who is not using the app as a student reaches `/flashcardfinder` (and `/customquiz`) from the "Student Tools" section of the staff home. There is no student collection, so `useFlashcardFinder` returns `canCollect: false` (domain rule `canCollectFlashcards`) and the page passes it to `ResultsSection`, which drops the select column, select-all, row Add/Owned, the Custom chip, and "Apply these filters to my flashcards". Search, filters, copy, and "Create a quiz from these examples" stay. `useCustomQuizV2` passes the same flag to the quiz props, so that quiz has no add/remove controls. While using as student, everything behaves as it does for a student.
+**Staff browse the Finder read-only.** A coach/admin who is not using the app as a student reaches `/customquiz` ("Custom Quiz") and `/flashcardfinder` ("Find Flashcards") from the "Student Tools" section of the staff home. There is no student collection, so `useFlashcardFinder` returns `canCollect: false` (domain rule `canCollectFlashcards`) and the page passes it to `ResultsSection`, which drops the select column, select-all, row Add/Owned, the Custom chip, and "Apply these filters to my flashcards". Search, filters, copy, and "Create a quiz from these examples" stay. `useCustomQuizV2` passes the same flag to the quiz props, so that quiz has no add/remove controls. While using as student, everything behaves as it does for a student.
 
 **Treat Manager and Finder as one redesign surface.** Students move between them (`Find More Matching Flashcards`, `Use these filters on my flashcards` via `?enableFiltering=true`). They share filter chrome and list-item chrome.
 

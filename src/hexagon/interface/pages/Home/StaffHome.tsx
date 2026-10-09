@@ -7,8 +7,9 @@ interface StaffHomeProps {
 
 /**
  * Coach/admin home while they are not using the app as a student. Internal
- * tools plus the read-only Flashcard Finder; every other student tool stays
- * behind "Use as student" in the header. Keeps the legacy `Menu` look (global
+ * tools plus the catalog tools that work without a student (Custom Quiz and
+ * the read-only Flashcard Finder); every other student tool stays behind
+ * "Use as student" in the header. Keeps the legacy `Menu` look (global
  * `menu` / `linkButton` classes) because these tools have not been redesigned.
  */
 export default function StaffHome({
@@ -18,6 +19,11 @@ export default function StaffHome({
     <div className="menu">
       <div className="menuBox">
         <h3>Student Tools</h3>
+        <div className="buttonBox">
+          <Link className="linkButton" to="/customquiz">
+            Custom Quiz
+          </Link>
+        </div>
         <div className="buttonBox">
           <Link className="linkButton" to="/flashcardfinder">
             Find Flashcards
