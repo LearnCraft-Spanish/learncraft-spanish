@@ -85,4 +85,32 @@ describe('editableTableHeader', () => {
     expect(mockGetDisplay).toHaveBeenCalledWith('active');
     expect(mockGetDisplay).toHaveBeenCalledWith('description');
   });
+
+  it('applies the pinned class and style to pinned column headers only', () => {
+    const getPinnedCell = (columnId: string) =>
+      columnId === 'name'
+        ? { className: 'pinnedLeft', style: { left: '0px', width: '200px' } }
+        : undefined;
+
+    render(
+      <table>
+        <thead>
+          <EditableTableHeader
+            columns={columns}
+            getDisplay={getDisplay}
+            getPinnedCell={getPinnedCell}
+          />
+        </thead>
+      </table>,
+    );
+
+    const nameHeader = screen.getByRole('columnheader', { name: 'Name' });
+    expect(nameHeader).toHaveClass('paste-table__column-header', 'pinnedLeft');
+    expect(nameHeader).toHaveStyle({ left: '0px', width: '200px' });
+    const activeHeader = screen.getByRole('columnheader', {
+      name: 'Is Active',
+    });
+    expect(activeHeader).not.toHaveClass('pinnedLeft');
+    expect(activeHeader).toHaveStyle({ width: '100px' });
+  });
 });

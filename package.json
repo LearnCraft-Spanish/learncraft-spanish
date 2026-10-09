@@ -50,7 +50,7 @@
     "@auth0/auth0-react": "^2.3.0",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
-    "@learncraft-spanish/shared": "^0.25.0",
+    "@learncraft-spanish/shared": "^0.26.0",
     "@sentry/cli": "^2.42.2",
     "@sentry/react": "^9.2.0",
     "@sentry/vite-plugin": "^3.2.1",
@@ -134,6 +134,13 @@
     "tsx": "^4.19.3",
     "vite": "^6.4.2",
     "vitest": "^3.0.7"
+  },
+  "pnpm": {
+    "overrides": {
+      "@typescript-eslint/eslint-plugin": "8.70.1",
+      "@typescript-eslint/parser": "8.70.1",
+      "typescript-eslint": "8.70.1"
+    }
   },
   "directories": {
     "test": "tests"

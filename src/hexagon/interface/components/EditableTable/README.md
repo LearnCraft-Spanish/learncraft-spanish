@@ -160,6 +160,12 @@ const { tableProps, saveError, audioErrorHandlers } = useExampleEditor();
 
 **Key Point**: The use case composes `tableProps` before returning, following the codebase pattern. The interface layer only needs to add presentation concerns (`displayConfig`, `renderCell`) to complete the contract.
 
+## Pinned Columns
+
+Set `pinned: 'left'` or `pinned: 'right'` on a column's `ColumnDisplayConfig` to keep it in view while the other columns scroll horizontally. Once any column is pinned the table scrolls inside its own container, and **every column needs a fixed `width`** (e.g. `'8rem'`, not `'1fr'`): pinned columns are offset by the widths of the pinned columns between them and their edge, and the table is sized to the sum of its column widths.
+
+Pinned columns on a side do not need to be adjacent to that edge. A right-pinned column followed by an unpinned one (Coach Capacity's Notes) sticks to the right edge until the table is scrolled far enough to show it in place.
+
 ## Key Principles
 
 1. **Explicit Contracts**: `EditableTableUseCaseProps` explicitly defines what the use case must provide

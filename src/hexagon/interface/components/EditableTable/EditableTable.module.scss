@@ -1,0 +1,22 @@
+.scrollContainer {
+  overflow-x: auto;
+}
+
+// Collapsed borders stay behind when sticky cells move; separate borders travel with them.
+.scrollingTable {
+  border-collapse: separate;
+}
+
+.pinnedLeft,
+.pinnedRight {
+  position: sticky;
+  z-index: 1;
+}
+
+.pinnedLeftEdge {
+  box-shadow: inset -2px 0 0 var(--dark);
+}
+
+.pinnedRightEdge {
+  box-shadow: inset 2px 0 0 var(--dark);
+}

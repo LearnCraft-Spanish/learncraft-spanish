@@ -1,0 +1,86 @@
+.textCell,
+.numberCell {
+  padding: 0.5rem;
+}
+
+.textCell {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.numberCell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+// Opaque so pinned read-only columns still hide the columns scrolling under them
+:global(.paste-table__cell-container):has(> .readOnlyCell) {
+  background-color: color-mix(in srgb, var(--dark) 6%, var(--light));
+  cursor: pointer;
+}
+
+.inputCell :global(.paste-table__cell) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.coachButton {
+  display: block;
+  inline-size: 100%;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--lcs-tint-hover);
+  }
+
+  &:focus-visible {
+    outline: var(--lcs-focus-ring);
+    outline-offset: calc(-1 * var(--lcs-focus-offset));
+  }
+}
+
+.notesButton {
+  display: block;
+  inline-size: 100%;
+  padding: 0.5rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--lcs-tint-hover);
+  }
+
+  &:focus-visible {
+    outline: var(--lcs-focus-ring);
+    outline-offset: calc(-1 * var(--lcs-focus-offset));
+  }
+}
+
+.notesPlaceholder {
+  color: var(--lcs-color-placeholder);
+}
+
+.message {
+  padding: 1rem;
+}
+
+.saveError {
+  margin: 0 0 var(--lcs-space-3);
+  padding: var(--lcs-space-3);
+  border-radius: var(--lcs-radius-sm);
+  background: var(--lcs-tint-error);
+  color: var(--lcs-color-error);
+}

@@ -1,6 +1,8 @@
 import type {
   ActiveMembershipsByCourse,
   AssignmentsCompletedByWeek,
+  CoachCapacityReportRow,
+  CoachCapacitySettings,
   CoachSummary,
   CoachSummaryDrilldown,
   GroupCallsByCoach,
@@ -12,6 +14,12 @@ import type {
 
 export type WeeksDrilldownReportName =
   'Weekly Coach Summary' | 'Last Week Coach Summary';
+
+/** Replaces one coach's whole Coach Capacity settings */
+export interface UpdateCoachCapacitySettingsCommand {
+  coachId: number;
+  settings: CoachCapacitySettings;
+}
 
 export interface AdminReportsPort {
   getMembershipsByCoachCurrentReport: () => Promise<MembershipsByCoach[]>;
@@ -39,4 +47,9 @@ export interface AdminReportsPort {
     WeeklyTimeCommitmentByCoach[]
   >;
   getLeadsToReEngageReport: () => Promise<LeadsToReEngage[]>;
+  getCoachCapacityTodayReport: () => Promise<CoachCapacityReportRow[]>;
+  getCoachCapacityTwoWeeksOutReport: () => Promise<CoachCapacityReportRow[]>;
+  updateCoachCapacitySettings: (
+    command: UpdateCoachCapacitySettingsCommand,
+  ) => Promise<CoachCapacitySettings>;
 }
