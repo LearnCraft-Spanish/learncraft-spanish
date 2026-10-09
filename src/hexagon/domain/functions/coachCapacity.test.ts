@@ -1,3 +1,4 @@
+import type { CoachCapacitySort } from '@domain/functions/coachCapacity';
 import type {
   CoachCapacityReportRow,
   CountedMembership,
@@ -5,13 +6,16 @@ import type {
 import {
   applyCoachCapacitySettings,
   computeCoachCapacityTotals,
+  DEFAULT_COACH_CAPACITY_SORT,
   formatBookedPercent,
   formatCoachCapacityHours,
   formatCoachCapacitySettingsCells,
   formatCoachCapacityTotalsCells,
+  isCoachCapacitySortColumnId,
   keepRowOrder,
   mapCoachCapacityRowToTableRow,
   mapCountedMembershipsToDisplayRows,
+  nextCoachCapacitySort,
   NOT_SET_DISPLAY,
   parseCoachCapacitySettingsCells,
   resolveCoachCapacitySettingsCells,
@@ -27,10 +31,12 @@ function coachRow(
   fullName: string,
   desiredHours: number | null,
   bookedPercent: number | null,
+  committedHours = 10,
 ): CoachCapacityReportRow {
   return createMockCoachCapacityReportRow({
     coach: { coach_id: fullName.length, fullName, email: 'coach@example.test' },
     settings: createMockCoachCapacitySettings({ desiredHours }),
+    committedHours,
     bookedPercent,
   });
 }
@@ -39,17 +45,38 @@ function names(rows: CoachCapacityReportRow[]): string[] {
   return rows.map((row) => row.coach.fullName);
 }
 
-describe('sortCoachCapacityRows', () => {
-  it('puts coaches with no Desired Hours first, then Booked % ascending', () => {
-    const rows = [
-      coachRow('Booked Eighty', 20, 80),
-      coachRow('Not Set Up', null, null),
-      coachRow('Booked Ten', 20, 10),
-      coachRow('Zero Desired', 0, null),
-      coachRow('Booked Fifty', 20, 50.5),
-    ];
+const bookedAscending: CoachCapacitySort = {
+  columnId: 'bookedPercent',
+  direction: 'ascending',
+};
+const bookedDescending: CoachCapacitySort = {
+  columnId: 'bookedPercent',
+  direction: 'descending',
+};
+const committedAscending: CoachCapacitySort = {
+  columnId: 'committedHours',
+  direction: 'ascending',
+};
+const committedDescending: CoachCapacitySort = {
+  columnId: 'committedHours',
+  direction: 'descending',
+};
 
-    expect(names(sortCoachCapacityRows(rows))).toEqual([
+describe('sortCoachCapacityRows', () => {
+  const bookedRows = [
+    coachRow('Booked Eighty', 20, 80),
+    coachRow('Not Set Up', null, null),
+    coachRow('Booked Ten', 20, 10),
+    coachRow('Zero Desired', 0, null),
+    coachRow('Booked Fifty', 20, 50.5),
+  ];
+
+  it('defaults to least booked first', () => {
+    expect(DEFAULT_COACH_CAPACITY_SORT).toEqual(bookedAscending);
+  });
+
+  it('by Booked % ascending, puts coaches with no Desired Hours first, then least booked', () => {
+    expect(names(sortCoachCapacityRows(bookedRows, bookedAscending))).toEqual([
       'Not Set Up',
       'Zero Desired',
       'Booked Ten',
@@ -58,39 +85,148 @@ describe('sortCoachCapacityRows', () => {
     ]);
   });
 
-  it('breaks Booked % ties by coach name', () => {
-    const rows = [
-      coachRow('Carla', 10, 40),
-      coachRow('Ana', 10, 40),
-      coachRow('Beto', 10, 40),
-    ];
-
-    expect(names(sortCoachCapacityRows(rows))).toEqual([
-      'Ana',
-      'Beto',
-      'Carla',
+  it('by Booked % descending, still puts coaches with no Desired Hours first, then most booked', () => {
+    expect(names(sortCoachCapacityRows(bookedRows, bookedDescending))).toEqual([
+      'Not Set Up',
+      'Zero Desired',
+      'Booked Eighty',
+      'Booked Fifty',
+      'Booked Ten',
     ]);
   });
 
-  it('sorts coaches without Desired Hours by name', () => {
-    const rows = [coachRow('Zoe', null, null), coachRow('Ana', null, null)];
+  it.each([bookedAscending, bookedDescending])(
+    'breaks Booked % ties by coach name A to Z ($direction)',
+    (sort) => {
+      const rows = [
+        coachRow('Carla', 10, 40),
+        coachRow('Ana', 10, 40),
+        coachRow('Beto', 10, 40),
+      ];
 
-    expect(names(sortCoachCapacityRows(rows))).toEqual(['Ana', 'Zoe']);
-  });
+      expect(names(sortCoachCapacityRows(rows, sort))).toEqual([
+        'Ana',
+        'Beto',
+        'Carla',
+      ]);
+    },
+  );
+
+  it.each([bookedAscending, bookedDescending])(
+    'sorts coaches without Desired Hours by name ($direction)',
+    (sort) => {
+      const rows = [coachRow('Zoe', null, null), coachRow('Ana', null, null)];
+
+      expect(names(sortCoachCapacityRows(rows, sort))).toEqual(['Ana', 'Zoe']);
+    },
+  );
 
   it('keeps a coach without Desired Hours ahead of a 0% booked coach', () => {
     const rows = [coachRow('Aaron', 10, 0), coachRow('Zoe', null, null)];
 
-    expect(names(sortCoachCapacityRows(rows))).toEqual(['Zoe', 'Aaron']);
+    expect(names(sortCoachCapacityRows(rows, bookedAscending))).toEqual([
+      'Zoe',
+      'Aaron',
+    ]);
+  });
+
+  describe('by Committed Hours', () => {
+    const committedRows = [
+      coachRow('Twelve', 20, 60, 12),
+      coachRow('Not Set Up', null, null, 8),
+      coachRow('Four', 20, 20, 4),
+      coachRow('Twenty', 20, 100, 20),
+    ];
+
+    it('sorts ascending, with coaches without Desired Hours among the rest', () => {
+      expect(
+        names(sortCoachCapacityRows(committedRows, committedAscending)),
+      ).toEqual(['Four', 'Not Set Up', 'Twelve', 'Twenty']);
+    });
+
+    it('sorts descending, with coaches without Desired Hours among the rest', () => {
+      expect(
+        names(sortCoachCapacityRows(committedRows, committedDescending)),
+      ).toEqual(['Twenty', 'Twelve', 'Not Set Up', 'Four']);
+    });
+
+    it.each([committedAscending, committedDescending])(
+      'breaks ties by coach name A to Z ($direction)',
+      (sort) => {
+        const rows = [
+          coachRow('Carla', 10, 80, 8),
+          coachRow('Ana', null, null, 8),
+          coachRow('Beto', 20, 40, 8),
+        ];
+
+        expect(names(sortCoachCapacityRows(rows, sort))).toEqual([
+          'Ana',
+          'Beto',
+          'Carla',
+        ]);
+      },
+    );
   });
 
   it('does not reorder the rows it was given', () => {
     const rows = [coachRow('Second', 10, 90), coachRow('First', 10, 10)];
 
-    sortCoachCapacityRows(rows);
+    sortCoachCapacityRows(rows, bookedAscending);
 
     expect(names(rows)).toEqual(['Second', 'First']);
   });
+});
+
+describe('nextCoachCapacitySort', () => {
+  it('switches Booked % between ascending and descending', () => {
+    const once = nextCoachCapacitySort(bookedAscending, 'bookedPercent');
+    const twice = nextCoachCapacitySort(once, 'bookedPercent');
+
+    expect(once).toEqual(bookedDescending);
+    expect(twice).toEqual(bookedAscending);
+  });
+
+  it('takes Committed Hours ascending, then descending, then back to the default', () => {
+    const once = nextCoachCapacitySort(
+      DEFAULT_COACH_CAPACITY_SORT,
+      'committedHours',
+    );
+    const twice = nextCoachCapacitySort(once, 'committedHours');
+    const thrice = nextCoachCapacitySort(twice, 'committedHours');
+
+    expect(once).toEqual(committedAscending);
+    expect(twice).toEqual(committedDescending);
+    expect(thrice).toEqual(DEFAULT_COACH_CAPACITY_SORT);
+  });
+
+  it.each([committedAscending, committedDescending])(
+    'sorts by Booked % ascending when it is clicked while Committed Hours is $direction',
+    (current) => {
+      expect(nextCoachCapacitySort(current, 'bookedPercent')).toEqual(
+        bookedAscending,
+      );
+    },
+  );
+
+  it('sorts by Committed Hours ascending when it is clicked while Booked % is descending', () => {
+    expect(nextCoachCapacitySort(bookedDescending, 'committedHours')).toEqual(
+      committedAscending,
+    );
+  });
+});
+
+describe('isCoachCapacitySortColumnId', () => {
+  it('accepts Committed Hours and Booked %', () => {
+    expect(isCoachCapacitySortColumnId('committedHours')).toBe(true);
+    expect(isCoachCapacitySortColumnId('bookedPercent')).toBe(true);
+  });
+
+  it.each(['coach', 'coachingHours', 'desiredHours', 'notes', ''])(
+    'rejects "%s"',
+    (columnId) => {
+      expect(isCoachCapacitySortColumnId(columnId)).toBe(false);
+    },
+  );
 });
 
 describe('keepRowOrder', () => {
