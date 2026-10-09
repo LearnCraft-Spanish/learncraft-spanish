@@ -1,4 +1,4 @@
-import type { UpdateCoachCapacitySettingsCommand } from '@application/ports/AdminReports/adminReportsPort';
+import type { UpdateCoachCapacitySettingsVariables } from '@application/queries/AdminReportQueries/useUpdateCoachCapacitySettingsMutation';
 import type { UseCoachCapacityReportResult } from '@application/useCases/useCoachCapacityReport/useCoachCapacityReport';
 import type { CoachCapacityPeriod } from '@domain/functions/coachCapacity';
 import type {
@@ -18,11 +18,9 @@ import {
   resetMockUseUpdateCoachCapacitySettingsMutation,
 } from '@application/queries/AdminReportQueries/useUpdateCoachCapacitySettingsMutation.mock';
 import { useCoachCapacityReport } from '@application/useCases/useCoachCapacityReport/useCoachCapacityReport';
+import { applyCoachCapacitySettings } from '@domain/functions/coachCapacity';
 import { act, renderHook } from '@testing-library/react';
-import {
-  createMockCoachCapacityReportRow,
-  createMockCoachCapacitySettings,
-} from '@testing/factories/adminReportsFactory';
+import { createMockCoachCapacityReportRow } from '@testing/factories/adminReportsFactory';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock(
@@ -53,26 +51,47 @@ function queryResult(
   } as UseQueryResult<CoachCapacityReportRow[]>;
 }
 
+const defaultSettings = {
+  groupSessionsPerWeek: 2,
+  projectsHours: 1.25,
+  internalTimeHours: 0.5,
+  teamMeetingHours: 1,
+  desiredHours: 20,
+};
+
+/** A coach as the API reports them, with totals that follow from their hours and settings */
 function coachRow(
   coachId: number,
   fullName: string,
-  bookedPercent: number | null,
-  settings: Partial<CoachCapacitySettings> = {},
+  {
+    privateCallHours,
+    adminTimeHours = 0.5,
+    settings = {},
+  }: {
+    privateCallHours: number;
+    adminTimeHours?: number;
+    settings?: Partial<CoachCapacitySettings>;
+  },
 ): CoachCapacityReportRow {
-  return createMockCoachCapacityReportRow({
-    coach: { coach_id: coachId, fullName, email: 'coach@example.test' },
-    settings: createMockCoachCapacitySettings({
-      groupSessionsPerWeek: 2,
-      projectsHours: 1.25,
-      internalTimeHours: 0.5,
-      teamMeetingHours: 1,
-      desiredHours: bookedPercent === null ? null : 20,
-      notes: `${fullName} notes`,
-      ...settings,
+  return applyCoachCapacitySettings(
+    createMockCoachCapacityReportRow({
+      coach: { coach_id: coachId, fullName, email: 'coach@example.test' },
+      privateCallHours,
+      adminTimeHours,
+      countedMemberships: [],
     }),
-    bookedPercent,
-  });
+    { ...defaultSettings, notes: `${fullName} notes`, ...settings },
+  );
 }
+
+// Booked % 93%: 13.25 + 0.5 + 2 = 15.75 Coaching Hours, 18.5 Committed
+const mostlyBooked = coachRow(1, 'Mostly Booked', { privateCallHours: 13.25 });
+// Booked % 31%: 1 + 0.5 + 2 = 3.5 Coaching Hours, 6.25 Committed
+const lightlyBooked = coachRow(2, 'Lightly Booked', { privateCallHours: 1 });
+const notSetUp = coachRow(3, 'Not Set Up', {
+  privateCallHours: 4,
+  settings: { desiredHours: null },
+});
 
 function showReport(rows: CoachCapacityReportRow[]): void {
   overrideMockUseCoachCapacityReportQuery({
@@ -85,7 +104,7 @@ function showReport(rows: CoachCapacityReportRow[]): void {
 }
 
 type UpdateSettings = (
-  command: UpdateCoachCapacitySettingsCommand,
+  variables: UpdateCoachCapacitySettingsVariables,
 ) => Promise<CoachCapacitySettings>;
 
 function mockUpdateSettings(implementation: UpdateSettings) {
@@ -97,10 +116,26 @@ function mockUpdateSettings(implementation: UpdateSettings) {
     } as UseMutationResult<
       CoachCapacitySettings,
       Error,
-      UpdateCoachCapacitySettingsCommand
+      UpdateCoachCapacitySettingsVariables
     >,
   });
   return mutateAsync;
+}
+
+/** Saves succeed, returning the saved row's settings with the changes */
+function saveSucceeds() {
+  return mockUpdateSettings(async ({ coachId, changes }) => {
+    const row = [mostlyBooked, lightlyBooked, notSetUp].find(
+      (coach) => coach.coach.coach_id === coachId,
+    );
+    return { ...row!.settings, ...changes };
+  });
+}
+
+function saveFails() {
+  return mockUpdateSettings(async () => {
+    throw new Error('Failed to save');
+  });
 }
 
 function cellsOf(
@@ -112,13 +147,41 @@ function cellsOf(
   return row.cells;
 }
 
+function totalsOf(
+  result: { current: UseCoachCapacityReportResult },
+  rowId: string,
+): [string, string, string] {
+  const { coachingHours, committedHours, bookedPercent } = cellsOf(
+    result,
+    rowId,
+  );
+  return [coachingHours, committedHours, bookedPercent];
+}
+
+function rowOrder(result: { current: UseCoachCapacityReportResult }) {
+  return result.current.tableProps.rows.map((row) => row.cells.coach);
+}
+
+function typeInto(
+  result: { current: UseCoachCapacityReportResult },
+  rowId: string,
+  columnId: string,
+  value: string,
+): void {
+  act(() => result.current.tableProps.onCellChange(rowId, columnId, value));
+}
+
+async function commit(
+  result: { current: UseCoachCapacityReportResult },
+  rowId: string,
+  columnId: string,
+): Promise<void> {
+  await act(async () => result.current.commitCell(rowId, columnId));
+}
+
 describe('useCoachCapacityReport', () => {
   beforeEach(() => {
-    showReport([
-      coachRow(1, 'Mostly Booked', 90),
-      coachRow(2, 'Lightly Booked', 15, { projectsHours: 2 }),
-      coachRow(3, 'Not Set Up', null),
-    ]);
+    showReport([mostlyBooked, lightlyBooked, notSetUp]);
   });
 
   afterEach(() => {
@@ -137,12 +200,12 @@ describe('useCoachCapacityReport', () => {
     };
 
     const todayRows = [
-      { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [membership] },
-      { ...coachRow(2, 'Lightly Booked', 15), coachingHours: 5 },
+      { ...mostlyBooked, countedMemberships: [membership] },
+      lightlyBooked,
     ];
     const twoWeeksOutRows = [
-      { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [] },
-      { ...coachRow(2, 'Lightly Booked', 15), coachingHours: 3 },
+      mostlyBooked,
+      coachRow(2, 'Lightly Booked', { privateCallHours: 0 }),
     ];
 
     /** Serves each period its own report; a period missing from `loaded` is still loading */
@@ -176,15 +239,13 @@ describe('useCoachCapacityReport', () => {
       expect(useCoachCapacityReportQuery).toHaveBeenLastCalledWith(
         'twoWeeksOut',
       );
-      expect(cellsOf(result, '2').coachingHours).toBe('3.00');
+      expect(cellsOf(result, '2').coachingHours).toBe('2.50');
     });
 
-    it('keeps unsaved edits across a switch, including while the new period loads', () => {
+    it('keeps unsaved edits, and counts them in the totals, across a switch', () => {
       showReportsByPeriod({ today: todayRows });
       const { result, rerender } = renderHook(() => useCoachCapacityReport());
-      act(() =>
-        result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
-      );
+      typeInto(result, '2', 'projectsHours', '3');
 
       act(() => result.current.selectPeriod('twoWeeksOut'));
       expect(result.current.tableProps.isLoading).toBe(true);
@@ -193,16 +254,30 @@ describe('useCoachCapacityReport', () => {
       rerender();
 
       expect(cellsOf(result, '2').projectsHours).toBe('3');
-      expect(cellsOf(result, '2').coachingHours).toBe('3.00');
+      // 2.5 Coaching Hours two weeks out + 3 + 0.5 + 1
+      expect(totalsOf(result, '2')).toEqual(['2.50', '7.00', '35%']);
       expect(result.current.tableProps.dirtyRowIds).toEqual(new Set(['2']));
       act(() => result.current.selectPeriod('today'));
       expect(cellsOf(result, '2').projectsHours).toBe('3');
     });
 
+    it('keeps a value that failed to save, with its error, across a switch', async () => {
+      saveFails();
+      showReportsByPeriod({ today: todayRows, twoWeeksOut: twoWeeksOutRows });
+      const { result } = renderHook(() => useCoachCapacityReport());
+      typeInto(result, '2', 'projectsHours', '3');
+      await commit(result, '2', 'projectsHours');
+
+      act(() => result.current.selectPeriod('twoWeeksOut'));
+
+      expect(cellsOf(result, '2').projectsHours).toBe('3.00');
+      expect(totalsOf(result, '2')).toEqual(['2.50', '7.00', '35%']);
+      expect(result.current.tableProps.dirtyRowIds).toEqual(new Set(['2']));
+      expect(result.current.saveError).toContain('Lightly Booked');
+    });
+
     it('keeps the notes panel open with its draft across a switch', async () => {
-      const updateSettings = mockUpdateSettings(
-        async ({ settings }) => settings,
-      );
+      const updateSettings = saveSucceeds();
       showReportsByPeriod({ today: todayRows });
       const { result, rerender } = renderHook(() => useCoachCapacityReport());
       act(() => result.current.openNotes('1'));
@@ -218,15 +293,13 @@ describe('useCoachCapacityReport', () => {
 
       expect(updateSettings).toHaveBeenCalledExactlyOnceWith({
         coachId: 1,
-        settings: expect.objectContaining({ notes: 'Full until August' }),
+        changes: { notes: 'Full until August' },
       });
       expect(result.current.notesPanel.coachName).toBeNull();
     });
 
     it('does not save notes before the selected period has loaded', async () => {
-      const updateSettings = mockUpdateSettings(
-        async ({ settings }) => settings,
-      );
+      const updateSettings = saveSucceeds();
       showReportsByPeriod({ today: todayRows });
       const { result } = renderHook(() => useCoachCapacityReport());
       act(() => result.current.openNotes('1'));
@@ -263,14 +336,31 @@ describe('useCoachCapacityReport', () => {
     it('returns one row per coach, least booked first', () => {
       const { result } = renderHook(() => useCoachCapacityReport());
 
-      expect(result.current.tableProps.rows.map((row) => row.id)).toEqual([
-        '3',
-        '2',
-        '1',
+      expect(rowOrder(result)).toEqual([
+        'Not Set Up',
+        'Lightly Booked',
+        'Mostly Booked',
       ]);
       expect(
         result.current.tableProps.rows.map((row) => row.cells.bookedPercent),
-      ).toEqual(['—', '15%', '90%']);
+      ).toEqual(['—', '31%', '93%']);
+    });
+
+    it('works out the totals from the report’s Private Call and Admin Time hours and the settings', () => {
+      showReport([
+        {
+          ...lightlyBooked,
+          privateCallHours: 2,
+          adminTimeHours: 0.25,
+          coachingHours: 99,
+          committedHours: 99,
+          bookedPercent: 99,
+        },
+      ]);
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      // 2 + 0.25 + 2 group sessions; + 1.25 + 0.5 + 1; ÷ 20
+      expect(totalsOf(result, '2')).toEqual(['4.25', '7.00', '35%']);
     });
 
     it('makes the five settings editable and the rest read-only', () => {
@@ -293,6 +383,13 @@ describe('useCoachCapacityReport', () => {
         ['bookedPercent', false],
         ['notes', false],
       ]);
+    });
+
+    it('has no Save or Discard', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      expect(result.current.tableProps.onSave).toBeUndefined();
+      expect(result.current.tableProps.onDiscard).toBeUndefined();
     });
 
     it('returns no rows while the report is loading', () => {
@@ -323,139 +420,273 @@ describe('useCoachCapacityReport', () => {
     });
   });
 
-  describe('editing settings', () => {
-    it('marks an edited coach as having unsaved changes', () => {
+  describe('totals while typing', () => {
+    it('update the edited row on every keystroke', () => {
       const { result } = renderHook(() => useCoachCapacityReport());
 
-      act(() =>
-        result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
-      );
+      typeInto(result, '2', 'projectsHours', '3');
+      expect(totalsOf(result, '2')).toEqual(['3.50', '8.00', '40%']);
 
-      expect(cellsOf(result, '2').projectsHours).toBe('3');
-      expect(result.current.tableProps.dirtyRowIds).toEqual(new Set(['2']));
-      expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
+      typeInto(result, '2', 'projectsHours', '3.5');
+      expect(totalsOf(result, '2')).toEqual(['3.50', '8.50', '43%']);
+
+      typeInto(result, '2', 'teamMeetingHours', '2');
+      expect(totalsOf(result, '2')).toEqual(['3.50', '9.50', '48%']);
+      expect(totalsOf(result, '1')).toEqual(['15.75', '18.50', '93%']);
+    });
+
+    it('move Coaching Hours with Group Sessions', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      typeInto(result, '2', 'groupSessionsPerWeek', '4');
+
+      expect(totalsOf(result, '2')).toEqual(['5.50', '8.25', '41%']);
+    });
+
+    it.each(['', '0'])(
+      'show no Booked %% when Desired Hours is "%s"',
+      (desiredHours) => {
+        const { result } = renderHook(() => useCoachCapacityReport());
+
+        typeInto(result, '2', 'desiredHours', desiredHours);
+
+        expect(totalsOf(result, '2')).toEqual(['3.50', '6.25', '—']);
+      },
+    );
+
+    it('stay at the last valid value while a cell is invalid', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      typeInto(result, '2', 'projectsHours', '3');
+      typeInto(result, '2', 'projectsHours', '3.1');
+      expect(totalsOf(result, '2')).toEqual(['3.50', '8.00', '40%']);
+      expect(result.current.tableProps.validationErrors).toEqual({
+        '2': { projectsHours: 'Enter hours from 0 to 40 in steps of 0.25' },
+      });
+
+      typeInto(result, '2', 'teamMeetingHours', '2');
+      expect(totalsOf(result, '2')).toEqual(['3.50', '9.00', '45%']);
+
+      typeInto(result, '2', 'projectsHours', '3.25');
+      expect(totalsOf(result, '2')).toEqual(['3.50', '9.25', '46%']);
       expect(result.current.tableProps.isValid).toBe(true);
     });
 
-    it('flags invalid input on its cell and blocks saving', () => {
+    it('stay at the saved value when the first value typed is invalid', () => {
       const { result } = renderHook(() => useCoachCapacityReport());
 
-      act(() =>
-        result.current.tableProps.onCellChange('2', 'projectsHours', '1.1'),
-      );
-      act(() =>
-        result.current.tableProps.onCellChange(
-          '1',
-          'groupSessionsPerWeek',
-          '1.5',
-        ),
-      );
+      typeInto(result, '1', 'groupSessionsPerWeek', '1.5');
 
-      expect(result.current.tableProps.isValid).toBe(false);
+      expect(totalsOf(result, '1')).toEqual(['15.75', '18.50', '93%']);
       expect(result.current.tableProps.validationErrors).toEqual({
-        '2': { projectsHours: 'Enter hours from 0 to 40 in steps of 0.25' },
         '1': { groupSessionsPerWeek: 'Enter a whole number from 0 to 40' },
       });
     });
+  });
 
-    it('saves each edited coach with their full settings, then clears the edits', async () => {
-      const updateSettings = mockUpdateSettings(
-        async ({ settings }) => settings,
-      );
+  describe('saving', () => {
+    it('sends nothing while the admin types', async () => {
+      const updateSettings = saveSucceeds();
       const { result } = renderHook(() => useCoachCapacityReport());
 
-      act(() =>
-        result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
-      );
-      act(() =>
-        result.current.tableProps.onCellChange('3', 'desiredHours', '25'),
-      );
-      await act(() => result.current.tableProps.onSave!());
+      typeInto(result, '2', 'projectsHours', '3');
+      typeInto(result, '2', 'teamMeetingHours', '2');
+      await act(async () => {});
 
-      expect(updateSettings).toHaveBeenCalledTimes(2);
-      expect(updateSettings).toHaveBeenCalledWith({
+      expect(updateSettings).not.toHaveBeenCalled();
+      expect(result.current.tableProps.dirtyRowIds).toEqual(new Set(['2']));
+    });
+
+    it('saves the coach’s settings once when an edited cell is committed', async () => {
+      const updateSettings = saveSucceeds();
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      typeInto(result, '2', 'projectsHours', '3');
+      await commit(result, '2', 'projectsHours');
+      await commit(result, '2', 'projectsHours');
+
+      expect(updateSettings).toHaveBeenCalledExactlyOnceWith({
         coachId: 2,
-        settings: {
+        changes: {
           groupSessionsPerWeek: 2,
           projectsHours: 3,
           internalTimeHours: 0.5,
           teamMeetingHours: 1,
           desiredHours: 20,
-          notes: 'Lightly Booked notes',
         },
       });
-      expect(updateSettings).toHaveBeenCalledWith({
-        coachId: 3,
-        settings: {
-          groupSessionsPerWeek: 2,
-          projectsHours: 1.25,
-          internalTimeHours: 0.5,
-          teamMeetingHours: 1,
-          desiredHours: 25,
-          notes: 'Not Set Up notes',
-        },
-      });
-      expect(result.current.tableProps.hasUnsavedChanges).toBe(false);
-      expect(result.current.saveError).toBeNull();
-      expect(result.current.tableProps.isSaving).toBe(false);
+    });
+
+    it('does not save a cell that was not edited', async () => {
+      const updateSettings = saveSucceeds();
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      typeInto(result, '2', 'projectsHours', '3');
+      await commit(result, '2', 'teamMeetingHours');
+      await commit(result, '1', 'projectsHours');
+
+      expect(updateSettings).not.toHaveBeenCalled();
     });
 
     it('sends a cleared Desired Hours as not set', async () => {
-      const updateSettings = mockUpdateSettings(
-        async ({ settings }) => settings,
-      );
+      const updateSettings = saveSucceeds();
       const { result } = renderHook(() => useCoachCapacityReport());
 
-      act(() =>
-        result.current.tableProps.onCellChange('1', 'desiredHours', ''),
-      );
-      await act(() => result.current.tableProps.onSave!());
+      typeInto(result, '1', 'desiredHours', '');
+      await commit(result, '1', 'desiredHours');
 
       expect(updateSettings).toHaveBeenCalledWith({
         coachId: 1,
-        settings: expect.objectContaining({ desiredHours: null }),
+        changes: expect.objectContaining({ desiredHours: null }),
       });
     });
 
-    it('keeps the edits of coaches whose save failed and names them', async () => {
-      mockUpdateSettings(async ({ coachId, settings }) => {
-        if (coachId === 2) throw new Error('Failed to save');
-        return settings;
-      });
+    it('formats a committed value like a saved one', async () => {
+      saveSucceeds();
       const { result } = renderHook(() => useCoachCapacityReport());
 
-      act(() =>
-        result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
-      );
-      act(() =>
-        result.current.tableProps.onCellChange('3', 'desiredHours', '25'),
-      );
-      await act(() => result.current.tableProps.onSave!());
+      typeInto(result, '2', 'projectsHours', '3');
+      await commit(result, '2', 'projectsHours');
+
+      expect(cellsOf(result, '2').projectsHours).toBe('3.00');
+    });
+
+    it('does not send an invalid value', async () => {
+      const updateSettings = saveSucceeds();
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      typeInto(result, '2', 'projectsHours', '3.1');
+      await commit(result, '2', 'projectsHours');
+
+      expect(updateSettings).not.toHaveBeenCalled();
+      expect(cellsOf(result, '2').projectsHours).toBe('3.1');
+      expect(totalsOf(result, '2')).toEqual(['3.50', '6.25', '31%']);
+    });
+
+    it('stops marking the coach as edited once the report holds the saved settings, keeping newer typing', async () => {
+      saveSucceeds();
+      const { result, rerender } = renderHook(() => useCoachCapacityReport());
+      typeInto(result, '2', 'projectsHours', '3');
+      await commit(result, '2', 'projectsHours');
+      typeInto(result, '1', 'teamMeetingHours', '2');
+
+      showReport([
+        mostlyBooked,
+        applyCoachCapacitySettings(lightlyBooked, {
+          ...lightlyBooked.settings,
+          projectsHours: 3,
+        }),
+        notSetUp,
+      ]);
+      rerender();
+
+      expect(result.current.tableProps.dirtyRowIds).toEqual(new Set(['1']));
+      expect(cellsOf(result, '2').projectsHours).toBe('3.00');
+      expect(cellsOf(result, '1').teamMeetingHours).toBe('2');
+    });
+
+    it('keeps a value that failed to save, names the coach, and counts it in the totals', async () => {
+      saveFails();
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      typeInto(result, '2', 'projectsHours', '3');
+      await commit(result, '2', 'projectsHours');
 
       expect(result.current.saveError).toBe(
         'Could not save settings for Lightly Booked. Your changes are still in the table.',
       );
+      expect(cellsOf(result, '2').projectsHours).toBe('3.00');
       expect(result.current.tableProps.dirtyRowIds).toEqual(new Set(['2']));
-      expect(cellsOf(result, '2').projectsHours).toBe('3');
-      expect(cellsOf(result, '3').desiredHours).toBe('');
+      expect(totalsOf(result, '2')).toEqual(['3.50', '8.00', '40%']);
     });
 
-    it('clears the save error when the edits are discarded', async () => {
-      mockUpdateSettings(async () => {
-        throw new Error('Failed to save');
+    it('retries a failed save the next time the cell is edited, clearing the error once it saves', async () => {
+      const updateSettings = saveFails();
+      const { result } = renderHook(() => useCoachCapacityReport());
+      typeInto(result, '2', 'projectsHours', '3');
+      await commit(result, '2', 'projectsHours');
+      await commit(result, '2', 'projectsHours');
+      expect(updateSettings).toHaveBeenCalledOnce();
+
+      const retry = saveSucceeds();
+      typeInto(result, '2', 'projectsHours', '3.5');
+      await commit(result, '2', 'projectsHours');
+
+      expect(retry).toHaveBeenCalledExactlyOnceWith({
+        coachId: 2,
+        changes: expect.objectContaining({ projectsHours: 3.5 }),
       });
+      expect(result.current.saveError).toBeNull();
+    });
+
+    it('names every coach whose latest save failed', async () => {
+      saveFails();
       const { result } = renderHook(() => useCoachCapacityReport());
 
-      act(() =>
-        result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
+      typeInto(result, '2', 'projectsHours', '3');
+      await commit(result, '2', 'projectsHours');
+      typeInto(result, '3', 'desiredHours', '25');
+      await commit(result, '3', 'desiredHours');
+
+      expect(result.current.saveError).toBe(
+        'Could not save settings for Lightly Booked, Not Set Up. Your changes are still in the table.',
       );
-      await act(() => result.current.tableProps.onSave!());
-      expect(result.current.saveError).not.toBeNull();
+    });
 
-      act(() => result.current.tableProps.onDiscard!());
+    it('is saving while a save is on its way', async () => {
+      let finishSave = (): void => {};
+      mockUpdateSettings(
+        ({ changes }) =>
+          new Promise((resolve) => {
+            finishSave = () =>
+              resolve({ ...lightlyBooked.settings, ...changes });
+          }),
+      );
+      const { result } = renderHook(() => useCoachCapacityReport());
 
-      expect(result.current.saveError).toBeNull();
-      expect(cellsOf(result, '2').projectsHours).toBe('2.00');
+      typeInto(result, '2', 'projectsHours', '3');
+      await commit(result, '2', 'projectsHours');
+      expect(result.current.tableProps.isSaving).toBe(true);
+
+      await act(async () => finishSave());
+      expect(result.current.tableProps.isSaving).toBe(false);
+    });
+  });
+
+  describe('row order', () => {
+    it('re-sorts by the values shown, edits included', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      // 6.25 Committed Hours ÷ 5 Desired Hours = 125%
+      typeInto(result, '2', 'desiredHours', '5');
+
+      expect(rowOrder(result)).toEqual([
+        'Not Set Up',
+        'Mostly Booked',
+        'Lightly Booked',
+      ]);
+    });
+
+    it('holds while focus is in the table and re-sorts once it leaves', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      act(() => result.current.onTableFocus());
+      typeInto(result, '2', 'desiredHours', '5');
+      act(() => result.current.onTableFocus());
+      // 9.25 Committed Hours ÷ 5 Desired Hours = 185%
+      typeInto(result, '3', 'desiredHours', '5');
+      expect(rowOrder(result)).toEqual([
+        'Not Set Up',
+        'Lightly Booked',
+        'Mostly Booked',
+      ]);
+
+      act(() => result.current.onTableBlur());
+      expect(rowOrder(result)).toEqual([
+        'Mostly Booked',
+        'Lightly Booked',
+        'Not Set Up',
+      ]);
     });
   });
 
@@ -470,38 +701,25 @@ describe('useCoachCapacityReport', () => {
       expect(result.current.notesPanel.draft).toBe('Lightly Booked notes');
     });
 
-    it('saves the edited notes with the coach’s saved settings, then closes', async () => {
-      const updateSettings = mockUpdateSettings(
-        async ({ settings }) => settings,
-      );
+    it('saves only the edited notes, keeping the coach’s saved settings, then closes', async () => {
+      const updateSettings = saveSucceeds();
       const { result } = renderHook(() => useCoachCapacityReport());
 
-      act(() =>
-        result.current.tableProps.onCellChange('2', 'projectsHours', '3'),
-      );
+      typeInto(result, '2', 'projectsHours', '3');
       act(() => result.current.openNotes('2'));
       act(() => result.current.notesPanel.setDraft('Back from leave in May'));
       await act(() => result.current.notesPanel.save());
 
       expect(updateSettings).toHaveBeenCalledExactlyOnceWith({
         coachId: 2,
-        settings: {
-          groupSessionsPerWeek: 2,
-          projectsHours: 2,
-          internalTimeHours: 0.5,
-          teamMeetingHours: 1,
-          desiredHours: 20,
-          notes: 'Back from leave in May',
-        },
+        changes: { notes: 'Back from leave in May' },
       });
       expect(result.current.notesPanel.coachName).toBeNull();
       expect(result.current.tableProps.dirtyRowIds).toEqual(new Set(['2']));
     });
 
     it('stays open with the draft and an error when the save fails', async () => {
-      mockUpdateSettings(async () => {
-        throw new Error('Failed to save');
-      });
+      saveFails();
       const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() => result.current.openNotes('1'));
@@ -514,12 +732,11 @@ describe('useCoachCapacityReport', () => {
         'Notes could not be saved. Try again.',
       );
       expect(result.current.notesPanel.isSaving).toBe(false);
+      expect(result.current.saveError).toBeNull();
     });
 
     it('closes without saving', () => {
-      const updateSettings = mockUpdateSettings(
-        async ({ settings }) => settings,
-      );
+      const updateSettings = saveSucceeds();
       const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() => result.current.openNotes('1'));
@@ -549,11 +766,8 @@ describe('useCoachCapacityReport', () => {
 
     it('opens on a coach with their counted memberships', () => {
       showReport([
-        { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [] },
-        {
-          ...coachRow(2, 'Lightly Booked', 15),
-          countedMemberships: [membership],
-        },
+        mostlyBooked,
+        { ...lightlyBooked, countedMemberships: [membership] },
       ]);
       const { result } = renderHook(() => useCoachCapacityReport());
 
@@ -574,9 +788,7 @@ describe('useCoachCapacityReport', () => {
     });
 
     it('opens on a coach with no counted memberships', () => {
-      showReport([
-        { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [] },
-      ]);
+      showReport([mostlyBooked]);
       const { result } = renderHook(() => useCoachCapacityReport());
 
       act(() => result.current.openDrilldown('1'));
@@ -586,18 +798,11 @@ describe('useCoachCapacityReport', () => {
     });
 
     it('shows the refetched memberships of the open coach', () => {
-      showReport([
-        { ...coachRow(1, 'Mostly Booked', 90), countedMemberships: [] },
-      ]);
+      showReport([mostlyBooked]);
       const { result, rerender } = renderHook(() => useCoachCapacityReport());
       act(() => result.current.openDrilldown('1'));
 
-      showReport([
-        {
-          ...coachRow(1, 'Mostly Booked', 90),
-          countedMemberships: [membership],
-        },
-      ]);
+      showReport([{ ...mostlyBooked, countedMemberships: [membership] }]);
       rerender();
 
       expect(

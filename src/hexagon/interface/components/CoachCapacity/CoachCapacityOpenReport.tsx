@@ -19,6 +19,9 @@ export function CoachCapacityOpenReport({
     tableProps,
     isError,
     saveError,
+    commitCell,
+    onTableFocus,
+    onTableBlur,
     openNotes,
     notesPanel,
     openDrilldown,
@@ -39,6 +42,9 @@ export function CoachCapacityOpenReport({
         tableProps={tableProps}
         isError={isError}
         saveError={saveError}
+        onCommitCell={commitCell}
+        onTableFocus={onTableFocus}
+        onTableBlur={onTableBlur}
         onOpenNotes={openNotes}
         notesPanel={notesPanel}
         onOpenDrilldown={openDrilldown}

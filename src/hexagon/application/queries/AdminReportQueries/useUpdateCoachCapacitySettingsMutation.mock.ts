@@ -1,7 +1,10 @@
-import type { UpdateCoachCapacitySettingsCommand } from '@application/ports/AdminReports/adminReportsPort';
-import type { UseUpdateCoachCapacitySettingsMutationReturn } from '@application/queries/AdminReportQueries/useUpdateCoachCapacitySettingsMutation';
+import type {
+  UpdateCoachCapacitySettingsVariables,
+  UseUpdateCoachCapacitySettingsMutationReturn,
+} from '@application/queries/AdminReportQueries/useUpdateCoachCapacitySettingsMutation';
 import type { CoachCapacitySettings } from '@learncraft-spanish/shared';
 import type { UseMutationResult } from '@tanstack/react-query';
+import { createMockCoachCapacitySettings } from '@testing/factories/adminReportsFactory';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 const defaultMockImplementation: UseUpdateCoachCapacitySettingsMutationReturn =
@@ -14,8 +17,8 @@ const defaultMockImplementation: UseUpdateCoachCapacitySettingsMutationReturn =
       isError: false,
       error: null,
       mutate: () => {},
-      mutateAsync: async ({ settings }: UpdateCoachCapacitySettingsCommand) =>
-        settings,
+      mutateAsync: async ({ changes }: UpdateCoachCapacitySettingsVariables) =>
+        createMockCoachCapacitySettings(changes),
       reset: () => {},
       status: 'idle',
       variables: undefined,
@@ -26,7 +29,7 @@ const defaultMockImplementation: UseUpdateCoachCapacitySettingsMutationReturn =
     } as unknown as UseMutationResult<
       CoachCapacitySettings,
       Error,
-      UpdateCoachCapacitySettingsCommand
+      UpdateCoachCapacitySettingsVariables
     >,
   };
 

@@ -6,7 +6,7 @@ import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { CoachCapacityTableProps } from '@interface/components/CoachCapacity/CoachCapacityTable';
 import type { EditableTableUseCaseProps } from '@interface/components/EditableTable/types';
 import { CoachCapacityTable } from '@interface/components/CoachCapacity/CoachCapacityTable';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import styles from './CoachCapacityTable.module.scss';
 
@@ -77,6 +77,9 @@ function renderTable(overrides: Partial<CoachCapacityTableProps> = {}) {
       tableProps={tableProps()}
       isError={false}
       saveError={null}
+      onCommitCell={() => {}}
+      onTableFocus={() => {}}
+      onTableBlur={() => {}}
       onOpenNotes={() => {}}
       notesPanel={closedNotesPanel}
       onOpenDrilldown={() => {}}
@@ -105,6 +108,63 @@ describe('coach capacity table', () => {
       screen.getAllByRole('spinbutton', { name: 'Projects' }),
     ).toHaveLength(2);
     expect(screen.getByDisplayValue('1.25')).toBeInTheDocument();
+  });
+
+  it('commits a settings cell when the admin leaves it', () => {
+    const onCommitCell = vi.fn();
+    renderTable({ onCommitCell });
+    const [anaProjects] = screen.getAllByRole('spinbutton', {
+      name: 'Projects',
+    });
+
+    fireEvent.change(anaProjects, { target: { value: '3' } });
+    expect(onCommitCell).not.toHaveBeenCalled();
+    fireEvent.blur(anaProjects);
+
+    expect(onCommitCell).toHaveBeenCalledExactlyOnceWith('7', 'projectsHours');
+  });
+
+  it('commits a settings cell when the admin presses Enter in it', () => {
+    const onCommitCell = vi.fn();
+    renderTable({ onCommitCell });
+    const [, betoProjects] = screen.getAllByRole('spinbutton', {
+      name: 'Projects',
+    });
+
+    fireEvent.keyDown(betoProjects, { key: '1' });
+    expect(onCommitCell).not.toHaveBeenCalled();
+    fireEvent.keyDown(betoProjects, { key: 'Enter' });
+
+    expect(onCommitCell).toHaveBeenCalledExactlyOnceWith('8', 'projectsHours');
+  });
+
+  it('reports focus entering and leaving the table, not moving within it', () => {
+    const onTableFocus = vi.fn();
+    const onTableBlur = vi.fn();
+    renderTable({ onTableFocus, onTableBlur });
+    const [anaProjects, betoProjects] = screen.getAllByRole('spinbutton', {
+      name: 'Projects',
+    });
+
+    act(() => anaProjects.focus());
+    expect(onTableFocus).toHaveBeenCalled();
+    act(() => betoProjects.focus());
+    act(() => screen.getByRole('button', { name: 'Coach Beto' }).focus());
+    expect(onTableBlur).not.toHaveBeenCalled();
+
+    act(() => screen.getByRole('button', { name: 'Coach Beto' }).blur());
+    expect(onTableBlur).toHaveBeenCalledOnce();
+  });
+
+  it('has no Save or Discard buttons', () => {
+    renderTable();
+
+    expect(
+      screen.queryByRole('button', { name: 'Save' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Discard' }),
+    ).not.toBeInTheDocument();
   });
 
   it('opens the notes of the coach whose Notes cell is clicked', () => {

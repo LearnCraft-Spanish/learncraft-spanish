@@ -7,7 +7,7 @@ import type {
   ColumnDisplayConfig,
   EditableTableUseCaseProps,
 } from '@interface/components/EditableTable/types';
-import type { JSX, ReactNode } from 'react';
+import type { FocusEvent, JSX, ReactNode } from 'react';
 import { NOT_SET_DISPLAY } from '@domain/functions/coachCapacity';
 import { CoachCapacityDrilldown } from '@interface/components/CoachCapacity/CoachCapacityDrilldown';
 import { CoachCapacityNotesPanel } from '@interface/components/CoachCapacity/CoachCapacityNotesPanel';
@@ -22,6 +22,11 @@ export interface CoachCapacityTableProps {
   tableProps: EditableTableUseCaseProps;
   isError: boolean;
   saveError: string | null;
+  /** Called when the admin leaves a settings cell or presses Enter in it */
+  onCommitCell: (rowId: string, columnId: string) => void;
+  onTableFocus: () => void;
+  /** Called once focus has left the table, not when it moves within it */
+  onTableBlur: () => void;
   onOpenNotes: (rowId: string) => void;
   notesPanel: CoachCapacityNotesPanelState;
   onOpenDrilldown: (rowId: string) => void;
@@ -56,6 +61,9 @@ export function CoachCapacityTable({
   tableProps,
   isError,
   saveError,
+  onCommitCell,
+  onTableFocus,
+  onTableBlur,
   onOpenNotes,
   notesPanel,
   onOpenDrilldown,
@@ -90,7 +98,13 @@ export function CoachCapacityTable({
       }
       if (isEditable) {
         return (
-          <div className={styles.inputCell}>
+          <div
+            className={styles.inputCell}
+            onBlur={() => onCommitCell(row.id, column.id)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') onCommitCell(row.id, column.id);
+            }}
+          >
             <StandardCell {...props} />
           </div>
         );
@@ -101,7 +115,14 @@ export function CoachCapacityTable({
         </div>
       );
     },
-    [onOpenNotes, onOpenDrilldown],
+    [onCommitCell, onOpenNotes, onOpenDrilldown],
+  );
+
+  const handleTableBlur = useCallback(
+    (event: FocusEvent<HTMLDivElement>) => {
+      if (!event.currentTarget.contains(event.relatedTarget)) onTableBlur();
+    },
+    [onTableBlur],
   );
 
   if (isError) {
@@ -123,11 +144,13 @@ export function CoachCapacityTable({
           {saveError}
         </p>
       )}
-      <EditableTable
-        {...tableProps}
-        displayConfig={coachCapacityDisplayConfig}
-        renderCell={renderCell}
-      />
+      <div onFocus={onTableFocus} onBlur={handleTableBlur}>
+        <EditableTable
+          {...tableProps}
+          displayConfig={coachCapacityDisplayConfig}
+          renderCell={renderCell}
+        />
+      </div>
       <CoachCapacityDrilldown {...drilldown} />
       <CoachCapacityNotesPanel {...notesPanel} />
     </>

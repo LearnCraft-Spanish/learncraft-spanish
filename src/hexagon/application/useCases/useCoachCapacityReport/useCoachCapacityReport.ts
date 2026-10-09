@@ -5,18 +5,26 @@ import type {
   CountedMembershipDisplayRow,
 } from '@domain/functions/coachCapacity';
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
-import type { CoachCapacitySettings } from '@learncraft-spanish/shared';
+import type {
+  CoachCapacityReportRow,
+  CoachCapacitySettings,
+} from '@learncraft-spanish/shared';
 import { useCoachCapacityReportQuery } from '@application/queries/AdminReportQueries/useCoachCapacityReportQuery';
 import { useUpdateCoachCapacitySettingsMutation } from '@application/queries/AdminReportQueries/useUpdateCoachCapacitySettingsMutation';
 import { useEditTableState } from '@application/units/pasteTable';
 import { useTableValidation } from '@application/units/pasteTable/hooks';
 import {
+  applyCoachCapacitySettings,
+  formatCoachCapacitySettingsCells,
+  formatCoachCapacityTotalsCells,
+  keepRowOrder,
   mapCoachCapacityRowToTableRow,
   mapCountedMembershipsToDisplayRows,
   parseCoachCapacitySettingsCells,
+  resolveCoachCapacitySettingsCells,
   sortCoachCapacityRows,
 } from '@domain/functions/coachCapacity';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 export interface CoachCapacityNotesPanelState {
   /** The coach whose notes are open, or null when the panel is closed */
@@ -46,6 +54,14 @@ export interface UseCoachCapacityReportResult {
   isError: boolean;
   /** Names the coaches whose settings failed to save, if any did */
   saveError: string | null;
+  /**
+   * Call when the admin leaves a cell or presses Enter in it. Saves the
+   * coach's settings if the cell was edited since it was last committed.
+   */
+  commitCell: (rowId: string, columnId: string) => void;
+  /** Rows keep their order from when focus enters the table until it leaves */
+  onTableFocus: () => void;
+  onTableBlur: () => void;
   openNotes: (rowId: string) => void;
   notesPanel: CoachCapacityNotesPanelState;
   openDrilldown: (rowId: string) => void;
@@ -85,6 +101,10 @@ function validateSettingsRow(row: TableRow): Record<string, string> {
   return result.success ? {} : result.errors;
 }
 
+function cellKey(rowId: string, columnId: string): string {
+  return `${rowId}:${columnId}`;
+}
+
 export function useCoachCapacityReport(): UseCoachCapacityReportResult {
   const [period, setPeriod] = useState<CoachCapacityPeriod>('today');
   const { coachCapacityReportQuery } = useCoachCapacityReportQuery(period);
@@ -93,83 +113,177 @@ export function useCoachCapacityReport(): UseCoachCapacityReportResult {
   const { data, isLoading, isError } = coachCapacityReportQuery;
   const { mutateAsync: updateSettings } = updateCoachCapacitySettingsMutation;
 
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const [pendingSaveCount, setPendingSaveCount] = useState(0);
+  /** Coach names by row, for coaches whose latest save failed */
+  const [failedSaves, setFailedSaves] = useState<ReadonlyMap<string, string>>(
+    () => new Map(),
+  );
+  /** The settings each edited row's totals were last worked out from */
+  const [lastValidSettings, setLastValidSettings] = useState<
+    ReadonlyMap<string, CoachCapacitySettings>
+  >(() => new Map());
+  const [heldRowOrder, setHeldRowOrder] = useState<string[] | null>(null);
+  const uncommittedCells = useRef(new Set<string>());
   const [notesCoach, setNotesCoach] = useState<OpenCoach | null>(null);
   const [notesDraft, setNotesDraft] = useState('');
   const [isSavingNotes, setIsSavingNotes] = useState(false);
   const [notesError, setNotesError] = useState<string | null>(null);
   const [drilldownCoach, setDrilldownCoach] = useState<OpenCoach | null>(null);
 
-  const reportRows = useMemo(() => sortCoachCapacityRows(data ?? []), [data]);
   const reportRowsById = useMemo(
-    () => new Map(reportRows.map((row) => [String(row.coach.coach_id), row])),
-    [reportRows],
+    () => new Map((data ?? []).map((row) => [String(row.coach.coach_id), row])),
+    [data],
   );
   const sourceRows = useMemo(
-    () => reportRows.map(mapCoachCapacityRowToTableRow),
-    [reportRows],
+    () => (data ?? []).map(mapCoachCapacityRowToTableRow),
+    [data],
+  );
+
+  /** The report row as the table shows it, each invalid cell at its last valid value */
+  const toLiveReportRow = useCallback(
+    (row: TableRow): CoachCapacityReportRow | undefined => {
+      const reportRow = reportRowsById.get(row.id);
+      if (!reportRow) return undefined;
+      const settings = resolveCoachCapacitySettingsCells(
+        row.cells,
+        lastValidSettings.get(row.id) ?? reportRow.settings,
+      );
+      return applyCoachCapacitySettings(reportRow, settings);
+    },
+    [reportRowsById, lastValidSettings],
+  );
+
+  const computeDerivedFields = useCallback(
+    (row: TableRow): Record<string, string> => {
+      const liveRow = toLiveReportRow(row);
+      return liveRow ? formatCoachCapacityTotalsCells(liveRow) : {};
+    },
+    [toLiveReportRow],
   );
 
   const editTableState = useEditTableState({
     sourceRows,
     columns: coachCapacityColumns,
+    computeDerivedFields,
   });
+  const editedRows = editTableState.data.rows;
+  const editedRowsById = useMemo(
+    () => new Map(editedRows.map((row) => [row.id, row])),
+    [editedRows],
+  );
   const { validationState } = useTableValidation({
-    rows: editTableState.data.rows,
+    rows: editedRows,
     validateRow: validateSettingsRow,
   });
 
-  const saveSettings = useCallback(
-    (rowId: string, settings: CoachCapacitySettings) => {
-      const reportRow = reportRowsById.get(rowId);
-      if (!reportRow) {
-        return Promise.reject(new Error(`Coach ${rowId} is not in the report`));
-      }
-      return updateSettings({ coachId: reportRow.coach.coach_id, settings });
-    },
-    [reportRowsById, updateSettings],
+  const sortedRowIds = useMemo(
+    () =>
+      sortCoachCapacityRows(
+        editedRows.flatMap((row) => toLiveReportRow(row) ?? []),
+      ).map((row) => String(row.coach.coach_id)),
+    [editedRows, toLiveReportRow],
+  );
+  const rowOrder = useMemo(
+    () =>
+      heldRowOrder ? keepRowOrder(sortedRowIds, heldRowOrder) : sortedRowIds,
+    [heldRowOrder, sortedRowIds],
+  );
+  const rows = useMemo(
+    () => rowOrder.flatMap((id) => editedRowsById.get(id) ?? []),
+    [rowOrder, editedRowsById],
   );
 
-  const saveEditedRow = useCallback(
-    (row: TableRow) => {
-      const notes = reportRowsById.get(row.id)?.settings.notes ?? '';
-      const parsed = parseCoachCapacitySettingsCells(row.cells, notes);
-      if (!parsed.success) {
-        return Promise.reject(new Error('Settings are not valid'));
-      }
-      return saveSettings(row.id, parsed.settings);
-    },
-    [reportRowsById, saveSettings],
+  const onTableFocus = useCallback(
+    () => setHeldRowOrder((held) => held ?? rowOrder),
+    [rowOrder],
   );
+  const onTableBlur = useCallback(() => setHeldRowOrder(null), []);
 
-  const { getDirtyRows, setRowsViaDiffs } = editTableState;
-  const handleSave = useCallback(async (): Promise<void> => {
-    const dirtyRows = getDirtyRows();
-    setIsSaving(true);
-    setSaveError(null);
-
-    const results = await Promise.allSettled(dirtyRows.map(saveEditedRow));
-    const failedRows = dirtyRows.filter(
-      (_, index) => results[index].status === 'rejected',
-    );
-
-    // Saved rows drop their edits; failed rows keep them for another try
-    setRowsViaDiffs(failedRows);
-    if (failedRows.length > 0) {
-      const coachNames = failedRows.map((row) => row.cells.coach).join(', ');
-      setSaveError(
-        `Could not save settings for ${coachNames}. Your changes are still in the table.`,
+  const { updateCell } = editTableState;
+  const handleCellChange = useCallback(
+    (rowId: string, columnId: string, value: string) => {
+      updateCell(rowId, columnId, value);
+      uncommittedCells.current.add(cellKey(rowId, columnId));
+      const row = editedRowsById.get(rowId);
+      const liveRow = row && toLiveReportRow(row);
+      if (!row || !liveRow) return;
+      const settings = resolveCoachCapacitySettingsCells(
+        { ...row.cells, [columnId]: value },
+        liveRow.settings,
       );
-    }
-    setIsSaving(false);
-  }, [getDirtyRows, setRowsViaDiffs, saveEditedRow]);
+      setLastValidSettings((previous) =>
+        new Map(previous).set(rowId, settings),
+      );
+    },
+    [updateCell, editedRowsById, toLiveReportRow],
+  );
 
-  const { discardChanges } = editTableState;
-  const handleDiscard = useCallback(() => {
-    discardChanges();
-    setSaveError(null);
-  }, [discardChanges]);
+  const saveCoachSettings = useCallback(
+    (
+      rowId: string,
+      coach: CoachCapacityReportRow['coach'],
+      changes: Partial<CoachCapacitySettings>,
+    ) => {
+      setPendingSaveCount((count) => count + 1);
+      updateSettings({ coachId: coach.coach_id, changes })
+        .then(() =>
+          setFailedSaves((previous) => {
+            if (!previous.has(rowId)) return previous;
+            const next = new Map(previous);
+            next.delete(rowId);
+            return next;
+          }),
+        )
+        .catch(() =>
+          setFailedSaves((previous) =>
+            new Map(previous).set(rowId, coach.fullName),
+          ),
+        )
+        .finally(() => setPendingSaveCount((count) => count - 1));
+    },
+    [updateSettings],
+  );
+
+  const { setRowsViaDiffs } = editTableState;
+  const commitCell = useCallback(
+    (rowId: string, columnId: string) => {
+      if (!uncommittedCells.current.delete(cellKey(rowId, columnId))) return;
+      const row = editedRowsById.get(rowId);
+      const reportRow = reportRowsById.get(rowId);
+      if (!row || !reportRow) return;
+      const parsed = parseCoachCapacitySettingsCells(row.cells, '');
+      if (!parsed.success) return;
+
+      // Formatted like saved values, so each cell stops counting as edited
+      // once the report holds what was saved
+      const formattedCells = formatCoachCapacitySettingsCells(parsed.settings);
+      setRowsViaDiffs(
+        editedRows.map((editedRow) =>
+          editedRow.id === rowId
+            ? { ...editedRow, cells: { ...editedRow.cells, ...formattedCells } }
+            : editedRow,
+        ),
+      );
+      // Notes are left out so the save keeps the coach's saved notes
+      const { notes: _notes, ...changes } = parsed.settings;
+      saveCoachSettings(rowId, reportRow.coach, changes);
+    },
+    [
+      editedRows,
+      editedRowsById,
+      reportRowsById,
+      setRowsViaDiffs,
+      saveCoachSettings,
+    ],
+  );
+
+  const saveError = useMemo(
+    () =>
+      failedSaves.size === 0
+        ? null
+        : `Could not save settings for ${[...failedSaves.values()].join(', ')}. Your changes are still in the table.`,
+    [failedSaves],
+  );
 
   const notesRow =
     notesCoach === null ? undefined : reportRowsById.get(notesCoach.rowId);
@@ -190,7 +304,7 @@ export function useCoachCapacityReport(): UseCoachCapacityReportResult {
     setNotesError(null);
   }, []);
 
-  // Sends the coach's saved settings, not any unsaved edits in their row
+  // Keeps the coach's saved settings, not any unsaved edits in their row
   const saveNotes = useCallback(async (): Promise<void> => {
     if (notesCoach === null) return;
     if (!notesRow) {
@@ -200,9 +314,9 @@ export function useCoachCapacityReport(): UseCoachCapacityReportResult {
     setIsSavingNotes(true);
     setNotesError(null);
     try {
-      await saveSettings(notesCoach.rowId, {
-        ...notesRow.settings,
-        notes: notesDraft,
+      await updateSettings({
+        coachId: notesRow.coach.coach_id,
+        changes: { notes: notesDraft },
       });
       setNotesCoach(null);
     } catch {
@@ -210,7 +324,7 @@ export function useCoachCapacityReport(): UseCoachCapacityReportResult {
     } finally {
       setIsSavingNotes(false);
     }
-  }, [notesCoach, notesRow, notesDraft, saveSettings]);
+  }, [notesCoach, notesRow, notesDraft, updateSettings]);
 
   const drilldownRow =
     drilldownCoach === null
@@ -238,33 +352,29 @@ export function useCoachCapacityReport(): UseCoachCapacityReportResult {
 
   const tableProps = useMemo<EditableTableUseCaseProps>(
     () => ({
-      rows: editTableState.data.rows,
+      rows,
       columns: editTableState.data.columns,
       dirtyRowIds: editTableState.dirtyRowIds,
       validationErrors: validationState.errors,
-      onCellChange: editTableState.updateCell,
+      onCellChange: handleCellChange,
       setActiveCellInfo: editTableState.setActiveCellInfo,
       clearActiveCellInfo: editTableState.clearActiveCellInfo,
       hasUnsavedChanges: editTableState.hasUnsavedChanges,
-      onSave: handleSave,
-      onDiscard: handleDiscard,
-      isSaving,
+      isSaving: pendingSaveCount > 0,
       isLoading,
       isValid: validationState.isValid,
     }),
     [
-      editTableState.data.rows,
+      rows,
       editTableState.data.columns,
       editTableState.dirtyRowIds,
-      editTableState.updateCell,
       editTableState.setActiveCellInfo,
       editTableState.clearActiveCellInfo,
       editTableState.hasUnsavedChanges,
       validationState.errors,
       validationState.isValid,
-      handleSave,
-      handleDiscard,
-      isSaving,
+      handleCellChange,
+      pendingSaveCount,
       isLoading,
     ],
   );
@@ -275,6 +385,9 @@ export function useCoachCapacityReport(): UseCoachCapacityReportResult {
     tableProps,
     isError,
     saveError,
+    commitCell,
+    onTableFocus,
+    onTableBlur,
     openNotes,
     notesPanel: {
       coachName: notesCoach?.coachName ?? null,

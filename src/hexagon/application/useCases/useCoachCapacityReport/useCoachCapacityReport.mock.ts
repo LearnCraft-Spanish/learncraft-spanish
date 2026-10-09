@@ -10,8 +10,6 @@ const defaultMockResult: UseCoachCapacityReportResult = {
     dirtyRowIds: new Set(),
     validationErrors: {},
     onCellChange: () => {},
-    onSave: async () => {},
-    onDiscard: () => {},
     hasUnsavedChanges: false,
     isLoading: false,
     isSaving: false,
@@ -19,6 +17,9 @@ const defaultMockResult: UseCoachCapacityReportResult = {
   },
   isError: false,
   saveError: null,
+  commitCell: () => {},
+  onTableFocus: () => {},
+  onTableBlur: () => {},
   openNotes: () => {},
   notesPanel: {
     coachName: null,

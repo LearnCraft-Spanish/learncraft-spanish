@@ -3,12 +3,18 @@ import type {
   CountedMembership,
 } from '@learncraft-spanish/shared';
 import {
+  applyCoachCapacitySettings,
+  computeCoachCapacityTotals,
   formatBookedPercent,
   formatCoachCapacityHours,
+  formatCoachCapacitySettingsCells,
+  formatCoachCapacityTotalsCells,
+  keepRowOrder,
   mapCoachCapacityRowToTableRow,
   mapCountedMembershipsToDisplayRows,
   NOT_SET_DISPLAY,
   parseCoachCapacitySettingsCells,
+  resolveCoachCapacitySettingsCells,
   sortCoachCapacityRows,
 } from '@domain/functions/coachCapacity';
 import {
@@ -84,6 +90,134 @@ describe('sortCoachCapacityRows', () => {
     sortCoachCapacityRows(rows);
 
     expect(names(rows)).toEqual(['Second', 'First']);
+  });
+});
+
+describe('keepRowOrder', () => {
+  it('keeps the kept order even when the sort would move rows', () => {
+    expect(keepRowOrder(['b', 'a', 'c'], ['a', 'b', 'c'])).toEqual([
+      'a',
+      'b',
+      'c',
+    ]);
+  });
+
+  it('adds rows the kept order does not have after it, in sorted order', () => {
+    expect(keepRowOrder(['d', 'b', 'a', 'c'], ['a', 'b'])).toEqual([
+      'a',
+      'b',
+      'd',
+      'c',
+    ]);
+  });
+
+  it('drops kept rows that are no longer there', () => {
+    expect(keepRowOrder(['b'], ['a', 'b'])).toEqual(['b']);
+  });
+});
+
+describe('computeCoachCapacityTotals', () => {
+  /** Irene from the manual sheet: 6.42 Coaching Hours with 1 group session */
+  const ireneHours = { privateCallHours: 4.5, adminTimeHours: 0.92 };
+  const ireneSettings = createMockCoachCapacitySettings({
+    groupSessionsPerWeek: 1,
+    projectsHours: 2,
+    internalTimeHours: 1,
+    teamMeetingHours: 1,
+    desiredHours: 20,
+  });
+
+  it('works out Irene’s example from the manual sheet', () => {
+    const totals = computeCoachCapacityTotals(ireneHours, ireneSettings);
+
+    expect(totals.groupSessionHours).toBe(1);
+    expect(totals.coachingHours).toBeCloseTo(6.42);
+    expect(totals.nonCoachingHours).toBe(4);
+    expect(totals.committedHours).toBeCloseTo(10.42);
+    expect(totals.bookedPercent).toBeCloseTo(52.1);
+    expect(formatCoachCapacityTotalsCells(totals)).toEqual({
+      coachingHours: '6.42',
+      committedHours: '10.42',
+      bookedPercent: '52%',
+    });
+  });
+
+  it('counts each group session as one Coaching Hour', () => {
+    const totals = computeCoachCapacityTotals(ireneHours, {
+      ...ireneSettings,
+      groupSessionsPerWeek: 3,
+    });
+
+    expect(formatCoachCapacityTotalsCells(totals)).toEqual({
+      coachingHours: '8.42',
+      committedHours: '12.42',
+      bookedPercent: '62%',
+    });
+  });
+
+  it.each([
+    ['empty', null],
+    ['0', 0],
+  ])('has no Booked %% when Desired Hours is %s', (_, desiredHours) => {
+    const totals = computeCoachCapacityTotals(ireneHours, {
+      ...ireneSettings,
+      desiredHours,
+    });
+
+    expect(totals.bookedPercent).toBeNull();
+    expect(totals.committedHours).toBeCloseTo(10.42);
+    expect(formatCoachCapacityTotalsCells(totals).bookedPercent).toBe('—');
+  });
+});
+
+describe('applyCoachCapacitySettings', () => {
+  it('replaces the settings and the totals that follow from them, keeping the report’s hours', () => {
+    const row = createMockCoachCapacityReportRow({
+      privateCallHours: 4,
+      adminTimeHours: 0.5,
+      coachingHours: 6.5,
+      committedHours: 8,
+      bookedPercent: 40,
+    });
+    const settings = createMockCoachCapacitySettings({
+      groupSessionsPerWeek: 1,
+      projectsHours: 1,
+      internalTimeHours: 0.5,
+      teamMeetingHours: 0.5,
+      desiredHours: 10,
+    });
+
+    expect(applyCoachCapacitySettings(row, settings)).toEqual({
+      ...row,
+      settings,
+      groupSessionHours: 1,
+      coachingHours: 5.5,
+      nonCoachingHours: 2,
+      committedHours: 7.5,
+      bookedPercent: 75,
+    });
+  });
+});
+
+describe('formatCoachCapacitySettingsCells', () => {
+  it('formats hours with 2 decimals, Group Sessions as a whole number, and no Desired Hours as empty', () => {
+    expect(
+      formatCoachCapacitySettingsCells(
+        createMockCoachCapacitySettings({
+          groupSessionsPerWeek: 2,
+          projectsHours: 3,
+          internalTimeHours: 0.5,
+          teamMeetingHours: 1.25,
+          desiredHours: null,
+        }),
+      ),
+    ).toEqual({
+      groupSessionsPerWeek: '2',
+      projectsHours: '3.00',
+      internalTimeHours: '0.50',
+      teamMeetingHours: '1.25',
+      desiredHours: '',
+    });
   });
 });
 
@@ -342,5 +476,59 @@ describe('parseCoachCapacitySettingsCells', () => {
       'internalTimeHours',
       'teamMeetingHours',
     ]);
+  });
+});
+
+describe('resolveCoachCapacitySettingsCells', () => {
+  const fallback = createMockCoachCapacitySettings({
+    groupSessionsPerWeek: 1,
+    projectsHours: 0.5,
+    internalTimeHours: 0.25,
+    teamMeetingHours: 0.75,
+    desiredHours: 10,
+    notes: 'Saved notes',
+  });
+  const validCells = {
+    groupSessionsPerWeek: '2',
+    projectsHours: '3',
+    internalTimeHours: '1.5',
+    teamMeetingHours: '1',
+    desiredHours: '',
+  };
+
+  it('reads valid cells, with the fallback’s notes', () => {
+    expect(resolveCoachCapacitySettingsCells(validCells, fallback)).toEqual({
+      groupSessionsPerWeek: 2,
+      projectsHours: 3,
+      internalTimeHours: 1.5,
+      teamMeetingHours: 1,
+      desiredHours: null,
+      notes: 'Saved notes',
+    });
+  });
+
+  it('takes only the invalid cells from the fallback', () => {
+    expect(
+      resolveCoachCapacitySettingsCells(
+        { ...validCells, projectsHours: '3.1', groupSessionsPerWeek: '1.5' },
+        fallback,
+      ),
+    ).toEqual({
+      groupSessionsPerWeek: 1,
+      projectsHours: 0.5,
+      internalTimeHours: 1.5,
+      teamMeetingHours: 1,
+      desiredHours: null,
+      notes: 'Saved notes',
+    });
+  });
+
+  it('takes an invalid Desired Hours from the fallback', () => {
+    expect(
+      resolveCoachCapacitySettingsCells(
+        { ...validCells, desiredHours: '41' },
+        fallback,
+      ).desiredHours,
+    ).toBe(10);
   });
 });
