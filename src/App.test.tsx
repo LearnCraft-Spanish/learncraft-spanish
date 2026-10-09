@@ -635,6 +635,36 @@ describe('app', () => {
     expect(queryByText('Coaching Tools')).not.toBeInTheDocument();
   });
 
+  it('takes a coach from the Student Tools Custom Quiz button to the v2 quiz setup', async () => {
+    overrideMockUseStudentUiVersion({ version: 'v2' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+      isAuthenticated: true,
+      isLoading: false,
+      isAdmin: false,
+      isCoach: true,
+      isStudent: true,
+      isLimited: false,
+    });
+    const user = userEvent.setup();
+    const { findByRole, findAllByRole, queryByText } = renderAppAtRoute('/');
+
+    await user.click(
+      await findByRole('link', { name: 'Custom Quiz' }, { timeout: 5000 }),
+    );
+
+    expect(
+      (
+        await findAllByRole(
+          'heading',
+          { name: 'Set up your quiz' },
+          { timeout: 5000 },
+        )
+      ).length,
+    ).toBeGreaterThan(0);
+    expect(queryByText('Coaching Tools')).not.toBeInTheDocument();
+  });
+
   it('still sends a coach who is not using the app as a student away from other student tools', async () => {
     overrideMockUseStudentUiVersion({ version: 'v2' });
     overrideMockAuthAdapter({

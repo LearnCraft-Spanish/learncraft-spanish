@@ -80,7 +80,7 @@ describe('home page', () => {
     ).toBeInTheDocument();
   });
 
-  it('leads the staff view with a Student Tools section linking to the Finder', () => {
+  it('leads the staff view with a Student Tools section linking to Custom Quiz and the Finder', () => {
     overrideMockUseHomeView({ view: 'staffTools', showAdminTools: false });
 
     renderHome();
@@ -89,9 +89,28 @@ describe('home page', () => {
       .getAllByRole('heading', { level: 3 })
       .map((heading) => heading.textContent);
     expect(headings.slice(0, 2)).toEqual(['Student Tools', 'Coaching Tools']);
+    expect(screen.getByRole('link', { name: 'Custom Quiz' })).toHaveAttribute(
+      'href',
+      '/customquiz',
+    );
     expect(
       screen.getByRole('link', { name: 'Find Flashcards' }),
     ).toHaveAttribute('href', '/flashcardfinder');
+  });
+
+  it('lists Custom Quiz above Find Flashcards in Student Tools', () => {
+    overrideMockUseHomeView({ view: 'staffTools', showAdminTools: false });
+
+    renderHome();
+
+    const linkNames = screen
+      .getAllByRole('link')
+      .map((link) => link.textContent);
+    expect(linkNames.slice(0, 3)).toEqual([
+      'Custom Quiz',
+      'Find Flashcards',
+      'FrequenSay',
+    ]);
   });
 
   it('shows no other student tools in the staff view', () => {
@@ -103,7 +122,6 @@ describe('home page', () => {
       /Quiz My Flashcards/,
       /Manage My Flashcards/,
       /Official Quizzes/,
-      /Custom Quiz/,
       /Audio Quiz/,
       /How to Use This App/,
     ]) {
