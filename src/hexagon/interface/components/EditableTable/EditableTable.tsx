@@ -34,6 +34,8 @@ export function EditableTable({
   isSaving = false,
   isLoading = false,
   isValid = true,
+  sort,
+  onSortColumn,
   className,
 }: EditableTableProps) {
   // UI-specific state
@@ -113,6 +115,8 @@ export function EditableTable({
           columns={columns}
           getDisplay={getDisplay}
           getPinnedCell={getPinnedCell}
+          sort={sort}
+          onSortColumn={onSortColumn}
         />
       </thead>
       <tbody>
