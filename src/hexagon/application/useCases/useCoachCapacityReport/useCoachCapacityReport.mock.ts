@@ -1,4 +1,5 @@
 import type { UseCoachCapacityReportResult } from '@application/useCases/useCoachCapacityReport/useCoachCapacityReport';
+import { DEFAULT_COACH_CAPACITY_SORT } from '@domain/functions/coachCapacity';
 import { createOverrideableMockHook } from '@testing/utils/createOverrideableMockHook';
 
 const defaultMockResult: UseCoachCapacityReportResult = {
@@ -14,6 +15,8 @@ const defaultMockResult: UseCoachCapacityReportResult = {
     isLoading: false,
     isSaving: false,
     isValid: true,
+    sort: DEFAULT_COACH_CAPACITY_SORT,
+    onSortColumn: () => {},
   },
   isError: false,
   saveError: null,

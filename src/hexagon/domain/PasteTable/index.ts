@@ -7,5 +7,6 @@ export * from '@domain/PasteTable/columnDefinition';
 // Functions
 export * from '@domain/PasteTable/functions';
 export * from '@domain/PasteTable/tableRow';
+export * from '@domain/PasteTable/tableSort';
 
 export * from '@domain/PasteTable/validationTypes';

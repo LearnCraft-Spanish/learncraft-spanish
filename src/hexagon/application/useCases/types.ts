@@ -1,4 +1,4 @@
-import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
+import type { ColumnDefinition, TableRow, TableSort } from '@domain/PasteTable';
 import type { Vocabulary } from '@learncraft-spanish/shared';
 import type { ClipboardEvent } from 'react';
 
@@ -114,12 +114,16 @@ export interface EditableTableUseCaseProps {
   isValid: boolean;
   /** Whether there are any unsaved changes */
   hasUnsavedChanges?: boolean;
+  /** The sort shown on the headers. `rows` must already be in this order. */
+  sort?: TableSort | null;
 
   // =============================================================================
   // ACTIONS
   // =============================================================================
   /** Handler for cell value changes */
   onCellChange: (rowId: string, columnId: string, value: string) => void;
+  /** Handler for a click on a sortable column's header */
+  onSortColumn?: (columnId: string) => void;
   /** Handler for paste operations */
   onPaste?: (e: ClipboardEvent<Element>) => void;
   /** Handler to save changes */

@@ -1,0 +1,28 @@
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lcs-space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  // The header background is dark, so the ring takes the header's text color
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: var(--lcs-focus-offset);
+  }
+}
+
+.sortHint {
+  display: inline-flex;
+  opacity: 0.5;
+
+  .sortButton:hover &,
+  .sortButton:focus-visible & {
+    opacity: 1;
+  }
+}

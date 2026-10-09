@@ -2,6 +2,7 @@ import type { EditableTableUseCaseProps } from '@application/useCases/types';
 import type {
   CoachCapacityColumnId,
   CoachCapacityPeriod,
+  CoachCapacitySort,
   CountedMembershipDisplayRow,
 } from '@domain/functions/coachCapacity';
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
@@ -15,11 +16,14 @@ import { useEditTableState } from '@application/units/pasteTable';
 import { useTableValidation } from '@application/units/pasteTable/hooks';
 import {
   applyCoachCapacitySettings,
+  DEFAULT_COACH_CAPACITY_SORT,
   formatCoachCapacitySettingsCells,
   formatCoachCapacityTotalsCells,
+  isCoachCapacitySortColumnId,
   keepRowOrder,
   mapCoachCapacityRowToTableRow,
   mapCountedMembershipsToDisplayRows,
+  nextCoachCapacitySort,
   parseCoachCapacitySettingsCells,
   resolveCoachCapacitySettingsCells,
   sortCoachCapacityRows,
@@ -59,7 +63,10 @@ export interface UseCoachCapacityReportResult {
    * coach's settings if the cell was edited since it was last committed.
    */
   commitCell: (rowId: string, columnId: string) => void;
-  /** Rows keep their order from when focus enters the table until it leaves */
+  /**
+   * Rows keep their order from when focus enters the table until it leaves,
+   * except that a sort chosen meanwhile applies at once
+   */
   onTableFocus: () => void;
   onTableBlur: () => void;
   openNotes: (rowId: string) => void;
@@ -105,8 +112,21 @@ function cellKey(rowId: string, columnId: string): string {
   return `${rowId}:${columnId}`;
 }
 
+function sortedIds(
+  rows: readonly CoachCapacityReportRow[],
+  sort: CoachCapacitySort,
+): string[] {
+  return sortCoachCapacityRows(rows, sort).map((row) =>
+    String(row.coach.coach_id),
+  );
+}
+
 export function useCoachCapacityReport(): UseCoachCapacityReportResult {
   const [period, setPeriod] = useState<CoachCapacityPeriod>('today');
+  /** Kept across period switches; starts on the default each time the report mounts */
+  const [sort, setSort] = useState<CoachCapacitySort>(
+    DEFAULT_COACH_CAPACITY_SORT,
+  );
   const { coachCapacityReportQuery } = useCoachCapacityReportQuery(period);
   const { updateCoachCapacitySettingsMutation } =
     useUpdateCoachCapacitySettingsMutation();
@@ -176,12 +196,13 @@ export function useCoachCapacityReport(): UseCoachCapacityReportResult {
     validateRow: validateSettingsRow,
   });
 
-  const sortedRowIds = useMemo(
-    () =>
-      sortCoachCapacityRows(
-        editedRows.flatMap((row) => toLiveReportRow(row) ?? []),
-      ).map((row) => String(row.coach.coach_id)),
+  const liveReportRows = useMemo(
+    () => editedRows.flatMap((row) => toLiveReportRow(row) ?? []),
     [editedRows, toLiveReportRow],
+  );
+  const sortedRowIds = useMemo(
+    () => sortedIds(liveReportRows, sort),
+    [liveReportRows, sort],
   );
   const rowOrder = useMemo(
     () =>
@@ -198,6 +219,19 @@ export function useCoachCapacityReport(): UseCoachCapacityReportResult {
     [rowOrder],
   );
   const onTableBlur = useCallback(() => setHeldRowOrder(null), []);
+
+  // Clicking a header focuses it, so the order is usually held by then: the
+  // new sort replaces the held order rather than waiting for focus to leave
+  const sortColumn = useCallback(
+    (columnId: string) => {
+      if (!isCoachCapacitySortColumnId(columnId)) return;
+      const nextSort = nextCoachCapacitySort(sort, columnId);
+      const nextOrder = sortedIds(liveReportRows, nextSort);
+      setSort(nextSort);
+      setHeldRowOrder((held) => held && nextOrder);
+    },
+    [sort, liveReportRows],
+  );
 
   const { updateCell } = editTableState;
   const handleCellChange = useCallback(
@@ -363,6 +397,8 @@ export function useCoachCapacityReport(): UseCoachCapacityReportResult {
       isSaving: pendingSaveCount > 0,
       isLoading,
       isValid: validationState.isValid,
+      sort,
+      onSortColumn: sortColumn,
     }),
     [
       rows,
@@ -376,6 +412,8 @@ export function useCoachCapacityReport(): UseCoachCapacityReportResult {
       handleCellChange,
       pendingSaveCount,
       isLoading,
+      sort,
+      sortColumn,
     ],
   );
 

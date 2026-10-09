@@ -45,6 +45,7 @@ const coachCapacityDisplayConfig: ColumnDisplayConfig[] = [
     label: 'Committed Hours',
     width: '7rem',
     pinned: 'right',
+    sortable: true,
   },
   {
     id: 'desiredHours',
@@ -53,7 +54,13 @@ const coachCapacityDisplayConfig: ColumnDisplayConfig[] = [
     pinned: 'right',
     placeholder: NOT_SET_DISPLAY,
   },
-  { id: 'bookedPercent', label: 'Booked %', width: '6rem', pinned: 'right' },
+  {
+    id: 'bookedPercent',
+    label: 'Booked %',
+    width: '6rem',
+    pinned: 'right',
+    sortable: true,
+  },
   { id: 'notes', label: 'Notes', width: '18rem' },
 ];
 
