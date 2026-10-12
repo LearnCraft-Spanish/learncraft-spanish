@@ -699,38 +699,38 @@ describe.each(periods)(
   },
 );
 
+/**
+ * Serves both periods from one set of per-coach settings, the way the API
+ * does: saving a coach's settings changes them in either period, while each
+ * period keeps its own Coaching Hours.
+ */
+function serveReportsSharingSettings(): void {
+  const settingsByCoach = new Map<number, CoachCapacitySettings>();
+  overrideMockAdminReportsAdapter({
+    getCoachCapacityTodayReport: async () =>
+      withSavedSettings(report, settingsByCoach),
+    getCoachCapacityTwoWeeksOutReport: async () =>
+      withSavedSettings(twoWeeksOutReport, settingsByCoach),
+    updateCoachCapacitySettings: async ({ coachId, settings }) => {
+      settingsByCoach.set(coachId, settings);
+      return settings;
+    },
+  });
+}
+
+/** Waits for the period whose Coaching Hours for Lightly Booked are `coachingHours` */
+async function waitForPeriod(coachingHours: string): Promise<void> {
+  await waitFor(() =>
+    expect(
+      within(coachTableRow('Lightly Booked')).getByText(coachingHours),
+    ).toBeInTheDocument(),
+  );
+}
+
+const TODAY_HOURS = '5.33';
+const TWO_WEEKS_OUT_HOURS = '4.00';
+
 describe('switching between Today and Two Weeks Out', () => {
-  /**
-   * Serves both periods from one set of per-coach settings, the way the API
-   * does: saving a coach's settings changes them in either period, while each
-   * period keeps its own Coaching Hours.
-   */
-  function serveReportsSharingSettings(): void {
-    const settingsByCoach = new Map<number, CoachCapacitySettings>();
-    overrideMockAdminReportsAdapter({
-      getCoachCapacityTodayReport: async () =>
-        withSavedSettings(report, settingsByCoach),
-      getCoachCapacityTwoWeeksOutReport: async () =>
-        withSavedSettings(twoWeeksOutReport, settingsByCoach),
-      updateCoachCapacitySettings: async ({ coachId, settings }) => {
-        settingsByCoach.set(coachId, settings);
-        return settings;
-      },
-    });
-  }
-
-  /** Waits for the period whose Coaching Hours for Lightly Booked are `coachingHours` */
-  async function waitForPeriod(coachingHours: string): Promise<void> {
-    await waitFor(() =>
-      expect(
-        within(coachTableRow('Lightly Booked')).getByText(coachingHours),
-      ).toBeInTheDocument(),
-    );
-  }
-
-  const TODAY_HOURS = '5.33';
-  const TWO_WEEKS_OUT_HOURS = '4.00';
-
   it('is one collapsed Coach Capacity section that fetches nothing and shows no toggle', () => {
     renderReport();
 
@@ -996,5 +996,195 @@ describe('switching between Today and Two Weeks Out', () => {
       await within(drilldown).findByText('No counted memberships'),
     ).toBeInTheDocument();
     expect(within(drilldown).queryByRole('table')).not.toBeInTheDocument();
+  });
+});
+
+describe('sorting by Committed Hours or Booked %', () => {
+  // Today: Lightly Booked 8.08 Committed Hours (40%), Mostly Booked 8.75
+  // (88%), Not Set Up 8.75 (no Booked %)
+  function sortHeader(label: string): HTMLElement {
+    return screen.getByRole('columnheader', { name: label });
+  }
+
+  /** Clicks a header the way a browser does, focusing it first */
+  function clickSortHeader(label: string): void {
+    const button = within(sortHeader(label)).getByRole('button');
+    act(() => button.focus());
+    fireEvent.click(button);
+  }
+
+  /** Each sortable header's `aria-sort` and the arrow it shows */
+  function sortHeaders(): Record<string, string> {
+    const headers = within(screen.getByRole('table')).getAllByRole(
+      'columnheader',
+    );
+    return Object.fromEntries(
+      headers
+        .filter((header) => header.hasAttribute('aria-sort'))
+        .map((header) => {
+          const arrow = ['arrow-up', 'arrow-down', 'arrows-sort'].find(
+            (glyph) => header.querySelector(`.tabler-icon-${glyph}`),
+          );
+          return [
+            header.textContent ?? '',
+            `${header.getAttribute('aria-sort')} ${arrow}`,
+          ];
+        }),
+    );
+  }
+
+  it('opens on Booked % ascending with an up arrow, and only Committed Hours and Booked % are sortable', async () => {
+    serveReportsSharingSettings();
+    renderReport();
+    await openReport();
+
+    expect(sortHeaders()).toEqual({
+      'Committed Hours': 'none arrows-sort',
+      'Booked %': 'ascending arrow-up',
+    });
+    expect(
+      within(sortHeader('Desired Hours')).queryByRole('button'),
+    ).not.toBeInTheDocument();
+    expect(coachOrder()).toEqual([
+      'Not Set Up',
+      'Lightly Booked',
+      'Mostly Booked',
+    ]);
+  });
+
+  it('switches Booked % between ascending and descending, keeping coaches who are not set up on top', async () => {
+    serveReportsSharingSettings();
+    renderReport();
+    await openReport();
+
+    clickSortHeader('Booked %');
+    expect(sortHeaders()['Booked %']).toBe('descending arrow-down');
+    expect(coachOrder()).toEqual([
+      'Not Set Up',
+      'Mostly Booked',
+      'Lightly Booked',
+    ]);
+
+    clickSortHeader('Booked %');
+    expect(sortHeaders()['Booked %']).toBe('ascending arrow-up');
+    expect(coachOrder()).toEqual([
+      'Not Set Up',
+      'Lightly Booked',
+      'Mostly Booked',
+    ]);
+  });
+
+  it('takes Committed Hours ascending, then descending, then back to the default, breaking ties by name', async () => {
+    serveReportsSharingSettings();
+    renderReport();
+    await openReport();
+
+    clickSortHeader('Committed Hours');
+    expect(sortHeaders()).toEqual({
+      'Committed Hours': 'ascending arrow-up',
+      'Booked %': 'none arrows-sort',
+    });
+    expect(coachOrder()).toEqual([
+      'Lightly Booked',
+      'Mostly Booked',
+      'Not Set Up',
+    ]);
+
+    clickSortHeader('Committed Hours');
+    expect(sortHeaders()['Committed Hours']).toBe('descending arrow-down');
+    expect(coachOrder()).toEqual([
+      'Mostly Booked',
+      'Not Set Up',
+      'Lightly Booked',
+    ]);
+
+    clickSortHeader('Committed Hours');
+    expect(sortHeaders()).toEqual({
+      'Committed Hours': 'none arrows-sort',
+      'Booked %': 'ascending arrow-up',
+    });
+    expect(coachOrder()).toEqual([
+      'Not Set Up',
+      'Lightly Booked',
+      'Mostly Booked',
+    ]);
+  });
+
+  it('applies a clicked sort at once while editing, holds it, and sorts the live values once focus leaves', async () => {
+    serveReportsSharingSettings();
+    renderReport();
+    await openReport();
+
+    // 8.08 Committed Hours on 5 Desired Hours is 162%, most booked of all
+    typeSetting('Lightly Booked', 'Desired Hours', '5');
+    expect(coachOrder()).toEqual([
+      'Not Set Up',
+      'Lightly Booked',
+      'Mostly Booked',
+    ]);
+
+    // Descending by the saved 40% would put Lightly Booked last
+    clickSortHeader('Booked %');
+    expect(coachOrder()).toEqual([
+      'Not Set Up',
+      'Lightly Booked',
+      'Mostly Booked',
+    ]);
+    clickSortHeader('Committed Hours');
+    expect(coachOrder()).toEqual([
+      'Lightly Booked',
+      'Mostly Booked',
+      'Not Set Up',
+    ]);
+
+    // 8.75 - 1.25 Projects hours = 7.50 Committed Hours, now the fewest
+    typeSetting('Mostly Booked', 'Projects', '0');
+    expect(coachOrder()).toEqual([
+      'Lightly Booked',
+      'Mostly Booked',
+      'Not Set Up',
+    ]);
+
+    leaveTable();
+    expect(coachOrder()).toEqual([
+      'Mostly Booked',
+      'Lightly Booked',
+      'Not Set Up',
+    ]);
+    await waitFor(() =>
+      expect(
+        mockAdminReportsAdapter.updateCoachCapacitySettings,
+      ).toHaveBeenCalledTimes(2),
+    );
+  });
+
+  it('keeps the sort across a switch to Two Weeks Out and back', async () => {
+    serveReportsSharingSettings();
+    renderReport();
+    await openReport();
+    clickSortHeader('Committed Hours');
+    clickSortHeader('Committed Hours');
+
+    // Clicking the toggle takes focus out of the table
+    leaveTable();
+    selectPeriod('Two Weeks Out');
+    await waitForPeriod(TWO_WEEKS_OUT_HOURS);
+
+    expect(sortHeaders()['Committed Hours']).toBe('descending arrow-down');
+    // Every coach has 6.75 Committed Hours two weeks out, so by name
+    expect(coachOrder()).toEqual([
+      'Lightly Booked',
+      'Mostly Booked',
+      'Not Set Up',
+    ]);
+
+    selectPeriod('Today');
+    await waitForPeriod(TODAY_HOURS);
+    expect(sortHeaders()['Committed Hours']).toBe('descending arrow-down');
+    expect(coachOrder()).toEqual([
+      'Mostly Booked',
+      'Not Set Up',
+      'Lightly Booked',
+    ]);
   });
 });

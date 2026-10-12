@@ -31,6 +31,11 @@ export interface ColumnDisplayConfig {
    * Once any column is pinned, every column needs a fixed `width` (e.g. '8rem').
    */
   pinned?: 'left' | 'right';
+  /**
+   * Makes the header a button that reports clicks through `onSortColumn` and
+   * shows the `sort` it is given. The table never reorders rows itself.
+   */
+  sortable?: boolean;
 }
 
 /**

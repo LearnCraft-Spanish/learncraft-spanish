@@ -156,6 +156,34 @@ describe('coach capacity table', () => {
     expect(onTableBlur).toHaveBeenCalledOnce();
   });
 
+  it('makes Committed Hours and Booked % sortable headers that report clicks', () => {
+    const onSortColumn = vi.fn();
+    renderTable({
+      tableProps: tableProps({
+        columns: [
+          ...columns,
+          { id: 'committedHours', type: 'number', editable: false },
+          { id: 'desiredHours', type: 'number' },
+          { id: 'bookedPercent', type: 'read-only', editable: false },
+        ],
+        sort: { columnId: 'bookedPercent', direction: 'ascending' },
+        onSortColumn,
+      }),
+    });
+
+    const sortable = screen
+      .getAllByRole('columnheader')
+      .filter((header) => within(header).queryByRole('button'))
+      .map((header) => header.textContent);
+    expect(sortable).toEqual(['Committed Hours', 'Booked %']);
+    expect(
+      screen.getByRole('columnheader', { name: 'Booked %' }),
+    ).toHaveAttribute('aria-sort', 'ascending');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Committed Hours' }));
+    expect(onSortColumn).toHaveBeenCalledExactlyOnceWith('committedHours');
+  });
+
   it('has no Save or Discard buttons', () => {
     renderTable();
 

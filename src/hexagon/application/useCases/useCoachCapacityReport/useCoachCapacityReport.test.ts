@@ -242,6 +242,46 @@ describe('useCoachCapacityReport', () => {
       expect(cellsOf(result, '2').coachingHours).toBe('2.50');
     });
 
+    it('keeps the chosen sort across a switch, applying it to the new period', () => {
+      const lessCommittedTwoWeeksOut = [
+        mostlyBooked,
+        // 12.5 Coaching Hours, 15.25 Committed, 76%
+        coachRow(2, 'Lightly Booked', { privateCallHours: 10 }),
+        // 0.5 + 2 Coaching Hours, 5.25 Committed, below Lightly Booked
+        coachRow(3, 'Not Set Up', {
+          privateCallHours: 0,
+          settings: { desiredHours: null },
+        }),
+      ];
+      showReportsByPeriod({
+        today: [mostlyBooked, lightlyBooked, notSetUp],
+        twoWeeksOut: lessCommittedTwoWeeksOut,
+      });
+      const { result } = renderHook(() => useCoachCapacityReport());
+      act(() => result.current.tableProps.onSortColumn?.('committedHours'));
+      act(() => result.current.tableProps.onSortColumn?.('committedHours'));
+      expect(rowOrder(result)).toEqual([
+        'Mostly Booked',
+        'Not Set Up',
+        'Lightly Booked',
+      ]);
+
+      act(() => result.current.selectPeriod('twoWeeksOut'));
+
+      expect(result.current.tableProps.sort).toEqual({
+        columnId: 'committedHours',
+        direction: 'descending',
+      });
+      expect(rowOrder(result)).toEqual([
+        'Mostly Booked',
+        'Lightly Booked',
+        'Not Set Up',
+      ]);
+
+      act(() => result.current.selectPeriod('today'));
+      expect(result.current.tableProps.sort?.direction).toBe('descending');
+    });
+
     it('keeps unsaved edits, and counts them in the totals, across a switch', () => {
       showReportsByPeriod({ today: todayRows });
       const { result, rerender } = renderHook(() => useCoachCapacityReport());
@@ -685,6 +725,167 @@ describe('useCoachCapacityReport', () => {
       expect(rowOrder(result)).toEqual([
         'Mostly Booked',
         'Lightly Booked',
+        'Not Set Up',
+      ]);
+    });
+  });
+
+  describe('sorting', () => {
+    // Committed Hours: Lightly Booked 6.25, Not Set Up 9.25, Mostly Booked 18.5
+    function sortBy(
+      result: { current: UseCoachCapacityReportResult },
+      columnId: string,
+    ): void {
+      act(() => result.current.tableProps.onSortColumn?.(columnId));
+    }
+
+    it('starts on Booked % ascending, least booked first', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      expect(result.current.tableProps.sort).toEqual({
+        columnId: 'bookedPercent',
+        direction: 'ascending',
+      });
+      expect(rowOrder(result)).toEqual([
+        'Not Set Up',
+        'Lightly Booked',
+        'Mostly Booked',
+      ]);
+    });
+
+    it('switches Booked % to descending and back, keeping coaches who are not set up on top', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      sortBy(result, 'bookedPercent');
+      expect(result.current.tableProps.sort).toEqual({
+        columnId: 'bookedPercent',
+        direction: 'descending',
+      });
+      expect(rowOrder(result)).toEqual([
+        'Not Set Up',
+        'Mostly Booked',
+        'Lightly Booked',
+      ]);
+
+      sortBy(result, 'bookedPercent');
+      expect(result.current.tableProps.sort?.direction).toBe('ascending');
+      expect(rowOrder(result)).toEqual([
+        'Not Set Up',
+        'Lightly Booked',
+        'Mostly Booked',
+      ]);
+    });
+
+    it('takes Committed Hours ascending, then descending, then back to the default', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      sortBy(result, 'committedHours');
+      expect(result.current.tableProps.sort).toEqual({
+        columnId: 'committedHours',
+        direction: 'ascending',
+      });
+      expect(rowOrder(result)).toEqual([
+        'Lightly Booked',
+        'Not Set Up',
+        'Mostly Booked',
+      ]);
+
+      sortBy(result, 'committedHours');
+      expect(result.current.tableProps.sort?.direction).toBe('descending');
+      expect(rowOrder(result)).toEqual([
+        'Mostly Booked',
+        'Not Set Up',
+        'Lightly Booked',
+      ]);
+
+      sortBy(result, 'committedHours');
+      expect(result.current.tableProps.sort).toEqual({
+        columnId: 'bookedPercent',
+        direction: 'ascending',
+      });
+      expect(rowOrder(result)).toEqual([
+        'Not Set Up',
+        'Lightly Booked',
+        'Mostly Booked',
+      ]);
+    });
+
+    it('breaks ties by coach name A to Z in either direction', () => {
+      const alsoLight = coachRow(4, 'Also Light', { privateCallHours: 1 });
+      showReport([mostlyBooked, lightlyBooked, alsoLight]);
+      const { result } = renderHook(() => useCoachCapacityReport());
+      expect(rowOrder(result)).toEqual([
+        'Also Light',
+        'Lightly Booked',
+        'Mostly Booked',
+      ]);
+
+      sortBy(result, 'committedHours');
+      sortBy(result, 'committedHours');
+
+      expect(rowOrder(result)).toEqual([
+        'Mostly Booked',
+        'Also Light',
+        'Lightly Booked',
+      ]);
+    });
+
+    it('sorts by the values shown, edits included', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+      sortBy(result, 'committedHours');
+
+      // 6.25 + 10 more Projects hours = 16.25 Committed Hours
+      typeInto(result, '2', 'projectsHours', '11.25');
+
+      expect(rowOrder(result)).toEqual([
+        'Not Set Up',
+        'Lightly Booked',
+        'Mostly Booked',
+      ]);
+    });
+
+    it('ignores clicks on columns that are not sortable', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      sortBy(result, 'coachingHours');
+
+      expect(result.current.tableProps.sort).toEqual({
+        columnId: 'bookedPercent',
+        direction: 'ascending',
+      });
+    });
+
+    it('applies a chosen sort at once while focus is in the table, then holds it until focus leaves', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+      act(() => result.current.onTableFocus());
+      // 9.25 Committed Hours ÷ 20 Desired Hours = 46%
+      typeInto(result, '3', 'desiredHours', '20');
+      expect(rowOrder(result)).toEqual([
+        'Not Set Up',
+        'Lightly Booked',
+        'Mostly Booked',
+      ]);
+
+      sortBy(result, 'bookedPercent');
+      expect(rowOrder(result)).toEqual([
+        'Mostly Booked',
+        'Not Set Up',
+        'Lightly Booked',
+      ]);
+
+      act(() => result.current.onTableFocus());
+      // 6.25 Committed Hours ÷ 5 Desired Hours = 125%
+      typeInto(result, '2', 'desiredHours', '5');
+      expect(rowOrder(result)).toEqual([
+        'Mostly Booked',
+        'Not Set Up',
+        'Lightly Booked',
+      ]);
+
+      act(() => result.current.onTableBlur());
+      expect(rowOrder(result)).toEqual([
+        'Lightly Booked',
+        'Mostly Booked',
         'Not Set Up',
       ]);
     });

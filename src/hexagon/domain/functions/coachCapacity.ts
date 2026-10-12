@@ -1,4 +1,4 @@
-import type { TableRow } from '@domain/PasteTable';
+import type { TableRow, TableSort } from '@domain/PasteTable';
 import type {
   CoachCapacityReportRow,
   CoachCapacitySettings,
@@ -51,19 +51,66 @@ function isSettingsColumnId(
   return typeof id === 'string' && id in settingsErrors;
 }
 
+/** The columns admins can sort the report by */
+export type CoachCapacitySortColumnId = Extract<
+  CoachCapacityColumnId,
+  'committedHours' | 'bookedPercent'
+>;
+
+export interface CoachCapacitySort extends TableSort {
+  columnId: CoachCapacitySortColumnId;
+}
+
+/** Least booked coaches first, the order the report opens in */
+export const DEFAULT_COACH_CAPACITY_SORT: CoachCapacitySort = {
+  columnId: 'bookedPercent',
+  direction: 'ascending',
+};
+
+export function isCoachCapacitySortColumnId(
+  id: string,
+): id is CoachCapacitySortColumnId {
+  return id === 'committedHours' || id === 'bookedPercent';
+}
+
 /**
- * Least booked coaches first: coaches with no Desired Hours, then Booked %
- * ascending, then coach name. The contract leaves Booked % null exactly when
- * Desired Hours is null or 0, so a null Booked % marks a coach without them.
+ * The sort after the admin clicks a sortable header. A newly clicked column
+ * sorts ascending. Booked % then switches between ascending and descending;
+ * Committed Hours goes descending, then back to the default sort.
+ */
+export function nextCoachCapacitySort(
+  current: CoachCapacitySort,
+  columnId: CoachCapacitySortColumnId,
+): CoachCapacitySort {
+  if (current.columnId !== columnId) {
+    return { columnId, direction: 'ascending' };
+  }
+  if (current.direction === 'ascending') {
+    return { columnId, direction: 'descending' };
+  }
+  return columnId === 'bookedPercent'
+    ? { columnId, direction: 'ascending' }
+    : DEFAULT_COACH_CAPACITY_SORT;
+}
+
+/**
+ * Rows by the sorted column, ties broken by coach name A to Z. By Booked %,
+ * coaches with no Desired Hours come first in either direction. The contract
+ * leaves Booked % null exactly when Desired Hours is null or 0, so a null
+ * Booked % marks a coach without them.
  */
 export function sortCoachCapacityRows(
   rows: readonly CoachCapacityReportRow[],
+  sort: CoachCapacitySort,
 ): CoachCapacityReportRow[] {
+  const sign = sort.direction === 'ascending' ? 1 : -1;
   return [...rows].sort((a, b) => {
-    if (a.bookedPercent === null && b.bookedPercent !== null) return -1;
-    if (a.bookedPercent !== null && b.bookedPercent === null) return 1;
-    const byBookedPercent = (a.bookedPercent ?? 0) - (b.bookedPercent ?? 0);
-    if (byBookedPercent !== 0) return byBookedPercent;
+    const aValue = a[sort.columnId];
+    const bValue = b[sort.columnId];
+    if (aValue === null && bValue !== null) return -1;
+    if (aValue !== null && bValue === null) return 1;
+    const byColumn = sign * ((aValue ?? 0) - (bValue ?? 0));
+    if (byColumn !== 0) return byColumn;
     return a.coach.fullName.localeCompare(b.coach.fullName);
   });
 }

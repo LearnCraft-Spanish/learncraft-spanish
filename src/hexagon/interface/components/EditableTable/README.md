@@ -11,8 +11,8 @@
 **Contract for the use case layer** - defines what a use case must provide:
 
 - **Data**: `rows`, `columns`
-- **State**: `dirtyRowIds`, `validationErrors`, `isLoading`, `isSaving`, `isValid`
-- **Actions**: `onCellChange`, `onPaste`, `onSave`, `onDiscard`
+- **State**: `dirtyRowIds`, `validationErrors`, `isLoading`, `isSaving`, `isValid`, `sort`
+- **Actions**: `onCellChange`, `onPaste`, `onSave`, `onDiscard`, `onSortColumn`
 - **Focus Management**: `setActiveCellInfo`, `clearActiveCellInfo`
 - **UI State**: `hasUnsavedChanges`
 
@@ -165,6 +165,16 @@ const { tableProps, saveError, audioErrorHandlers } = useExampleEditor();
 Set `pinned: 'left'` or `pinned: 'right'` on a column's `ColumnDisplayConfig` to keep it in view while the other columns scroll horizontally. Once any column is pinned the table scrolls inside its own container, and **every column needs a fixed `width`** (e.g. `'8rem'`, not `'1fr'`): pinned columns are offset by the widths of the pinned columns between them and their edge, and the table is sized to the sum of its column widths.
 
 Pinned columns on a side do not need to be adjacent to that edge. A right-pinned column followed by an unpinned one (Coach Capacity's Notes) sticks to the right edge until the table is scrolled far enough to show it in place.
+
+## Sortable Columns
+
+Set `sortable: true` on a column's `ColumnDisplayConfig` to make its header a button. The table does not sort rows; it only reports and shows the sort:
+
+- A click on a sortable header calls the use case's `onSortColumn(columnId)`.
+- The use case's `sort` (`{ columnId, direction }`) marks its column with an up or down arrow and `aria-sort`. Other sortable headers show a faint hint icon and `aria-sort="none"`.
+- `rows` must already be in the order `sort` describes. What a click does (flip direction, reset to a default) and how ties break are the use case's rules, kept in domain functions.
+
+Coach Capacity marks Committed Hours and Booked % sortable; `useCoachCapacityReport` holds the sort and `sortCoachCapacityRows` applies it.
 
 ## Key Principles
 
