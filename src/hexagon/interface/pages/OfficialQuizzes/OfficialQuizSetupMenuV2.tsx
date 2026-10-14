@@ -6,6 +6,7 @@ import {
 } from '@domain/functions/officialQuizSetupOptions';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
 import { Card } from '@interface/components/general/Card/Card';
+import { Combobox } from '@interface/components/general/Combobox/Combobox';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
 import { Field } from '@interface/components/general/Field/Field';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
@@ -37,21 +38,13 @@ export function OfficialQuizSetupMenuV2({
     (quiz) => quiz.quizNumber === quizNumber,
   );
 
-  const quizSelectOptions =
-    quizNumber === 0
-      ? [
-          { value: '0', label: 'Select a quiz' },
-          ...officialQuizSelectOptions(quizOptions),
-        ]
-      : officialQuizSelectOptions(quizOptions);
-
   return (
     <PageShell>
       <div className={styles.column}>
         <Eyebrow>Official quiz</Eyebrow>
         <h1 className={styles.title}>Choose a quiz</h1>
 
-        <Card>
+        <Card clip={false}>
           <div className={styles.body}>
             <div className={styles.groupRow}>
               {isEditingGroup ? (
@@ -113,13 +106,15 @@ export function OfficialQuizSetupMenuV2({
 
             <div className={styles.quizField}>
               <Field htmlFor="official-quiz-number" label="Quiz">
-                <Select
+                <Combobox
                   id="official-quiz-number"
-                  value={String(quizNumber)}
-                  options={quizSelectOptions}
+                  value={quizNumber === 0 ? '' : String(quizNumber)}
+                  options={officialQuizSelectOptions(quizOptions)}
                   onChange={(value) =>
                     setUserSelectedQuizNumber(Number.parseInt(value, 10) || 0)
                   }
+                  placeholder="Search quizzes"
+                  emptyLabel="No quizzes match"
                   emphasis
                   disabled={quizOptions.length === 0}
                 />

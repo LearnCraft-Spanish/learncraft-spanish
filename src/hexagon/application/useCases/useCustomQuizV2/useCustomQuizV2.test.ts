@@ -174,12 +174,6 @@ describe('useCustomQuizV2', () => {
     expect(result.current.quizNotReady).toBe(true);
   });
 
-  it('names the course and starting lesson', () => {
-    const { result } = renderCustomQuiz();
-
-    expect(result.current.fromLessonText).toBe('From lesson lcsp 2');
-  });
-
   it('switching to audio changes the noun in both count and CTA', async () => {
     const { result } = renderCustomQuiz();
 

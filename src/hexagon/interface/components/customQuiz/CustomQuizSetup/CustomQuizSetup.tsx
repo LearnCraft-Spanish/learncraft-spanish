@@ -79,10 +79,7 @@ export function CustomQuizSetup({
 
       <div className={styles.columns}>
         <div className={styles.settings}>
-          <CourseCard
-            exampleFilter={quiz.exampleFilter}
-            fromLessonText={quiz.fromLessonText}
-          />
+          <CourseCard exampleFilter={quiz.exampleFilter} />
           <div className={styles.optionsSlot}>
             <QuizOptionsCard
               quizType={quiz.quizType}

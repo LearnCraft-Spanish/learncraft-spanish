@@ -29,7 +29,12 @@ describe('customQuizSetup', () => {
     renderSetup();
 
     expect(screen.getByText('LearnCraft Spanish')).toBeInTheDocument();
-    expect(screen.getByText('From lesson lcsp 1')).toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', { name: 'From lesson' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', { name: 'Up to lesson' }),
+    ).toBeInTheDocument();
     expect(
       screen.getAllByText('6,992 flashcards found').length,
     ).toBeGreaterThan(0);
@@ -161,16 +166,15 @@ describe('customQuizSetup', () => {
       .forEach((button) => expect(button).toBeDisabled());
   });
 
-  it('opens the advanced settings panel without losing the card', async () => {
+  it('reveals the course dropdown behind the change action', async () => {
     renderSetup();
 
-    const toggle = screen.getByRole('button', { name: /advanced settings/i });
-    expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByLabelText('From lesson')).toBeNull();
+    expect(screen.queryByLabelText('Course')).toBeNull();
 
-    await userEvent.click(toggle);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Change course' }),
+    );
 
-    expect(toggle).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByLabelText('Course')).toBeInTheDocument();
     expect(screen.getByLabelText('From lesson')).toBeInTheDocument();
     expect(screen.getByLabelText('Up to lesson')).toBeInTheDocument();

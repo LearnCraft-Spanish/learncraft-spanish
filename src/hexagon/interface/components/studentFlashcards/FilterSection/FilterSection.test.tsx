@@ -165,10 +165,22 @@ function renderSection(
   return exampleFilter;
 }
 
-function scopeSelectIds(): string[] {
-  const grid = document.querySelector(`.${styles.scopeGrid}`);
-  expect(grid).not.toBeNull();
-  return Array.from(grid!.querySelectorAll('select')).map((el) => el.id);
+function scopeControlIds(): string[] {
+  const scope = document.querySelector(`.${styles.scope}`);
+  expect(scope).not.toBeNull();
+  return Array.from(scope!.querySelectorAll('input, select')).map(
+    (el) => el.id,
+  );
+}
+
+async function openLessonList(label: string): Promise<void> {
+  await userEvent.click(screen.getByLabelText(label));
+}
+
+function listedOptions(): string[] {
+  return screen
+    .getAllByRole('option')
+    .map((option) => option.textContent ?? '');
 }
 
 describe('filter section', () => {
@@ -176,7 +188,7 @@ describe('filter section', () => {
     cleanup();
   });
 
-  it('renders the scope header, real courses, and the card options section', () => {
+  it('renders the scope header, course identity, and the card options section', () => {
     renderSection();
 
     expect(
@@ -188,20 +200,16 @@ describe('filter section', () => {
     expect(
       screen.getByRole('button', { name: 'Reset all filters' }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText('Course')).toHaveDisplayValue(
-      'LearnCraft Spanish',
-    );
+    expect(screen.getByText('LearnCraft Spanish')).toBeInTheDocument();
     expect(
-      screen.getByRole('option', { name: 'Essential Spanish' }),
+      screen.getByRole('button', { name: 'Change course' }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText('From lesson')).toHaveDisplayValue(
+    expect(screen.queryByLabelText('Course')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('From lesson')).toHaveValue(
       'Lesson 1 — from the start',
     );
-    expect(screen.getByLabelText('Through lesson')).toHaveDisplayValue(
-      'Lesson 8',
-    );
-    expect(scopeSelectIds()).toEqual([
-      'finder-course',
+    expect(screen.getByLabelText('Up to lesson')).toHaveValue('Lesson 8');
+    expect(scopeControlIds()).toEqual([
       'finder-from-lesson',
       'finder-to-lesson',
     ]);
@@ -247,8 +255,25 @@ describe('filter section', () => {
     expect(screen.queryByText(/all of these tags/i)).not.toBeInTheDocument();
   });
 
-  it('falls back to the selected course when the catalog is missing', () => {
+  it('lists the real courses behind the change action', async () => {
+    const user = userEvent.setup();
+    renderSection();
+
+    await user.click(screen.getByRole('button', { name: 'Change course' }));
+
+    expect(screen.getByLabelText('Course')).toHaveDisplayValue(
+      'LearnCraft Spanish',
+    );
+    expect(
+      screen.getByRole('option', { name: 'Essential Spanish' }),
+    ).toBeInTheDocument();
+  });
+
+  it('falls back to the selected course when the catalog is missing', async () => {
+    const user = userEvent.setup();
     renderSection(createFilter({ coursesWithLessons: undefined }));
+
+    await user.click(screen.getByRole('button', { name: 'Change course' }));
 
     expect(screen.getByLabelText('Course')).toHaveDisplayValue(
       'LearnCraft Spanish',
@@ -258,15 +283,18 @@ describe('filter section', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('falls back to the selected course when the catalog is empty', () => {
+  it('falls back to the selected course when the catalog is empty', async () => {
+    const user = userEvent.setup();
     renderSection(createFilter({ coursesWithLessons: [] }));
+
+    await user.click(screen.getByRole('button', { name: 'Change course' }));
 
     expect(screen.getByLabelText('Course')).toHaveDisplayValue(
       'LearnCraft Spanish',
     );
   });
 
-  it('renders empty course and lesson controls when nothing is selected', () => {
+  it('shows the course dropdown and disabled lesson pickers when nothing is selected', () => {
     renderSection(
       createFilter({
         course: null,
@@ -279,17 +307,14 @@ describe('filter section', () => {
       }),
     );
 
-    expect(screen.getByLabelText('Course')).toBeInTheDocument();
-    expect(
-      screen.getByLabelText('Course').querySelectorAll('option'),
-    ).toHaveLength(0);
-    expect(
-      screen.getByLabelText('From lesson').querySelectorAll('option'),
-    ).toHaveLength(0);
-    expect(
-      screen.getByLabelText('Through lesson').querySelectorAll('option'),
-    ).toHaveLength(0);
-    expect(scopeSelectIds()).toEqual([
+    const coursePicker = screen.getByLabelText('Course');
+    expect(coursePicker).toHaveDisplayValue('Choose a course');
+    expect(coursePicker.querySelectorAll('option')).toHaveLength(1);
+    expect(screen.getByLabelText('From lesson')).toBeDisabled();
+    expect(screen.getByLabelText('From lesson')).toHaveValue('');
+    expect(screen.getByLabelText('Up to lesson')).toBeDisabled();
+    expect(screen.getByLabelText('Up to lesson')).toHaveValue('');
+    expect(scopeControlIds()).toEqual([
       'finder-course',
       'finder-from-lesson',
       'finder-to-lesson',
@@ -299,7 +324,7 @@ describe('filter section', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders an empty from-lesson select when the course has no lessons', () => {
+  it('keeps the from-lesson list closed when the course has no lessons', async () => {
     renderSection(
       createFilter({
         course: emptyCourse,
@@ -312,9 +337,12 @@ describe('filter section', () => {
       }),
     );
 
-    expect(
-      screen.getByLabelText('From lesson').querySelectorAll('option'),
-    ).toHaveLength(0);
+    await openLessonList('From lesson');
+
+    expect(screen.getByLabelText('From lesson')).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
   });
 
   it('calls onResetAll without a starting-lesson toggle', async () => {
@@ -323,7 +351,7 @@ describe('filter section', () => {
     const exampleFilter = createFilter({ fromLessonNumber: 8 });
     renderSection(exampleFilter, onResetAll);
 
-    expect(screen.getByLabelText('From lesson')).toHaveDisplayValue('Lesson 8');
+    expect(screen.getByLabelText('From lesson')).toHaveValue('Lesson 8');
 
     await user.click(screen.getByRole('button', { name: 'Reset all filters' }));
 
@@ -394,58 +422,54 @@ describe('filter section', () => {
     expect(exampleFilter.updateIncludeUnpublished).toHaveBeenCalledWith(true);
   });
 
-  it('updates the selected course', async () => {
+  it('updates the selected course from the change action', async () => {
     const user = userEvent.setup();
     const exampleFilter = createFilter();
     renderSection(exampleFilter);
 
+    await user.click(screen.getByRole('button', { name: 'Change course' }));
     await user.selectOptions(screen.getByLabelText('Course'), '3');
 
     expect(exampleFilter.updateUserSelectedCourseId).toHaveBeenCalledWith(3);
   });
 
-  it('updates the through-lesson with the emphasized control', async () => {
+  it('updates the up-to-lesson with the emphasized control', async () => {
     const user = userEvent.setup();
     const exampleFilter = createFilter();
     renderSection(exampleFilter);
 
-    await user.selectOptions(screen.getByLabelText('Through lesson'), '2');
+    await openLessonList('Up to lesson');
+    await user.click(screen.getByRole('option', { name: 'Lesson 2' }));
 
     expect(exampleFilter.updateToLessonNumber).toHaveBeenCalledWith(2);
   });
 
-  it('updates the from-lesson select', async () => {
+  it('narrows the from-lesson list by typing and commits on Enter', async () => {
     const user = userEvent.setup();
     const exampleFilter = createFilter();
     renderSection(exampleFilter);
 
-    const fromLesson = screen.getByLabelText('From lesson');
-    expect(fromLesson.tagName).toBe('SELECT');
-    await user.selectOptions(fromLesson, '2');
+    const fromLesson = screen.getByRole('combobox', { name: 'From lesson' });
+    await user.click(fromLesson);
+    await user.keyboard('2');
 
+    expect(listedOptions()).toEqual(['Lesson 2']);
+    await user.keyboard('{Enter}');
     expect(exampleFilter.updateFromLessonNumber).toHaveBeenCalledWith(2);
   });
 
-  it('marks only the course starting lesson with the from-the-start suffix', () => {
+  it('marks only the course starting lesson with the from-the-start suffix', async () => {
     renderSection();
 
-    const fromLesson = screen.getByLabelText('From lesson');
-    expect(
-      within(fromLesson).getByRole('option', {
-        name: 'Lesson 1 — from the start',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      within(fromLesson).getByRole('option', { name: /^Lesson 2$/ }),
-    ).toBeInTheDocument();
-    expect(
-      within(fromLesson).queryByRole('option', {
-        name: 'Lesson 2 — from the start',
-      }),
-    ).not.toBeInTheDocument();
+    await openLessonList('From lesson');
+
+    const options = listedOptions();
+    expect(options).toContain('Lesson 1 — from the start');
+    expect(options).toContain('Lesson 2');
+    expect(options).not.toContain('Lesson 2 — from the start');
   });
 
-  it('puts the from-the-start suffix on the prerequisite, not lesson 1', () => {
+  it('puts the from-the-start suffix on the prerequisite, not lesson 1', async () => {
     renderSection(
       createFilter({
         course: postChallengeCourse,
@@ -456,26 +480,18 @@ describe('filter section', () => {
       }),
     );
 
-    const fromLesson = screen.getByLabelText('From lesson');
-    expect(fromLesson).toHaveDisplayValue(
+    expect(screen.getByLabelText('From lesson')).toHaveValue(
       'All si1m Lessons (1-20) — from the start',
     );
-    expect(
-      within(fromLesson).getByRole('option', {
-        name: 'All si1m Lessons (1-20) — from the start',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      within(fromLesson).getByRole('option', { name: /^Lesson 1$/ }),
-    ).toBeInTheDocument();
-    expect(
-      within(fromLesson).queryByRole('option', {
-        name: 'Lesson 1 — from the start',
-      }),
-    ).not.toBeInTheDocument();
+    await openLessonList('From lesson');
+
+    const options = listedOptions();
+    expect(options).toContain('All si1m Lessons (1-20) — from the start');
+    expect(options).toContain('Lesson 1');
+    expect(options).not.toContain('Lesson 1 — from the start');
   });
 
-  it('lists every through-lesson when from is a prerequisite', () => {
+  it('lists every up-to-lesson when from is a prerequisite', async () => {
     renderSection(
       createFilter({
         course: postChallengeCourse,
@@ -486,16 +502,12 @@ describe('filter section', () => {
       }),
     );
 
-    const throughLesson = screen.getByLabelText('Through lesson');
-    expect(
-      within(throughLesson).getByRole('option', { name: /^Lesson 1$/ }),
-    ).toBeInTheDocument();
-    expect(
-      within(throughLesson).getByRole('option', { name: /^Lesson 2$/ }),
-    ).toBeInTheDocument();
+    await openLessonList('Up to lesson');
+
+    expect(listedOptions()).toEqual(['Lesson 1', 'Lesson 2']);
   });
 
-  it('omits regular from-lessons until a through-lesson is chosen', () => {
+  it('omits regular from-lessons until an up-to-lesson is chosen', async () => {
     renderSection(
       createFilter({
         toLesson: null,
@@ -503,35 +515,33 @@ describe('filter section', () => {
       }),
     );
 
-    const fromLesson = screen.getByLabelText('From lesson');
-    expect(fromLesson).not.toHaveTextContent('Lesson 8');
+    await openLessonList('From lesson');
+
+    expect(screen.queryAllByRole('option')).toHaveLength(0);
   });
 
-  it('filters through-lessons to those at or after from', () => {
+  it('filters up-to-lessons to those at or after from', async () => {
     renderSection(createFilter({ fromLessonNumber: 8 }));
 
-    const throughLesson = screen.getByLabelText('Through lesson');
-    expect(throughLesson).not.toHaveTextContent('Lesson 1');
-    expect(throughLesson).toHaveTextContent('Lesson 8');
+    await openLessonList('Up to lesson');
+
+    expect(listedOptions()).toEqual(['Lesson 8']);
   });
 
-  it('filters from-lessons to those at or before through', () => {
+  it('filters from-lessons to those at or before up-to', async () => {
     renderSection(createFilter({ toLessonNumber: 2 }));
 
-    const fromLesson = screen.getByLabelText('From lesson');
-    expect(fromLesson).toHaveTextContent('Lesson 1 — from the start');
-    expect(fromLesson).toHaveTextContent('Lesson 2');
-    expect(fromLesson).not.toHaveTextContent('Lesson 8');
+    await openLessonList('From lesson');
+
+    expect(listedOptions()).toEqual(['Lesson 1 — from the start', 'Lesson 2']);
   });
 
-  it('lists every through-lesson when from is unset', () => {
+  it('lists every up-to-lesson when from is unset', async () => {
     renderSection(createFilter({ fromLesson: null, fromLessonNumber: null }));
 
-    expect(
-      within(screen.getByLabelText('Through lesson')).getByRole('option', {
-        name: /^Lesson 1$/,
-      }),
-    ).toBeInTheDocument();
+    await openLessonList('Up to lesson');
+
+    expect(listedOptions()).toEqual(['Lesson 1', 'Lesson 2', 'Lesson 8']);
   });
 
   it('searches tags and adds a suggestion while keeping the typed search', async () => {
