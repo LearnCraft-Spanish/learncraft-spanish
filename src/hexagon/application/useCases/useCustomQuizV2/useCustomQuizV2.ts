@@ -12,7 +12,6 @@ import { AudioQuizType } from '@domain/audioQuizzing';
 import {
   countLabel as buildCountLabel,
   ctaLabel as buildCtaLabel,
-  fromLessonText as buildFromLessonText,
   effectiveQuizCount,
 } from '@domain/functions/customQuizCopy';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
@@ -61,7 +60,6 @@ export interface UseCustomQuizV2Return {
   effectiveCount: number;
   countLabel: string;
   ctaLabel: string;
-  fromLessonText: string;
   selectedTagCount: number;
 
   isLoadingExamples: boolean;
@@ -227,10 +225,6 @@ export function useCustomQuizV2(): UseCustomQuizV2Return {
     effectiveCount,
     countLabel: buildCountLabel(count, isAudioQuiz),
     ctaLabel: buildCtaLabel(count, quizLength, isAudioQuiz),
-    fromLessonText: buildFromLessonText(
-      exampleFilter.course?.name ?? null,
-      exampleFilter.fromLessonNumber,
-    ),
     selectedTagCount: exampleFilter.selectedSkillTags.length,
 
     isLoadingExamples,

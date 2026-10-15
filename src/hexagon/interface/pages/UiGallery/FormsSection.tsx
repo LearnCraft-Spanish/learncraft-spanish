@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 import { Checkbox } from '@interface/components/general/Checkbox';
+import { Combobox } from '@interface/components/general/Combobox';
 import { Field } from '@interface/components/general/Field';
 import { Select } from '@interface/components/general/Select';
 import { TextInput } from '@interface/components/general/TextInput';
@@ -17,8 +18,14 @@ const LESSONS = [
   { value: '3', label: 'Lesson 3' },
 ];
 
+const MANY_LESSONS = Array.from({ length: 60 }, (_, index) => ({
+  value: String(index + 1),
+  label: `Lesson ${index + 1}`,
+}));
+
 export function FormsSection(): JSX.Element {
   const [lesson, setLesson] = useState('2');
+  const [searched, setSearched] = useState('12');
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(false);
   const [useFrom, setUseFrom] = useState(false);
@@ -87,6 +94,60 @@ export function FormsSection(): JSX.Element {
                 value={lesson}
                 options={LESSONS}
                 onChange={setLesson}
+                disabled
+              />
+            </Field>
+          </GallerySpecimen>
+        </GallerySpecimens>
+      </GallerySection>
+
+      <GallerySection title="Combobox">
+        <GallerySpecimens>
+          <GallerySpecimen label="default — type to filter 60 lessons">
+            <Field htmlFor="g-combo" label="From lesson">
+              <Combobox
+                id="g-combo"
+                value={searched}
+                options={MANY_LESSONS}
+                onChange={setSearched}
+                emptyLabel="No lessons match"
+              />
+            </Field>
+          </GallerySpecimen>
+          <GallerySpecimen label="emphasis (required)">
+            <Field htmlFor="g-combo-em" label="Up to lesson">
+              <Combobox
+                id="g-combo-em"
+                value={searched}
+                options={MANY_LESSONS}
+                onChange={setSearched}
+                emptyLabel="No lessons match"
+                emphasis
+              />
+            </Field>
+          </GallerySpecimen>
+          <GallerySpecimen label="error">
+            <Field
+              htmlFor="g-combo-err"
+              label="From lesson"
+              error="Pick a lesson in this course"
+            >
+              <Combobox
+                id="g-combo-err"
+                value={searched}
+                options={MANY_LESSONS}
+                onChange={setSearched}
+                invalid
+              />
+            </Field>
+          </GallerySpecimen>
+          <GallerySpecimen label="disabled">
+            <Field htmlFor="g-combo-dis" label="From lesson">
+              <Combobox
+                id="g-combo-dis"
+                value={searched}
+                options={MANY_LESSONS}
+                onChange={setSearched}
                 disabled
               />
             </Field>

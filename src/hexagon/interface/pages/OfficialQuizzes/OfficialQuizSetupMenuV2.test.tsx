@@ -2,6 +2,7 @@ import type { OfficialQuizSetupMenuProps } from '@interface/pages/OfficialQuizze
 import type { QuizGroup } from '@learncraft-spanish/shared';
 import { OfficialQuizSetupMenuV2 } from '@interface/pages/OfficialQuizzes/OfficialQuizSetupMenuV2';
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {
   createMockOfficialQuizRecord,
   createMockQuizGroup,
@@ -138,37 +139,62 @@ describe('component OfficialQuizSetupMenuV2', () => {
   });
 
   describe('quiz field', () => {
-    it('lists a placeholder plus every quiz in the group when nothing is chosen', () => {
+    it('is a searchable picker showing a placeholder when nothing is chosen', () => {
       renderWithOverrides({ quizNumber: 0 });
 
-      const quizSelect = screen.getByLabelText('Quiz') as HTMLSelectElement;
-      expect(quizSelect.value).toBe('0');
-      expect(
-        screen.getByRole('option', { name: 'Select a quiz' }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('option', { name: 'LCSP - Lesson 1' }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('option', { name: 'LCSP - Lesson 2' }),
-      ).toBeInTheDocument();
+      const quizField = screen.getByRole('combobox', { name: 'Quiz' });
+      expect(quizField).toHaveValue('');
+      expect(quizField).toHaveAttribute('placeholder', 'Search quizzes');
     });
 
-    it('calls setUserSelectedQuizNumber when a quiz is chosen', () => {
+    it('shows the chosen quiz title at rest', () => {
+      renderWithOverrides({ quizNumber: 2 });
+
+      expect(screen.getByRole('combobox', { name: 'Quiz' })).toHaveValue(
+        'LCSP - Lesson 2',
+      );
+    });
+
+    it('lists every quiz in the group when opened', async () => {
+      const user = userEvent.setup();
+      renderWithOverrides();
+
+      await user.click(screen.getByRole('combobox', { name: 'Quiz' }));
+
+      expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual([
+        'LCSP - Lesson 1',
+        'LCSP - Lesson 2',
+      ]);
+    });
+
+    it('filters by typed text and commits the match on Enter', async () => {
+      const user = userEvent.setup();
       const setUserSelectedQuizNumber = vi.fn();
       renderWithOverrides({ setUserSelectedQuizNumber });
 
-      const quizSelect = screen.getByLabelText('Quiz') as HTMLSelectElement;
-      fireEvent.change(quizSelect, { target: { value: '2' } });
+      await user.click(screen.getByRole('combobox', { name: 'Quiz' }));
+      await user.keyboard('2');
 
+      expect(screen.getAllByRole('option')).toHaveLength(1);
+      await user.keyboard('{Enter}');
       expect(setUserSelectedQuizNumber).toHaveBeenCalledWith(2);
+    });
+
+    it('calls setUserSelectedQuizNumber when a quiz is clicked', async () => {
+      const user = userEvent.setup();
+      const setUserSelectedQuizNumber = vi.fn();
+      renderWithOverrides({ setUserSelectedQuizNumber });
+
+      await user.click(screen.getByRole('combobox', { name: 'Quiz' }));
+      await user.click(screen.getByRole('option', { name: 'LCSP - Lesson 1' }));
+
+      expect(setUserSelectedQuizNumber).toHaveBeenCalledWith(1);
     });
 
     it('is disabled when the group has no quizzes', () => {
       renderWithOverrides({ quizOptions: [] });
 
-      const quizSelect = screen.getByLabelText('Quiz') as HTMLSelectElement;
-      expect(quizSelect).toBeDisabled();
+      expect(screen.getByRole('combobox', { name: 'Quiz' })).toBeDisabled();
     });
   });
 

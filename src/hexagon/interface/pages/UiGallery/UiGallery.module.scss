@@ -134,3 +134,17 @@
   border: 1px solid var(--lcs-border-card);
   border-radius: var(--lcs-radius-xl);
 }
+
+/* Lesson range scope at the two widths it ships in. */
+.scopeDemoWide {
+  width: min(720px, 90vw);
+}
+
+.scopeDemoNarrow {
+  width: min(420px, 90vw);
+}
+
+.scopeDemoHeader {
+  padding: var(--lcs-space-7) var(--lcs-space-8);
+  border-bottom: var(--lcs-border-hairline) solid var(--lcs-divider);
+}
