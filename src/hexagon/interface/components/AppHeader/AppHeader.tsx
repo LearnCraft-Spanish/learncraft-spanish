@@ -37,7 +37,6 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
     isStaffUsingAsStudent,
     usingAs,
     stopUsingAsStudent,
-    logout,
     stack,
   } = useAppHeaderView();
   const navigate = useNavigate();
@@ -63,7 +62,7 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
     <AccountMenu
       studentName={studentName}
       studentEmail={studentEmail}
-      onLogOut={logout}
+      onOpenSettings={() => navigate('/settings')}
       usingAs={usingAs}
       onUseAsStudent={showUseAsStudent ? openFromAccount : undefined}
       onChangeStudent={isStaffUsingAsStudent ? openFromAccount : undefined}

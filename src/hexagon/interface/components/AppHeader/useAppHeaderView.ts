@@ -30,7 +30,6 @@ export interface UseAppHeaderViewResult {
   isStaffUsingAsStudent: boolean;
   usingAs: UsingAsIdentity | null;
   stopUsingAsStudent: () => void;
-  logout: () => void;
   /** Mobile student-v2 stack chrome. `null` on Home, desktop, and non-student routes. */
   stack: AppHeaderStack | null;
 }
@@ -52,7 +51,6 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
     isStaffUsingAsStudent,
     usingAs,
     stopUsingAsStudent,
-    logout,
   }: UseAppHeaderResult = useAppHeader();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -86,7 +84,6 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
     isStaffUsingAsStudent,
     usingAs,
     stopUsingAsStudent,
-    logout,
     stack,
   };
 }

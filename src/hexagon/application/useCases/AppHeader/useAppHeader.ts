@@ -22,7 +22,7 @@ export interface UseAppHeaderResult {
   staffRole: 'admin' | 'coach' | null;
   /** Signed-in coach/admin in their own view: "Use as student" replaces the student nav. */
   showUseAsStudent: boolean;
-  /** Coach/admin using the app as a student: "Change student", and a way back instead of Log out. */
+  /** Coach/admin using the app as a student: "Change student", and a way back to their own view. */
   isStaffUsingAsStudent: boolean;
   /** The student a coach/admin is using the app as, once loaded. */
   usingAs: UsingAsIdentity | null;

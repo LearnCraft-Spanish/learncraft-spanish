@@ -31,6 +31,7 @@ const FlashcardFinderPage = lazy(
 );
 const GetHelpHub = lazy(() => import('@interface/pages/GetHelp'));
 const GetHelpVocab = lazy(() => import('@interface/pages/GetHelp/VocabLookup'));
+const SettingsPage = lazy(() => import('@interface/pages/Settings'));
 
 // Development-only, gated by environment so it never registers in production
 const UiGallery = lazy(() => import('@interface/pages/UiGallery'));
@@ -167,6 +168,16 @@ export default function AppRoutes() {
             (isStudent || isCoach || isAdmin) && (
               <UiScope>
                 <GetHelpVocab />
+              </UiScope>
+            )
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            isAuthenticated && (
+              <UiScope>
+                <SettingsPage />
               </UiScope>
             )
           }

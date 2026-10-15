@@ -193,6 +193,9 @@ describe('component AppHeader', () => {
       expect(
         screen.queryByRole('menuitem', { name: /Log out/ }),
       ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('menuitem', { name: 'Settings' }),
+      ).toBeInTheDocument();
       expect(screen.getByText('Back to your admin view')).toBeInTheDocument();
 
       await userEvent.click(
@@ -222,7 +225,7 @@ describe('component AppHeader', () => {
     ).not.toBeInTheDocument();
     expect(
       screen.getAllByRole('menuitem').map((item) => item.textContent),
-    ).toEqual(['Log out']);
+    ).toEqual(['Settings']);
     expect(screen.queryByText('Using as')).not.toBeInTheDocument();
   });
 
@@ -249,6 +252,36 @@ describe('component AppHeader', () => {
     expect(screen.queryAllByRole('button')).toHaveLength(0);
     expect(
       screen.queryByRole('button', { name: /Log in/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('opens Settings from the account menu', async () => {
+    overrideMockUseAppHeader({
+      isAuthenticated: true,
+      isLoading: false,
+      isSignedIn: true,
+      studentName: 'Maria Silva',
+      studentEmail: 'maria@example.com',
+    });
+
+    function PathReadout(): JSX.Element {
+      const { pathname } = useLocation();
+      return <div data-testid="path">{pathname}</div>;
+    }
+
+    render(
+      <MemoryRouter initialEntries={['/quizzes']}>
+        <AppHeader />
+        <PathReadout />
+      </MemoryRouter>,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Account' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Settings' }));
+
+    expect(screen.getByTestId('path')).toHaveTextContent('/settings');
+    expect(
+      screen.queryByRole('menuitem', { name: /Log out/ }),
     ).not.toBeInTheDocument();
   });
 

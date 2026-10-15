@@ -118,7 +118,7 @@ describe('app', () => {
     });
   });
 
-  it('shows a log out option in the account menu when logged in on v2', async () => {
+  it('opens settings from the account menu when logged in on v2', async () => {
     const user = userEvent.setup();
     asV2BetaStudent();
     overrideAuthAndAppUser(
@@ -132,7 +132,7 @@ describe('app', () => {
         isOwnUser: true,
       },
     );
-    const { getByRole } = render(
+    const { getByRole, queryByRole } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>,
@@ -142,7 +142,15 @@ describe('app', () => {
     );
     await user.click(accountTrigger);
 
-    expect(getByRole('menuitem', { name: /log out/i })).toBeInTheDocument();
+    expect(
+      queryByRole('menuitem', { name: /log out/i }),
+    ).not.toBeInTheDocument();
+    await user.click(getByRole('menuitem', { name: /settings/i }));
+
+    expect(
+      await waitFor(() => getByRole('heading', { name: 'Settings' })),
+    ).toBeInTheDocument();
+    expect(getByRole('button', { name: /log out/i })).toBeInTheDocument();
   });
 
   it('shows the legacy nav login and the logged-out screen button', async () => {
