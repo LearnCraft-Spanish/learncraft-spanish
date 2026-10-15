@@ -5,7 +5,7 @@ import SectionHeader from 'src/components/CoachingDashboard/components/SectionHe
 import useWeeklyTimeCommitmentByCoach from 'src/hooks/AdminData/useWeeklyTimeCommitmentByCoach';
 
 function formatHours(minutes: number): string {
-  return `${(minutes / 60).toFixed(1)} hrs`;
+  return (minutes / 60).toFixed(1);
 }
 
 function renderRow(data: WeeklyTimeCommitmentByCoachData) {
@@ -23,7 +23,7 @@ export default function WeeklyTimeCommitmentByCoach() {
     useWeeklyTimeCommitmentByCoach();
 
   const [isOpen, setIsOpen] = useState(false);
-  const headers = ['Coach', 'Weekly Time Commitment'];
+  const headers = ['Coach', 'Weekly Time Commitment (Hours)'];
 
   return (
     <div>
