@@ -2,8 +2,10 @@ import type { UseHomeViewResult } from '@application/useCases/useHomeView';
 import { createOverrideableMockHook } from '@testing/utils/createOverrideableMockHook';
 
 const defaultMockResult: UseHomeViewResult = {
-  view: 'legacyMenu',
+  view: 'student',
   showAdminTools: false,
+  ctas: [],
+  entries: [],
 };
 
 export const {

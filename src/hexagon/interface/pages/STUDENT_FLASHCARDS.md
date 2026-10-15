@@ -67,7 +67,7 @@ flowchart TB
 
 **Treat Manager and Finder as one redesign surface.** Students move between them (`Find More Matching Flashcards`, `Use these filters on my flashcards` via `?enableFiltering=true`). They share filter chrome and list-item chrome.
 
-**v2 vs v1 is per-user, not per-surface.** A beta-tester student (`studentRole === 'student'` and `betaTester === true` on their own record) gets v2 on every student surface. Everyone else gets v1. The two pages remain one redesign _surface_ — they share the same primitives and the same filter coordinator.
+**v2 vs v1 is per-user, not per-surface.** v2 is now rolled out to every visitor, so everyone gets v2 on every student surface; the v1 branches remain until they are deleted. The two pages remain one redesign _surface_ — they share the same primitives and the same filter coordinator.
 
 Do not wrap Custom Quiz or Review My Flashcards under a separate version gate; they follow the same per-user rule.
 
@@ -196,4 +196,4 @@ When the visual design exists, ship small PRs in this order:
 5. Replace Pagination/Toggle/Tag chips with primitives only as those land in the new tree.
 6. Remove the old table/filter imports from these two pages only. Leave global SCSS for quiz/admin.
 
-Each PR stays version-gated by the logged-in user's beta-tester status. Non-beta students stay on v1 until the surface is complete.
+Each PR stayed version-gated by the logged-in user's beta-tester status until the v2 rollout made every visitor v2.

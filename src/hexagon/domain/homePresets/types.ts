@@ -20,10 +20,13 @@ export type HomePresetIcon =
   | 'language'
   | 'bolt';
 
-export interface HomePresetCta {
+export interface HomeCta {
   headline: string;
-  eyebrow: string;
   path: string;
+}
+
+export interface HomePresetCta extends HomeCta {
+  eyebrow: string;
 }
 
 export interface HomePresetEntry {

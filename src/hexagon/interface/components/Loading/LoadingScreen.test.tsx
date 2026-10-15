@@ -18,6 +18,7 @@ describe('component LoadingScreen', () => {
   });
 
   it('renders the v1 spinner without a page shell', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     render(<LoadingScreen message="Loading Official Quizzes..." />);
 
     expect(screen.getByText('Loading Official Quizzes...')).toBeInTheDocument();

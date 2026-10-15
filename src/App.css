@@ -6,9 +6,8 @@
   box-sizing: border-box;
 }
 
-/* Canvas behind confirmed v2 surfaces. Until then `.App.paperShell`
- * / `.mainContent` (`App.module.scss`) paint parchment so this color
- * does not leak around short v1 pages or the logged-out screen. */
+/* Canvas behind v2 surfaces. `.mainContent` (`App.module.scss`) paints
+ * parchment over it for the legacy staff tools. */
 body {
   background-color: var(--lcs-color-page);
 }

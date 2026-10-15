@@ -1,14 +1,14 @@
+import type { AudioQuizType } from '@domain/audioQuizzing';
 import type { JSX } from 'react';
 import { CustomQuizType } from '@application/useCases/useCustomQuizV2';
-import { AudioQuizType } from '@domain/audioQuizzing';
+import { AudioModeOptions } from '@interface/components/customQuiz/QuizOptionsCard/AudioModeOptions';
+import { QuizLengthField } from '@interface/components/customQuiz/QuizOptionsCard/QuizLengthField';
 import {
   handleRadioGroupKeyDown,
   SelectorCard,
 } from '@interface/components/customQuiz/SelectorCard';
 import { Card } from '@interface/components/general/Card/Card';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
-import { Field } from '@interface/components/general/Field/Field';
-import { Select } from '@interface/components/general/Select/Select';
 import { Toggle } from '@interface/components/general/Toggle/Toggle';
 import styles from './QuizOptionsCard.module.scss';
 
@@ -75,39 +75,13 @@ export function QuizOptionsCard({
         <div className={styles.options}>
           <div className={styles.switches}>
             {isAudio ? (
-              <>
-                <div
-                  className={styles.modes}
-                  role="radiogroup"
-                  aria-label="Audio quiz type"
-                  onKeyDown={handleRadioGroupKeyDown}
-                >
-                  <SelectorCard
-                    icon="microphone"
-                    label="Speaking"
-                    variant="compactTile"
-                    selected={audioQuizType === AudioQuizType.Speaking}
-                    onSelect={() =>
-                      onAudioQuizTypeChange(AudioQuizType.Speaking)
-                    }
-                  />
-                  <SelectorCard
-                    icon="headphones"
-                    label="Listening"
-                    variant="compactTile"
-                    selected={audioQuizType === AudioQuizType.Listening}
-                    onSelect={() =>
-                      onAudioQuizTypeChange(AudioQuizType.Listening)
-                    }
-                  />
-                </div>
-                <Toggle
-                  id="custom-quiz-autoplay"
-                  checked={autoplay}
-                  onChange={onAutoplayChange}
-                  label="Autoplay"
-                />
-              </>
+              <AudioModeOptions
+                idPrefix="custom-quiz"
+                audioQuizType={audioQuizType}
+                onAudioQuizTypeChange={onAudioQuizTypeChange}
+                autoplay={autoplay}
+                onAutoplayChange={onAutoplayChange}
+              />
             ) : (
               <>
                 <Toggle
@@ -126,20 +100,13 @@ export function QuizOptionsCard({
             )}
           </div>
 
-          <div>
-            <Field htmlFor="custom-quiz-length" label="Quiz length">
-              <Select
-                id="custom-quiz-length"
-                value={String(quizLength)}
-                options={quizLengthOptions.map((option) => ({
-                  value: String(option),
-                  label: option.toLocaleString('en-US'),
-                }))}
-                onChange={(value) => onQuizLengthChange(Number(value))}
-              />
-            </Field>
-            <p className={styles.count}>{countLabel}</p>
-          </div>
+          <QuizLengthField
+            idPrefix="custom-quiz"
+            quizLength={quizLength}
+            quizLengthOptions={quizLengthOptions}
+            onQuizLengthChange={onQuizLengthChange}
+            countLabel={countLabel}
+          />
         </div>
       </div>
     </Card>

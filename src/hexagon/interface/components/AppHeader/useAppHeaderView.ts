@@ -27,10 +27,11 @@ export interface UseAppHeaderViewResult {
   isStaff: boolean;
   staffRole: 'admin' | 'coach' | null;
   showUseAsStudent: boolean;
+  showStudentNav: boolean;
   isStaffUsingAsStudent: boolean;
   usingAs: UsingAsIdentity | null;
   stopUsingAsStudent: () => void;
-  /** Mobile student-v2 stack chrome. `null` on Home, desktop, and non-student routes. */
+  /** Mobile student-v2 stack chrome. `null` on Home, desktop, non-student routes, and before login. */
   stack: AppHeaderStack | null;
 }
 
@@ -48,6 +49,7 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
     isStaff,
     staffRole,
     showUseAsStudent,
+    showStudentNav,
     isStaffUsingAsStudent,
     usingAs,
     stopUsingAsStudent,
@@ -59,7 +61,7 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
   const override = useMobileStackOverride();
 
   const showStack =
-    isMobile && version === 'v2' && isStudentStackPath(pathname);
+    isSignedIn && isMobile && version === 'v2' && isStudentStackPath(pathname);
 
   const stack: AppHeaderStack | null = showStack
     ? {
@@ -81,6 +83,7 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
     isStaff,
     staffRole,
     showUseAsStudent,
+    showStudentNav,
     isStaffUsingAsStudent,
     usingAs,
     stopUsingAsStudent,

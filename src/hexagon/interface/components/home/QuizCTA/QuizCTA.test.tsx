@@ -48,6 +48,17 @@ describe('quiz cta', () => {
     expect(screen.getByText("Today's suggested tool")).toBeInTheDocument();
   });
 
+  it('renders the headline alone when no eyebrow is given', () => {
+    render(<QuizCTA headline="Official Quizzes" onGo={vi.fn()} />);
+
+    expect(
+      screen.getByRole('button', { name: 'Official Quizzes' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Today's suggested tool"),
+    ).not.toBeInTheDocument();
+  });
+
   it('calls onGo when clicked', async () => {
     const user = userEvent.setup();
     const onGo = vi.fn();
