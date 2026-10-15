@@ -1,5 +1,13 @@
 import { useCallback, useRef } from 'react';
 
+const SELECTABLE_INPUT_TYPES = new Set([
+  'text',
+  'search',
+  'url',
+  'tel',
+  'password',
+]);
+
 /**
  * Hook for managing cell focus and refs in EditableTable
  *
@@ -46,9 +54,13 @@ export function useTableFocus() {
       // Move DOM focus to the element
       element.focus();
 
-      // For text inputs, position cursor at the end of existing value
-      // NOTE: Only works for type="text"; number/email/etc don't support selection
-      if (element instanceof HTMLInputElement && element.value) {
+      // For text inputs, position cursor at the end of existing value.
+      // Number, email, etc. inputs throw if asked to set a selection.
+      if (
+        element instanceof HTMLInputElement &&
+        SELECTABLE_INPUT_TYPES.has(element.type) &&
+        element.value
+      ) {
         const length = element.value.length;
         element.setSelectionRange(length, length);
       }

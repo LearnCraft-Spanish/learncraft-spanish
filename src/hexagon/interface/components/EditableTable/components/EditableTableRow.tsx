@@ -2,6 +2,7 @@ import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type {
   CellRenderProps,
   ColumnDisplayConfig,
+  PinnedCellProps,
 } from '@interface/components/EditableTable/types';
 import React from 'react';
 
@@ -25,6 +26,7 @@ interface EditableTableRowProps {
    * Called once per cell to determine which component to render
    */
   renderCell: (props: CellRenderProps) => React.ReactNode;
+  getPinnedCell?: (columnId: string) => PinnedCellProps | undefined;
 }
 
 export function EditableTableRow({
@@ -39,6 +41,7 @@ export function EditableTableRow({
   onBlur,
   createCellRef,
   renderCell,
+  getPinnedCell,
 }: EditableTableRowProps) {
   return (
     <tr className="paste-table__row">
@@ -81,6 +84,7 @@ export function EditableTableRow({
         };
 
         const hasError = !!error;
+        const pinned = getPinnedCell?.(column.id);
 
         // Render the cell using the renderer function from parent
         // The renderer decides which component to use (StandardCell, custom component, etc.)
@@ -91,7 +95,8 @@ export function EditableTableRow({
               isActive ? 'paste-table__cell-container--active' : ''
             } ${hasError ? 'paste-table__cell-container--error' : ''} ${
               isDirty && !hasError ? 'paste-table__cell-container--dirty' : ''
-            }`}
+            } ${pinned?.className ?? ''}`}
+            style={pinned?.style}
             aria-selected={isActive || undefined}
           >
             {renderCell(cellProps)}

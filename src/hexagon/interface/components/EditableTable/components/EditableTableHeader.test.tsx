@@ -1,7 +1,8 @@
 import type { ColumnDefinition } from '@domain/PasteTable';
+import type { EditableTableHeaderProps } from '@interface/components/EditableTable/components/EditableTableHeader';
 import type { ColumnDisplayConfig } from '@interface/components/EditableTable/types';
 import { EditableTableHeader } from '@interface/components/EditableTable/components/EditableTableHeader';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 describe('editableTableHeader', () => {
@@ -84,5 +85,118 @@ describe('editableTableHeader', () => {
     expect(mockGetDisplay).toHaveBeenCalledWith('name');
     expect(mockGetDisplay).toHaveBeenCalledWith('active');
     expect(mockGetDisplay).toHaveBeenCalledWith('description');
+  });
+
+  it('applies the pinned class and style to pinned column headers only', () => {
+    const getPinnedCell = (columnId: string) =>
+      columnId === 'name'
+        ? { className: 'pinnedLeft', style: { left: '0px', width: '200px' } }
+        : undefined;
+
+    render(
+      <table>
+        <thead>
+          <EditableTableHeader
+            columns={columns}
+            getDisplay={getDisplay}
+            getPinnedCell={getPinnedCell}
+          />
+        </thead>
+      </table>,
+    );
+
+    const nameHeader = screen.getByRole('columnheader', { name: 'Name' });
+    expect(nameHeader).toHaveClass('paste-table__column-header', 'pinnedLeft');
+    expect(nameHeader).toHaveStyle({ left: '0px', width: '200px' });
+    const activeHeader = screen.getByRole('columnheader', {
+      name: 'Is Active',
+    });
+    expect(activeHeader).not.toHaveClass('pinnedLeft');
+    expect(activeHeader).toHaveStyle({ width: '100px' });
+  });
+
+  describe('sortable columns', () => {
+    const sortableDisplay: Record<string, ColumnDisplayConfig> = {
+      ...displayConfig,
+      name: { ...displayConfig.name, sortable: true },
+      active: { ...displayConfig.active, sortable: true },
+    };
+
+    function renderSortable(props: Partial<EditableTableHeaderProps> = {}) {
+      return render(
+        <table>
+          <thead>
+            <EditableTableHeader
+              columns={columns}
+              getDisplay={(columnId) => sortableDisplay[columnId]}
+              {...props}
+            />
+          </thead>
+        </table>,
+      );
+    }
+
+    function arrowOf(header: HTMLElement): string | null {
+      const svg = header.querySelector('svg');
+      const glyph = [...(svg?.classList ?? [])].find(
+        (name) => name !== 'tabler-icon' && name.startsWith('tabler-icon-'),
+      );
+      return glyph?.replace('tabler-icon-', '') ?? null;
+    }
+
+    it('makes only sortable headers buttons', () => {
+      renderSortable();
+
+      expect(screen.getByRole('button', { name: 'Name' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Is Active' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Description' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('reports which sortable header was clicked, without sorting anything itself', () => {
+      const onSortColumn = vi.fn();
+      renderSortable({ onSortColumn });
+
+      fireEvent.click(screen.getByRole('button', { name: 'Is Active' }));
+
+      expect(onSortColumn).toHaveBeenCalledExactlyOnceWith('active');
+    });
+
+    it.each([
+      ['ascending', 'arrow-up'],
+      ['descending', 'arrow-down'],
+    ] as const)(
+      'shows the %s sort on its column with an %s arrow',
+      (direction, arrow) => {
+        renderSortable({ sort: { columnId: 'name', direction } });
+
+        const nameHeader = screen.getByRole('columnheader', { name: 'Name' });
+        expect(nameHeader).toHaveAttribute('aria-sort', direction);
+        expect(arrowOf(nameHeader)).toBe(arrow);
+      },
+    );
+
+    it('hints that the other sortable header can be sorted', () => {
+      renderSortable({ sort: { columnId: 'name', direction: 'ascending' } });
+
+      const activeHeader = screen.getByRole('columnheader', {
+        name: 'Is Active',
+      });
+      expect(activeHeader).toHaveAttribute('aria-sort', 'none');
+      expect(arrowOf(activeHeader)).toBe('arrows-sort');
+    });
+
+    it('gives headers that are not sortable no sort state or icon', () => {
+      renderSortable({ sort: { columnId: 'name', direction: 'ascending' } });
+
+      const descriptionHeader = screen.getByRole('columnheader', {
+        name: 'Description',
+      });
+      expect(descriptionHeader).not.toHaveAttribute('aria-sort');
+      expect(arrowOf(descriptionHeader)).toBeNull();
+    });
   });
 });

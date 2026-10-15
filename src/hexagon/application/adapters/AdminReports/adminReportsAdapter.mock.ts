@@ -16,6 +16,9 @@ const defaultMockAdminReportsAdapter: AdminReportsPort = {
   getDropoutsByLevelReport: async () => [],
   getWeeklyTimeCommitmentByCoachReport: async () => [],
   getLeadsToReEngageReport: async () => [],
+  getCoachCapacityTodayReport: async () => [],
+  getCoachCapacityTwoWeeksOutReport: async () => [],
+  updateCoachCapacitySettings: async ({ settings }) => settings,
 };
 
 export const {

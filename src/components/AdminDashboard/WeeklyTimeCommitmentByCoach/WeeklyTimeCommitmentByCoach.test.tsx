@@ -60,7 +60,11 @@ describe('weeklyTimeCommitmentByCoach', () => {
     fireEvent.click(screen.getByText('Weekly Time Commitment by Coach'));
 
     expect(screen.getByText('Coach Weekly')).toBeInTheDocument();
-    expect(screen.getByText('1.5 hrs')).toBeInTheDocument();
+    expect(
+      screen.getByText('Weekly Time Commitment (Hours)'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('1.5')).toBeInTheDocument();
+    expect(screen.queryByText('1.5 hrs')).not.toBeInTheDocument();
   });
 
   it('shows no records when there are no coaches with a time commitment', () => {

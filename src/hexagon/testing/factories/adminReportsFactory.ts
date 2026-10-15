@@ -2,6 +2,8 @@ import {
   activeMembershipsByCourseSchema,
   activeMembershipSummarySchema,
   assignmentsCompletedByWeekSchema,
+  coachCapacityReportRowSchema,
+  coachCapacitySettingsSchema,
   coachSummaryDrilldownSchema,
   coachSummarySchema,
   groupCallsByCoachSchema,
@@ -65,6 +67,17 @@ export const createMockWeeklyTimeCommitmentByCoach = createZodFactory(
 );
 export const createMockWeeklyTimeCommitmentByCoachList = createZodListFactory(
   weeklyTimeCommitmentByCoachSchema,
+);
+
+export const createMockCoachCapacitySettings = createZodFactory(
+  coachCapacitySettingsSchema,
+);
+
+export const createMockCoachCapacityReportRow = createZodFactory(
+  coachCapacityReportRowSchema,
+);
+export const createMockCoachCapacityReportRowList = createZodListFactory(
+  coachCapacityReportRowSchema,
 );
 
 export const createMockLeadsToReEngage = createZodFactory(

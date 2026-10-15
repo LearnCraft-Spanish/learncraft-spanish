@@ -1,7 +1,10 @@
 import type { JSX } from 'react';
 import {
+  IconArrowDown,
   IconArrowLeft,
   IconArrowRight,
+  IconArrowsSort,
+  IconArrowUp,
   IconBell,
   IconBolt,
   IconBook,
@@ -45,8 +48,11 @@ import styles from './Icon.module.scss';
  * Register an icon here before using it.
  */
 const GLYPHS = {
+  arrowDown: IconArrowDown,
   arrowLeft: IconArrowLeft,
   arrowRight: IconArrowRight,
+  arrowsSort: IconArrowsSort,
+  arrowUp: IconArrowUp,
   bell: IconBell,
   bolt: IconBolt,
   book: IconBook,

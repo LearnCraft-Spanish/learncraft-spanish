@@ -1,8 +1,13 @@
-import type { AdminReportsPort } from '@application/ports/AdminReports/adminReportsPort';
+import type {
+  AdminReportsPort,
+  UpdateCoachCapacitySettingsCommand,
+} from '@application/ports/AdminReports/adminReportsPort';
 import type { AuthPort } from '@application/ports/authPort';
 import type {
   ActiveMembershipsByCourse,
   AssignmentsCompletedByWeek,
+  CoachCapacityReportRow,
+  CoachCapacitySettings,
   CoachSummary,
   CoachSummaryDrilldown,
   GroupCallsByCoach,
@@ -15,6 +20,8 @@ import { createHttpClient } from '@infrastructure/http/client';
 import {
   getActiveMembershipsReportEndpoint,
   getAssignmentsCompletedByWeekReportEndpoint,
+  getCoachCapacityTodayReportEndpoint,
+  getCoachCapacityTwoWeeksOutReportEndpoint,
   getDropoutsByLevelReportEndpoint,
   getGroupCallsByCoachReportEndpoint,
   getLastWeekCoachSummaryReportEndpoint,
@@ -27,6 +34,7 @@ import {
   getWeeklyCoachSummaryReportEndpoint,
   getWeeklyTimeCommitmentByCoachReportEndpoint,
   getWeeksDrilldownReportEndpoint,
+  updateCoachCapacitySettingsEndpoint,
 } from '@learncraft-spanish/shared';
 
 export function createAdminReportsInfrastructure(
@@ -115,6 +123,24 @@ export function createAdminReportsInfrastructure(
       httpClient.get<LeadsToReEngage[]>(
         getLeadsToReEngageReportEndpoint.path,
         getLeadsToReEngageReportEndpoint.requiredScopes,
+      ),
+    getCoachCapacityTodayReport: () =>
+      httpClient.get<CoachCapacityReportRow[]>(
+        getCoachCapacityTodayReportEndpoint.path,
+        getCoachCapacityTodayReportEndpoint.requiredScopes,
+      ),
+    getCoachCapacityTwoWeeksOutReport: () =>
+      httpClient.get<CoachCapacityReportRow[]>(
+        getCoachCapacityTwoWeeksOutReportEndpoint.path,
+        getCoachCapacityTwoWeeksOutReportEndpoint.requiredScopes,
+      ),
+    updateCoachCapacitySettings: (
+      command: UpdateCoachCapacitySettingsCommand,
+    ) =>
+      httpClient.put<CoachCapacitySettings>(
+        updateCoachCapacitySettingsEndpoint.path,
+        updateCoachCapacitySettingsEndpoint.requiredScopes,
+        command,
       ),
   };
 }
