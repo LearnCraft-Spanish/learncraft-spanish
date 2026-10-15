@@ -62,6 +62,11 @@ markdown into bold/regular runs). Speaking's answer step labels replay
 - **`AudioKeyboardHints`** instead of `KeyboardHints`. Different shortcuts
   (space play/pause · ↑ next step · ← → card) with no SRS/flip branch, so a
   shared component would just be two unrelated hint lists behind one prop.
+  `AudioQuizV2` omits the legend and does not attach those shortcuts on iPad
+  or other touch-primary devices (`useQuizKeyboardShortcuts`). Viewport width
+  is not the signal — iPad landscape is wider than 768px, and a Magic Keyboard
+  can report a fine pointer. `Escape` on `WordPanelModal` is a separate
+  listener and still dismisses the dialog.
 - **`AudioQuizEndV2`** is new — the legacy `AudioQuizEnd` (untouched, still
   used by the v1 audio quiz) is a plain unstyled screen. Text quiz now has a
   parallel `TextQuizEndV2` (under `textQuiz/`, gated by the student UI

@@ -77,16 +77,26 @@ function stubMedia(
   options: {
     mobile?: boolean;
     reducedMotion?: boolean;
+    /** Primary pointer is a mouse or trackpad. Defaults to a desktop. */
+    finePointer?: boolean;
+    /** Primary pointer can hover. Defaults to a desktop. */
+    canHover?: boolean;
   } = {},
 ): void {
   const mobile = options.mobile ?? false;
   const reducedMotion = options.reducedMotion ?? true;
+  const finePointer = options.finePointer ?? true;
+  const canHover = options.canHover ?? true;
   vi.stubGlobal('matchMedia', (query: string) => ({
     matches: query.includes('prefers-reduced-motion')
       ? reducedMotion
       : query.includes('max-width')
         ? mobile
-        : false,
+        : query.includes('pointer') && query.includes('fine')
+          ? finePointer
+          : query.includes('hover')
+            ? canHover
+            : false,
     media: query,
     addEventListener: () => {},
     removeEventListener: () => {},
@@ -96,6 +106,46 @@ function stubMedia(
 /** Stubs `matchMedia` (absent in jsdom) so `useMediaQuery` can match. */
 function stubMobile(matches: boolean): void {
   stubMedia({ mobile: matches, reducedMotion: true });
+}
+
+let restoreNavigator: (() => void) | undefined;
+
+/** Overrides the iPad signals `shouldEnableQuizKeyboardShortcuts` reads. */
+function stubNavigator(overrides: {
+  userAgent: string;
+  platform: string;
+  maxTouchPoints: number;
+}): void {
+  restoreNavigator?.();
+  const keys = ['userAgent', 'platform', 'maxTouchPoints'] as const;
+  const previous = keys.map((key) => ({
+    key,
+    descriptor: Object.getOwnPropertyDescriptor(navigator, key),
+  }));
+
+  Object.defineProperty(navigator, 'userAgent', {
+    configurable: true,
+    get: () => overrides.userAgent,
+  });
+  Object.defineProperty(navigator, 'platform', {
+    configurable: true,
+    get: () => overrides.platform,
+  });
+  Object.defineProperty(navigator, 'maxTouchPoints', {
+    configurable: true,
+    get: () => overrides.maxTouchPoints,
+  });
+
+  restoreNavigator = () => {
+    for (const { key, descriptor } of previous) {
+      if (descriptor) {
+        Object.defineProperty(navigator, key, descriptor);
+      } else {
+        Reflect.deleteProperty(navigator, key);
+      }
+    }
+    restoreNavigator = undefined;
+  };
 }
 
 function renderQuiz(): void {
@@ -463,6 +513,7 @@ describe('text quiz v2 keyboard navigation', () => {
 
   afterEach(() => {
     cleanup();
+    restoreNavigator?.();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     if (originalPaused) {
@@ -818,6 +869,86 @@ describe('text quiz v2 keyboard navigation', () => {
     fireEvent.keyDown(document, { key: '1' });
 
     expect(onGrade).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    {
+      label: 'iPadOS with a trackpad',
+      finePointer: true,
+      canHover: true,
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15',
+      platform: 'MacIntel',
+      maxTouchPoints: 5,
+    },
+    {
+      label: 'a touch tablet',
+      finePointer: false,
+      canHover: false,
+      userAgent: 'Mozilla/5.0 (Linux; Android 13; Pixel Tablet)',
+      platform: 'Linux armv8l',
+      maxTouchPoints: 5,
+    },
+  ])(
+    'ignores quiz shortcuts and hides the legend on $label',
+    async ({ finePointer, canHover, userAgent, platform, maxTouchPoints }) => {
+      stubMedia({ mobile: false, finePointer, canHover });
+      stubNavigator({ userAgent, platform, maxTouchPoints });
+      const play = vi
+        .spyOn(HTMLMediaElement.prototype, 'play')
+        .mockResolvedValue(undefined);
+      const { onPrevious, onNext, onGrade, toggleAnswer } = renderQuizWithProps(
+        {
+          srs: true,
+          answerShowing: true,
+          getHelpIsOpen: false,
+          tallies: { hard: 0, easy: 0 },
+          exampleNumber: 2,
+          quizExample: {
+            ...QUIZ_EXAMPLE,
+            question: {
+              ...QUIZ_EXAMPLE.question,
+              hasAudio: true,
+              audioUrl: 'https://example.com/audio.mp3',
+            },
+          },
+        },
+      );
+
+      fireEvent.keyDown(document, { key: ' ' });
+      fireEvent.keyDown(document, { key: 'ArrowUp' });
+      fireEvent.keyDown(document, { key: 'ArrowDown' });
+      fireEvent.keyDown(document, { key: 'ArrowLeft' });
+      fireEvent.keyDown(document, { key: 'ArrowRight' });
+      fireEvent.keyDown(document, { key: '1' });
+      fireEvent.keyDown(document, { key: '2' });
+
+      expect(play).not.toHaveBeenCalled();
+      expect(toggleAnswer).not.toHaveBeenCalled();
+      expect(onPrevious).not.toHaveBeenCalled();
+      expect(onNext).not.toHaveBeenCalled();
+      expect(onGrade).not.toHaveBeenCalled();
+      expect(screen.queryByText('Keyboard controls')).toBeNull();
+
+      await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+      expect(onNext).toHaveBeenCalledOnce();
+    },
+  );
+
+  it('still closes the word panel on Escape on iPad', async () => {
+    stubMedia({ mobile: true, finePointer: false, canHover: false });
+    stubNavigator({
+      userAgent: 'Mozilla/5.0 (iPad; CPU OS 17_5 like Mac OS X)',
+      platform: 'iPad',
+      maxTouchPoints: 5,
+    });
+    renderQuiz();
+
+    await userEvent.click(screen.getByRole('button', { name: 'lo' }));
+    expect(screen.getByRole('dialog', { name: 'Details for lo' })).toBeTruthy();
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 });
 
