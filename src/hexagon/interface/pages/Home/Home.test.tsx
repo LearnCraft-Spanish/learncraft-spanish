@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import {
   mockUseHomeView,
   overrideMockUseHomeView,
@@ -6,7 +7,8 @@ import {
 import { mockUseStudentUiVersion } from '@application/useCases/useStudentUiVersion.mock';
 import Home from '@interface/pages/Home/Home';
 import { cleanup, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@application/useCases/useHomeView', () => ({
@@ -17,21 +19,35 @@ vi.mock('@application/useCases/useStudentUiVersion', () => ({
   useStudentUiVersion: mockUseStudentUiVersion,
 }));
 
-vi.mock('src/sections/Menu', () => ({
-  default: () => <div data-testid="legacy-menu" />,
-}));
-
 vi.mock('@interface/pages/Home/HomeV2', () => ({
   HomeV2: () => <div data-testid="home-v2" />,
 }));
+
+function PathReadout(): JSX.Element {
+  const { pathname } = useLocation();
+  return <div data-testid="path">{pathname}</div>;
+}
 
 function renderHome() {
   return render(
     <MemoryRouter>
       <Home />
+      <PathReadout />
     </MemoryRouter>,
   );
 }
+
+const limitedHome = {
+  ctas: [{ headline: 'Audio Quiz', path: '/customquiz' }],
+  entries: [
+    {
+      icon: 'trophy' as const,
+      title: 'Official quizzes',
+      meta: 'Test yourself against a lesson quiz',
+      path: '/officialquizzes',
+    },
+  ],
+};
 
 describe('home page', () => {
   afterEach(() => {
@@ -39,20 +55,53 @@ describe('home page', () => {
     cleanup();
   });
 
-  it('renders the legacy Menu when the student UI is v1', () => {
-    renderHome();
-
-    expect(screen.getByTestId('legacy-menu')).toBeInTheDocument();
-    expect(screen.queryByTestId('home-v2')).not.toBeInTheDocument();
-  });
-
-  it('renders HomeV2 for a v2 student or staff using the app as a student', () => {
-    overrideMockUseHomeView({ view: 'studentV2' });
+  it('renders HomeV2 for a student or staff using the app as a student', () => {
+    overrideMockUseHomeView({ view: 'student' });
 
     renderHome();
 
     expect(screen.getByTestId('home-v2')).toBeInTheDocument();
-    expect(screen.queryByTestId('legacy-menu')).not.toBeInTheDocument();
+  });
+
+  it('gives a limited user an Audio Quiz CTA then an Official quizzes menu option, and nothing else', () => {
+    overrideMockUseHomeView({ view: 'limited', ...limitedHome });
+
+    renderHome();
+
+    const [cta, entry, ...rest] = screen.getAllByRole('button');
+    expect(cta).toHaveAccessibleName('Audio Quiz');
+    expect(entry).toHaveAccessibleName(/^Official quizzes/);
+    expect(rest).toEqual([]);
+    expect(
+      screen.queryByText("Today's suggested tool"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('home-v2')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+  });
+
+  it('takes a limited user to the official quizzes from the menu option', async () => {
+    const user = userEvent.setup();
+    overrideMockUseHomeView({ view: 'limited', ...limitedHome });
+
+    renderHome();
+    await user.click(screen.getByRole('button', { name: /Official quizzes/ }));
+
+    expect(screen.getByTestId('path')).toHaveTextContent('/officialquizzes');
+  });
+
+  it('takes a free user to the official quizzes from their only CTA', async () => {
+    const user = userEvent.setup();
+    overrideMockUseHomeView({
+      view: 'free',
+      ctas: [{ headline: 'Official Quizzes', path: '/officialquizzes' }],
+    });
+
+    renderHome();
+    await user.click(screen.getByRole('button', { name: 'Official Quizzes' }));
+
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.getByTestId('path')).toHaveTextContent('/officialquizzes');
   });
 
   it('renders only coaching tools for a coach in the staff view', () => {
@@ -65,7 +114,6 @@ describe('home page', () => {
       screen.getByRole('link', { name: 'Weekly Records Interface' }),
     ).toBeInTheDocument();
     expect(screen.queryByText('Admin Tools')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('legacy-menu')).not.toBeInTheDocument();
     expect(screen.queryByTestId('home-v2')).not.toBeInTheDocument();
   });
 

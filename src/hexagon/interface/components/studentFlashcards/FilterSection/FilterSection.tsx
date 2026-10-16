@@ -1,21 +1,15 @@
 import type { UseCombinedFiltersReturnType } from '@application/units/Filtering/useCombinedFilters';
 import type { JSX } from 'react';
 import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
-import {
-  courseOptions,
-  fromLessonOptions,
-  toLessonOptions,
-} from '@domain/functions/lessonOptions';
 import { Badge } from '@interface/components/general/Badge/Badge';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
 import { Card, CardSection } from '@interface/components/general/Card/Card';
 import { Chip } from '@interface/components/general/Chip/Chip';
 import { Eyebrow } from '@interface/components/general/Eyebrow/Eyebrow';
-import { Field } from '@interface/components/general/Field/Field';
 import { Popover } from '@interface/components/general/Popover/Popover';
-import { Select } from '@interface/components/general/Select/Select';
 import { TextInput } from '@interface/components/general/TextInput/TextInput';
 import { Toggle } from '@interface/components/general/Toggle/Toggle';
+import { LessonRangeScope } from '@interface/components/lessonRange/LessonRangeScope/LessonRangeScope';
 import {
   PresetList,
   tagCountLabel,
@@ -48,7 +42,6 @@ export function FilterSection({
 }: FilterSectionProps): JSX.Element {
   const {
     course,
-    courseId,
     coursesWithLessons,
     fromLessonNumber,
     toLessonNumber,
@@ -83,18 +76,6 @@ export function FilterSection({
   const searchOpen =
     skillTagSearch.tagSearchTerm.trim().length > 0 && !suggestionsDismissed;
   const hasTags = selectedSkillTags.length > 0;
-
-  function changeFromLesson(value: string): void {
-    updateFromLessonNumber(Number.parseInt(value, 10));
-  }
-
-  function changeToLesson(value: string): void {
-    updateToLessonNumber(Number.parseInt(value, 10));
-  }
-
-  function changeCourse(value: string): void {
-    updateUserSelectedCourseId(Number.parseInt(value, 10));
-  }
 
   function changeTagFilterMode(mode: TagFilterMode): void {
     setTagFilterMode(mode);
@@ -137,36 +118,17 @@ export function FilterSection({
               />
             </div>
           )}
-          <div className={styles.scopeGrid}>
-            <Field htmlFor="finder-course" label="Course">
-              <Select
-                id="finder-course"
-                value={courseId !== null ? String(courseId) : ''}
-                options={courseOptions(coursesWithLessons, course)}
-                onChange={changeCourse}
-              />
-            </Field>
-
-            <Field htmlFor="finder-from-lesson" label="From lesson">
-              <Select
-                id="finder-from-lesson"
-                value={
-                  fromLessonNumber !== null ? String(fromLessonNumber) : ''
-                }
-                options={fromLessonOptions(course, toLessonNumber)}
-                onChange={changeFromLesson}
-              />
-            </Field>
-
-            <Field htmlFor="finder-to-lesson" label="Through lesson">
-              <Select
-                id="finder-to-lesson"
-                value={toLessonNumber !== null ? String(toLessonNumber) : ''}
-                options={toLessonOptions(course, fromLessonNumber)}
-                onChange={changeToLesson}
-                emphasis
-              />
-            </Field>
+          <div className={styles.scope}>
+            <LessonRangeScope
+              idPrefix="finder"
+              course={course}
+              coursesWithLessons={coursesWithLessons}
+              fromLessonNumber={fromLessonNumber}
+              toLessonNumber={toLessonNumber}
+              onCourseChange={updateUserSelectedCourseId}
+              onFromLessonChange={updateFromLessonNumber}
+              onToLessonChange={updateToLessonNumber}
+            />
           </div>
         </CardSection>
 

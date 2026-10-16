@@ -1,0 +1,159 @@
+.root {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+/* Same box as Select so the two can sit in one grid without a seam. */
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--lcs-control-height);
+  padding: 0 var(--lcs-space-11) 0 var(--lcs-space-6);
+  border: var(--lcs-control-border) solid var(--lcs-border-control);
+  border-radius: var(--lcs-radius-lg);
+  background-color: var(--lcs-color-surface);
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--lcs-text-control);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: border-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.input::placeholder {
+  color: var(--lcs-color-placeholder);
+}
+
+.input:focus {
+  cursor: text;
+}
+
+.input:focus-visible {
+  outline: var(--lcs-focus-ring);
+  outline-offset: var(--lcs-focus-offset);
+}
+
+.input::selection {
+  background-color: var(--lcs-tint-action);
+}
+
+/* Required scope controls carry the action border. */
+.emphasis {
+  border-color: var(--lcs-color-action);
+}
+
+.invalid {
+  border-color: var(--lcs-color-error);
+}
+
+.input:disabled {
+  background-color: var(--lcs-color-page);
+  color: var(--lcs-color-muted);
+  cursor: not-allowed;
+}
+
+.chevron {
+  position: absolute;
+  top: 50%;
+  right: var(--lcs-space-5);
+  display: flex;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: transform var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.chevronOpen {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Same sheet as Popover light: hairline card border, popover shadow. */
+.panel {
+  position: absolute;
+  z-index: var(--lcs-z-popover);
+  top: calc(100% + var(--lcs-space-2));
+  right: 0;
+  left: 0;
+  overflow: hidden;
+  border: var(--lcs-border-hairline) solid var(--lcs-border-card);
+  border-radius: var(--lcs-radius-xl);
+  background-color: var(--lcs-color-surface);
+  box-shadow: var(--lcs-shadow-popover);
+  animation: rise var(--lcs-motion-panel) var(--lcs-ease-standard);
+}
+
+/* Seven in-row-height rows before the list scrolls. */
+.list {
+  max-height: calc(7 * var(--lcs-control-height-sm));
+  padding: var(--lcs-space-2) 0;
+  margin: 0;
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.option {
+  display: flex;
+  min-height: var(--lcs-control-height-sm);
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lcs-space-5);
+  padding: 0 var(--lcs-space-7);
+  color: var(--lcs-color-ink);
+  cursor: pointer;
+  font-size: var(--lcs-text-control);
+  line-height: var(--lcs-line-tight);
+  transition: background-color var(--lcs-motion-micro) var(--lcs-ease-standard);
+}
+
+.optionLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Keyboard / hover row: hover tint, matching Menu rows. */
+.optionActive {
+  background-color: var(--lcs-tint-hover);
+}
+
+/* The current value: action ink, bold, with a trailing check. */
+.optionSelected {
+  color: var(--lcs-color-action);
+  font-weight: var(--lcs-weight-bold);
+}
+
+.empty {
+  padding: var(--lcs-space-6) var(--lcs-space-7);
+  color: var(--lcs-color-muted);
+  font-size: var(--lcs-text-action);
+  overflow-wrap: anywhere;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input,
+  .chevron,
+  .option {
+    transition: none;
+  }
+
+  .panel {
+    animation: none;
+  }
+}

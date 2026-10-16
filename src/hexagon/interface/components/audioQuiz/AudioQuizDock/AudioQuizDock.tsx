@@ -8,6 +8,8 @@ interface AudioQuizDockProps {
   replayLabel: string;
   /** Disables `Previous card` on the deck's first card. */
   isFirst: boolean;
+  /** Desktop shortcut legend. Off on iPad and other touch-primary devices. */
+  showKeyboardHints: boolean;
   onPrimary: () => void;
   onReplay: () => void;
   onPrevious: () => void;
@@ -26,6 +28,7 @@ export function AudioQuizDock({
   primaryLabel,
   replayLabel,
   isFirst,
+  showKeyboardHints,
   onPrimary,
   onReplay,
   onPrevious,
@@ -58,7 +61,7 @@ export function AudioQuizDock({
           Next card
           <Icon name="chevronRight" tone="inherit" size="sm" />
         </button>
-        <AudioKeyboardHints />
+        {showKeyboardHints && <AudioKeyboardHints />}
       </div>
     </div>
   );

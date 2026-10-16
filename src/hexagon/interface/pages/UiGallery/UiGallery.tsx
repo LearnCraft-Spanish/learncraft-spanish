@@ -3,6 +3,7 @@ import { PageShell } from '@interface/components/general/PageShell';
 import { DataSection } from '@interface/pages/UiGallery/DataSection';
 import { FormsSection } from '@interface/pages/UiGallery/FormsSection';
 import { IconsSection } from '@interface/pages/UiGallery/IconsSection';
+import { LessonRangeSection } from '@interface/pages/UiGallery/LessonRangeSection';
 import { OverlaysSection } from '@interface/pages/UiGallery/OverlaysSection';
 import { SurfacesSection } from '@interface/pages/UiGallery/SurfacesSection';
 import { TokensSection } from '@interface/pages/UiGallery/TokensSection';
@@ -24,6 +25,7 @@ export default function UiGallery(): JSX.Element {
       <IconsSection />
       <SurfacesSection />
       <FormsSection />
+      <LessonRangeSection />
       <OverlaysSection />
       <DataSection />
     </PageShell>

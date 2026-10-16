@@ -11,6 +11,7 @@ const defaultMockResult: UseAppHeaderResult = {
   isStaff: false,
   staffRole: null,
   showUseAsStudent: false,
+  showStudentNav: false,
   isStaffUsingAsStudent: false,
   usingAs: null,
   stopUsingAsStudent: vi.fn<() => void>(),

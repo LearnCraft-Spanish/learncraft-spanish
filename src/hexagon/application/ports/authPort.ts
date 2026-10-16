@@ -26,6 +26,12 @@ export interface AuthPort {
   logout: () => void;
 
   /**
+   * Ask the auth provider to email a password-reset link to this address.
+   * Resolves once the provider accepts the request.
+   */
+  requestPasswordReset: (email: string) => Promise<void>;
+
+  /**
    * Get the current user's information
    */
   authUser: AuthUser;

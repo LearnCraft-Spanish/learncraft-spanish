@@ -39,14 +39,69 @@ function vocabInfoHook(vocab: Vocabulary): VocabInfo {
   } as unknown as VocabInfo;
 }
 
-/** Stubs `matchMedia` (absent in jsdom) so `useMediaQuery` can match. */
-function stubMobile(matches: boolean): void {
+/**
+ * Stubs `matchMedia` (absent in jsdom) so `useMediaQuery` can match.
+ * `matches` is the max-width result. Pointer and hover default to a desktop
+ * so keyboard shortcuts stay on unless a test opts into a touch tablet.
+ */
+function stubMobile(
+  matches: boolean,
+  input: { finePointer?: boolean; canHover?: boolean } = {},
+): void {
+  const finePointer = input.finePointer ?? true;
+  const canHover = input.canHover ?? true;
   vi.stubGlobal('matchMedia', (query: string) => ({
-    matches,
+    matches: query.includes('max-width')
+      ? matches
+      : query.includes('pointer') && query.includes('fine')
+        ? finePointer
+        : query.includes('hover')
+          ? canHover
+          : matches,
     media: query,
     addEventListener: () => {},
     removeEventListener: () => {},
   }));
+}
+
+let restoreNavigator: (() => void) | undefined;
+
+/** Overrides the iPad signals `shouldEnableQuizKeyboardShortcuts` reads. */
+function stubNavigator(overrides: {
+  userAgent: string;
+  platform: string;
+  maxTouchPoints: number;
+}): void {
+  restoreNavigator?.();
+  const keys = ['userAgent', 'platform', 'maxTouchPoints'] as const;
+  const previous = keys.map((key) => ({
+    key,
+    descriptor: Object.getOwnPropertyDescriptor(navigator, key),
+  }));
+
+  Object.defineProperty(navigator, 'userAgent', {
+    configurable: true,
+    get: () => overrides.userAgent,
+  });
+  Object.defineProperty(navigator, 'platform', {
+    configurable: true,
+    get: () => overrides.platform,
+  });
+  Object.defineProperty(navigator, 'maxTouchPoints', {
+    configurable: true,
+    get: () => overrides.maxTouchPoints,
+  });
+
+  restoreNavigator = () => {
+    for (const { key, descriptor } of previous) {
+      if (descriptor) {
+        Object.defineProperty(navigator, key, descriptor);
+      } else {
+        Reflect.deleteProperty(navigator, key);
+      }
+    }
+    restoreNavigator = undefined;
+  };
 }
 
 type AudioQuizV2TestProps = Partial<ComponentProps<typeof AudioQuizV2>>;
@@ -403,6 +458,7 @@ describe('audioQuizV2 — add to flashcards', () => {
 describe('audioQuizV2 — keyboard shortcuts', () => {
   afterEach(() => {
     cleanup();
+    restoreNavigator?.();
     vi.unstubAllGlobals();
   });
 
@@ -453,5 +509,81 @@ describe('audioQuizV2 — keyboard shortcuts', () => {
 
     expect(onNext).not.toHaveBeenCalled();
     expect(onPrevious).not.toHaveBeenCalled();
+  });
+
+  it('shows the keyboard legend on a fine-pointer desktop', () => {
+    stubMobile(false);
+    renderQuiz();
+
+    expect(screen.getByText('play / pause')).toBeInTheDocument();
+    expect(screen.getByText('next step')).toBeInTheDocument();
+    expect(screen.getByText('card')).toBeInTheDocument();
+  });
+
+  it.each([
+    {
+      label: 'iPadOS with a trackpad',
+      finePointer: true,
+      canHover: true,
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15',
+      platform: 'MacIntel',
+      maxTouchPoints: 5,
+    },
+    {
+      label: 'a touch tablet',
+      finePointer: false,
+      canHover: false,
+      userAgent: 'Mozilla/5.0 (Linux; Android 13; Pixel Tablet)',
+      platform: 'Linux armv8l',
+      maxTouchPoints: 5,
+    },
+  ])(
+    'ignores quiz shortcuts and hides the legend on $label',
+    async ({ finePointer, canHover, userAgent, platform, maxTouchPoints }) => {
+      stubMobile(false, { finePointer, canHover });
+      stubNavigator({ userAgent, platform, maxTouchPoints });
+      const { play, onPrimary, onPrevious, onNext } = renderQuiz({
+        exampleNumber: 2,
+        isPlaying: false,
+      });
+
+      fireEvent.keyDown(document, { key: ' ' });
+      fireEvent.keyDown(document, { key: 'ArrowUp' });
+      fireEvent.keyDown(document, { key: 'ArrowLeft' });
+      fireEvent.keyDown(document, { key: 'ArrowRight' });
+
+      expect(play).not.toHaveBeenCalled();
+      expect(onPrimary).not.toHaveBeenCalled();
+      expect(onPrevious).not.toHaveBeenCalled();
+      expect(onNext).not.toHaveBeenCalled();
+      expect(screen.queryByText('play / pause')).toBeNull();
+
+      await userEvent.click(screen.getByRole('button', { name: 'Play audio' }));
+      expect(play).toHaveBeenCalledOnce();
+    },
+  );
+
+  it('still closes the word panel on Escape on iPad', async () => {
+    stubMobile(true, { finePointer: false, canHover: false });
+    stubNavigator({
+      userAgent: 'Mozilla/5.0 (iPad; CPU OS 17_5 like Mac OS X)',
+      platform: 'iPad',
+      maxTouchPoints: 5,
+    });
+    renderQuiz({
+      currentStep: AudioQuizStep.Answer,
+      displayText: 'Lo sabré cuando ellos lo sepan.',
+      isSpanishText: true,
+      getHelpIsOpen: true,
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: 'sabré' }));
+    expect(
+      screen.getByRole('dialog', { name: 'Details for sabré' }),
+    ).toBeTruthy();
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 });

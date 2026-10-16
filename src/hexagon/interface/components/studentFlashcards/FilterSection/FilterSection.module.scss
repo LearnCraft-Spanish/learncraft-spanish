@@ -32,7 +32,7 @@
     padding-right: var(--lcs-space-8);
   }
 
-  .root > :first-child > *:has(.scopeGrid),
+  .root > :first-child > *:has(.scope),
   .root > :first-child > *:has(.tagsHeader),
   .root > :first-child > *:has(.optionsHeader) {
     padding-top: var(--lcs-space-8);
@@ -60,25 +60,20 @@
   line-height: normal;
 }
 
-.scopeGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--lcs-space-7) var(--lcs-space-8);
+/*
+ * The tag search below is its own popover-level stacking context and comes
+ * later in the DOM, so without a step up it would paint over an open lesson
+ * list hanging down from here.
+ */
+.scope {
+  position: relative;
+  z-index: calc(var(--lcs-z-popover) + 1);
 }
 
 .adminStrip :global(label),
 .optionsRow :global(label) {
   font-size: var(--lcs-text-action);
   gap: var(--lcs-space-4);
-}
-
-.scopeGrid :global(label) {
-  line-height: var(--lcs-line-body);
-}
-
-.scopeGrid :global(select) {
-  padding-left: var(--lcs-space-5);
-  padding-right: var(--lcs-space-5);
 }
 
 .adminStrip {

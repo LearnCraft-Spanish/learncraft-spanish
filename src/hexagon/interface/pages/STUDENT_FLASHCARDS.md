@@ -67,7 +67,7 @@ flowchart TB
 
 **Treat Manager and Finder as one redesign surface.** Students move between them (`Find More Matching Flashcards`, `Use these filters on my flashcards` via `?enableFiltering=true`). They share filter chrome and list-item chrome.
 
-**v2 vs v1 is per-user, not per-surface.** A beta-tester student (`studentRole === 'student'` and `betaTester === true` on their own record) gets v2 on every student surface. Everyone else gets v1. The two pages remain one redesign _surface_ — they share the same primitives and the same filter coordinator.
+**v2 vs v1 is per-user, not per-surface.** v2 is now rolled out to every visitor, so everyone gets v2 on every student surface; the v1 branches remain until they are deleted. The two pages remain one redesign _surface_ — they share the same primitives and the same filter coordinator.
 
 Do not wrap Custom Quiz or Review My Flashcards under a separate version gate; they follow the same per-user rule.
 
@@ -101,9 +101,11 @@ Filter **state** is global: [`useExampleFilterCoordinator`](../../application/co
 
 Finder fetch is gated: `useExampleQuery` only runs when a filter seed exists (lesson range, tags, exclude-Spanglish, or audio-only). An empty-looking Finder with no course/lesson selected is current behavior, not a loading bug. Preserve that unless product says otherwise.
 
+Course and lesson range in the v2 `FilterSection` and the Custom Quiz `CourseCard` are one shared control, [`LessonRangeScope`](../components/lessonRange/LessonRangeScope/LessonRangeScope.tsx): the course is identity with a "Change course" action that reveals a plain dropdown, and both lesson ends are searchable `Combobox` pickers labelled "From lesson" / "Up to lesson". Change it there, not per surface.
+
 Tag suggestions in the v2 `FilterSection` keep a subdued echo of the v1 per-type palette (left rail + tint, not saturated cards). Vocabulary `frequency` ranks results but is never shown as a label or value. Selected tag chips surface the same descriptor the suggestion list uses (hover / keyboard focus).
 
-**`authAdapter.mock.ts` defaults `isAdmin: true`.** The mock's default fixture is a student-admin fake, so any component or page test that renders `FilterSection` or `CourseCard` without explicitly overriding `isAdmin` will see the "Admin only" unpublished-courses-and-lessons strip / toggle. That default already caused one false alarm (v2-redesign-fix-batch-1, item 8): the gate itself (`isAdmin === true` in both components) was correct, and the sighting was an account-role artifact — a harness or test rendering with the shared default rather than a real code leak. Any new filter-panel test that wants to assert student-facing behavior must override the mock (or pass `isAdmin: false` on the synthetic `exampleFilter` fixture, for presentational-component tests that don't go through the mock at all) so the next person does not mistake the harness default for a product bug. Regression coverage for the gate itself lives in `FilterSection.test.tsx` (shared by Finder and Manager) and `CourseCard.test.tsx` (Custom Quiz advanced panel); `FlashcardManager.test.tsx` additionally pins that the page threads `exampleFilter.isAdmin` through to `FilterSection` unmodified.
+**`authAdapter.mock.ts` defaults `isAdmin: true`.** The mock's default fixture is a student-admin fake, so any component or page test that renders `FilterSection` or `CourseCard` without explicitly overriding `isAdmin` will see the "Admin only" unpublished-courses-and-lessons strip / toggle. That default already caused one false alarm (v2-redesign-fix-batch-1, item 8): the gate itself (`isAdmin === true` in both components) was correct, and the sighting was an account-role artifact — a harness or test rendering with the shared default rather than a real code leak. Any new filter-panel test that wants to assert student-facing behavior must override the mock (or pass `isAdmin: false` on the synthetic `exampleFilter` fixture, for presentational-component tests that don't go through the mock at all) so the next person does not mistake the harness default for a product bug. Regression coverage for the gate itself lives in `FilterSection.test.tsx` (shared by Finder and Manager) and `CourseCard.test.tsx` (Custom Quiz admin strip); `FlashcardManager.test.tsx` additionally pins that the page threads `exampleFilter.isAdmin` through to `FilterSection` unmodified.
 
 ---
 
@@ -194,4 +196,4 @@ When the visual design exists, ship small PRs in this order:
 5. Replace Pagination/Toggle/Tag chips with primitives only as those land in the new tree.
 6. Remove the old table/filter imports from these two pages only. Leave global SCSS for quiz/admin.
 
-Each PR stays version-gated by the logged-in user's beta-tester status. Non-beta students stay on v1 until the surface is complete.
+Each PR stayed version-gated by the logged-in user's beta-tester status until the v2 rollout made every visitor v2.

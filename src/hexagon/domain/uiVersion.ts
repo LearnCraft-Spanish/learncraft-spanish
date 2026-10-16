@@ -1,20 +1,7 @@
-import type { AppUser } from '@learncraft-spanish/shared';
-
 export type UiVersion = 'v1' | 'v2';
 
 /**
- * Coaches and admins (`isStaff`, from auth roles) always get v2 chrome.
- * Everyone else needs their own record to be a beta-tester student.
+ * The redesign is rolled out to every visitor. `v1` stays in the type until
+ * the v1 surfaces that still branch on it are deleted.
  */
-export function resolveStudentUiVersion(
-  user: Pick<AppUser, 'studentRole' | 'betaTester'> | null,
-  isStaff = false,
-): UiVersion {
-  if (isStaff) {
-    return 'v2';
-  }
-  if (!user) {
-    return 'v1';
-  }
-  return user.studentRole === 'student' && user.betaTester ? 'v2' : 'v1';
-}
+export const CURRENT_UI_VERSION: UiVersion = 'v2';

@@ -18,6 +18,7 @@ describe('ui scope', () => {
   });
 
   it('sets data-ui to v1 when the student UI is v1', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     render(
       <UiScope>
         <span>child</span>
