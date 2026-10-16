@@ -106,7 +106,7 @@ describe('home presets config', () => {
 describe('homeCtasForView', () => {
   it('gives a limited user only the Audio Quiz CTA', () => {
     expect(homeCtasForView('limited')).toEqual([
-      { headline: 'Audio Quiz', path: '/customquiz' },
+      { headline: 'Build an audio quiz', path: '/customquiz' },
     ]);
   });
 

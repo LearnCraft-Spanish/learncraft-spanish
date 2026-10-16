@@ -292,10 +292,14 @@ describe('app', () => {
       const { getByRole, queryByRole, getByText } = renderApp();
 
       await waitFor(() => {
-        expect(getByRole('button', { name: 'Audio Quiz' })).toBeInTheDocument();
+        expect(
+          getByRole('button', { name: 'Build an audio quiz' }),
+        ).toBeInTheDocument();
       });
       expect(
-        getByRole('button', { name: 'Official Quizzes' }),
+        getByRole('button', {
+          name: 'Official quizzes Test yourself against a lesson quiz',
+        }),
       ).toBeInTheDocument();
       expect(getByText('LEARNCRAFT')).toBeInTheDocument();
       expect(getByRole('button', { name: 'Account' })).toBeInTheDocument();
@@ -313,7 +317,11 @@ describe('app', () => {
       const { findByRole, getByRole, queryByRole } = renderAppAtRoute('/');
 
       await user.click(
-        await findByRole('button', { name: 'Audio Quiz' }, { timeout: 5000 }),
+        await findByRole(
+          'button',
+          { name: 'Build an audio quiz' },
+          { timeout: 5000 },
+        ),
       );
 
       expect(
@@ -343,7 +351,7 @@ describe('app', () => {
         ).toBeInTheDocument();
       });
       expect(
-        queryByRole('button', { name: 'Audio Quiz' }),
+        queryByRole('button', { name: 'Build an audio quiz' }),
       ).not.toBeInTheDocument();
       expect(
         queryByRole('navigation', { name: 'Primary' }),

@@ -67,7 +67,7 @@ describe('useHomeView', () => {
 
     expect(result.current.view).toBe('limited');
     expect(result.current.ctas.map((cta) => cta.headline)).toEqual([
-      'Audio Quiz',
+      'Build an audio quiz',
     ]);
     expect(result.current.entries.map((entry) => entry.title)).toEqual([
       'Official quizzes',
