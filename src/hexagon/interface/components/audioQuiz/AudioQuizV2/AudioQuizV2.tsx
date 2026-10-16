@@ -11,6 +11,7 @@ import { WordChips } from '@interface/components/textQuiz/WordChips';
 import { WordPanel } from '@interface/components/textQuiz/WordPanel';
 import { WordPanelModal } from '@interface/components/textQuiz/WordPanelModal';
 import { useMediaQuery } from '@interface/hooks/useMediaQuery';
+import { useQuizKeyboardShortcuts } from '@interface/hooks/useQuizKeyboardShortcuts';
 import { useEffect, useRef, useState } from 'react';
 import styles from './AudioQuizV2.module.scss';
 
@@ -86,6 +87,7 @@ export function AudioQuizV2({
   /* Below the desktop breakpoint a selected word opens `WordPanelModal`
    * instead of the chip-anchored panel, same reasoning as `TextQuizV2`. */
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const keyboardShortcuts = useQuizKeyboardShortcuts();
 
   // A new card can never carry over the previous one's chip selection.
   useEffect(() => {
@@ -146,7 +148,13 @@ export function AudioQuizV2({
   // Handoff: `space` play/pause · `↑` next step · `←` `→` previous/next
   // card. Space is suppressed when a control already owns it; arrow keys
   // are suppressed only in text-entry fields where they move the caret.
+  // iPad and other touch-primary devices get no listener — a desktop-width
+  // viewport is not enough, because iPad landscape is wider than 768px.
   useEffect(() => {
+    if (!keyboardShortcuts) {
+      return;
+    }
+
     function handleKeyDown(event: KeyboardEvent): void {
       const actions = keyActionsRef.current;
       if (event.key === ' ') {
@@ -181,7 +189,7 @@ export function AudioQuizV2({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [keyboardShortcuts]);
 
   const isLastCard = exampleNumber >= quizLength;
   const isAnswerStep = currentStep === AudioQuizStep.Answer;
@@ -268,6 +276,7 @@ export function AudioQuizV2({
         primaryLabel={copy.primaryLabel}
         replayLabel={copy.replayLabel}
         isFirst={exampleNumber <= 1}
+        showKeyboardHints={keyboardShortcuts}
         onPrimary={onPrimary}
         onReplay={onReplay}
         onPrevious={handlePrevious}
