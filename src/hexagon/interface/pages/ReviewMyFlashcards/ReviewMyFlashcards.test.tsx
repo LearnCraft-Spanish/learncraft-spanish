@@ -79,6 +79,7 @@ describe('review my flashcards page', () => {
   });
 
   it('falls back to the legacy setup menu on v1', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     renderPage();
 
     expect(screen.getByTestId('legacy-my-flashcards')).toBeInTheDocument();

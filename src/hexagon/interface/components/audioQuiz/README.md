@@ -1,7 +1,7 @@
 # Audio Quiz v2 — reuse + divergence ledger
 
-Implements `design_handoff_audio_quiz/README.md` ("Audio Quiz Redesign") for
-beta-tester students. Mirrors the `textQuiz/` v2 pattern:
+Implements `design_handoff_audio_quiz/README.md` ("Audio Quiz Redesign"), shown
+to every visitor now that v2 is rolled out. Mirrors the `textQuiz/` v2 pattern:
 props-only presentational components, one domain function for step-dependent
 copy, a thin screen bridge from `useAudioQuiz` to the presentational tree.
 

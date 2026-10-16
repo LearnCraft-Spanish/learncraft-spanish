@@ -2,6 +2,7 @@ import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useUsingAsStudent } from '@application/coordinators/hooks/useUsingAsStudent';
 import { useMyData } from '@application/queries/useMyData';
+import { resolveHomeView, showsStudentNav } from '@domain/studentAccess';
 import { useCallback } from 'react';
 
 export interface UsingAsIdentity {
@@ -22,6 +23,8 @@ export interface UseAppHeaderResult {
   staffRole: 'admin' | 'coach' | null;
   /** Signed-in coach/admin in their own view: "Use as student" replaces the student nav. */
   showUseAsStudent: boolean;
+  /** Signed-in student, or staff using the app as one. Limited, free, and logged-out visitors get no nav. */
+  showStudentNav: boolean;
   /** Coach/admin using the app as a student: "Change student", and a way back to their own view. */
   isStaffUsingAsStudent: boolean;
   /** The student a coach/admin is using the app as, once loaded. */
@@ -46,6 +49,8 @@ export default function useAppHeader(): UseAppHeaderResult {
     authUser,
     isAdmin,
     isCoach,
+    isStudent,
+    isLimited,
     login,
     logout,
   } = useAuthAdapter();
@@ -76,6 +81,11 @@ export default function useAppHeader(): UseAppHeaderResult {
     isStaff,
     staffRole: isAdmin ? 'admin' : isCoach ? 'coach' : null,
     showUseAsStudent: isSignedIn && isStaff && !isUsingAsStudent,
+    showStudentNav:
+      isSignedIn &&
+      showsStudentNav(
+        resolveHomeView({ isStaff, isUsingAsStudent, isStudent, isLimited }),
+      ),
     isStaffUsingAsStudent,
     usingAs,
     stopUsingAsStudent,

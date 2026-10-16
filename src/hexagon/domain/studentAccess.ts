@@ -1,23 +1,36 @@
-import type { UiVersion } from '@domain/uiVersion';
 import type { AppUser, AppUserAbbreviation } from '@learncraft-spanish/shared';
 
-export type HomeView = 'studentV2' | 'staffTools' | 'legacyMenu';
+export type HomeView = 'student' | 'staffTools' | 'limited' | 'free';
 
 /**
- * What `/` shows. Staff see their coaching/admin tools until they use the
- * app as a student; then they (and everyone else) follow the UI version.
+ * What `/` shows, from auth roles. Staff see their coaching/admin tools until
+ * they use the app as a student, then get the student home. Limited and free
+ * users get their own pared-down homes; anyone signed in with no other role
+ * is free.
  */
 export function resolveHomeView({
   isStaff,
   isUsingAsStudent,
-  version,
+  isStudent,
+  isLimited,
 }: {
   isStaff: boolean;
   isUsingAsStudent: boolean;
-  version: UiVersion;
+  isStudent: boolean;
+  isLimited: boolean;
 }): HomeView {
-  if (isStaff && !isUsingAsStudent) return 'staffTools';
-  return version === 'v2' ? 'studentV2' : 'legacyMenu';
+  if (isStaff) return isUsingAsStudent ? 'student' : 'staffTools';
+  if (isStudent) return 'student';
+  if (isLimited) return 'limited';
+  return 'free';
+}
+
+/**
+ * The header's student nav (and the mobile tab bar) only lead to full-student
+ * tools, so only the student home view gets them.
+ */
+export function showsStudentNav(view: HomeView): boolean {
+  return view === 'student';
 }
 
 /** Coaches and admins may only use the app as a full student. */

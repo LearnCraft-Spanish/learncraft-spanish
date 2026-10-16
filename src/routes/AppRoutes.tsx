@@ -7,7 +7,6 @@ import { RequireStudentTools } from '@interface/components/RequireStudentTools';
 import { lazy, Suspense } from 'react';
 import { Navigate, Route } from 'react-router-dom';
 import NotFoundPage from '../NotFoundPage';
-import Menu from '../sections/Menu';
 import SentryRoutes from './SentryRoutes';
 
 // Student / authenticated user pages
@@ -23,8 +22,8 @@ const FlashcardManager = lazy(
 );
 const QuizzesPage = lazy(() => import('@interface/pages/Quizzes'));
 const CustomQuiz = lazy(() => import('@interface/pages/CustomQuiz'));
-const LimitedCustomQuiz = lazy(
-  () => import('@interface/pages/LimitedCustomQuiz'),
+const LimitedAudioQuiz = lazy(
+  () => import('@interface/pages/LimitedAudioQuiz'),
 );
 const FlashcardFinderPage = lazy(
   () => import('@interface/pages/FlashcardFinder'),
@@ -61,19 +60,9 @@ export default function AppRoutes() {
   const { version } = useStudentUiVersion();
 
   return (
-    <Suspense
-      fallback={
-        // The bound version is already known here (`useStudentUiVersion`
-        // resolved before `App` mounted this tree). v1 keeps the paper
-        // canvas; v2 still gets `PageShell` via `LoadingScreen`.
-        <LoadingScreen message="Loading..." />
-      }
-    >
+    <Suspense fallback={<LoadingScreen message="Loading..." />}>
       <SentryRoutes>
-        <Route
-          path="/"
-          element={isStudent || isCoach || isAdmin ? <HomePage /> : <Menu />}
-        />
+        <Route path="/" element={<HomePage />} />
         <Route
           path="/myflashcards"
           element={
@@ -125,13 +114,9 @@ export default function AppRoutes() {
           element={
             (isLimited || isStudent || isCoach || isAdmin) && (
               <RequireStudentTools scope="catalog">
-                {isLimited ? (
-                  <LimitedCustomQuiz />
-                ) : (
-                  <UiScope>
-                    <CustomQuiz />
-                  </UiScope>
-                )}
+                <UiScope>
+                  {isLimited ? <LimitedAudioQuiz /> : <CustomQuiz />}
+                </UiScope>
               </RequireStudentTools>
             )
           }

@@ -66,7 +66,7 @@ export function HomeV2Loaded({ cta, entries }: HomeV2LoadedProps): JSX.Element {
 /**
  * The student v2 home screen. One responsive tree: the CTA is always the
  * first child of the scrolling column, followed by the preset's entry list
- * and a footer with help plus a beta-tester feedback mailto. Which CTA and
+ * and a footer with help plus a feedback mailto. Which CTA and
  * entries appear is resolved by `useHomeScreen` from the student's course
  * and lesson.
  *

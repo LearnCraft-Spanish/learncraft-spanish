@@ -362,6 +362,7 @@ describe('flashcard manager page', () => {
   afterEach(resetMocks);
 
   it('renders the v1 heading, filter panel, and table when the version is v1', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     renderManager();
 
     expect(
@@ -379,6 +380,7 @@ describe('flashcard manager page', () => {
   });
 
   it('renders the v1 loading state while student flashcards load', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseFlashcardManager({ studentFlashcardsLoading: true });
 
     renderManager();
@@ -388,6 +390,7 @@ describe('flashcard manager page', () => {
   });
 
   it('renders the v1 loading state while dependencies load', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseFlashcardManager({ dependenciesLoading: true });
 
     renderManager();
@@ -396,6 +399,7 @@ describe('flashcard manager page', () => {
   });
 
   it('renders the v1 error state', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseFlashcardManager({ error: new Error('failed') });
 
     renderManager();
@@ -1371,6 +1375,7 @@ describe('enableFiltering url parameter', () => {
   // `useState`, so it survives the strip. That is asserted in
   // useFlashcardManager.test.ts. These only claim the handoff and the url.
   it('hands the parameter to the use case and strips it in v1', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     renderManager('/manage-flashcards?enableFiltering=true');
 
     expect(mockUseFlashcardManager).toHaveBeenCalledWith({
@@ -1382,6 +1387,7 @@ describe('enableFiltering url parameter', () => {
   });
 
   it('keeps other query parameters when stripping enableFiltering in v1', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     renderManager('/manage-flashcards?enableFiltering=true&page=2');
 
     expect(screen.getByTestId('location').textContent).toBe(

@@ -198,6 +198,7 @@ describe('flashcard finder page', () => {
   });
 
   it('renders the v1 heading and tree when the version is v1', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     renderFinder();
 
     expect(
@@ -217,6 +218,7 @@ describe('flashcard finder page', () => {
   });
 
   it('renders the v1 loading state', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseFlashcardFinder({ initialLoading: true });
 
     renderFinder();
@@ -225,6 +227,7 @@ describe('flashcard finder page', () => {
   });
 
   it('passes first-page loading to the v1 table', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseFlashcardFinder({
       exampleQuery: {
         ...mockUseFlashcardFinder().exampleQuery,
@@ -239,6 +242,7 @@ describe('flashcard finder page', () => {
   });
 
   it('passes later-page loading to the v1 table', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseFlashcardFinder({
       exampleQuery: {
         ...mockUseFlashcardFinder().exampleQuery,
@@ -253,6 +257,7 @@ describe('flashcard finder page', () => {
   });
 
   it('renders the v1 error state', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseFlashcardFinder({ error: new Error('failed') });
 
     renderFinder();

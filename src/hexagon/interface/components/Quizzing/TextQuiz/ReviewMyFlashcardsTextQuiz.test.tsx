@@ -44,6 +44,7 @@ describe('reviewMyFlashcardsTextQuiz', () => {
   });
 
   it('should render TextQuiz component', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseReviewMyFlashcardsTextQuiz(
       createMockTextQuizReturn({
         quizLength: 3,
@@ -61,6 +62,7 @@ describe('reviewMyFlashcardsTextQuiz', () => {
   });
 
   it('shows the fixed "Text Quiz" title on the legacy screen', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseReviewMyFlashcardsTextQuiz(
       createMockTextQuizReturn({
         quizLength: 3,

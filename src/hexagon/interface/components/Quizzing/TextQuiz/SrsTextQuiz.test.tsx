@@ -56,6 +56,7 @@ describe('srsTextQuiz', () => {
   });
 
   it('should render TextQuiz component with SRS props', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseSrsTextQuiz({
       TextQuizReturn: createMockTextQuizReturn({
         quizLength: 3,
@@ -73,6 +74,7 @@ describe('srsTextQuiz', () => {
   });
 
   it('shows the fixed "SRS Quiz" title on the legacy screen', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseSrsTextQuiz({
       TextQuizReturn: createMockTextQuizReturn({
         quizLength: 4,

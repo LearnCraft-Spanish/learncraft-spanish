@@ -1,74 +1,88 @@
 import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
 import { overrideMockUseUsingAsStudent } from '@application/coordinators/hooks/useUsingAsStudent.mock';
-import {
-  mockUseMyData,
-  overrideMockUseMyData,
-  resetMockUseMyData,
-} from '@application/queries/useMyData.mock';
 import { useHomeView } from '@application/useCases/useHomeView';
 import { renderHook } from '@testing-library/react';
-import { createMockAppUser } from '@testing/factories/appUserFactories';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-vi.mock('@application/queries/useMyData', () => ({
-  useMyData: () => mockUseMyData,
-}));
+const noRoles = {
+  isAdmin: false,
+  isCoach: false,
+  isStudent: false,
+  isLimited: false,
+};
 
 describe('useHomeView', () => {
-  afterEach(() => {
-    resetMockUseMyData();
-  });
-
   it('shows a coach their staff tools without admin tools', () => {
-    overrideMockAuthAdapter({ isCoach: true, isAdmin: false });
+    overrideMockAuthAdapter({ ...noRoles, isCoach: true });
 
     const { result } = renderHook(() => useHomeView());
 
     expect(result.current).toEqual({
       view: 'staffTools',
       showAdminTools: false,
+      ctas: [],
+      entries: [],
     });
   });
 
   it('shows an admin their staff tools with admin tools', () => {
-    overrideMockAuthAdapter({ isCoach: false, isAdmin: true });
+    overrideMockAuthAdapter({ ...noRoles, isAdmin: true });
 
     const { result } = renderHook(() => useHomeView());
 
     expect(result.current).toEqual({
       view: 'staffTools',
       showAdminTools: true,
+      ctas: [],
+      entries: [],
     });
   });
 
-  it('shows staff the v2 student home while using the app as a student', () => {
-    overrideMockAuthAdapter({ isCoach: true, isAdmin: false });
+  it('shows staff the student home while using the app as a student', () => {
+    overrideMockAuthAdapter({ ...noRoles, isCoach: true });
     overrideMockUseUsingAsStudent({ isUsingAsStudent: true });
 
     const { result } = renderHook(() => useHomeView());
 
-    expect(result.current.view).toBe('studentV2');
+    expect(result.current.view).toBe('student');
   });
 
-  it('shows a beta-tester student the v2 home', () => {
-    overrideMockAuthAdapter({ isCoach: false, isAdmin: false });
-    overrideMockUseMyData({
-      myData: createMockAppUser({ studentRole: 'student', betaTester: true }),
-    });
+  it('shows every student the student home, beta tester or not', () => {
+    overrideMockAuthAdapter({ ...noRoles, isStudent: true });
 
     const { result } = renderHook(() => useHomeView());
 
-    expect(result.current.view).toBe('studentV2');
+    expect(result.current).toEqual({
+      view: 'student',
+      showAdminTools: false,
+      ctas: [],
+      entries: [],
+    });
   });
 
-  it('shows a non-beta student the legacy menu', () => {
-    overrideMockAuthAdapter({ isCoach: false, isAdmin: false });
-    overrideMockUseMyData({
-      myData: createMockAppUser({ studentRole: 'student', betaTester: false }),
-    });
+  it('gives a limited user the Audio Quiz CTA and Official quizzes as a menu option', () => {
+    overrideMockAuthAdapter({ ...noRoles, isLimited: true });
 
     const { result } = renderHook(() => useHomeView());
 
-    expect(result.current.view).toBe('legacyMenu');
+    expect(result.current.view).toBe('limited');
+    expect(result.current.ctas.map((cta) => cta.headline)).toEqual([
+      'Build an audio quiz',
+    ]);
+    expect(result.current.entries.map((entry) => entry.title)).toEqual([
+      'Official quizzes',
+    ]);
+  });
+
+  it('gives a free user only the Official Quizzes CTA', () => {
+    overrideMockAuthAdapter(noRoles);
+
+    const { result } = renderHook(() => useHomeView());
+
+    expect(result.current.view).toBe('free');
+    expect(result.current.ctas.map((cta) => cta.headline)).toEqual([
+      'Official Quizzes',
+    ]);
+    expect(result.current.entries).toEqual([]);
   });
 });
