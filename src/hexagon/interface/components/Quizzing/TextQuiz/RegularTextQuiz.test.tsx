@@ -44,6 +44,7 @@ describe('regularTextQuiz', () => {
   });
 
   it('should render TextQuiz component', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseTextQuiz(
       createMockTextQuizReturn({
         quizLength: 3,
@@ -61,6 +62,7 @@ describe('regularTextQuiz', () => {
   });
 
   it('should pass quizTitle to TextQuiz', () => {
+    overrideMockUseStudentUiVersion({ version: 'v1' });
     overrideMockUseTextQuiz(
       createMockTextQuizReturn({
         quizLength: 5,

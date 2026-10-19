@@ -2,6 +2,16 @@ import type { AuthPort } from '@application/ports/authPort';
 import { useAuth0 } from '@auth0/auth0-react';
 import { config } from '@config';
 import { useMemo } from 'react';
+
+/**
+ * The only database connection enabled on this Auth0 application. Confirmed
+ * from the tenant's public client settings (`/client/{clientId}.js`), which
+ * lists one `auth0` strategy and this connection with forgot-password on.
+ * Authentication API `POST /dbconnections/change_password` only works for a
+ * database connection, and it needs this name.
+ */
+const AUTH0_DATABASE_CONNECTION = 'Username-Password-Authentication';
+
 export function useAuthInfrastructure(): AuthPort {
   const audience = config.apiAudience;
   const {
@@ -76,6 +86,28 @@ export function useAuthInfrastructure(): AuthPort {
       auth0Logout({
         logoutParams: { returnTo: window.location.origin },
       }),
+
+    requestPasswordReset: async (email: string): Promise<void> => {
+      // Auth0's documented SPA path: the browser posts to the Authentication
+      // API, and Auth0 emails the hosted reset page. The app origin must be
+      // in the application's Allowed Origins (CORS) list.
+      const response = await fetch(
+        `https://${config.auth0Domain}/dbconnections/change_password`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client_id: config.auth0ClientId,
+            email,
+            connection: AUTH0_DATABASE_CONNECTION,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Password reset email could not be sent.');
+      }
+    },
 
     isAuthenticated,
     isLoading,

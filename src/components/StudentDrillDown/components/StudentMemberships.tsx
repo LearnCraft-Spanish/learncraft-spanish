@@ -296,10 +296,11 @@ function StudentMembershipContextual({
     });
   };
 
+  // if there is a primary coach, only the primary coach or any admin can edit that membership
   if (
     membership.primaryCoach &&
     membership.primaryCoach.email !== currentUserAsQbUser?.email &&
-    isAdmin
+    !isAdmin
   ) {
     return (
       <ContextualView>

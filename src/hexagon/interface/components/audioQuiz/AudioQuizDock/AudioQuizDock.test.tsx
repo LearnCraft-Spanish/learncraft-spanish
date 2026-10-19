@@ -14,6 +14,7 @@ describe('audioQuizDock', () => {
         primaryLabel="Show answer"
         replayLabel="Replay"
         isFirst={false}
+        showKeyboardHints
         onPrimary={onPrimary}
         onReplay={onReplay}
         onPrevious={vi.fn()}
@@ -36,6 +37,7 @@ describe('audioQuizDock', () => {
         primaryLabel="Show answer"
         replayLabel="Replay"
         isFirst
+        showKeyboardHints
         onPrimary={vi.fn()}
         onReplay={vi.fn()}
         onPrevious={vi.fn()}

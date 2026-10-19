@@ -2,8 +2,7 @@ import type { StudentUiVersionResult } from '@application/useCases/useStudentUiV
 import { createOverrideableMockHook } from '@testing/utils/createOverrideableMockHook';
 
 const defaultMockImplementation: StudentUiVersionResult = {
-  version: 'v1',
-  isLoading: false,
+  version: 'v2',
 };
 
 export const {

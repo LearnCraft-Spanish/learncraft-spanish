@@ -1,28 +1,38 @@
+import type { HomeCta, HomePresetEntry } from '@domain/homePresets/types';
 import type { HomeView } from '@domain/studentAccess';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useUsingAsStudent } from '@application/coordinators/hooks/useUsingAsStudent';
-import { useMyData } from '@application/queries/useMyData';
+import {
+  homeCtasForView,
+  homeEntriesForView,
+} from '@domain/homePresets/homePresets';
 import { resolveHomeView } from '@domain/studentAccess';
-import { resolveStudentUiVersion } from '@domain/uiVersion';
 
 export interface UseHomeViewResult {
   view: HomeView;
   showAdminTools: boolean;
+  /** The limited and free homes' CTAs. Empty for other views. */
+  ctas: readonly HomeCta[];
+  /** The limited and free homes' regular menu options. Empty for other views. */
+  entries: readonly HomePresetEntry[];
 }
 
-/** Which home `/` renders: v2 student, staff tools, or the legacy menu. */
+/** Which home `/` renders: student, staff tools, limited, or free. */
 export function useHomeView(): UseHomeViewResult {
-  const { isAdmin, isCoach } = useAuthAdapter();
+  const { isAdmin, isCoach, isStudent, isLimited } = useAuthAdapter();
   const { isUsingAsStudent } = useUsingAsStudent();
-  const { myData } = useMyData();
-  const isStaff = isAdmin || isCoach;
+
+  const view = resolveHomeView({
+    isStaff: isAdmin || isCoach,
+    isUsingAsStudent,
+    isStudent,
+    isLimited,
+  });
 
   return {
-    view: resolveHomeView({
-      isStaff,
-      isUsingAsStudent,
-      version: resolveStudentUiVersion(myData, isStaff),
-    }),
+    view,
     showAdminTools: isAdmin,
+    ctas: homeCtasForView(view),
+    entries: homeEntriesForView(view),
   };
 }

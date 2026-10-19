@@ -1,7 +1,10 @@
 import type {
   ActiveCourseAndLesson,
+  HomeCta,
   HomePreset,
+  HomePresetEntry,
 } from '@domain/homePresets/types';
+import type { HomeView } from '@domain/studentAccess';
 
 const SUGGESTED_TOOL_EYEBROW = "Today's suggested tool";
 
@@ -141,6 +144,42 @@ export const HOME_PRESETS: readonly HomePreset[] = [
     ],
   },
 ];
+
+const OFFICIAL_QUIZZES_CTA: HomeCta = {
+  headline: 'Official Quizzes',
+  path: '/officialquizzes',
+};
+
+const AUDIO_QUIZ_CTA: HomeCta = {
+  headline: 'Build an audio quiz',
+  path: '/customquiz',
+};
+
+const OFFICIAL_QUIZZES_ENTRY: HomePresetEntry = {
+  icon: 'trophy',
+  title: 'Official quizzes',
+  meta: 'Test yourself against a lesson quiz',
+  path: '/officialquizzes',
+};
+
+/**
+ * The CTAs on the limited and free homes. Student and staff views have
+ * their own homes and get none.
+ */
+export function homeCtasForView(view: HomeView): readonly HomeCta[] {
+  if (view === 'limited') return [AUDIO_QUIZ_CTA];
+  if (view === 'free') return [OFFICIAL_QUIZZES_CTA];
+  return [];
+}
+
+/**
+ * The regular menu options below the CTAs on the limited and free homes.
+ * Student and staff views have their own homes and get none.
+ */
+export function homeEntriesForView(view: HomeView): readonly HomePresetEntry[] {
+  if (view === 'limited') return [OFFICIAL_QUIZZES_ENTRY];
+  return [];
+}
 
 function presetMatchesLesson(
   preset: HomePreset,

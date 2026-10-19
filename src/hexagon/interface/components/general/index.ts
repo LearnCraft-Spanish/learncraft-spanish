@@ -4,6 +4,7 @@ export * from '@interface/components/general/Buttons';
 export * from '@interface/components/general/Card';
 export * from '@interface/components/general/Checkbox';
 export * from '@interface/components/general/Chip';
+export * from '@interface/components/general/Combobox';
 export * from '@interface/components/general/DataTable';
 export * from '@interface/components/general/EmptyState';
 export * from '@interface/components/general/Eyebrow';

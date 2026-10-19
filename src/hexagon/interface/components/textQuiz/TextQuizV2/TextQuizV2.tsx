@@ -19,6 +19,7 @@ import { WordPanel } from '@interface/components/textQuiz/WordPanel';
 import { WordPanelModal } from '@interface/components/textQuiz/WordPanelModal';
 import { useMediaQuery } from '@interface/hooks/useMediaQuery';
 import { useQuizCardMotion } from '@interface/hooks/useQuizCardMotion';
+import { useQuizKeyboardShortcuts } from '@interface/hooks/useQuizKeyboardShortcuts';
 import { useEffect, useRef, useState } from 'react';
 import styles from './TextQuizV2.module.scss';
 
@@ -114,6 +115,7 @@ export function TextQuizV2({
    * instead of the chip-anchored panel — in-flow, the panel was cramped
    * into the card's own scroll region. */
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const keyboardShortcuts = useQuizKeyboardShortcuts();
   // Visual phases only. Commits stay the callbacks this screen already owned.
   const motion = useQuizCardMotion();
   const audioControlRef = useRef<CardAudioHandle | null>(null);
@@ -230,8 +232,13 @@ export function TextQuizV2({
   // Space play/pause is a hidden shortcut: skip it when a native control
   // already owns Space (buttons, links, fields). Arrow keys and 1/2 are
   // skipped only in text-entry fields. Left/right are always previous/next;
-  // in SRS, 1/2 grade hard/easy on either face.
+  // in SRS, 1/2 grade hard/easy on either face. iPad and other touch-primary
+  // devices get no listener — viewport width is not a reliable signal there.
   useEffect(() => {
+    if (!keyboardShortcuts) {
+      return;
+    }
+
     function handleKeyDown(event: KeyboardEvent): void {
       const actions = keyActionsRef.current;
       if (event.key === ' ') {
@@ -278,7 +285,7 @@ export function TextQuizV2({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [keyboardShortcuts]);
 
   if (!quizExample) {
     return (
@@ -456,7 +463,7 @@ export function TextQuizV2({
         onNext={handleNext}
       />
 
-      <KeyboardHints srs={srs} />
+      {keyboardShortcuts && <KeyboardHints srs={srs} />}
 
       {isMobile && selectedVocab && (
         <WordPanelModal

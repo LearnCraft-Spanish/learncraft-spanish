@@ -29,6 +29,9 @@
 
 .copy {
   position: relative;
+  /* The wheel and arrow are later siblings, so a long headline runs under
+   * them. Lift the copy so the words stay on top wherever they overlap. */
+  z-index: 1;
   display: flex;
   min-width: 0;
   flex-direction: column;

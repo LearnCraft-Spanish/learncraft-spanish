@@ -26,6 +26,7 @@ describe('studentMobileStack', () => {
     expect(isStudentStackPath('/quizzes')).toBe(true);
     expect(isStudentStackPath('/get-help')).toBe(true);
     expect(isStudentStackPath('/get-help/vocab')).toBe(true);
+    expect(isStudentStackPath('/settings')).toBe(true);
     expect(isStudentStackPath('/customquiz')).toBe(true);
     expect(isStudentStackPath('/myflashcards')).toBe(true);
     expect(isStudentStackPath('/officialquizzes')).toBe(true);
@@ -44,6 +45,7 @@ describe('studentMobileStack', () => {
     expect(stackParentPath('/quizzes')).toBe('/');
     expect(stackParentPath('/get-help')).toBe('/');
     expect(stackParentPath('/get-help/vocab')).toBe('/get-help');
+    expect(stackParentPath('/settings')).toBe('/');
     expect(stackParentPath('/customquiz')).toBe('/');
     expect(stackParentPath('/myflashcards')).toBe('/');
     expect(stackParentPath('/officialquizzes')).toBe('/');
@@ -57,6 +59,7 @@ describe('studentMobileStack', () => {
     expect(stackTitle('/quizzes')).toBe('Quizzes');
     expect(stackTitle('/get-help')).toBe('Help & walkthroughs');
     expect(stackTitle('/get-help/vocab')).toBe('Vocab lookup');
+    expect(stackTitle('/settings')).toBe('Settings');
     expect(stackTitle('/customquiz')).toBe('Set up your quiz');
     expect(stackTitle('/myflashcards')).toBe('Quiz my flashcards');
     expect(stackTitle('/officialquizzes')).toBe('Choose a quiz');

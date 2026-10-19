@@ -9,16 +9,16 @@ import styles from './AccountMenu.module.scss';
 interface AccountMenuProps {
   studentName: string | undefined;
   studentEmail: string | undefined;
-  onLogOut: () => void;
+  onOpenSettings: () => void;
   /** The student a coach/admin is using the app as. */
   usingAs?: UsingAsIdentity | null;
-  /** Coach/admin in their own view: "Use as student" above Log out. */
+  /** Coach/admin in their own view: "Use as student" above Settings. */
   onUseAsStudent?: () => void;
   /** Coach/admin using the app as a student: "Change student". */
   onChangeStudent?: () => void;
   /**
-   * Coach/admin using the app as a student: replaces Log out, so leaving
-   * the student view never signs them out by accident.
+   * Coach/admin using the app as a student. Shown above Settings, so leaving
+   * the student view is separate from account settings.
    */
   stopUsingAsStudent?: { label: string; caption: string; onSelect: () => void };
 }
@@ -47,7 +47,7 @@ function initialsOf(
 export function AccountMenu({
   studentName,
   studentEmail,
-  onLogOut,
+  onOpenSettings,
   usingAs = null,
   onUseAsStudent,
   onChangeStudent,
@@ -71,16 +71,19 @@ export function AccountMenu({
       onSelect: onChangeStudent,
     });
   }
-  actions.push(
-    stopUsingAsStudent !== undefined
-      ? {
-          label: stopUsingAsStudent.label,
-          caption: stopUsingAsStudent.caption,
-          icon: 'arrowLeft',
-          onSelect: stopUsingAsStudent.onSelect,
-        }
-      : { label: 'Log out', icon: 'logout', onSelect: onLogOut },
-  );
+  if (stopUsingAsStudent !== undefined) {
+    actions.push({
+      label: stopUsingAsStudent.label,
+      caption: stopUsingAsStudent.caption,
+      icon: 'arrowLeft',
+      onSelect: stopUsingAsStudent.onSelect,
+    });
+  }
+  actions.push({
+    label: 'Settings',
+    icon: 'settings',
+    onSelect: onOpenSettings,
+  });
 
   return (
     <Popover

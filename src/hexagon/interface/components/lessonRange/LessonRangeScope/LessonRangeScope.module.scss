@@ -1,0 +1,66 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcs-space-7);
+}
+
+/* Identity (or the revealed course picker) on the left, its action on the right. */
+.courseRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--lcs-space-7);
+}
+
+.identity {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--lcs-space-1);
+}
+
+.courseName {
+  color: var(--lcs-color-ink);
+  font-size: var(--lcs-text-h3);
+  font-weight: var(--lcs-weight-bold);
+  line-height: var(--lcs-line-tight);
+  overflow-wrap: anywhere;
+}
+
+.courseField {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* Same inline ghost treatment as "Reset all filters" in FilterSection. */
+.inlineAction {
+  flex: none;
+}
+
+.inlineAction :global(button[class]) {
+  padding: var(--lcs-space-1);
+  font-size: var(--lcs-text-action);
+  line-height: normal;
+}
+
+/* Centre "Cancel" on the 44px course field beside it. */
+.pickerAction {
+  padding-bottom: var(--lcs-space-4);
+}
+
+.range {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--lcs-space-7);
+}
+
+@media (max-width: 480px) {
+  .courseName {
+    font-size: var(--lcs-text-body);
+  }
+
+  .range {
+    grid-template-columns: 1fr;
+    gap: var(--lcs-space-6);
+  }
+}

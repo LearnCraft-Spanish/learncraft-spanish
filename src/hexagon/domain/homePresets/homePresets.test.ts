@@ -2,6 +2,8 @@ import type { HomePreset } from '@domain/homePresets/types';
 import {
   DEFAULT_HOME_PRESET,
   HOME_PRESETS,
+  homeCtasForView,
+  homeEntriesForView,
   selectHomePreset,
 } from '@domain/homePresets/homePresets';
 import { describe, expect, it } from 'vitest';
@@ -98,5 +100,46 @@ describe('home presets config', () => {
         expect(current.toLessonNumber!).toBeLessThan(next.fromLessonNumber);
       }
     }
+  });
+});
+
+describe('homeCtasForView', () => {
+  it('gives a limited user only the Audio Quiz CTA', () => {
+    expect(homeCtasForView('limited')).toEqual([
+      { headline: 'Build an audio quiz', path: '/customquiz' },
+    ]);
+  });
+
+  it('gives a free user only Official Quizzes', () => {
+    expect(homeCtasForView('free')).toEqual([
+      { headline: 'Official Quizzes', path: '/officialquizzes' },
+    ]);
+  });
+
+  it('gives student and staff views no CTAs, since they have their own homes', () => {
+    expect(homeCtasForView('student')).toEqual([]);
+    expect(homeCtasForView('staffTools')).toEqual([]);
+  });
+});
+
+describe('homeEntriesForView', () => {
+  it('gives a limited user Official quizzes as a regular menu option', () => {
+    expect(homeEntriesForView('limited')).toEqual([
+      {
+        icon: 'trophy',
+        title: 'Official quizzes',
+        meta: 'Test yourself against a lesson quiz',
+        path: '/officialquizzes',
+      },
+    ]);
+  });
+
+  it('gives a free user no menu options, since Official Quizzes is already their CTA', () => {
+    expect(homeEntriesForView('free')).toEqual([]);
+  });
+
+  it('gives student and staff views no menu options, since they have their own homes', () => {
+    expect(homeEntriesForView('student')).toEqual([]);
+    expect(homeEntriesForView('staffTools')).toEqual([]);
   });
 });

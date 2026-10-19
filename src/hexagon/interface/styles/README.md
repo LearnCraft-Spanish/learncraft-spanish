@@ -54,7 +54,7 @@ The design specified Avenir, but Avenir is not licensed for the web and only res
 
 ## Student v1 vs v2
 
-v2 is shown when the logged-in user's own record has `studentRole === 'student'` and `betaTester === true`. Everyone else gets v1. `UiScope` wraps each student route, uses `display: contents`, and sets `data-ui="v1"` or `data-ui="v2"`. Author v2 styles as a `*.module.scss` file. Target `[data-ui='v2']` only when a v1/v2 split exists in the same tree.
+v2 is rolled out to every visitor, logged in or not (`CURRENT_UI_VERSION` in `domain/uiVersion.ts`). The v1 branches remain in the tree until they are deleted, reachable only by tests that mock `useStudentUiVersion` to `v1`. `UiScope` wraps each student route, uses `display: contents`, and sets `data-ui="v1"` or `data-ui="v2"`. Author v2 styles as a `*.module.scss` file. Target `[data-ui='v2']` only when a v1/v2 split exists in the same tree.
 
 The first major student surface is Flashcard Finder. Architecture, isolation rules, and the start sequence live in [`pages/STUDENT_FLASHCARDS.md`](../pages/STUDENT_FLASHCARDS.md). Get Help is the help hub at `/get-help` (vocab lookup + video walkthroughs); the vocab search itself remains at `/get-help/vocab`.
 

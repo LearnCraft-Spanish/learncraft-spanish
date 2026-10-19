@@ -172,6 +172,66 @@ describe('useAppHeader', () => {
     });
   });
 
+  describe('showStudentNav', () => {
+    const signedIn = {
+      isAuthenticated: true,
+      isLoading: false,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: false,
+      isLimited: false,
+    };
+
+    it('is shown to a signed-in student', () => {
+      overrideMockAuthAdapter({ ...signedIn, isStudent: true });
+
+      const { result } = renderHook(() => useAppHeader());
+
+      expect(result.current.showStudentNav).toBe(true);
+    });
+
+    it('is shown to staff using the app as a student', () => {
+      overrideMockAuthAdapter({ ...signedIn, isCoach: true });
+      overrideMockUseUsingAsStudent({ isUsingAsStudent: true });
+
+      const { result } = renderHook(() => useAppHeader());
+
+      expect(result.current.showStudentNav).toBe(true);
+    });
+
+    it('is hidden from staff in their own view', () => {
+      overrideMockAuthAdapter({ ...signedIn, isAdmin: true });
+
+      const { result } = renderHook(() => useAppHeader());
+
+      expect(result.current.showStudentNav).toBe(false);
+    });
+
+    it('is hidden from limited and free users', () => {
+      overrideMockAuthAdapter({ ...signedIn, isLimited: true });
+      expect(
+        renderHook(() => useAppHeader()).result.current.showStudentNav,
+      ).toBe(false);
+
+      overrideMockAuthAdapter(signedIn);
+      expect(
+        renderHook(() => useAppHeader()).result.current.showStudentNav,
+      ).toBe(false);
+    });
+
+    it('is hidden before login, even with a Student role cached', () => {
+      overrideMockAuthAdapter({
+        ...signedIn,
+        isAuthenticated: false,
+        isStudent: true,
+      });
+
+      const { result } = renderHook(() => useAppHeader());
+
+      expect(result.current.showStudentNav).toBe(false);
+    });
+  });
+
   it('flags coaches and admins as staff, not students', () => {
     overrideMockAuthAdapter({ isAdmin: false, isCoach: true });
     const coach = renderHook(() => useAppHeader());

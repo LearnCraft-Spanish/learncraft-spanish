@@ -19,6 +19,9 @@ const defaultMockAdapter: AuthPort = {
     }),
   login: vi.fn<() => void>(),
   logout: vi.fn<() => void>(),
+  requestPasswordReset: vi
+    .fn<(email: string) => Promise<void>>()
+    .mockResolvedValue(undefined),
   authUser: studentAdmin,
   isAdmin: true,
   isCoach: true,

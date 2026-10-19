@@ -41,7 +41,11 @@ function wrapperFor(path: string) {
 describe('useAppHeaderView', () => {
   beforeEach(() => {
     resetMockUseAppHeader();
-    overrideMockUseAppHeader({ isAuthenticated: true, isLoading: false });
+    overrideMockUseAppHeader({
+      isAuthenticated: true,
+      isLoading: false,
+      isSignedIn: true,
+    });
   });
 
   afterEach(() => {
@@ -67,6 +71,17 @@ describe('useAppHeaderView', () => {
 
     const { result } = renderHook(() => useAppHeaderView(), {
       wrapper: wrapperFor('/'),
+    });
+
+    expect(result.current.stack).toBeNull();
+  });
+
+  it('does not expose stack chrome on mobile before login', () => {
+    stubMobile(true);
+    overrideMockUseAppHeader({ isAuthenticated: false, isSignedIn: false });
+
+    const { result } = renderHook(() => useAppHeaderView(), {
+      wrapper: wrapperFor('/officialquizzes'),
     });
 
     expect(result.current.stack).toBeNull();

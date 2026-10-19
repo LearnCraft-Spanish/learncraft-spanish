@@ -13,7 +13,7 @@ describe('account menu', () => {
       <AccountMenu
         studentName="Maria Silva"
         studentEmail="maria@example.com"
-        onLogOut={vi.fn()}
+        onOpenSettings={vi.fn()}
       />,
     );
 
@@ -26,7 +26,7 @@ describe('account menu', () => {
       <AccountMenu
         studentName="Maria Silva"
         studentEmail="maria@example.com"
-        onLogOut={vi.fn()}
+        onOpenSettings={vi.fn()}
       />,
     );
 
@@ -35,13 +35,13 @@ describe('account menu', () => {
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 
-  it('opens the menu on click, showing full name, email, and Log out', async () => {
+  it('opens the menu on click, showing full name, email, and Settings', async () => {
     const user = userEvent.setup();
     render(
       <AccountMenu
         studentName="Maria Silva"
         studentEmail="maria@example.com"
-        onLogOut={vi.fn()}
+        onOpenSettings={vi.fn()}
       />,
     );
 
@@ -51,25 +51,28 @@ describe('account menu', () => {
     expect(screen.getByText('Maria Silva')).toBeInTheDocument();
     expect(screen.getByText('maria@example.com')).toBeInTheDocument();
     expect(
-      screen.getByRole('menuitem', { name: /Log out/ }),
+      screen.getByRole('menuitem', { name: 'Settings' }),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('menuitem', { name: /Log out/ }),
+    ).not.toBeInTheDocument();
   });
 
-  it('calls onLogOut and closes when Log out is chosen', async () => {
+  it('calls onOpenSettings and closes when Settings is chosen', async () => {
     const user = userEvent.setup();
-    const onLogOut = vi.fn();
+    const onOpenSettings = vi.fn();
     render(
       <AccountMenu
         studentName="Maria Silva"
         studentEmail="maria@example.com"
-        onLogOut={onLogOut}
+        onOpenSettings={onOpenSettings}
       />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Account' }));
-    await user.click(screen.getByRole('menuitem', { name: /Log out/ }));
+    await user.click(screen.getByRole('menuitem', { name: 'Settings' }));
 
-    expect(onLogOut).toHaveBeenCalledOnce();
+    expect(onOpenSettings).toHaveBeenCalledOnce();
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
@@ -80,7 +83,7 @@ describe('account menu', () => {
         <AccountMenu
           studentName="Maria Silva"
           studentEmail="maria@example.com"
-          onLogOut={vi.fn()}
+          onOpenSettings={vi.fn()}
         />
         <button type="button">elsewhere</button>
       </div>,
@@ -100,7 +103,7 @@ describe('account menu', () => {
       <AccountMenu
         studentName="Coach Carla"
         studentEmail="carla@fake.not"
-        onLogOut={vi.fn()}
+        onOpenSettings={vi.fn()}
         usingAs={{ name: 'Ana Ruiz', email: 'ana@fake.not' }}
       />,
     );
@@ -113,14 +116,14 @@ describe('account menu', () => {
     expect(screen.getByText('ana@fake.not')).toBeInTheDocument();
   });
 
-  it('puts "Use as student" above Log out for staff in their own view', async () => {
+  it('puts "Use as student" above Settings for staff in their own view', async () => {
     const user = userEvent.setup();
     const onUseAsStudent = vi.fn();
     render(
       <AccountMenu
         studentName="Coach Carla"
         studentEmail="carla@fake.not"
-        onLogOut={vi.fn()}
+        onOpenSettings={vi.fn()}
         onUseAsStudent={onUseAsStudent}
       />,
     );
@@ -129,7 +132,7 @@ describe('account menu', () => {
     const items = screen.getAllByRole('menuitem');
     expect(items.map((item) => item.textContent)).toEqual([
       'Use as student',
-      'Log out',
+      'Settings',
     ]);
 
     await user.click(items[0]!);
@@ -138,16 +141,16 @@ describe('account menu', () => {
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
-  it('offers Change student and Stop, with no Log out, while using as a student', async () => {
+  it('offers Change student, Stop, and Settings, with no Log out, while using as a student', async () => {
     const user = userEvent.setup();
     const onChangeStudent = vi.fn();
     const onStop = vi.fn();
-    const onLogOut = vi.fn();
+    const onOpenSettings = vi.fn();
     render(
       <AccountMenu
         studentName="Coach Carla"
         studentEmail="carla@fake.not"
-        onLogOut={onLogOut}
+        onOpenSettings={onOpenSettings}
         usingAs={{ name: 'Ana Ruiz', email: 'ana@fake.not' }}
         onChangeStudent={onChangeStudent}
         stopUsingAsStudent={{
@@ -167,6 +170,7 @@ describe('account menu', () => {
     ).toEqual([
       'Change student',
       'Stop using as studentBack to your coach view',
+      'Settings',
     ]);
 
     await user.click(screen.getByRole('menuitem', { name: /Change student/ }));
@@ -177,7 +181,11 @@ describe('account menu', () => {
       screen.getByRole('menuitem', { name: /Stop using as student/ }),
     );
     expect(onStop).toHaveBeenCalledOnce();
-    expect(onLogOut).not.toHaveBeenCalled();
+    expect(onOpenSettings).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'Account' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Settings' }));
+    expect(onOpenSettings).toHaveBeenCalledOnce();
   });
 
   it('falls back to the email initial when the account has no name', () => {
@@ -185,7 +193,7 @@ describe('account menu', () => {
       <AccountMenu
         studentName=""
         studentEmail="blake@fake.not"
-        onLogOut={vi.fn()}
+        onOpenSettings={vi.fn()}
       />,
     );
 
@@ -200,7 +208,7 @@ describe('account menu', () => {
       <AccountMenu
         studentName="Maria Silva"
         studentEmail="maria@example.com"
-        onLogOut={vi.fn()}
+        onOpenSettings={vi.fn()}
       />,
     );
 
@@ -216,7 +224,7 @@ describe('account menu', () => {
       <AccountMenu
         studentName="Maria Silva"
         studentEmail="maria@example.com"
-        onLogOut={vi.fn()}
+        onOpenSettings={vi.fn()}
       />,
     );
 

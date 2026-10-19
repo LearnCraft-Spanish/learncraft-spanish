@@ -39,6 +39,7 @@ export function useAuthAdapter(): AuthPort {
     logout: () => {
       throw new Error('[gauntlet] AuthPort.logout is disabled in preview');
     },
+    requestPasswordReset: async () => undefined,
     authUser,
     isAdmin: role === 'admin',
     isCoach: role === 'admin' || role === 'coach',

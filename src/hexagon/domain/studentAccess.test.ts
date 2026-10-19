@@ -4,6 +4,7 @@ import {
   canUseAsStudent,
   filterStudentsBySearch,
   resolveHomeView,
+  showsStudentNav,
   sortStudents,
 } from '@domain/studentAccess';
 import { describe, expect, it } from 'vitest';
@@ -114,40 +115,51 @@ describe('canCollectFlashcards', () => {
 });
 
 describe('resolveHomeView', () => {
+  const noRoles = {
+    isStaff: false,
+    isUsingAsStudent: false,
+    isStudent: false,
+    isLimited: false,
+  };
+
   it('shows staff tools to staff who are not using the app as a student', () => {
+    expect(resolveHomeView({ ...noRoles, isStaff: true })).toBe('staffTools');
+  });
+
+  it('shows staff tools to staff who also hold the Student role', () => {
     expect(
-      resolveHomeView({
-        isStaff: true,
-        isUsingAsStudent: false,
-        version: 'v2',
-      }),
+      resolveHomeView({ ...noRoles, isStaff: true, isStudent: true }),
     ).toBe('staffTools');
   });
 
-  it('shows the v2 student home to staff using the app as a student', () => {
+  it('shows the student home to staff using the app as a student', () => {
     expect(
-      resolveHomeView({ isStaff: true, isUsingAsStudent: true, version: 'v2' }),
-    ).toBe('studentV2');
+      resolveHomeView({ ...noRoles, isStaff: true, isUsingAsStudent: true }),
+    ).toBe('student');
   });
 
-  it('shows the v2 student home to a beta-tester student', () => {
-    expect(
-      resolveHomeView({
-        isStaff: false,
-        isUsingAsStudent: false,
-        version: 'v2',
-      }),
-    ).toBe('studentV2');
+  it('shows the student home to a student', () => {
+    expect(resolveHomeView({ ...noRoles, isStudent: true })).toBe('student');
   });
 
-  it('shows the legacy menu to a v1 student', () => {
-    expect(
-      resolveHomeView({
-        isStaff: false,
-        isUsingAsStudent: false,
-        version: 'v1',
-      }),
-    ).toBe('legacyMenu');
+  it('shows the limited home to a limited user', () => {
+    expect(resolveHomeView({ ...noRoles, isLimited: true })).toBe('limited');
+  });
+
+  it('shows the free home to a signed-in user with no other role', () => {
+    expect(resolveHomeView(noRoles)).toBe('free');
+  });
+});
+
+describe('showsStudentNav', () => {
+  it('shows the student nav on the student home view', () => {
+    expect(showsStudentNav('student')).toBe(true);
+  });
+
+  it('hides the student nav from staff, limited, and free views', () => {
+    expect(showsStudentNav('staffTools')).toBe(false);
+    expect(showsStudentNav('limited')).toBe(false);
+    expect(showsStudentNav('free')).toBe(false);
   });
 });
 

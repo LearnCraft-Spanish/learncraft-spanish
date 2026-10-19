@@ -1,9 +1,7 @@
 import {
   countLabel,
-  courseShortCode,
   ctaLabel,
   effectiveQuizCount,
-  fromLessonText,
   quizNoun,
 } from '@domain/functions/customQuizCopy';
 import { describe, expect, it } from 'vitest';
@@ -15,42 +13,6 @@ describe('quizNoun', () => {
 
   it('names audio examples for an audio quiz', () => {
     expect(quizNoun(true)).toBe('audio examples');
-  });
-});
-
-describe('courseShortCode', () => {
-  it('uses the override for LearnCraft Spanish', () => {
-    expect(courseShortCode('LearnCraft Spanish')).toBe('lcsp');
-  });
-
-  it('uses the override for Spanish in One Month', () => {
-    expect(courseShortCode('Spanish in One Month')).toBe('si1m');
-  });
-
-  it('falls back to lowercase initials, splitting on hyphens', () => {
-    expect(courseShortCode('Post-Podcast Lessons')).toBe('ppl');
-  });
-
-  it('is empty when no course is selected', () => {
-    expect(courseShortCode(null)).toBe('');
-  });
-});
-
-describe('fromLessonText', () => {
-  it('reads "From lesson <code> <number>"', () => {
-    expect(fromLessonText('LearnCraft Spanish', 1)).toBe('From lesson lcsp 1');
-  });
-
-  it('drops the code when the course name yields none', () => {
-    expect(fromLessonText('  ', 4)).toBe('From lesson 4');
-  });
-
-  it('is empty without a course', () => {
-    expect(fromLessonText(null, 1)).toBe('');
-  });
-
-  it('is empty without a from lesson', () => {
-    expect(fromLessonText('LearnCraft Spanish', null)).toBe('');
   });
 });
 

@@ -82,7 +82,6 @@ export const defaultMockUseCustomQuizV2: UseCustomQuizV2Return = {
   effectiveCount: 20,
   countLabel: '6,992 flashcards found',
   ctaLabel: 'Quiz 20 flashcards',
-  fromLessonText: 'From lesson lcsp 1',
   selectedTagCount: 0,
 
   isLoadingExamples: false,

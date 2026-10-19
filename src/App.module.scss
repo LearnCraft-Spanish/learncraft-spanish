@@ -1,19 +1,7 @@
-/* Parchment for v1. `.paperShell` is on `.App` so the texture fills the
- * viewport even when the route is shorter than the window. `.mainContent`
- * keeps the same image so transparent v1 page gaps still show paper.
- * `App` applies `.paperShell` until a beta-tester student session is
- * confirmed; only then does `body`'s `--lcs-color-page` become the canvas. */
-.paperShell {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-  background-image: url('./assets/paper-small.jpeg');
-}
-
-.paperShell .mainContent {
-  flex: 1;
-}
-
+/* Parchment behind the legacy staff tools (coaching, admin) that have not
+ * been redesigned and leave their page gaps transparent. Student surfaces
+ * and the logged-out screen sit on a `PageShell`, which paints
+ * `--lcs-color-page` over this. */
 .mainContent {
   background-image: url('./assets/paper-small.jpeg');
 }

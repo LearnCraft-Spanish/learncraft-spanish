@@ -24,7 +24,7 @@ A file in this folder is a v2 primitive only if all of the following hold.
 | Layout   | `PageShell`, `FixedBottomStack`, `TabBar`, `Card` + `CardSection` + `CardSectionHeader` + `CardFooterStrip` |
 | Type     | `Eyebrow`, `Badge`                                                                                          |
 | Icons    | `Icon`, `IconButton`, `IconTile`                                                                            |
-| Controls | `Button`, `Field`, `Select`, `TextInput`, `Checkbox`, `Toggle`                                              |
+| Controls | `Button`, `Field`, `Select`, `Combobox`, `TextInput`, `Checkbox`, `Toggle`                                  |
 | Overlays | `Popover` (+ `useDismissable`), `Menu`                                                                      |
 | Feedback | `EmptyState`, `NoticeBar`, `Skeleton`                                                                       |
 | Data     | `Chip`, `DataTable`, `PaginationV2`                                                                         |
@@ -32,6 +32,8 @@ A file in this folder is a v2 primitive only if all of the following hold.
 `Icon` is the only file that imports an icon package. Call sites name a glyph by string, so swapping `@tabler/icons-react` for another set is a change to one map. Register a glyph in `Icon.tsx` before using it.
 
 `Select` has a `readout` variant that renders a read-only input rather than a disabled `select` — a greyed-out dropdown reads as broken rather than inactive.
+
+`Combobox` is a `Select` the learner can type into, for lists too long to scan (lesson numbers). Short lists like courses stay a `Select`. At rest it is the same 44px box; on focus the list opens and the current label is selected so the first keystroke starts a filter. Whole-word hits sort first, so "12" lists Lesson 12 before Lesson 112. Enter and click commit; Escape and blur revert to the committed value. It owns no data — callers pass `options` the same way they do for `Select`.
 
 `DataTable` takes the grid as custom properties rather than an inline `grid-template-columns`, so an optional `mobileLayout` can reflow the row below 768px — inline styles cannot carry a media query. A column names the area it occupies on mobile; a column with no area is hidden there, header included. The Finder's results row stacks Spanish over English and keeps the checkbox and chevron spanning both lines:
 

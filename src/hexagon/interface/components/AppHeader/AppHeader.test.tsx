@@ -112,6 +112,7 @@ describe('component AppHeader', () => {
     it('shows the student nav and who they are using the app as', async () => {
       overrideMockUseAppHeader({
         ...staff,
+        showStudentNav: true,
         isStaffUsingAsStudent: true,
         usingAs: { name: 'Ana Ruiz', email: 'ana@fake.not' },
       });
@@ -193,6 +194,9 @@ describe('component AppHeader', () => {
       expect(
         screen.queryByRole('menuitem', { name: /Log out/ }),
       ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('menuitem', { name: 'Settings' }),
+      ).toBeInTheDocument();
       expect(screen.getByText('Back to your admin view')).toBeInTheDocument();
 
       await userEvent.click(
@@ -222,7 +226,7 @@ describe('component AppHeader', () => {
     ).not.toBeInTheDocument();
     expect(
       screen.getAllByRole('menuitem').map((item) => item.textContent),
-    ).toEqual(['Log out']);
+    ).toEqual(['Settings']);
     expect(screen.queryByText('Using as')).not.toBeInTheDocument();
   });
 
@@ -249,6 +253,36 @@ describe('component AppHeader', () => {
     expect(screen.queryAllByRole('button')).toHaveLength(0);
     expect(
       screen.queryByRole('button', { name: /Log in/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('opens Settings from the account menu', async () => {
+    overrideMockUseAppHeader({
+      isAuthenticated: true,
+      isLoading: false,
+      isSignedIn: true,
+      studentName: 'Maria Silva',
+      studentEmail: 'maria@example.com',
+    });
+
+    function PathReadout(): JSX.Element {
+      const { pathname } = useLocation();
+      return <div data-testid="path">{pathname}</div>;
+    }
+
+    render(
+      <MemoryRouter initialEntries={['/quizzes']}>
+        <AppHeader />
+        <PathReadout />
+      </MemoryRouter>,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Account' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Settings' }));
+
+    expect(screen.getByTestId('path')).toHaveTextContent('/settings');
+    expect(
+      screen.queryByRole('menuitem', { name: /Log out/ }),
     ).not.toBeInTheDocument();
   });
 
@@ -295,14 +329,62 @@ describe('component AppHeader', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders centered nav children when given', () => {
-    overrideMockUseAppHeader({ isAuthenticated: false, isLoading: false });
+  it('renders the centered student nav for a student', () => {
+    overrideMockUseAppHeader({
+      isAuthenticated: true,
+      isLoading: false,
+      isSignedIn: true,
+      showStudentNav: true,
+    });
 
     renderHeader(<a href="/flashcardfinder">Flashcard Finder</a>);
 
     expect(
       screen.getByRole('link', { name: 'Flashcard Finder' }),
     ).toBeInTheDocument();
+  });
+
+  it('gives a limited or free user the account menu but no nav', () => {
+    overrideMockUseAppHeader({
+      isAuthenticated: true,
+      isLoading: false,
+      isSignedIn: true,
+      showStudentNav: false,
+    });
+
+    renderHeader(<a href="/flashcardfinder">Flashcard Finder</a>);
+
+    expect(screen.getByRole('button', { name: 'Account' })).toBeInTheDocument();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Flashcard Finder' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows only the brand before login, with no nav', () => {
+    overrideMockUseAppHeader({ isAuthenticated: false, isLoading: false });
+
+    renderHeader(<a href="/flashcardfinder">Flashcard Finder</a>);
+
+    expect(
+      screen.getByRole('link', { name: /LEARNCRAFT/ }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
+  });
+
+  it('keeps the brand, not the stack back arrow, on mobile before login', () => {
+    stubMobile(true);
+    overrideMockUseAppHeader({ isAuthenticated: false, isLoading: false });
+
+    renderHeader(undefined, '/officialquizzes');
+
+    expect(
+      screen.queryByRole('button', { name: 'Back' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'Choose a quiz' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows back and the page title on a mobile stack screen, without the account menu', async () => {

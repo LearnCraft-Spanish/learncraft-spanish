@@ -9,19 +9,23 @@ import iconWhite from 'src/assets/Icon_White.svg';
 import styles from './AppHeader.module.scss';
 
 interface AppHeaderProps {
-  /** Centered nav content on desktop; hidden below 768px. Optional — most pages pass nothing. */
+  /**
+   * The student nav, centered on desktop and hidden below 768px. Shown only
+   * to students and staff using the app as one.
+   */
   children?: ReactNode;
 }
 
 /**
- * The Celestial Blue app bar. `App` mounts this for v2 sessions: beta-tester
- * students, and every coach/admin. v2.2: the right slot is the account only —
- * no lesson number, no card count, no due count. Those belong on the page,
- * on cards.
+ * The Celestial Blue app bar. `App` mounts this for every visitor, logged in
+ * or not. v2.2: the right slot is the account only — no lesson number, no
+ * card count, no due count. Those belong on the page, on cards. Logged-out
+ * visitors get the brand alone; Log in lives on the LoggedOut screen.
  *
  * Coaches/admins not yet using the app as a student get a "Use as student"
  * button in place of the student nav. Once they are, the student nav returns
- * and the account menu reports who they are using the app as.
+ * and the account menu reports who they are using the app as. Limited and
+ * free users get the account menu with no nav at all.
  *
  * On mobile student-v2 stack screens (every student surface except Home)
  * the brand and account swap for a back arrow and the page title.
@@ -34,10 +38,10 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
     isStaff,
     staffRole,
     showUseAsStudent,
+    showStudentNav,
     isStaffUsingAsStudent,
     usingAs,
     stopUsingAsStudent,
-    logout,
     stack,
   } = useAppHeaderView();
   const navigate = useNavigate();
@@ -63,7 +67,7 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
     <AccountMenu
       studentName={studentName}
       studentEmail={studentEmail}
-      onLogOut={logout}
+      onOpenSettings={() => navigate('/settings')}
       usingAs={usingAs}
       onUseAsStudent={showUseAsStudent ? openFromAccount : undefined}
       onChangeStudent={isStaffUsingAsStudent ? openFromAccount : undefined}
@@ -125,6 +129,7 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
           />
         </div>
       ) : (
+        showStudentNav &&
         Boolean(children) && <nav className={styles.nav}>{children}</nav>
       )}
 
