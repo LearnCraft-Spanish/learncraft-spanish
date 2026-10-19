@@ -6,6 +6,7 @@ const defaultMockResult: UseSettingsResult = {
   email: 'maria@example.com',
   isLoading: false,
   passwordResetStatus: 'idle',
+  passwordResetCooldownSeconds: 0,
   requestPasswordReset: () => {},
   logout: () => {},
 };

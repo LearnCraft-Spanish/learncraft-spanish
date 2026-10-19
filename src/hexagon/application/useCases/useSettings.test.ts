@@ -11,6 +11,7 @@ import {
 import { useSettings } from '@application/useCases/useSettings';
 import { act, renderHook } from '@testing-library/react';
 import { createMockAppUser } from '@testing/factories/appUserFactories';
+import { toast } from 'react-toastify';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@application/adapters/authAdapter', () => ({
@@ -21,10 +22,19 @@ vi.mock('@application/queries/useMyData', () => ({
   useMyData: () => mockUseMyData,
 }));
 
+vi.mock('react-toastify', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
 describe('useSettings', () => {
   beforeEach(() => {
     resetMockAuthAdapter();
     resetMockUseMyData();
+    vi.mocked(toast.success).mockClear();
+    vi.mocked(toast.error).mockClear();
   });
 
   it('shows the signed-in user name and email', () => {
@@ -83,6 +93,10 @@ describe('useSettings', () => {
     expect(requestPasswordReset).toHaveBeenCalledOnce();
     expect(requestPasswordReset).toHaveBeenCalledWith('maria@example.com');
     expect(result.current.passwordResetStatus).toBe('sent');
+    expect(result.current.passwordResetCooldownSeconds).toBe(60);
+    expect(toast.success).toHaveBeenCalledWith(
+      'Your password reset email is on its way.',
+    );
   });
 
   it('records an error when the reset email is rejected', async () => {
@@ -102,6 +116,11 @@ describe('useSettings', () => {
     });
 
     expect(result.current.passwordResetStatus).toBe('error');
+    expect(result.current.passwordResetCooldownSeconds).toBe(0);
+    expect(toast.error).toHaveBeenCalledWith(
+      "We couldn't send the reset email. Please try again.",
+    );
+    expect(toast.success).not.toHaveBeenCalled();
   });
 
   it('does not ask for a reset when the account has no email', async () => {
@@ -149,6 +168,56 @@ describe('useSettings', () => {
     });
 
     expect(result.current.passwordResetStatus).toBe('sent');
+    expect(toast.success).toHaveBeenCalledOnce();
+  });
+
+  it('ignores another reset until a minute has passed', async () => {
+    vi.useFakeTimers();
+    try {
+      const requestPasswordReset = vi.fn<(email: string) => Promise<void>>(
+        async () => undefined,
+      );
+      overrideMockAuthAdapter({
+        authUser: { email: 'maria@example.com', roles: ['Student'] },
+        requestPasswordReset,
+      });
+
+      const { result } = renderHook(() => useSettings());
+
+      await act(async () => {
+        result.current.requestPasswordReset();
+      });
+
+      expect(result.current.passwordResetCooldownSeconds).toBe(60);
+
+      await act(async () => {
+        result.current.requestPasswordReset();
+      });
+      expect(requestPasswordReset).toHaveBeenCalledOnce();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(59_000);
+      });
+
+      expect(result.current.passwordResetCooldownSeconds).toBe(1);
+      await act(async () => {
+        result.current.requestPasswordReset();
+      });
+      expect(requestPasswordReset).toHaveBeenCalledOnce();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1_000);
+      });
+
+      expect(result.current.passwordResetCooldownSeconds).toBe(0);
+
+      await act(async () => {
+        result.current.requestPasswordReset();
+      });
+      expect(requestPasswordReset).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('forwards logout to the auth adapter', () => {

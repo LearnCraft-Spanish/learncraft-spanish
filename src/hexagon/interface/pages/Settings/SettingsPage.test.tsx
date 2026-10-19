@@ -70,24 +70,36 @@ describe('settings page', () => {
     expect(screen.getByRole('button', { name: 'Sending...' })).toBeDisabled();
   });
 
-  it('confirms when the reset email has been sent', () => {
-    overrideMockUseSettings({ passwordResetStatus: 'sent' });
+  it('keeps the reset hint and locks the button during the cooldown', () => {
+    overrideMockUseSettings({
+      passwordResetStatus: 'sent',
+      passwordResetCooldownSeconds: 60,
+    });
 
     render(<SettingsPage />);
 
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Check your email for a link to choose a new password.',
-    );
+    expect(
+      screen.getByText("We'll email you a link to choose a new password."),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Try again in 60s' }),
+    ).toBeDisabled();
   });
 
-  it('shows an error when the reset email cannot be sent', () => {
+  it('keeps the reset hint when the reset email cannot be sent', () => {
     overrideMockUseSettings({ passwordResetStatus: 'error' });
 
     render(<SettingsPage />);
 
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      "We couldn't send the reset email. Please try again.",
-    );
+    expect(
+      screen.getByText("We'll email you a link to choose a new password."),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reset password' }),
+    ).toBeEnabled();
   });
 
   it('logs out from the page', async () => {

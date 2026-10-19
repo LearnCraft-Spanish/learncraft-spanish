@@ -1,3 +1,4 @@
+import type { PasswordResetStatus } from '@application/useCases/useSettings';
 import type { JSX } from 'react';
 import { useSettings } from '@application/useCases/useSettings';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
@@ -5,6 +6,19 @@ import { Card, CardSection } from '@interface/components/general/Card/Card';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { Loading } from '@interface/components/Loading';
 import styles from './SettingsPage.module.scss';
+
+function resetPasswordLabel(
+  status: PasswordResetStatus,
+  cooldownSeconds: number,
+): string {
+  if (status === 'sending') {
+    return 'Sending...';
+  }
+  if (cooldownSeconds > 0) {
+    return `Try again in ${cooldownSeconds}s`;
+  }
+  return 'Reset password';
+}
 
 /**
  * Signed-in account settings for every role on the v2 chrome. Name and email
@@ -17,6 +31,7 @@ export function SettingsPage(): JSX.Element {
     email,
     isLoading,
     passwordResetStatus,
+    passwordResetCooldownSeconds,
     requestPasswordReset,
     logout,
   } = useSettings();
@@ -51,26 +66,21 @@ export function SettingsPage(): JSX.Element {
               <Button
                 variant="ghost"
                 size="inline"
-                disabled={passwordResetStatus === 'sending' || email === null}
+                disabled={
+                  passwordResetStatus === 'sending' ||
+                  passwordResetCooldownSeconds > 0 ||
+                  email === null
+                }
                 onClick={requestPasswordReset}
               >
-                {passwordResetStatus === 'sending'
-                  ? 'Sending...'
-                  : 'Reset password'}
+                {resetPasswordLabel(
+                  passwordResetStatus,
+                  passwordResetCooldownSeconds,
+                )}
               </Button>
               <p className={styles.hint}>
                 {"We'll email you a link to choose a new password."}
               </p>
-              {passwordResetStatus === 'sent' && (
-                <p className={styles.status} role="status">
-                  Check your email for a link to choose a new password.
-                </p>
-              )}
-              {passwordResetStatus === 'error' && (
-                <p className={styles.error} role="alert">
-                  {"We couldn't send the reset email. Please try again."}
-                </p>
-              )}
             </div>
           </CardSection>
           <CardSection divided>
