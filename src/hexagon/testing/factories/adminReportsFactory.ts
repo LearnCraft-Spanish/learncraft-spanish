@@ -7,6 +7,7 @@ import {
   coachSummaryDrilldownSchema,
   coachSummarySchema,
   groupCallsByCoachSchema,
+  lapsedLongTermCoachingStudentSchema,
   leadsToReEngageSchema,
   membershipsByCoachSchema,
   weeklyTimeCommitmentByCoachSchema,
@@ -85,4 +86,11 @@ export const createMockLeadsToReEngage = createZodFactory(
 );
 export const createMockLeadsToReEngageList = createZodListFactory(
   leadsToReEngageSchema,
+);
+
+export const createMockLapsedLongTermCoachingStudent = createZodFactory(
+  lapsedLongTermCoachingStudentSchema,
+);
+export const createMockLapsedLongTermCoachingStudentList = createZodListFactory(
+  lapsedLongTermCoachingStudentSchema,
 );

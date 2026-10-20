@@ -1,4 +1,5 @@
 import { CoachCapacityReport } from '@interface/components/CoachCapacity';
+import { LapsedLongTermCoachingStudentsReport } from '@interface/components/LapsedLongTermCoachingStudents';
 import { Loading } from '@interface/components/Loading';
 import {
   ActiveMemberships,
@@ -36,6 +37,7 @@ export default function AdminDashboard() {
             <DropoutsByLevel />
             <AssignmentsCompletedByWeek />
           </div>
+          <LapsedLongTermCoachingStudentsReport />
         </>
       )}
     </div>

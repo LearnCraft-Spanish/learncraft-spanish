@@ -11,6 +11,7 @@ import type {
   CoachSummary,
   CoachSummaryDrilldown,
   GroupCallsByCoach,
+  LapsedLongTermCoachingStudent,
   LeadsToReEngage,
   MembershipsByCoach,
   PrivateCallsByCoach,
@@ -24,6 +25,7 @@ import {
   getCoachCapacityTwoWeeksOutReportEndpoint,
   getDropoutsByLevelReportEndpoint,
   getGroupCallsByCoachReportEndpoint,
+  getLapsedLongTermCoachingStudentsReportEndpoint,
   getLastWeekCoachSummaryReportEndpoint,
   getLeadsToReEngageReportEndpoint,
   getMembershipsByCoachCurrentReportEndpoint,
@@ -123,6 +125,11 @@ export function createAdminReportsInfrastructure(
       httpClient.get<LeadsToReEngage[]>(
         getLeadsToReEngageReportEndpoint.path,
         getLeadsToReEngageReportEndpoint.requiredScopes,
+      ),
+    getLapsedLongTermCoachingStudentsReport: () =>
+      httpClient.get<LapsedLongTermCoachingStudent[]>(
+        getLapsedLongTermCoachingStudentsReportEndpoint.path,
+        getLapsedLongTermCoachingStudentsReportEndpoint.requiredScopes,
       ),
     getCoachCapacityTodayReport: () =>
       httpClient.get<CoachCapacityReportRow[]>(
