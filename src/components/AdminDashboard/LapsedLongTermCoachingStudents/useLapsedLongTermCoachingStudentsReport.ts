@@ -1,10 +1,11 @@
+import type { LapsedLongTermCoachingStudent } from '@learncraft-spanish/shared';
 import type {
   LapsedStudentFilterOption,
   LapsedStudentSort,
   LapsedStudentSortColumn,
-} from '@domain/functions/lapsedLongTermCoachingStudents';
-import type { LapsedLongTermCoachingStudent } from '@learncraft-spanish/shared';
-import { useLapsedLongTermCoachingStudentsReportQuery } from '@application/queries/AdminReportQueries/useLapsedLongTermCoachingStudentsReportQuery';
+} from './lapsedLongTermCoachingStudents';
+import { useCallback, useMemo, useState } from 'react';
+import useLapsedLongTermCoachingStudents from 'src/hooks/AdminData/useLapsedLongTermCoachingStudents';
 import {
   arrangeLapsedLongTermCoachingStudents,
   DEFAULT_LAPSED_STUDENT_SORT,
@@ -13,8 +14,7 @@ import {
   lapsedStudentMembershipTypeOptions,
   lapsedStudentSortForColumn,
   toggleLapsedStudentSortDirection,
-} from '@domain/functions/lapsedLongTermCoachingStudents';
-import { useCallback, useMemo, useState } from 'react';
+} from './lapsedLongTermCoachingStudents';
 
 const NO_STUDENTS: LapsedLongTermCoachingStudent[] = [];
 
@@ -43,7 +43,7 @@ export interface UseLapsedLongTermCoachingStudentsReportResult {
 
 export function useLapsedLongTermCoachingStudentsReport(): UseLapsedLongTermCoachingStudentsReportResult {
   const { lapsedLongTermCoachingStudentsReportQuery } =
-    useLapsedLongTermCoachingStudentsReportQuery();
+    useLapsedLongTermCoachingStudents();
   const { data, isLoading, isError, isSuccess } =
     lapsedLongTermCoachingStudentsReportQuery;
   const [search, setSearch] = useState('');

@@ -1,4 +1,5 @@
 import type { LapsedLongTermCoachingStudent } from '@learncraft-spanish/shared';
+import { describe, expect, it } from 'vitest';
 import {
   arrangeLapsedLongTermCoachingStudents,
   DEFAULT_LAPSED_STUDENT_SORT,
@@ -7,8 +8,7 @@ import {
   lapsedStudentMembershipTypeOptions,
   lapsedStudentSortForColumn,
   toggleLapsedStudentSortDirection,
-} from '@domain/functions/lapsedLongTermCoachingStudents';
-import { describe, expect, it } from 'vitest';
+} from './lapsedLongTermCoachingStudents';
 
 function student(
   id: number,

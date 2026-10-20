@@ -1,23 +1,18 @@
 import type { LapsedLongTermCoachingStudent } from '@learncraft-spanish/shared';
 import type { UseQueryResult } from '@tanstack/react-query';
-import { useLapsedLongTermCoachingStudentsReportQuery } from '@application/queries/AdminReportQueries/useLapsedLongTermCoachingStudentsReportQuery';
-import {
-  mockUseLapsedLongTermCoachingStudentsReportQuery,
-  overrideMockUseLapsedLongTermCoachingStudentsReportQuery,
-  resetMockUseLapsedLongTermCoachingStudentsReportQuery,
-} from '@application/queries/AdminReportQueries/useLapsedLongTermCoachingStudentsReportQuery.mock';
-import { useLapsedLongTermCoachingStudentsReport } from '@application/useCases/useLapsedLongTermCoachingStudentsReport/useLapsedLongTermCoachingStudentsReport';
 import { act, renderHook } from '@testing-library/react';
+import useLapsedLongTermCoachingStudents from 'src/hooks/AdminData/useLapsedLongTermCoachingStudents';
+import {
+  mockUseLapsedLongTermCoachingStudents,
+  overrideMockUseLapsedLongTermCoachingStudents,
+  resetMockUseLapsedLongTermCoachingStudents,
+} from 'src/hooks/AdminData/useLapsedLongTermCoachingStudents.mock';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useLapsedLongTermCoachingStudentsReport } from './useLapsedLongTermCoachingStudentsReport';
 
-vi.mock(
-  '@application/queries/AdminReportQueries/useLapsedLongTermCoachingStudentsReportQuery',
-  () => ({
-    useLapsedLongTermCoachingStudentsReportQuery: vi.fn(
-      () => mockUseLapsedLongTermCoachingStudentsReportQuery,
-    ),
-  }),
-);
+vi.mock('src/hooks/AdminData/useLapsedLongTermCoachingStudents', () => ({
+  default: vi.fn(() => mockUseLapsedLongTermCoachingStudents),
+}));
 
 function queryResult(
   overrides: Partial<UseQueryResult<LapsedLongTermCoachingStudent[]>>,
@@ -62,11 +57,11 @@ const zoe: LapsedLongTermCoachingStudent = {
 
 describe('useLapsedLongTermCoachingStudentsReport', () => {
   beforeEach(() => {
-    resetMockUseLapsedLongTermCoachingStudentsReportQuery();
+    resetMockUseLapsedLongTermCoachingStudents();
   });
 
   it('starts on newest membership first and narrows when a coach or membership type is chosen', () => {
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: queryResult({
         data: [zoe, amy],
         isSuccess: true,
@@ -103,7 +98,7 @@ describe('useLapsedLongTermCoachingStudentsReport', () => {
   });
 
   it('narrows by a case-insensitive name or email search', () => {
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: queryResult({
         data: [zoe, amy],
         isSuccess: true,
@@ -130,7 +125,7 @@ describe('useLapsedLongTermCoachingStudentsReport', () => {
   });
 
   it('sorts by coach and flips the direction', () => {
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: queryResult({
         data: [amy, zoe],
         isSuccess: true,
@@ -161,7 +156,7 @@ describe('useLapsedLongTermCoachingStudentsReport', () => {
   });
 
   it('passes through loading and error without inventing students', () => {
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: queryResult({
         isLoading: true,
         status: 'pending',
@@ -173,7 +168,7 @@ describe('useLapsedLongTermCoachingStudentsReport', () => {
     expect(loading.result.current.students).toEqual([]);
     loading.unmount();
 
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: queryResult({
         isError: true,
         status: 'error',
@@ -186,6 +181,6 @@ describe('useLapsedLongTermCoachingStudentsReport', () => {
     expect(result.current.isError).toBe(true);
     expect(result.current.isSuccess).toBe(false);
     expect(result.current.students).toEqual([]);
-    expect(useLapsedLongTermCoachingStudentsReportQuery).toHaveBeenCalled();
+    expect(useLapsedLongTermCoachingStudents).toHaveBeenCalled();
   });
 });

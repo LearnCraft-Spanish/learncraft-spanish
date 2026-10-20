@@ -1,24 +1,19 @@
 import type { LapsedLongTermCoachingStudent } from '@learncraft-spanish/shared';
 import type { UseQueryResult } from '@tanstack/react-query';
-import { useLapsedLongTermCoachingStudentsReportQuery } from '@application/queries/AdminReportQueries/useLapsedLongTermCoachingStudentsReportQuery';
-import {
-  mockUseLapsedLongTermCoachingStudentsReportQuery,
-  overrideMockUseLapsedLongTermCoachingStudentsReportQuery,
-  resetMockUseLapsedLongTermCoachingStudentsReportQuery,
-} from '@application/queries/AdminReportQueries/useLapsedLongTermCoachingStudentsReportQuery.mock';
-import { LAPSED_STUDENT_ALL } from '@domain/functions/lapsedLongTermCoachingStudents';
-import { LapsedLongTermCoachingStudentsReport } from '@interface/components/LapsedLongTermCoachingStudents';
 import { fireEvent, render, screen } from '@testing-library/react';
+import useLapsedLongTermCoachingStudents from 'src/hooks/AdminData/useLapsedLongTermCoachingStudents';
+import {
+  mockUseLapsedLongTermCoachingStudents,
+  overrideMockUseLapsedLongTermCoachingStudents,
+  resetMockUseLapsedLongTermCoachingStudents,
+} from 'src/hooks/AdminData/useLapsedLongTermCoachingStudents.mock';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { LAPSED_STUDENT_ALL } from './lapsedLongTermCoachingStudents';
+import LapsedLongTermCoachingStudentsReport from './LapsedLongTermCoachingStudentsReport';
 
-vi.mock(
-  '@application/queries/AdminReportQueries/useLapsedLongTermCoachingStudentsReportQuery',
-  () => ({
-    useLapsedLongTermCoachingStudentsReportQuery: vi.fn(
-      () => mockUseLapsedLongTermCoachingStudentsReportQuery,
-    ),
-  }),
-);
+vi.mock('src/hooks/AdminData/useLapsedLongTermCoachingStudents', () => ({
+  default: vi.fn(() => mockUseLapsedLongTermCoachingStudents),
+}));
 
 const TITLE = 'Lapsed Long-Term Coaching Students';
 
@@ -85,8 +80,8 @@ function students(count: number): LapsedLongTermCoachingStudent[] {
 
 describe('lapsed long-term coaching students report', () => {
   beforeEach(() => {
-    resetMockUseLapsedLongTermCoachingStudentsReportQuery();
-    vi.mocked(useLapsedLongTermCoachingStudentsReportQuery).mockClear();
+    resetMockUseLapsedLongTermCoachingStudents();
+    vi.mocked(useLapsedLongTermCoachingStudents).mockClear();
   });
 
   it('stays collapsed and does not fetch until it is opened', () => {
@@ -94,11 +89,11 @@ describe('lapsed long-term coaching students report', () => {
 
     expect(screen.getByText(TITLE)).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(useLapsedLongTermCoachingStudentsReportQuery).not.toHaveBeenCalled();
+    expect(useLapsedLongTermCoachingStudents).not.toHaveBeenCalled();
   });
 
   it('lists each student with their coach and previous memberships, newest first', () => {
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: successfulQueryResult([ada]),
     });
 
@@ -119,7 +114,7 @@ describe('lapsed long-term coaching students report', () => {
   });
 
   it('shows a dash when no previous coach was recorded, and the course alone when dates are blank', () => {
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: successfulQueryResult([
         noCoach,
       ]),
@@ -135,7 +130,7 @@ describe('lapsed long-term coaching students report', () => {
   });
 
   it('shows no records when nobody qualifies', () => {
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: successfulQueryResult([]),
     });
 
@@ -147,7 +142,7 @@ describe('lapsed long-term coaching students report', () => {
   });
 
   it('shows a loading message while the report is fetching', () => {
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: {
         data: undefined,
         isLoading: true,
@@ -164,7 +159,7 @@ describe('lapsed long-term coaching students report', () => {
   });
 
   it('shows an error when the report fails to load', () => {
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: {
         data: undefined,
         isLoading: false,
@@ -181,7 +176,7 @@ describe('lapsed long-term coaching students report', () => {
   });
 
   it('pages the list 20 students at a time', () => {
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: successfulQueryResult(
         students(21),
       ),
@@ -232,7 +227,7 @@ describe('lapsed long-term coaching students report', () => {
         },
       ],
     };
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: successfulQueryResult([
         zoe,
         amy,
@@ -310,7 +305,7 @@ describe('lapsed long-term coaching students report', () => {
   });
 
   it('searches students by name or email, ignoring case', () => {
-    overrideMockUseLapsedLongTermCoachingStudentsReportQuery({
+    overrideMockUseLapsedLongTermCoachingStudents({
       lapsedLongTermCoachingStudentsReportQuery: successfulQueryResult([
         ada,
         noCoach,

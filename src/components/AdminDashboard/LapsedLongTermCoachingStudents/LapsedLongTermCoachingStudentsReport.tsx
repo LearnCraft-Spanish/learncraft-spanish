@@ -1,10 +1,8 @@
-import type { UseLapsedLongTermCoachingStudentsReportResult } from '@application/useCases/useLapsedLongTermCoachingStudentsReport/useLapsedLongTermCoachingStudentsReport';
-import type { LapsedStudentSort } from '@domain/functions/lapsedLongTermCoachingStudents';
 import type { LapsedLongTermCoachingStudent } from '@learncraft-spanish/shared';
 import type { JSX } from 'react';
+import type { LapsedStudentSort } from './lapsedLongTermCoachingStudents';
+import type { UseLapsedLongTermCoachingStudentsReportResult } from './useLapsedLongTermCoachingStudentsReport';
 import { usePagination } from '@application/units/Pagination/usePagination';
-import { useLapsedLongTermCoachingStudentsReport } from '@application/useCases/useLapsedLongTermCoachingStudentsReport/useLapsedLongTermCoachingStudentsReport';
-import { isLapsedStudentSortColumn } from '@domain/functions/lapsedLongTermCoachingStudents';
 import { Button } from '@interface/components/general/Buttons/Button/Button';
 import { Field } from '@interface/components/general/Field/Field';
 import Pagination from '@interface/components/general/Pagination/Pagination';
@@ -17,7 +15,9 @@ import {
   MultiSelectSearch,
   SelectedOptionChips,
 } from 'src/components/AdminDashboard/MultiSelectSearch';
+import { isLapsedStudentSortColumn } from './lapsedLongTermCoachingStudents';
 import styles from './LapsedLongTermCoachingStudentsReport.module.scss';
+import { useLapsedLongTermCoachingStudentsReport } from './useLapsedLongTermCoachingStudentsReport';
 
 const TITLE = 'Lapsed Long-Term Coaching Students';
 const STUDENTS_PER_PAGE = 20;
@@ -255,7 +255,7 @@ function LapsedLongTermCoachingStudentsBody(): JSX.Element | null {
   );
 }
 
-export function LapsedLongTermCoachingStudentsReport(): JSX.Element {
+export default function LapsedLongTermCoachingStudentsReport(): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
 
   return (

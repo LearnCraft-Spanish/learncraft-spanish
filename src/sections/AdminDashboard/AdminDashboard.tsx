@@ -1,11 +1,11 @@
 import { CoachCapacityReport } from '@interface/components/CoachCapacity';
-import { LapsedLongTermCoachingStudentsReport } from '@interface/components/LapsedLongTermCoachingStudents';
 import { Loading } from '@interface/components/Loading';
 import {
   ActiveMemberships,
   AssignmentsCompletedByWeek,
   CallsByCoach,
   DropoutsByLevel,
+  LapsedLongTermCoachingStudentsReport,
   LeadsToReEngage,
   MembershipsByCoachReports,
   StudentsBySalariedCoach,
