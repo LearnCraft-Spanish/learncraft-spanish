@@ -5,6 +5,7 @@ import {
   AssignmentsCompletedByWeek,
   CallsByCoach,
   DropoutsByLevel,
+  LapsedLongTermCoachingStudentsReport,
   LeadsToReEngage,
   MembershipsByCoachReports,
   StudentsBySalariedCoach,
@@ -36,6 +37,7 @@ export default function AdminDashboard() {
             <DropoutsByLevel />
             <AssignmentsCompletedByWeek />
           </div>
+          <LapsedLongTermCoachingStudentsReport />
         </>
       )}
     </div>
