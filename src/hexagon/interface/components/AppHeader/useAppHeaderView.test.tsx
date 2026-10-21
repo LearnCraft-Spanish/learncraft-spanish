@@ -99,6 +99,46 @@ describe('useAppHeaderView', () => {
     expect(typeof result.current.stack?.onBack).toBe('function');
   });
 
+  describe('showUseAsStudentButton', () => {
+    it('shows the header button on the home menu and keeps the account offer everywhere else', () => {
+      overrideMockUseAppHeader({
+        isStaff: true,
+        showUseAsStudent: true,
+        showStudentNav: false,
+      });
+
+      const home = renderHook(() => useAppHeaderView(), {
+        wrapper: wrapperFor('/'),
+      });
+      expect(home.result.current.showUseAsStudent).toBe(true);
+      expect(home.result.current.showUseAsStudentButton).toBe(true);
+      expect(home.result.current.showStudentNav).toBe(false);
+
+      for (const path of ['/admin-dashboard', '/coaching-dashboard']) {
+        const { result } = renderHook(() => useAppHeaderView(), {
+          wrapper: wrapperFor(path),
+        });
+        expect(result.current.showUseAsStudent).toBe(true);
+        expect(result.current.showUseAsStudentButton).toBe(false);
+        expect(result.current.showStudentNav).toBe(false);
+      }
+    });
+
+    it('stays off on home when use-as-student is not offered', () => {
+      overrideMockUseAppHeader({
+        showUseAsStudent: false,
+        showStudentNav: true,
+      });
+
+      const { result } = renderHook(() => useAppHeaderView(), {
+        wrapper: wrapperFor('/'),
+      });
+
+      expect(result.current.showUseAsStudentButton).toBe(false);
+      expect(result.current.showStudentNav).toBe(true);
+    });
+  });
+
   it('lets an in-page override replace the title and back handler', () => {
     stubMobile(true);
     overrideMockUseStudentUiVersion({ version: 'v2' });
