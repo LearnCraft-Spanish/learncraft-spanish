@@ -3,7 +3,6 @@ import type { IconName } from '@interface/components/general/Icon/Icon';
 import type { JSX } from 'react';
 import { useHomeScreen } from '@application/useCases/useHomeScreen';
 import { PrimaryTabBar } from '@interface/components/AppHeader/PrimaryTabBar';
-import { Icon } from '@interface/components/general/Icon/Icon';
 import { PageShell } from '@interface/components/general/PageShell/PageShell';
 import { EntryCard } from '@interface/components/home/EntryCard/EntryCard';
 import { HelpRow } from '@interface/components/home/HelpRow/HelpRow';
@@ -48,15 +47,6 @@ export function HomeV2Loaded({ cta, entries }: HomeV2LoadedProps): JSX.Element {
 
         <div className={styles.footer}>
           <HelpRow onGo={() => navigate('/get-help')} />
-          <a
-            className={styles.feedbackLink}
-            href="mailto:info@learncraftspanish.com"
-          >
-            <span className={styles.feedbackLabel}>
-              give feedback / report a bug
-            </span>
-            <Icon name="chevronRight" size="inline" tone="inherit" />
-          </a>
         </div>
       </div>
     </PageShell>

@@ -127,15 +127,6 @@ describe('home v2', () => {
     expect(screen.getByText('Help & walkthroughs')).toBeInTheDocument();
   });
 
-  it('opens a mailto to info@learncraftspanish.com from the feedback link', () => {
-    overrideMockUseHomeScreen(readyPreset);
-    renderHome();
-
-    expect(
-      screen.getByRole('link', { name: 'give feedback / report a bug' }),
-    ).toHaveAttribute('href', 'mailto:info@learncraftspanish.com');
-  });
-
   it('does not show the feedback link while the home screen is loading', () => {
     overrideMockUseHomeScreen({
       cta: DEFAULT_HOME_PRESET.cta,
