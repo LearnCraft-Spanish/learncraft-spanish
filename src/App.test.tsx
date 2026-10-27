@@ -384,7 +384,8 @@ describe('app', () => {
 
     it('can open the Flashcard Finder without using the app as a student', async () => {
       asCoachWithStudentRole();
-      const { getByRole, queryByText } = renderAppAtRoute('/flashcardfinder');
+      const { getByRole, queryByRole, queryByText } =
+        renderAppAtRoute('/flashcardfinder');
 
       await waitFor(
         () => {
@@ -395,11 +396,18 @@ describe('app', () => {
         { timeout: 5000 },
       );
       expect(queryByText('Coaching Tools')).not.toBeInTheDocument();
+      expect(
+        queryByRole('button', { name: 'Use as student' }),
+      ).not.toBeInTheDocument();
+      expect(
+        queryByRole('link', { name: 'Flashcard Finder' }),
+      ).not.toBeInTheDocument();
     });
 
     it('can open Custom Quiz without using the app as a student', async () => {
       asCoachWithStudentRole();
-      const { getAllByRole, queryByText } = renderAppAtRoute('/customquiz');
+      const { getAllByRole, queryByRole, queryByText } =
+        renderAppAtRoute('/customquiz');
 
       await waitFor(
         () => {
@@ -410,12 +418,24 @@ describe('app', () => {
         { timeout: 5000 },
       );
       expect(queryByText('Coaching Tools')).not.toBeInTheDocument();
+      expect(
+        queryByRole('button', { name: 'Use as student' }),
+      ).not.toBeInTheDocument();
     });
 
     it('goes from the Student Tools Custom Quiz button to the v2 quiz setup', async () => {
       asCoachWithStudentRole();
       const user = userEvent.setup();
-      const { findByRole, findAllByRole, queryByText } = renderAppAtRoute('/');
+      const { findByRole, findAllByRole, queryByRole, queryByText } =
+        renderAppAtRoute('/');
+
+      expect(
+        await findByRole(
+          'button',
+          { name: 'Use as student' },
+          { timeout: 5000 },
+        ),
+      ).toBeInTheDocument();
 
       await user.click(
         await findByRole('link', { name: 'Custom Quiz' }, { timeout: 5000 }),
@@ -431,6 +451,9 @@ describe('app', () => {
         ).length,
       ).toBeGreaterThan(0);
       expect(queryByText('Coaching Tools')).not.toBeInTheDocument();
+      expect(
+        queryByRole('button', { name: 'Use as student' }),
+      ).not.toBeInTheDocument();
     });
 
     it('is still sent away from other student tools until using the app as a student', async () => {
@@ -446,6 +469,9 @@ describe('app', () => {
       expect(
         queryByRole('heading', { name: 'Flashcard Manager' }),
       ).not.toBeInTheDocument();
+      expect(
+        queryByRole('button', { name: 'Use as student' }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -459,10 +485,11 @@ describe('app', () => {
       isStudent: false,
       isLimited: false,
     });
-    const { getByText } = renderApp();
+    const { getByRole, getByText } = renderApp();
 
     await waitFor(() => {
       expect(getByText('Example Manager')).toBeInTheDocument();
     });
+    expect(getByRole('button', { name: 'Use as student' })).toBeInTheDocument();
   });
 });
