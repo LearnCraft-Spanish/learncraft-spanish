@@ -6,6 +6,7 @@ import type {
   CoachSummary,
   CoachSummaryDrilldown,
   GroupCallsByCoach,
+  LapsedLongTermCoachingStudent,
   LeadsToReEngage,
   MembershipsByCoach,
   PrivateCallsByCoach,
@@ -47,6 +48,9 @@ export interface AdminReportsPort {
     WeeklyTimeCommitmentByCoach[]
   >;
   getLeadsToReEngageReport: () => Promise<LeadsToReEngage[]>;
+  getLapsedLongTermCoachingStudentsReport: () => Promise<
+    LapsedLongTermCoachingStudent[]
+  >;
   getCoachCapacityTodayReport: () => Promise<CoachCapacityReportRow[]>;
   getCoachCapacityTwoWeeksOutReport: () => Promise<CoachCapacityReportRow[]>;
   updateCoachCapacitySettings: (

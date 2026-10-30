@@ -220,6 +220,10 @@ _Schema_: `groupCall`
 Coaching Students who have gone inactive or quiet, grouped by Coach, for follow-up.
 _Schema_: `coach`
 
+**Lapsed Long-Term Coaching Student**:
+A Coaching Student who had regular or premier coaching for at least nine months and has had no active Membership for at least nine months. The Admin Dashboard lists them with the coach they last had and their previous Memberships, and can search that list by name or email, filter it by coach or any combination of membership types, and sort it by coach, membership type, or most recent membership. Filters choose which students appear; each student still shows every previous Membership.
+_Schema_: `coach`
+
 ## Tools
 
 **Flashcard Finder**:
@@ -254,7 +258,7 @@ _Avoid_: Student Details
 Admin tools for creating, editing, and searching Examples, including the **Example Assigner** for assigning Examples.
 
 **Admin Dashboard**:
-Admin-only reports, such as Leads to Re-engage.
+Admin-only reports, such as Leads to Re-engage and Lapsed Long-Term Coaching Students.
 
 **Database Tables**:
 Admin-only screens for editing raw records such as Courses, Lessons, and Quiz Groups.
