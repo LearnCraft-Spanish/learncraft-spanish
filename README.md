@@ -17,12 +17,13 @@ A web application for learning Spanish, built with React, TypeScript, and hexago
 ```bash
 git clone <repository-url>
 cd learncraft-spanish
+doppler login && doppler setup # env vars come from Doppler; see documentation/SECRETS.md
+pnpm setup:npm-auth            # GitHub Packages token into ~/.npmrc
 pnpm install:local
-cp .env.development .env   # edit with your Auth0/API credentials
-pnpm start                 # http://localhost:5173
+pnpm start                     # http://localhost:5173
 ```
 
-**Prerequisites**: Node.js >= 24, pnpm >= 7, Git.
+**Prerequisites**: Node.js >= 24, pnpm >= 7, Git, Doppler CLI.
 
 ---
 

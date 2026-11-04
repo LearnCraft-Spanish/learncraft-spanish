@@ -6,7 +6,6 @@ interface Config {
   auth0Domain: string;
   backendDomain: string;
   environment: string;
-  localDomain: string;
 }
 
 export const config: Config = {
@@ -15,5 +14,4 @@ export const config: Config = {
   auth0Domain: viteConsts.VITE_AUTH0_DOMAIN,
   backendDomain: viteConsts.VITE_BACKEND_DOMAIN,
   environment: viteConsts.VITE_ENVIRONMENT,
-  localDomain: viteConsts.VITE_LOCAL_DOMAIN,
 };

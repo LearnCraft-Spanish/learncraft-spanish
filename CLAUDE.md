@@ -14,6 +14,7 @@ For the full documentation hierarchy (architecture, patterns, standards, etc.), 
 - **Dependencies flow inward only** — Domain → Application → Infrastructure/Interface → Composition.
 - **One use case per page** — Interface pages call exactly one use case hook.
 - **New code goes in `src/hexagon/`** — Never extend legacy code outside the hexagon.
+- **Env vars come from Doppler** — `pnpm start` loads them via `doppler run` (needs network access). Only public values get a `VITE_` prefix. Read `documentation/SECRETS.md` before adding a variable or touching CI/Netlify secrets.
 
 ---
 
@@ -58,7 +59,7 @@ Guidance for Cloud Agents setting up and running this repo in a fresh VM.
 
 ### Required secret
 
-- **`GH_PACKAGE_KEY`** — a GitHub token with `read:packages` for the `LearnCraft-Spanish` org. Every install path fetches the private `@learncraft-spanish/shared` package from GitHub Packages (`npm.pkg.github.com`), so installs fail without it (anonymous → 401; a repo-scoped token → 403). `.npmrc` already references `${GH_PACKAGE_KEY}`; just export it in the environment. This is the same secret CI uses.
+- **`GH_PACKAGE_KEY`** — a GitHub token with `read:packages` for the `LearnCraft-Spanish` org. Every install path fetches the private `@learncraft-spanish/shared` package from GitHub Packages (`npm.pkg.github.com`), so installs fail without it (anonymous → 401; a repo-scoped token → 403). `.npmrc` already references `${GH_PACKAGE_KEY}`; just export it in the environment (pnpm 9.7.1 expands it). Cloud VMs have no Doppler CLI.
 - Optional (only for a real authenticated login flow): `VITE_AUTH0_DOMAIN`, `VITE_AUTH0_CLIENTID`, `VITE_API_AUDIENCE`, `VITE_BACKEND_DOMAIN`. Without them the dev server, build, and hexagon tests still work, and the app renders its public login screen with placeholder values.
 
 ### Node version (important)
@@ -84,20 +85,16 @@ pnpm install:ci           # frozen install from lockfiles/ci; needs GH_PACKAGE_K
 
 ### Run the app
 
-Create `.env` (placeholders are fine for a non-authenticated demo), then start Vite:
+`pnpm start` needs Doppler, so export placeholders (fine for a non-authenticated demo) and run Vite directly. Don't write a `.env` file:
 
 ```bash
-cat > .env <<'EOF'
-VITE_API_AUDIENCE=https://api.learncraftspanish.com
-VITE_AUTH0_DOMAIN=dev-placeholder.us.auth0.com
-VITE_AUTH0_CLIENTID=placeholderClientId
-VITE_LOCAL_DOMAIN=http://localhost:5173
-VITE_BACKEND_DOMAIN=http://localhost:3000
-REACT_APP_BACKEND_URL=http://localhost:3000
-VITE_ENVIRONMENT=development
-VITE_PORT=5173
-EOF
-pnpm start -- --host 0.0.0.0 --port 5173   # http://localhost:5173
+export VITE_API_AUDIENCE=https://api.learncraftspanish.com
+export VITE_AUTH0_DOMAIN=dev-placeholder.us.auth0.com
+export VITE_AUTH0_CLIENTID=placeholderClientId
+export VITE_BACKEND_DOMAIN=http://localhost:3000/
+export VITE_ENVIRONMENT=development
+export VITE_PORT=5173
+pnpm exec vite --host 0.0.0.0 --port 5173   # http://localhost:5173
 ```
 
 The app is login-gated: with placeholder Auth0 values it renders the public "You must be logged in to use this app." landing screen (no real login completes).

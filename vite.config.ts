@@ -3,10 +3,9 @@ import path from 'node:path';
 import process from 'node:process';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import react from '@vitejs/plugin-react';
-import dotenv from 'dotenv';
 import { defineConfig, loadEnv } from 'vite';
 
-dotenv.config();
+import envGuard from './vite-plugins/env-guard.js';
 
 export default defineConfig(({ mode }) => {
   // Load environment variables based on the mode
@@ -21,6 +20,7 @@ export default defineConfig(({ mode }) => {
   return {
     environment: 'jsdom',
     plugins: [
+      envGuard(),
       react(),
       sentryVitePlugin({
         authToken: process.env.SENTRY_AUTH_TOKEN,

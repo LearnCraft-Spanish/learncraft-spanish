@@ -80,6 +80,22 @@ pnpm --version
 
 ---
 
+### Issue: `[env-guard] ... would be inlined into the public bundle`
+
+**Problem**: A `VITE_*` key that isn't on the public allowlist is set. Usually it's an old local `.env` file (`VITE_LOCAL_DOMAIN` and `VITE_BACKEND_URL` are retired).
+
+**Solution**: Delete your `.env`, `.env.development`, `.env.staging`, `.env.prod` and `.env.test` files; env vars come from Doppler now. If the key is new and safe to publish, add it to `PUBLIC_ENV_KEYS` in `vite-plugins/env-guard.js`. If it's a secret, drop the `VITE_` prefix. See [`SECRETS.md`](./SECRETS.md).
+
+---
+
+### Issue: Install fails with 401/403 for `@learncraft-spanish/shared`
+
+**Problem**: No GitHub Packages token in `~/.npmrc`.
+
+**Solution**: Run `pnpm setup:npm-auth` (after `doppler setup`), then install again.
+
+---
+
 ### Issue: Port already in use (5173)
 
 **Problem**: Development server port is already occupied.
@@ -438,13 +454,9 @@ pnpm --version
 
 **Solution**:
 
-1. Check `VITE_API_BASE_URL` in `.env`:
+1. Check `VITE_BACKEND_DOMAIN` in your Doppler config (`doppler secrets get VITE_BACKEND_DOMAIN`), and that you started with `pnpm start`, which loads it.
 
-   ```
-   VITE_API_BASE_URL=http://localhost:8000/api
-   ```
-
-2. Verify backend CORS configuration allows your origin
+2. Verify backend CORS configuration allows your origin (`CORS_ORIGIN` in the `lcs-api` Doppler config)
 
 3. For local development, use proxy in `vite.config.ts`:
    ```typescript
@@ -482,7 +494,7 @@ pnpm --version
 
 3. Log out and log back in to refresh token
 
-4. Check Auth0 configuration in `.env`
+4. Check the Auth0 values in your Doppler config (see [`SECRETS.md`](./SECRETS.md))
 
 ---
 
@@ -533,12 +545,7 @@ pnpm --version
    - Allowed Logout URLs: `http://localhost:5173`
    - Allowed Web Origins: `http://localhost:5173`
 
-2. Verify `.env` variables:
-   ```
-   VITE_AUTH0_DOMAIN=your-tenant.auth0.com
-   VITE_AUTH0_CLIENT_ID=your-client-id
-   VITE_AUTH0_AUDIENCE=your-api-identifier
-   ```
+2. Verify `VITE_AUTH0_DOMAIN`, `VITE_AUTH0_CLIENTID` and `VITE_API_AUDIENCE` in your Doppler config (`doppler secrets`)
 
 ---
 

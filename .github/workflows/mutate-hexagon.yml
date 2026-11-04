@@ -21,13 +21,16 @@ jobs:
         with:
           node-version: 24.x
 
-      # Write .npmrc
-      - name: Write .npmrc
-        run: |
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_PACKAGE_KEY }}" > .npmrc
-          echo "@learncraft-spanish:registry=https://npm.pkg.github.com" >> .npmrc
-          echo "package-manager=pnpm" >> .npmrc
-          echo "engine-strict=true" >> .npmrc
+      # Fetch secrets (GH_PACKAGE_KEY) from Doppler learncraft-spanish/tst
+      - name: Fetch secrets
+        uses: dopplerhq/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534 # v2.0.0
+        with:
+          doppler-token: ${{ secrets.DOPPLER_TOKEN }}
+          inject-env-vars: true
+
+      # Authenticate GitHub Packages (registry settings are in the committed .npmrc)
+      - name: Write ~/.npmrc
+        run: echo "//npm.pkg.github.com/:_authToken=${GH_PACKAGE_KEY}" > ~/.npmrc
 
       # Install pnpm
       - name: Install pnpm
@@ -45,13 +48,9 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: pnpm install:ci
-        env:
-          GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
       - name: Run Hexagon Mutation Testing
         run: pnpm mutate:hexagon
-        env:
-          VITE_BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
       - name: Upload Mutation Report
         uses: actions/upload-artifact@v4
