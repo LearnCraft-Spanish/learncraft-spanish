@@ -24,9 +24,8 @@ buld/*
 !.npmrc.local
 pnpm-workspace.yaml
 
-# misc
+# local env files (env vars live in Doppler)
 .env*
-!.env.example
 
 .DS_Store
 
