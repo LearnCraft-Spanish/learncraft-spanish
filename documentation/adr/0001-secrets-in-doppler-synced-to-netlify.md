@@ -17,7 +17,7 @@ This repo is a static Vite site on one Netlify site: `main` deploys to productio
 - **Netlify gets secrets through Doppler's native sync,** per deploy context on the one site: `prd` to production, `stg` to branch-deploy.
 - **`stg` and `prd` hold build secrets.** On a static site there is no runtime for them to leak into; the only exposure is the bundle.
 - **The bundle is guarded in code, not by convention.** `vite-plugins/env-guard.js` stops any dev server or build that sees a `VITE_*` key outside an allowlist, and fails any build whose output contains a build secret's value.
-- **Doppler webhooks trigger Netlify build hooks** (`prd` builds `main`, `stg` builds `staging`), since Netlify doesn't rebuild on env var changes.
+- **Redeploys after a secret change are manual.** Netlify doesn't rebuild when env vars change; trigger one by hand after saving `stg` or `prd`.
 - **Tests need no Doppler.**
 
 ## Alternatives rejected
@@ -25,6 +25,7 @@ This repo is a static Vite site on one Netlify site: `main` deploys to productio
 - **Copy the backend's `tst_build` split** (sync only public values; fetch build secrets with a Doppler token inside the Netlify build). Netlify installs before the build command, so this means disabling its install and running the Doppler CLI in the build, for no protection a static site needs.
 - **Two Netlify sites** so each config syncs to a whole site. Doppler's sync already targets a deploy context.
 - **Wrap tests in `doppler run --config tst`** like the backend. Tests read no real values, and the Cursor sandbox and Cloud Agent VMs have no Doppler CLI.
+- **A Doppler webhook calling a Netlify build hook on secret changes.** We tried it. Netlify snapshots env vars when it queues the build, which happens before Doppler's sync writes the new value, so the triggered build always ran one change behind, with no visible failure. Neither side offers a delay to fix the ordering. A relay that deliberately delays the forwarded request would fix it, but means standing up and maintaining infrastructure outside Doppler, Netlify and GitHub for a rare event (a secret change) that a manual redeploy already handles.
 
 ## Consequences
 
