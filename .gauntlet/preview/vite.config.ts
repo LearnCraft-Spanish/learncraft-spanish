@@ -77,9 +77,6 @@ export default defineConfig({
     'import.meta.env.VITE_AUTH0_CLIENTID': JSON.stringify('gauntlet-preview'),
     'import.meta.env.VITE_API_AUDIENCE': JSON.stringify('gauntlet'),
     'import.meta.env.VITE_ENVIRONMENT': JSON.stringify('development'),
-    'import.meta.env.VITE_LOCAL_DOMAIN': JSON.stringify(
-      'http://localhost:5273/',
-    ),
     'import.meta.env.VITE_PORT': JSON.stringify('5273'),
   },
   css: {

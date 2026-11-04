@@ -8,7 +8,8 @@ _Complete guide to all npm/pnpm scripts in LearnCraft Spanish_
 
 | Script                    | Use Case                                                                            |
 | ------------------------- | ----------------------------------------------------------------------------------- |
-| `pnpm start`              | Start development server                                                            |
+| `pnpm start`              | Start development server (env vars from Doppler)                                    |
+| `pnpm setup:npm-auth`     | Write the GitHub Packages token from Doppler into `~/.npmrc`                        |
 | `pnpm install:ci`         | Install from CI lockfile (published shared)                                         |
 | `pnpm install:local`      | Install CI deps, build local `../lcs-shared`, stage `dist/` only (keeps `tsc` fast) |
 | `pnpm install:published`  | Restore published `@learncraft-spanish/shared`                                      |
@@ -35,7 +36,7 @@ _Complete guide to all npm/pnpm scripts in LearnCraft Spanish_
 - Runs on `http://localhost:5173` by default
 - Auto-reloads on file changes
 - Includes React DevTools support
-- Uses `.env` file for environment variables
+- Runs `doppler run -- vite`, so env vars come from your Doppler config (see [`SECRETS.md`](./SECRETS.md))
 
 **Example:**
 
@@ -62,13 +63,14 @@ pnpm start
 - Minifies JavaScript and CSS
 - Generates source maps
 - Optimizes assets
-- Output: `dist/` directory
+- Fails if a non-public `VITE_*` key is set, or if a build secret's value ends up in the output (`vite-plugins/env-guard.js`)
+- Output: `build/` directory
 
 **Example:**
 
 ```bash
-pnpm build
-# Output: dist/
+doppler run -- pnpm build   # with your Doppler config's public values
+# Output: build/
 ```
 
 ---
@@ -363,6 +365,24 @@ pnpm validate
 ---
 
 ## Dependency Management Scripts
+
+### `pnpm setup:npm-auth`
+
+**What it does:** Reads `GH_PACKAGE_KEY` from your Doppler config and writes it to `~/.npmrc`, so installs can fetch `@learncraft-spanish/shared` from GitHub Packages. Never touches the project `.npmrc`.
+
+**When to use:**
+
+- Once, after `doppler setup`
+- After the token is rotated in Doppler
+
+**Example:**
+
+```bash
+pnpm setup:npm-auth
+# GitHub Packages auth written to /Users/you/.npmrc
+```
+
+---
 
 ### `pnpm install:ci`
 

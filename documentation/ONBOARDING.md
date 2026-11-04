@@ -11,17 +11,22 @@ _Setup, then the guided path through everything you need to know._
 - **Node.js** >= 24 ([nvm](https://github.com/nvm-sh/nvm) recommended)
 - **pnpm** >= 7 (`npm install -g pnpm`)
 - **Git**
+- **Doppler CLI** (`brew install dopplerhq/cli/doppler`) and access to the LearnCraft Doppler workspace
 
 ### Clone, Install, Run
 
 ```bash
 git clone <repository-url>
 cd learncraft-spanish
+doppler login
+doppler setup              # learncraft-spanish / dev, from .doppler.yaml
+pnpm setup:npm-auth        # GitHub Packages token into ~/.npmrc
 pnpm install:local
-cp .env.development .env   # edit with your Auth0/API credentials
 pnpm start                 # http://localhost:5173
 pnpm test:hexagon          # verify tests pass
 ```
+
+Env vars come from Doppler, never `.env` files. See [`SECRETS.md`](./SECRETS.md), including the rule that only public values get a `VITE_` prefix.
 
 If anything fails, see [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md).
 
@@ -147,5 +152,6 @@ When you're ready to build or review:
 ## 10. Reference
 
 - [`SCRIPTS.md`](./SCRIPTS.md) — All scripts and what they do
+- [`SECRETS.md`](./SECRETS.md) — Doppler configs, env vars, and how each environment gets them
 - [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md) — Common issues and solutions
 - [`INTERNAL_PROD_CHECKLIST.md`](./INTERNAL_PROD_CHECKLIST.md) — Production release process

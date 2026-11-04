@@ -53,9 +53,6 @@ importers:
       '@typescript-eslint/utils':
         specifier: ^8.32.1
         version: 8.72.0(eslint@9.39.5)(typescript@5.9.3)
-      dotenv:
-        specifier: ^16.4.7
-        version: 16.6.1
       glob:
         specifier: ^13.0.6
         version: 13.0.6

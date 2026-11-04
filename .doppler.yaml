@@ -1,0 +1,3 @@
+setup:
+  - project: learncraft-spanish
+    config: dev
