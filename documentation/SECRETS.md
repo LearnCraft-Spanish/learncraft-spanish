@@ -48,10 +48,10 @@ Tests, `pnpm typecheck`, `pnpm lint` and `pnpm gauntlet:preview` need no Doppler
 
 - **Local:** `pnpm start` runs `doppler run -- vite`. Installs use the token that `pnpm setup:npm-auth` wrote to `~/.npmrc`.
 - **GitHub Actions:** one repository secret, `DOPPLER_TOKEN`, a read-only service token for `tst`. Every job fetches `tst` with `dopplerhq/secrets-fetch-action` and writes `GH_PACKAGE_KEY` to `~/.npmrc` before installing.
-- **Netlify:** Doppler's Netlify integration syncs `prd` into the site's production context and `stg` into its branch-deploy context. Netlify installs with the `${GH_PACKAGE_KEY}` line in the committed `.npmrc`, so that line stays. Deploy previews are off.
+- **Netlify:** Doppler's Netlify integration syncs `prd` into the site's production context and `stg` into its branch-deploy context. Netlify installs using `PNPM_CONFIG__AUTH`, set in `stg` and `prd` to `{"https://npm.pkg.github.com":{"@learncraft-spanish":{"authToken":"${GH_PACKAGE_KEY}"}}}`. Doppler fills in the `${GH_PACKAGE_KEY}` reference before syncing; pnpm itself does not expand it. Deploy previews are off.
 - **Redeploys:** Netlify doesn't rebuild when env vars change, so after saving `stg` or `prd`, trigger one by hand (Netlify → **Trigger deploy → Clear cache and deploy**). We tried a Doppler webhook calling a Netlify build hook; Netlify snapshots env vars when it queues the build, which happens before Doppler's sync writes the new value, so the triggered build always ran one change behind. There's no delay option on either side to fix that, so we dropped it.
 
-The global pnpm 11 ignores `${...}` credentials in a project `.npmrc`, which is why local installs and CI use `~/.npmrc`. Netlify installs with the repo's pinned pnpm 9, which still reads it. Upgrading the pnpm that Netlify uses means moving Netlify's install auth too.
+pnpm 11 ignores `${...}` credentials in a project `.npmrc`, so the committed `.npmrc` holds only the registry line. Local installs and CI put the token in `~/.npmrc`. Netlify can't write files before it installs, so it gets the token from `PNPM_CONFIG__AUTH`.
 
 ## Adding or changing a value
 
