@@ -1,9 +1,8 @@
-# Optional local overrides — copy to .npmrc only if you need to customize registry auth.
+# Optional local overrides — copy to .npmrc only if you need to customize registry settings.
 # Local shared development uses `pnpm install:local` (symlinks ../lcs-shared).
 # CI and published installs use `pnpm install:ci` / `pnpm install:published`.
 #
-# Example: add your GitHub Packages token for fetching published @learncraft-spanish/shared
-# //npm.pkg.github.com/:_authToken=${GH_PACKAGE_KEY}
+# pnpm 11 reads only auth, registry, TLS and proxy settings from .npmrc; everything
+# else lives in pnpm-workspace.yaml. It also refuses ${VAR} tokens in a project
+# .npmrc, so put your GitHub Packages token in ~/.npmrc (`pnpm setup:npm-auth`).
 # @learncraft-spanish:registry=https://npm.pkg.github.com
-package-manager=pnpm
-engine-strict=true

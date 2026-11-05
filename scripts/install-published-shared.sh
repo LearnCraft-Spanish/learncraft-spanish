@@ -7,6 +7,6 @@ cd "$ROOT"
 rm -f .shared-local-mode
 
 echo "Installing published @learncraft-spanish/shared from CI lockfile..."
-pnpm install --frozen-lockfile --ignore-workspace --lockfile-dir=lockfiles/ci
+pnpm install --frozen-lockfile --lockfile-dir=lockfiles/ci
 
 echo "Published shared mode enabled."

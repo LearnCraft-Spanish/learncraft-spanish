@@ -59,12 +59,12 @@ Guidance for Cloud Agents setting up and running this repo in a fresh VM.
 
 ### Required secret
 
-- **`GH_PACKAGE_KEY`** — a GitHub token with `read:packages` for the `LearnCraft-Spanish` org. Every install path fetches the private `@learncraft-spanish/shared` package from GitHub Packages (`npm.pkg.github.com`), so installs fail without it (anonymous → 401; a repo-scoped token → 403). `.npmrc` already references `${GH_PACKAGE_KEY}`; just export it in the environment (pnpm 9.7.1 expands it). Cloud VMs have no Doppler CLI.
+- **`GH_PACKAGE_KEY`** — a GitHub token with `read:packages` for the `LearnCraft-Spanish` org. Every install path fetches the private `@learncraft-spanish/shared` package from GitHub Packages (`npm.pkg.github.com`), so installs fail without it (anonymous → 401; a repo-scoped token → 403). pnpm 11 won't read a token from the project `.npmrc`, so write it to the user-level one: `echo "//npm.pkg.github.com/:_authToken=${GH_PACKAGE_KEY}" > ~/.npmrc`. Cloud VMs have no Doppler CLI.
 - Optional (only for a real authenticated login flow): `VITE_AUTH0_DOMAIN`, `VITE_AUTH0_CLIENTID`, `VITE_API_AUDIENCE`, `VITE_BACKEND_DOMAIN`. Without them the dev server, build, and hexagon tests still work, and the app renders its public login screen with placeholder values.
 
 ### Node version (important)
 
-`package.json` requires `engines.node: 24.x` with `engine-strict=true`, but the Cloud Agent daemon puts a Node 22 binary (`/exec-daemon/node`) ahead of nvm on `PATH`. Any `node`/`pnpm` command will silently use Node 22 and fail `engine-strict` unless you force Node 24 first, in every shell:
+`package.json` requires `engines.node: 24.x` and `pnpm-workspace.yaml` sets `engineStrict: true`, but the Cloud Agent daemon puts a Node 22 binary (`/exec-daemon/node`) ahead of nvm on `PATH`. Any `node`/`pnpm` command will silently use Node 22 and fail `engine-strict` unless you force Node 24 first, in every shell:
 
 ```bash
 export NVM_DIR="$HOME/.nvm"
@@ -74,7 +74,7 @@ export PATH="$(dirname "$(nvm which 24)"):$PATH"
 hash -r
 node -v                   # must print v24.x
 corepack enable
-corepack prepare pnpm@9.7.1 --activate
+corepack prepare pnpm@11.28.9 --activate
 ```
 
 ### Install

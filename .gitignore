@@ -22,7 +22,6 @@ buld/*
 # npm config
 .npmrc.*
 !.npmrc.local
-pnpm-workspace.yaml
 
 # local env files (env vars live in Doppler)
 .env*
