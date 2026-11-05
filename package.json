@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@9.7.1",
+  "packageManager": "pnpm@11.28.9+sha512.35421cea2720eca3f5ad722b67e8ef18f4d3cd4745ed2fcfeb0dc288d4e9437fad3870d91ee6e83f268f0f6f7e0f62723317b19617bb45ee4333172ef51159f8",
   "description": "This project was bootstrapped with Create React App.",
   "author": "",
   "license": "ISC",
@@ -12,13 +12,13 @@
   "main": "index.tsx",
   "engines": {
     "node": "24.x",
-    "pnpm": ">=7"
+    "pnpm": "11.x"
   },
   "scripts": {
     "install:local": "bash scripts/install-local-shared.sh",
     "install:published": "bash scripts/install-published-shared.sh",
-    "install:ci": "pnpm install --frozen-lockfile --ignore-workspace --lockfile-dir=lockfiles/ci",
-    "install:ci:regenerate": "rm -rf lockfiles/ci && pnpm install --ignore-workspace --lockfile-dir=lockfiles/ci && pnpm install",
+    "install:ci": "pnpm install --frozen-lockfile --lockfile-dir=lockfiles/ci",
+    "install:ci:regenerate": "rm -rf lockfiles/ci && pnpm install --lockfile-dir=lockfiles/ci && pnpm install",
     "setup:npm-auth": "bash scripts/setup-npm-auth.sh",
     "build": "vite build",
     "format": "prettier --write . --config .prettierrc.json",

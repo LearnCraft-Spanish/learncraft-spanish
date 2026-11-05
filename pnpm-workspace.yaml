@@ -1,0 +1,18 @@
+# pnpm settings (pnpm 11 reads only auth/registry settings from .npmrc).
+engineStrict: true
+
+# pnpm 11 refuses package versions published less than a day ago
+# (minimumReleaseAge defaults to 1440 minutes). Our own shared package is
+# exempt so a fresh lcs-shared release can be installed right away.
+minimumReleaseAgeExclude:
+  - '@learncraft-spanish/shared'
+
+# pnpm 11 fails the install when a dependency has an unreviewed install script.
+# true = run it, false = skip it silently.
+allowBuilds:
+  '@sentry/cli': true # downloads the CLI binary that uploads source maps
+  esbuild: true
+  '@parcel/watcher': false # prebuilt binaries come from optional dependencies
+  unrs-resolver: false # prebuilt binaries come from optional dependencies
+  msw: false # only copies the worker file; we don't configure msw.workerDirectory
+  browser-tabs-lock: false

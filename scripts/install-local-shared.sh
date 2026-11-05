@@ -18,7 +18,7 @@ fi
 SHARED_REPO="$(cd "$SHARED_REPO" && pwd)"
 
 echo "Installing published dependencies from CI lockfile..."
-pnpm install --frozen-lockfile --ignore-workspace --lockfile-dir=lockfiles/ci
+pnpm install --frozen-lockfile --lockfile-dir=lockfiles/ci
 
 echo "Building local @learncraft-spanish/shared..."
 (cd "$SHARED_REPO" && pnpm install && pnpm build)
