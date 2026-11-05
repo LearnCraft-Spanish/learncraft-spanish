@@ -15,11 +15,13 @@ import {
   resetMockUseStudentUiVersion,
 } from '@application/useCases/useStudentUiVersion.mock';
 import { AppHeader } from '@interface/components/AppHeader/AppHeader';
+import { PrimaryNav } from '@interface/components/AppHeader/PrimaryNav';
 import { setMobileStackOverride } from '@interface/hooks/useMobileStackChrome';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import styles from './AppHeader.module.scss';
 
 vi.mock('@application/useCases/AppHeader', () => ({
   useAppHeader: () => mockUseAppHeader,
@@ -80,6 +82,7 @@ describe('component AppHeader', () => {
       expect(
         screen.getByRole('button', { name: 'Use as student' }),
       ).toBeInTheDocument();
+      expect(screen.getByRole('banner')).toHaveClass(styles.withStaffAction);
       expect(
         screen.queryByRole('link', { name: 'Flashcard Finder' }),
       ).not.toBeInTheDocument();
@@ -109,6 +112,25 @@ describe('component AppHeader', () => {
       ).toBeInTheDocument();
     });
 
+    it('keeps the student nav off home while using the app as a student', () => {
+      overrideMockUseAppHeader({
+        ...staff,
+        showStudentNav: true,
+        isStaffUsingAsStudent: true,
+        usingAs: { name: 'Ana Ruiz', email: 'ana@fake.not' },
+      });
+
+      renderHeader(<PrimaryNav />, '/admin-dashboard');
+
+      expect(screen.getByRole('link', { name: 'Quizzes' })).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Use as student' }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole('banner')).not.toHaveClass(
+        styles.withStaffAction,
+      );
+    });
+
     it('shows the student nav and who they are using the app as', async () => {
       overrideMockUseAppHeader({
         ...staff,
@@ -130,6 +152,37 @@ describe('component AppHeader', () => {
       expect(screen.getByText('Coach Carla')).toBeInTheDocument();
       expect(screen.getByText('Ana Ruiz')).toBeInTheDocument();
       expect(screen.getByText('ana@fake.not')).toBeInTheDocument();
+    });
+
+    it('hides the header button and student nav off the home menu, and keeps the account item', async () => {
+      overrideMockUseAppHeader({ ...staff, showUseAsStudent: true });
+
+      renderHeader(<PrimaryNav />, '/admin-dashboard');
+
+      expect(
+        screen.queryByRole('button', { name: 'Use as student' }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole('banner')).not.toHaveClass(
+        styles.withStaffAction,
+      );
+      expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+      for (const name of [
+        'Home',
+        'Flashcard Finder',
+        'My Flashcards',
+        'Quizzes',
+      ]) {
+        expect(screen.queryByRole('link', { name })).not.toBeInTheDocument();
+      }
+
+      await userEvent.click(screen.getByRole('button', { name: 'Account' }));
+      await userEvent.click(
+        screen.getByRole('menuitem', { name: 'Use as student' }),
+      );
+
+      expect(
+        screen.getByRole('dialog', { name: 'Use as student' }),
+      ).toBeInTheDocument();
     });
 
     it('opens the picker from the account menu\'s "Use as student"', async () => {
@@ -342,6 +395,22 @@ describe('component AppHeader', () => {
     expect(
       screen.getByRole('link', { name: 'Flashcard Finder' }),
     ).toBeInTheDocument();
+  });
+
+  it('still shows the student nav off home for a student', () => {
+    overrideMockUseAppHeader({
+      isAuthenticated: true,
+      isLoading: false,
+      isSignedIn: true,
+      showStudentNav: true,
+    });
+
+    renderHeader(<PrimaryNav />, '/quizzes');
+
+    expect(screen.getByRole('link', { name: 'Quizzes' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Use as student' }),
+    ).not.toBeInTheDocument();
   });
 
   it('gives a limited or free user the account menu but no nav', () => {

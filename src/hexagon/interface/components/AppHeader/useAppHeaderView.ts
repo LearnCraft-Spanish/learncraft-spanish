@@ -26,7 +26,10 @@ export interface UseAppHeaderViewResult {
   studentEmail: string | undefined;
   isStaff: boolean;
   staffRole: 'admin' | 'coach' | null;
+  /** Account menu item. Offered on every page for staff in their own view. */
   showUseAsStudent: boolean;
+  /** Header button. Same audience as `showUseAsStudent`, and only on `/`. */
+  showUseAsStudentButton: boolean;
   showStudentNav: boolean;
   isStaffUsingAsStudent: boolean;
   usingAs: UsingAsIdentity | null;
@@ -74,6 +77,10 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
       }
     : null;
 
+  // The header button is the home menu only. `showUseAsStudent` stays on
+  // so the account menu can offer the same action on every page.
+  const showUseAsStudentButton = showUseAsStudent && pathname === '/';
+
   return {
     isAuthenticated,
     isLoading,
@@ -83,6 +90,7 @@ export function useAppHeaderView(): UseAppHeaderViewResult {
     isStaff,
     staffRole,
     showUseAsStudent,
+    showUseAsStudentButton,
     showStudentNav,
     isStaffUsingAsStudent,
     usingAs,
