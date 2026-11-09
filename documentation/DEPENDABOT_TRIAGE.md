@@ -44,7 +44,7 @@ Each alert names one manifest. For every alert, the versions of that package res
 | fast-uri         | 3.0.6                  | 3.1.9                   |
 | js-yaml          | 3.14.1 / 4.1.0         | 3.15.2 / 4.3.2          |
 
-**This probably matters for production.** Netlify finds `pnpm-lock.yaml` in the repo root and installs from it, so the deployed bundle is most likely built from the _stale_ lockfile, not the one CI tests against. This needs confirming in Netlify's build settings. Bringing the root lockfile in line with the CI lockfile would close 101 alerts with no `package.json` changes.
+**This matters for production (confirmed).** Netlify's build command is just `pnpm build`, so Netlify's automatic dependency install runs first, from the root `pnpm-lock.yaml`. The deployed bundle was therefore built from the _stale_ lockfile, not the one CI tests against. Bringing the root lockfile in line with the CI lockfile would close 101 alerts with no `package.json` changes.
 
 ## Step 2 — Exploitability
 
@@ -106,7 +106,7 @@ These run at lint, test or build time, on files we write ourselves. Every one is
 
 ## What would close the most alerts with the least risk
 
-1. **Regenerate the root lockfile to match `lockfiles/ci`.** Closes 101 alerts and also fixes the stale production build, if Netlify uses it. Confirm Netlify's install step first.
+1. **Regenerate the root lockfile to match `lockfiles/ci`.** Closes 101 alerts and also fixes the stale production build.
 2. **Remove the unused `jsonwebtoken` dependency.** Closes 1.
 3. **Use `pnpm.overrides` or targeted bumps for the patch-level transitive fixes still open in the CI lock.** Covers handlebars 4.7.8, glob, minimatch, zod 4 (via shared), follow-redirects, deepmerge, serialize-javascript and tmp.
 4. **Major upgrades, as separate PRs:**
