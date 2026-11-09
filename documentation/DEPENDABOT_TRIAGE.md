@@ -17,6 +17,8 @@ Rechecked against the new lockfile, **54 of the 155 alerts remain**. The other 1
 | B (dev server / test runner) | 12: @vitest/mocker 4, tinypool 4, vitest 3, vite 1                                                                                              |
 | C (build/lint/test tooling)  | 35: handlebars 10, serialize-javascript 6, tmp 4, glob 3, @faker-js/faker 3, @babel/core 2, deepmerge 2, follow-redirects 2, minimatch 2, ajv 1 |
 
+**Drift prevention:** `install:ci:regenerate` now copies the CI lockfile to the root (`pnpm lockfile:sync`), and a `lockfile-sync` CI job fails any PR where the two differ.
+
 The sections below describe the original snapshot, taken before the regen.
 
 ## Step 1 — Do the alerts match versions we actually install?

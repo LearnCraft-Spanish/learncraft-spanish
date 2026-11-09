@@ -21,6 +21,17 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Netlify installs from the root pnpm-lock.yaml; CI installs from
+  # lockfiles/ci. Fail if they drift so production ships what CI tests.
+  lockfile-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Check root lockfile matches CI lockfile
+        run: bash scripts/sync-root-lockfile.sh --check
+
   format:
     runs-on: ubuntu-latest
     steps:

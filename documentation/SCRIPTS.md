@@ -13,6 +13,7 @@ _Complete guide to all npm/pnpm scripts in LearnCraft Spanish_
 | `pnpm install:ci`         | Install from CI lockfile (published shared)                                         |
 | `pnpm install:local`      | Install CI deps, build local `../lcs-shared`, stage `dist/` only (keeps `tsc` fast) |
 | `pnpm install:published`  | Restore published `@learncraft-spanish/shared`                                      |
+| `pnpm lockfile:sync`      | Copy `lockfiles/ci/pnpm-lock.yaml` to the root lockfile (Netlify installs from it)  |
 | `pnpm test:hexagon:watch` | Test while developing                                                               |
 | `pnpm validate`           | Pre-commit check (lint + format + typecheck)                                        |
 | `pnpm build`              | Build for production                                                                |
@@ -467,7 +468,7 @@ pnpm install:published
 
 ### `pnpm install:ci:regenerate`
 
-**What it does:** Regenerates the CI lockfile.
+**What it does:** Regenerates the CI lockfile, then copies it to the root `pnpm-lock.yaml`.
 
 **When to use:**
 
@@ -478,8 +479,9 @@ pnpm install:published
 **Details:**
 
 - Deletes `lockfiles/ci/`
-- Creates new CI lockfile
-- Runs regular install after
+- Creates a new CI lockfile, resolving every dependency fresh
+- Runs `pnpm lockfile:sync` to overwrite the root `pnpm-lock.yaml` from it
+- Runs `pnpm install --frozen-lockfile` to confirm the root lockfile installs
 
 **Example:**
 
@@ -487,6 +489,26 @@ pnpm install:published
 pnpm install:ci:regenerate
 # Regenerating CI lockfile...
 ```
+
+---
+
+### `pnpm lockfile:sync` / `pnpm lockfile:check`
+
+**What it does:** `lockfile:sync` overwrites the root `pnpm-lock.yaml` with `lockfiles/ci/pnpm-lock.yaml`. `lockfile:check` fails if the two differ.
+
+**Why:** `lockfiles/ci/pnpm-lock.yaml` is the canonical lockfile, used by CI and local installs. Netlify's build command is only `pnpm build`, so Netlify's automatic install reads the root `pnpm-lock.yaml`. If the two drift, production ships different dependency versions from the ones CI tests.
+
+**When to use:**
+
+- `install:ci:regenerate` runs `lockfile:sync` for you
+- Run `lockfile:sync` yourself if the `lockfile-sync` CI job fails
+- Run `lockfile:check` to confirm the two match before you push
+
+**Details:**
+
+- The files are identical except for the importer key: `../..` in the CI lockfile, `.` in the root one
+- Implemented in `scripts/sync-root-lockfile.sh`
+- The `lockfile-sync` job in `.github/workflows/ci.yml` runs the check on every PR
 
 ---
 
@@ -646,11 +668,11 @@ pnpm test:hexagon
 # 1. Add the dependency
 pnpm add <package-name>
 
-# 2. Regenerate CI lockfile
+# 2. Regenerate CI lockfile (also syncs the root pnpm-lock.yaml)
 pnpm install:ci:regenerate
 
-# 3. Commit both package.json and lockfiles
-git add package.json lockfiles/
+# 3. Commit package.json and BOTH lockfiles (Netlify installs from the root one)
+git add package.json pnpm-lock.yaml lockfiles/
 git commit -m "chore: add <package-name>"
 ```
 
