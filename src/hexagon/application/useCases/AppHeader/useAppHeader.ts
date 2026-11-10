@@ -21,7 +21,7 @@ export interface UseAppHeaderResult {
   isStaff: boolean;
   /** Which staff view "Stop using as student" returns to. */
   staffRole: 'admin' | 'coach' | null;
-  /** Signed-in coach/admin in their own view: "Use as student" replaces the student nav. */
+  /** Signed-in coach/admin who is not using the app as a student. */
   showUseAsStudent: boolean;
   /** Signed-in student, or staff using the app as one. Limited, free, and logged-out visitors get no nav. */
   showStudentNav: boolean;

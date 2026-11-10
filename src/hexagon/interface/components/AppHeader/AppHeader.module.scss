@@ -127,8 +127,8 @@
     grid-column: 2;
   }
 
-  /* Staff keep "Use as student" on mobile: the student nav it replaces is
-   * desktop-only, but this is the only way into the student view. */
+  /* Home only: staff keep "Use as student" on mobile. The student nav it
+   * replaces is desktop-only. Off home this column is not applied. */
   .withStaffAction {
     grid-template-columns: 1fr auto auto;
     gap: var(--lcs-space-4);

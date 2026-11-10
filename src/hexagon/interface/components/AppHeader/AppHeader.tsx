@@ -23,9 +23,11 @@ interface AppHeaderProps {
  * visitors get the brand alone; Log in lives on the LoggedOut screen.
  *
  * Coaches/admins not yet using the app as a student get a "Use as student"
- * button in place of the student nav. Once they are, the student nav returns
- * and the account menu reports who they are using the app as. Limited and
- * free users get the account menu with no nav at all.
+ * button in place of the student nav, and only on the home menu. On their
+ * other pages the center slot stays empty. The account menu still offers
+ * "Use as student" on every page. Once they are using the app as a student,
+ * the student nav returns and the account menu reports who they are using
+ * the app as. Limited and free users get the account menu with no nav at all.
  *
  * On mobile student-v2 stack screens (every student surface except Home)
  * the brand and account swap for a back arrow and the page title.
@@ -38,6 +40,7 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
     isStaff,
     staffRole,
     showUseAsStudent,
+    showUseAsStudentButton,
     showStudentNav,
     isStaffUsingAsStudent,
     usingAs,
@@ -56,7 +59,7 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
   const rootClassName = [
     styles.root,
     isStack ? styles.stackMode : undefined,
-    showUseAsStudent ? styles.withStaffAction : undefined,
+    showUseAsStudentButton ? styles.withStaffAction : undefined,
   ]
     .filter(Boolean)
     .join(' ');
@@ -106,7 +109,7 @@ export function AppHeader({ children }: AppHeaderProps): JSX.Element {
         <span className={styles.wordmark}>LEARNCRAFT</span>
       </Link>
 
-      {showUseAsStudent ? (
+      {showUseAsStudentButton ? (
         <div className={styles.staffAction} aria-hidden={isStack}>
           <StudentSelector
             open={selectorAnchor === 'nav'}
