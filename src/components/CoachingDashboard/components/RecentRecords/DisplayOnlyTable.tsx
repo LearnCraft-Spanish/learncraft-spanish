@@ -11,12 +11,14 @@ export default function DisplayOnlyTable({
   renderRow,
   onClickFunc,
   itemsPerPage = 20,
+  footerRow,
 }: {
   headers: string[];
   data: any[];
   renderRow: (item: any, onClick?: (str: string) => void) => ReactNode;
   onClickFunc?: (str: string) => void;
   itemsPerPage?: number;
+  footerRow?: ReactNode;
 }) {
   const {
     pageNumber: page,
@@ -75,6 +77,7 @@ export default function DisplayOnlyTable({
               </tr>
             )}
           </tbody>
+          {footerRow && <tfoot>{footerRow}</tfoot>}
         </table>
         <Pagination
           page={page}

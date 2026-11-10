@@ -91,9 +91,17 @@ describe('studentsBySalariedCoach', () => {
       courseName: 'Current Salaried Course',
       weeklyPrivateCalls: 3,
     });
+    const secondCurrentReport = createSalariedCoachReport({
+      coachId: 302,
+      coachName: 'Salaried Current Coach Two',
+      studentName: 'Current Salaried Student Two',
+      courseName: 'Current Salaried Course Two',
+      weeklyPrivateCalls: 1.5,
+    });
     overrideMockUseMembershipsBySalariedCoachCurrentReport({
       membershipsBySalariedCoachCurrentReportQuery: successfulQueryResult([
         currentReport,
+        secondCurrentReport,
       ]),
     });
 
@@ -103,6 +111,9 @@ describe('studentsBySalariedCoach', () => {
 
     expect(screen.getByText('Salaried Current Coach')).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();
+    expect(screen.getByText('1.5')).toBeInTheDocument();
+    const totalRow = screen.getByText('Total').closest('tr');
+    expect(totalRow).toHaveTextContent('Total4.5');
 
     fireEvent.click(screen.getByText('Salaried Current Coach'));
 
@@ -118,9 +129,17 @@ describe('studentsBySalariedCoach', () => {
       courseName: 'Future Salaried Course',
       weeklyPrivateCalls: 5,
     });
+    const secondTwoWeeksOutReport = createSalariedCoachReport({
+      coachId: 403,
+      coachName: 'Salaried Future Coach Two',
+      studentName: 'Future Salaried Student Two',
+      courseName: 'Future Salaried Course Two',
+      weeklyPrivateCalls: 1.5,
+    });
     overrideMockUseMembershipsBySalariedCoachTwoWeeksOutReport({
       membershipsBySalariedCoachTwoWeeksOutReportQuery: successfulQueryResult([
         twoWeeksOutReport,
+        secondTwoWeeksOutReport,
       ]),
     });
 
@@ -132,6 +151,9 @@ describe('studentsBySalariedCoach', () => {
 
     expect(screen.getByText('Salaried Future Coach')).toBeInTheDocument();
     expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByText('1.5')).toBeInTheDocument();
+    const totalRow = screen.getByText('Total').closest('tr');
+    expect(totalRow).toHaveTextContent('Total6.5');
 
     fireEvent.click(screen.getByText('Salaried Future Coach'));
 
