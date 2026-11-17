@@ -70,6 +70,7 @@ export const defaultMockTextQuizSetup: TextQuizSetupReturn = {
   quizLength: 20,
   setSelectedQuizLength: vi.fn<(selectedQuizLength: number) => void>(),
   canAccessSRS: true,
+  isSrsProgressTracked: true,
   srsQuiz: false,
   setSrsQuiz: vi.fn<(srsQuiz: boolean) => void>(),
   startWithSpanish: false,

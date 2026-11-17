@@ -84,6 +84,7 @@ function createTextSetup(
     quizLength: 20,
     setSelectedQuizLength: vi.fn(),
     canAccessSRS: false,
+    isSrsProgressTracked: false,
     srsQuiz: false,
     setSrsQuiz: vi.fn(),
     startWithSpanish: false,

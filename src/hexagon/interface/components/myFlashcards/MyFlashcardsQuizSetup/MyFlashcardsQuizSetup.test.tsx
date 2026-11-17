@@ -81,6 +81,50 @@ describe('myFlashcardsQuizSetup', () => {
     expect(screen.getByLabelText('Autoplay')).toBeChecked();
   });
 
+  describe('sRS quiz toggle', () => {
+    it('is offered when SRS is available, including to a coach using the app as a student', () => {
+      renderSetup({
+        textQuizSetup: {
+          ...defaultMockUseQuizMyFlashcards.textQuizSetup,
+          canAccessSRS: true,
+          isSrsProgressTracked: false,
+          srsQuiz: false,
+        },
+      });
+
+      expect(
+        screen.getByRole('switch', { name: 'SRS quiz' }),
+      ).not.toBeChecked();
+    });
+
+    it('is hidden when SRS is not available', () => {
+      renderSetup({
+        textQuizSetup: {
+          ...defaultMockUseQuizMyFlashcards.textQuizSetup,
+          canAccessSRS: false,
+        },
+      });
+
+      expect(screen.queryByRole('switch', { name: 'SRS quiz' })).toBeNull();
+    });
+
+    it('turns SRS on through the toggle', async () => {
+      const setSrsQuiz = vi.fn<(srsQuiz: boolean) => void>();
+      renderSetup({
+        textQuizSetup: {
+          ...defaultMockUseQuizMyFlashcards.textQuizSetup,
+          canAccessSRS: true,
+          srsQuiz: false,
+          setSrsQuiz,
+        },
+      });
+
+      await userEvent.click(screen.getByRole('switch', { name: 'SRS quiz' }));
+
+      expect(setSrsQuiz).toHaveBeenCalledWith(true);
+    });
+  });
+
   it('the filter control reads as its own header, matching Flashcard Manager', () => {
     renderSetup();
 
