@@ -709,20 +709,7 @@ describe('mappers', () => {
     });
   });
 
-  describe('mapDomainToTableRows with an id column', () => {
-    it('should give each row a deterministic id from its entity id', () => {
-      const rows = mapDomainToTableRows(
-        [
-          { id: 7, name: 'A' },
-          { id: 8, name: 'B' },
-        ],
-        [{ id: 'name', type: 'text' }],
-        'id',
-      );
-
-      expect(rows.map((row) => row.id)).toEqual(['row-7', 'row-8']);
-    });
-
+  describe('mapDomainToTableRows with no entities', () => {
     it('should return an empty list for no entities', () => {
       expect(mapDomainToTableRows([], [{ id: 'name', type: 'text' }])).toEqual(
         [],

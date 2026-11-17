@@ -192,13 +192,14 @@ describe('normalization', () => {
         expect(normalizeCellValue('-3.50', column)).toBe('-3.5');
       });
 
-      it('should produce the same result as normalizeNumber', () => {
-        for (const value of ['42', '42.0', '1.2500', ' 007 ', 'abc', '0.5']) {
+      it.each(['42', '42.0', '1.2500', ' 007 ', 'abc', '0.5'])(
+        'should produce the same result as normalizeNumber for %j',
+        (value) => {
           expect(normalizeCellValue(value, column)).toBe(
             normalizeNumber(value),
           );
-        }
-      });
+        },
+      );
     });
 
     describe('date', () => {

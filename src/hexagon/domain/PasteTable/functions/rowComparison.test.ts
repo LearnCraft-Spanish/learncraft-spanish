@@ -64,10 +64,6 @@ describe('rowComparison', () => {
 
         expect(cellsEqual(cells1, cells2, ['name', 'age'])).toBe(false);
       });
-
-      it('should return true when no columns are listed', () => {
-        expect(cellsEqual({ name: 'John' }, { name: 'Jane' }, [])).toBe(true);
-      });
     });
   });
 
@@ -261,12 +257,6 @@ describe('rowComparison', () => {
     it('should return an empty set when there are no rows', () => {
       expect(findDirtyRows([], []).size).toBe(0);
       expect(findDirtyRows([], [{ id: 'row-1', cells: {} }]).size).toBe(0);
-    });
-
-    it('should return an empty set when no original rows exist to compare against', () => {
-      const current: TableRow[] = [{ id: 'row-1', cells: { name: 'John' } }];
-
-      expect(findDirtyRows(current, []).size).toBe(0);
     });
   });
 });

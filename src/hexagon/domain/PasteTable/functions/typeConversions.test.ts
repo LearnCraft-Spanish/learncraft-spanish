@@ -395,9 +395,12 @@ describe('typeConversions', () => {
       expect(normalizeDate('2024-02-31x')).toBe('2024-02-31x');
     });
 
-    it('should not parse a blank date and should trim before matching a strict date', () => {
-      expect(normalizeDate('  01/15/2024  ')).toBe('2024-01-15');
+    it('should return an empty string for tab-only input', () => {
       expect(normalizeDate('\t')).toBe('');
+    });
+
+    it('should trim before matching a strict DD-MM-YYYY date', () => {
+      expect(normalizeDate('  15-01-2024  ')).toBe('2024-01-15');
     });
   });
 });
