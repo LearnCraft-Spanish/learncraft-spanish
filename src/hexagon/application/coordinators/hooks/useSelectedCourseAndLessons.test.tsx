@@ -3,7 +3,10 @@ import type { CourseWithLessons } from '@learncraft-spanish/shared';
 import type { TestUserEmail } from 'mocks/data/serverlike/userTable';
 import type { ReactNode } from 'react';
 import { overrideMockCourseAdapter } from '@application/adapters/courseAdapter.mock';
-import { seedMockLastStudiedLesson } from '@application/adapters/lastStudiedLessonAdapter.mock';
+import {
+  overrideMockLastStudiedLessonAdapter,
+  seedMockLastStudiedLesson,
+} from '@application/adapters/lastStudiedLessonAdapter.mock';
 import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
@@ -195,7 +198,22 @@ const postChallengeStudentEmail: TestUserEmail = 'student-ser-estar@fake.not';
 
 describe('useSelectedCourseAndLessons defaults', () => {
   it('defaults a non-student to LearnCraft Spanish, starting at lesson 2', async () => {
-    loginAsAppUser(coachEmail);
+    // Their recorded course (3) and lesson (4) are not used, since they are
+    // not a student
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail(coachEmail)!,
+        isAuthenticated: true,
+      },
+      {
+        appUser: {
+          ...getAppUserFromEmail(coachEmail)!,
+          courseId: 3,
+          lessonNumber: 4,
+        },
+        isOwnUser: true,
+      },
+    );
 
     const { result } = renderCoordinator();
 
@@ -410,6 +428,56 @@ describe('useSelectedCourseAndLessons unpublished courses', () => {
       expect(result.current.courseId).toBe(unpublishedCourse.id),
     );
     expect(result.current.includeUnpublished).toBe(true);
+  });
+});
+
+describe('useSelectedCourseAndLessons loading', () => {
+  function deferred<T>() {
+    let resolve!: (value: T) => void;
+    const promise = new Promise<T>((res) => {
+      resolve = res;
+    });
+    return { promise, resolve };
+  }
+
+  it('is loading until the courses have loaded', async () => {
+    loginAsAppUser(coachEmail);
+    const courses = deferred<CourseWithLessons[]>();
+    overrideMockCourseAdapter({
+      getPublishedCoursesWithLessons: () => courses.promise,
+    });
+
+    const { result } = renderCoordinator();
+    // Last-studied lesson finishes quickly; only the courses are outstanding
+    await waitFor(() => expect(result.current.isLoading).toBe(true));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(result.current.isLoading).toBe(true);
+
+    await act(async () => {
+      courses.resolve(createRealisticCourseWithLessonsList());
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.course).not.toBe(null);
+  });
+
+  it('is loading until the last studied lesson has loaded', async () => {
+    loginAsAppUser(coachEmail);
+    const lastStudied = deferred<null>();
+    overrideMockLastStudiedLessonAdapter({
+      getLastStudiedLesson: () => lastStudied.promise,
+    });
+
+    const { result } = renderCoordinator();
+    // Courses finish quickly; only the last-studied lesson is outstanding
+    await waitFor(() => expect(result.current.course).not.toBe(null));
+    expect(result.current.isLoading).toBe(true);
+
+    await act(async () => {
+      lastStudied.resolve(null);
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
   });
 });
 

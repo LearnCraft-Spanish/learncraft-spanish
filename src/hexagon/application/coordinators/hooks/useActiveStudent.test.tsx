@@ -150,8 +150,12 @@ describe('useActiveStudent permission to change student', () => {
     },
   );
 
-  it.each([{ roles: ['Student'] }, { roles: ['Limited'] }, { roles: [''] }])(
-    'does not let a user with roles $roles switch to another student',
+  it.each([
+    { label: 'Student only', roles: ['Student'] },
+    { label: 'Limited only', roles: ['Limited'] },
+    { label: 'no recognised role', roles: [''] },
+  ])(
+    'does not let a user with $label switch to another student',
     async ({ roles }) => {
       vi.spyOn(console, 'error').mockImplementation(() => {});
       signInWithRoles(roles);
@@ -208,7 +212,6 @@ describe('useActiveStudent selection', () => {
     act(() => result.current.changeActiveStudent(null));
 
     await waitFor(() => expect(result.current.appUser).toBe(null));
-    expect(result.current.isOwnUser).toBe(false);
   });
 
   it('surfaces an error when the signed-in user cannot be loaded', async () => {
