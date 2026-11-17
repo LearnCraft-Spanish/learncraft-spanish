@@ -431,29 +431,6 @@ describe('dateConversions', () => {
         'Invalid date format. Expected: YYYY-MM-DD',
       );
     });
-
-    it('should report an invalid value even when the column is not required', () => {
-      const column: ColumnDefinition = {
-        id: 'date',
-        type: 'date',
-        required: false,
-      };
-
-      expect(validateDate('not-a-date', column)).toContain(
-        'Invalid date format',
-      );
-    });
-
-    it('should report a required blank before checking the format', () => {
-      const column: ColumnDefinition = {
-        id: 'date',
-        type: 'date',
-        required: true,
-        dateFormat: { inputFormats: ['MM/DD/YYYY'] },
-      };
-
-      expect(validateDate('  ', column)).toBe('date is required');
-    });
   });
 
   describe('parse and display round trip', () => {

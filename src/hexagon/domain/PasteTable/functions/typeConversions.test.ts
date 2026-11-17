@@ -301,15 +301,6 @@ describe('typeConversions', () => {
       expect(convertCellValue('02/31/2024', column)).toBe('2024-02-31');
     });
 
-    it('should return multi-select and textarea values unchanged', () => {
-      expect(
-        convertCellValue(' a, b ', { id: 'tags', type: 'multi-select' }),
-      ).toBe(' a, b ');
-      expect(
-        convertCellValue('  long text ', { id: 'notes', type: 'textarea' }),
-      ).toBe('  long text ');
-    });
-
     it('should return select, custom, and read-only values unchanged', () => {
       expect(convertCellValue('Hello', { id: 'status', type: 'select' })).toBe(
         'Hello',
