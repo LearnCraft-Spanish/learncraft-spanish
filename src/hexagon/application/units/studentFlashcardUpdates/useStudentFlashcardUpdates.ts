@@ -12,6 +12,12 @@ export interface UseStudentFlashcardUpdatesReturn {
   handleReviewExample: (exampleId: number, difficulty: SrsDifficulty) => void;
   hasExampleBeenReviewed: (exampleId: number) => SrsDifficulty | null;
   flushBatch: () => Promise<void>;
+  /**
+   * True only when the logged-in user is the active student. When false
+   * (a coach/admin using the app as another student), reviews are kept in
+   * memory for this session and never saved.
+   */
+  isProgressTracked: boolean;
 }
 
 export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
@@ -23,6 +29,10 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
     setPendingFlashcardUpdateObjectsInLocalStorage,
   } = useStudentFlashcardUpdatesUtils();
 
+  // Only Students can have flashcards & flashcard updates, and progress is
+  // only saved when the logged-in user is that student.
+  const isProgressTracked = isOwnUser && appUser?.studentRole === 'student';
+
   // store the examplesReviewedResults in the state for optomistic UI updates
   const [examplesReviewedResults, setExamplesReviewedResults] = useState<
     PendingFlashcardUpdateObject[]
@@ -30,14 +40,36 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
 
   const hasExampleBeenReviewed = useCallback(
     (exampleId: number) => {
-      // get the flashcard update object from the localStorage
-      const flashcardUpdateObject =
-        getPendingFlashcardUpdateObjectsFromLocalStorage()?.find(
-          (update) => update.exampleId === exampleId,
-        );
+      // Untracked reviews live only in state; tracked ones in localStorage
+      const reviews = isProgressTracked
+        ? getPendingFlashcardUpdateObjectsFromLocalStorage()
+        : examplesReviewedResults;
+      const flashcardUpdateObject = reviews?.find(
+        (update) => update.exampleId === exampleId,
+      );
       return flashcardUpdateObject?.difficulty ?? null;
     },
-    [getPendingFlashcardUpdateObjectsFromLocalStorage],
+    [
+      isProgressTracked,
+      getPendingFlashcardUpdateObjectsFromLocalStorage,
+      examplesReviewedResults,
+    ],
+  );
+
+  // Record a review for this session only, without saving it anywhere
+  const addToSessionOnly = useCallback(
+    (exampleId: number, difficulty: SrsDifficulty) => {
+      const newRecord: PendingFlashcardUpdateObject = {
+        exampleId,
+        difficulty,
+        lastReviewedDate: new Date().toISOString().slice(0, 10),
+      };
+      setExamplesReviewedResults((previous) => [
+        ...previous.filter((record) => record.exampleId !== exampleId),
+        newRecord,
+      ]);
+    },
+    [],
   );
 
   const addToBatch = useCallback(
@@ -68,14 +100,17 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
 
   const handleReviewExample = useCallback(
     (exampleId: number, difficulty: SrsDifficulty) => {
-      if (!isOwnUser || appUser?.studentRole !== 'student') return; // Only Students can have flashcards & flashcard updates
+      if (!isProgressTracked) {
+        addToSessionOnly(exampleId, difficulty);
+        return;
+      }
       addToBatch(exampleId, difficulty);
     },
-    [addToBatch, isOwnUser, appUser?.studentRole],
+    [addToBatch, addToSessionOnly, isProgressTracked],
   );
 
   const flushBatch = useCallback(async () => {
-    if (!isOwnUser || appUser?.studentRole !== 'student') return; // Only Students can have flashcards & flashcard updates
+    if (!isProgressTracked) return; // Untracked reviews are never sent
     const pendingFlashcardUpdateObjects =
       getPendingFlashcardUpdateObjectsFromLocalStorage();
     if (
@@ -141,8 +176,7 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
     setPendingFlashcardUpdateObjectsInLocalStorage,
     updateFlashcards,
     getFlashcardByExampleId,
-    isOwnUser,
-    appUser?.studentRole,
+    isProgressTracked,
   ]);
 
   return {
@@ -150,5 +184,6 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
     handleReviewExample,
     hasExampleBeenReviewed,
     flushBatch,
+    isProgressTracked,
   };
 }

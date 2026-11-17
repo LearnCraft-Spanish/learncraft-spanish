@@ -13,6 +13,7 @@ export interface TextQuizSetupReturn {
   quizLength: number;
   setSelectedQuizLength: (selectedQuizLength: number) => void;
   canAccessSRS: boolean;
+  isSrsProgressTracked: boolean;
   srsQuiz: boolean;
   setSrsQuiz: (srsQuiz: boolean) => void;
   startWithSpanish: boolean;
@@ -66,12 +67,18 @@ export function useTextQuizSetup({
     (isAdmin || isCoach || isOwnUser) &&
     (customFlashcards?.length ?? 0) > 0;
 
-  // SRS quizzes are only accessible to the students themselves
-  const canAccessSRS =
-    ownedOnly && isOwnUser && appUser?.studentRole === 'student';
+  // SRS quizzes are available for any student's own flashcards. Coaches and
+  // admins using the app as a student can preview them too.
+  const canAccessSRS = ownedOnly && appUser?.studentRole === 'student';
+
+  // Review progress is only saved when the logged-in user is the active student
+  const isSrsProgressTracked = isOwnUser;
 
   // Local states with boolean choices
-  const [srsQuiz, setSrsQuiz] = useState<boolean>(canAccessSRS);
+  // SRS starts on only when its progress will be saved
+  const [srsQuiz, setSrsQuiz] = useState<boolean>(
+    canAccessSRS && isSrsProgressTracked,
+  );
   const [startWithSpanish, setStartWithSpanish] = useState<boolean>(false);
   const [customFlashcardsChoice, setCustomFlashcardsChoice] = useState<
     'included' | 'onlyCustom' | 'excluded'
@@ -198,6 +205,7 @@ export function useTextQuizSetup({
     examplesToQuiz,
     quizLength: safeQuizLength,
     canAccessSRS, // DO NOT render SRS controls if false
+    isSrsProgressTracked,
     srsQuiz,
     setSrsQuiz,
     startWithSpanish,
