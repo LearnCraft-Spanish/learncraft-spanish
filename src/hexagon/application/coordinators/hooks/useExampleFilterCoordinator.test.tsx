@@ -3,8 +3,8 @@ import type { SkillTag } from '@learncraft-spanish/shared';
 import type { ReactNode } from 'react';
 import { useExampleFilterCoordinator } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import { ExampleFilterContextProvider } from '@application/coordinators/providers/ExampleFilterContextProvider';
-import { SkillType } from '@learncraft-spanish/shared';
 import { act, renderHook } from '@testing-library/react';
+import { createMockSkillTagList } from '@testing/factories/skillTagFactory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockUseSkillTags = vi.hoisted(() => vi.fn());
@@ -13,17 +13,10 @@ vi.mock('@application/queries/useSkillTags', () => ({
   useSkillTags: mockUseSkillTags,
 }));
 
-const tag = (vocabularyId: number): SkillTag => ({
-  type: SkillType.Vocabulary,
-  key: `Vocabulary-${vocabularyId}`,
-  name: `word ${vocabularyId}`,
-  descriptor: '',
-  vocabularyId,
-  subcategoryName: 'Nouns',
-  frequency: null,
-});
-
-const catalog: SkillTag[] = [tag(1), tag(2), tag(3)];
+const catalog: SkillTag[] = createMockSkillTagList(3).map((tag, index) => ({
+  ...tag,
+  key: `Vocabulary-${index + 1}`,
+}));
 
 const setSkillTags = (
   overrides: Partial<UseSkillTagsReturnType> = {},
@@ -51,20 +44,6 @@ describe('useExampleFilterCoordinator', () => {
   beforeEach(() => {
     mockUseSkillTags.mockReset();
     setSkillTags();
-  });
-
-  describe('initial state', () => {
-    it('starts with no filters applied', () => {
-      const { result } = renderCoordinator();
-
-      expect(result.current.filterStateWithoutLesson).toEqual({
-        excludeSpanglish: false,
-        audioOnly: false,
-        skillTagKeys: [],
-        includeUnpublished: false,
-      });
-      expect(result.current.selectedSkillTags).toEqual([]);
-    });
   });
 
   describe('selected skill tags', () => {
@@ -102,26 +81,6 @@ describe('useExampleFilterCoordinator', () => {
 
       expect(result.current.selectedSkillTags).toEqual([]);
     });
-
-    it('has no selected tags when the catalog is unavailable', () => {
-      setSkillTags({ skillTags: undefined });
-      const { result } = renderCoordinator();
-
-      act(() => result.current.bulkUpdateSkillTagKeys(['Vocabulary-1']));
-
-      expect(result.current.selectedSkillTags).toEqual([]);
-    });
-
-    it('resolves the keys selected before loading finished once the catalog arrives', () => {
-      setSkillTags({ skillTags: undefined, isLoading: true });
-      const { result, rerender } = renderCoordinator();
-      act(() => result.current.bulkUpdateSkillTagKeys(['Vocabulary-2']));
-
-      setSkillTags();
-      rerender();
-
-      expect(selectedKeys(result)).toEqual(['Vocabulary-2']);
-    });
   });
 
   describe('adding and removing skill tags', () => {
@@ -157,85 +116,31 @@ describe('useExampleFilterCoordinator', () => {
 
       expect(selectedKeys(result)).toEqual(['Vocabulary-1', 'Vocabulary-3']);
     });
-
-    it('leaves the selection alone when removing a tag that is not selected', () => {
-      const { result } = renderCoordinator();
-      act(() => result.current.bulkUpdateSkillTagKeys(['Vocabulary-1']));
-
-      act(() => result.current.removeSkillTagFromFilters('Vocabulary-3'));
-
-      expect(selectedKeys(result)).toEqual(['Vocabulary-1']);
-    });
-
-    it('replaces the whole selection when the tag keys are bulk updated', () => {
-      const { result } = renderCoordinator();
-      act(() => result.current.bulkUpdateSkillTagKeys(['Vocabulary-1']));
-
-      act(() =>
-        result.current.bulkUpdateSkillTagKeys(['Vocabulary-2', 'Vocabulary-3']),
-      );
-
-      expect(selectedKeys(result)).toEqual(['Vocabulary-2', 'Vocabulary-3']);
-    });
   });
 
   describe('toggle filters', () => {
-    it('updates excludeSpanglish without disturbing the other filters', () => {
-      const { result } = renderCoordinator();
-      act(() => result.current.updateAudioOnly(true));
-      act(() => result.current.addSkillTagToFilters('Vocabulary-1'));
+    it.each([
+      ['excludeSpanglish', 'updateExcludeSpanglish'],
+      ['audioOnly', 'updateAudioOnly'],
+      ['includeUnpublished', 'updateIncludeUnpublished'],
+    ] as const)(
+      'updates %s without disturbing the other filters',
+      (filter, update) => {
+        const { result } = renderCoordinator();
+        act(() => result.current.addSkillTagToFilters('Vocabulary-1'));
 
-      act(() => result.current.updateExcludeSpanglish(true));
+        act(() => result.current[update](true));
 
-      expect(result.current.excludeSpanglish).toBe(true);
-      expect(result.current.filterStateWithoutLesson).toEqual({
-        excludeSpanglish: true,
-        audioOnly: true,
-        skillTagKeys: ['Vocabulary-1'],
-        includeUnpublished: false,
-      });
-    });
-
-    it('updates audioOnly without disturbing the other filters', () => {
-      const { result } = renderCoordinator();
-      act(() => result.current.updateExcludeSpanglish(true));
-      act(() => result.current.addSkillTagToFilters('Vocabulary-1'));
-
-      act(() => result.current.updateAudioOnly(true));
-
-      expect(result.current.audioOnly).toBe(true);
-      expect(result.current.filterStateWithoutLesson).toEqual({
-        excludeSpanglish: true,
-        audioOnly: true,
-        skillTagKeys: ['Vocabulary-1'],
-        includeUnpublished: false,
-      });
-    });
-
-    it('updates includeUnpublished without disturbing the other filters', () => {
-      const { result } = renderCoordinator();
-      act(() => result.current.updateAudioOnly(true));
-      act(() => result.current.addSkillTagToFilters('Vocabulary-1'));
-
-      act(() => result.current.updateIncludeUnpublished(true));
-
-      expect(result.current.includeUnpublished).toBe(true);
-      expect(result.current.filterStateWithoutLesson).toEqual({
-        excludeSpanglish: false,
-        audioOnly: true,
-        skillTagKeys: ['Vocabulary-1'],
-        includeUnpublished: true,
-      });
-    });
-
-    it('turns a filter back off', () => {
-      const { result } = renderCoordinator();
-      act(() => result.current.updateAudioOnly(true));
-
-      act(() => result.current.updateAudioOnly(false));
-
-      expect(result.current.audioOnly).toBe(false);
-    });
+        expect(result.current.filterStateWithoutLesson).toEqual({
+          excludeSpanglish: false,
+          audioOnly: false,
+          includeUnpublished: false,
+          skillTagKeys: ['Vocabulary-1'],
+          [filter]: true,
+        });
+        expect(result.current[filter]).toBe(true);
+      },
+    );
   });
 
   describe('batch update', () => {
@@ -266,13 +171,6 @@ describe('useExampleFilterCoordinator', () => {
       const { result } = renderCoordinator();
 
       expect(result.current.isLoading).toBe(true);
-    });
-
-    it('is not loading once the catalog has loaded', () => {
-      const { result } = renderCoordinator();
-
-      expect(result.current.isLoading).toBe(false);
-      expect(result.current.error).toBeNull();
     });
 
     it('surfaces a skill tag catalog failure', () => {

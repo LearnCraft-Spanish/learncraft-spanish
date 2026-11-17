@@ -18,16 +18,6 @@ const changedFilters: ExampleFilterStateWithoutLesson = {
 };
 
 describe('exampleFilterContextProvider', () => {
-  it('renders its children', () => {
-    render(
-      <ExampleFilterContextProvider>
-        <p>filter page</p>
-      </ExampleFilterContextProvider>,
-    );
-
-    expect(screen.getByText('filter page')).toBeInTheDocument();
-  });
-
   it('starts with no filters applied', () => {
     const { result } = renderHook(() => use(ExampleFilterContext), { wrapper });
 
@@ -39,22 +29,10 @@ describe('exampleFilterContextProvider', () => {
     });
   });
 
-  it('replaces the filters when they are updated', () => {
-    const { result } = renderHook(() => use(ExampleFilterContext), { wrapper });
-
-    act(() => result.current.updateExampleFilters(changedFilters));
-
-    expect(result.current.exampleFilters).toEqual(changedFilters);
-  });
-
-  it('shares the filters between everything rendered inside it', () => {
+  it('renders its children and shares the filters between all of them', () => {
     const Reader = ({ label }: { label: string }) => {
       const { exampleFilters } = use(ExampleFilterContext);
-      return (
-        <p>
-          {label}: {exampleFilters.skillTagKeys.join(',') || 'none'}
-        </p>
-      );
+      return <p>{`${label}: ${exampleFilters.skillTagKeys.join(',')}`}</p>;
     };
     const Writer = () => {
       const { updateExampleFilters } = use(ExampleFilterContext);

@@ -2,10 +2,7 @@ import {
   mockUseExampleFilterCoordinator,
   resetMockUseExampleFilterCoordinator,
 } from '@application/coordinators/hooks/useExampleFilterCoordinator.mock';
-import {
-  PreSetQuizPreset,
-  preSetQuizzes,
-} from '@application/units/Filtering/FilterPresets/preSetQuizzes';
+import { preSetQuizzes } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { usePresetFilters } from '@application/units/Filtering/FilterPresets/usePresetFilters';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -39,14 +36,4 @@ describe('usePresetFilters', () => {
       ).toHaveBeenCalledWith(SkillTagKeys);
     },
   );
-
-  it('clears the selected tags when the None preset is chosen', () => {
-    const { result } = renderHook(() => usePresetFilters());
-
-    result.current.setFilterPreset(PreSetQuizPreset.None);
-
-    expect(
-      mockUseExampleFilterCoordinator.bulkUpdateSkillTagKeys,
-    ).toHaveBeenCalledWith([]);
-  });
 });

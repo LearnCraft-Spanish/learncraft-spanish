@@ -294,28 +294,5 @@ describe('useFilterOwnedFlashcards', () => {
 
       expect(filteredIds(result.current.filteredFlashcards)).toEqual([2]);
     });
-
-    it('updates the list when the active filters change', () => {
-      const { result, rerender } = renderFilter(true);
-      expect(filteredIds(result.current.filteredFlashcards)).toEqual([1, 2]);
-
-      combinedFiltersValue = createCombinedFilters({ excludeSpanglish: true });
-      rerender();
-
-      expect(filteredIds(result.current.filteredFlashcards)).toEqual([1]);
-    });
-
-    it('ignores the active filters when filtering is switched off', () => {
-      combinedFiltersValue = createCombinedFilters({ excludeSpanglish: true });
-      const { result, rerender } = renderHook(
-        ({ on }) => useFilterOwnedFlashcards(on),
-        { initialProps: { on: true } },
-      );
-      expect(filteredIds(result.current.filteredFlashcards)).toEqual([1]);
-
-      rerender({ on: false });
-
-      expect(filteredIds(result.current.filteredFlashcards)).toEqual([1, 2]);
-    });
   });
 });

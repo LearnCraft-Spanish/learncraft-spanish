@@ -4,13 +4,9 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import { vi } from 'vitest';
 
 /**
- * Not registered in `setupTests.ts`: install it per test file with
- * `vi.mock('@application/coordinators/hooks/useExampleFilterCoordinator', async () => {
- *   const { mockUseExampleFilterCoordinator } = await import(
- *     '@application/coordinators/hooks/useExampleFilterCoordinator.mock'
- *   );
- *   return { useExampleFilterCoordinator: () => mockUseExampleFilterCoordinator };
- * });`
+ * Not registered in `setupTests.ts`. In a test file, mock the hook's module with an
+ * async factory that imports this file and returns
+ * `{ useExampleFilterCoordinator: () => mockUseExampleFilterCoordinator }` (see `useCombinedFilters.test.ts`).
  */
 const defaultMockResult: UseExampleFilterCoordinatorReturnType = {
   filterStateWithoutLesson: {

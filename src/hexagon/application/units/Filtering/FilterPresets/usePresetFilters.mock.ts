@@ -6,13 +6,9 @@ import { vi } from 'vitest';
 type UsePresetFiltersReturnType = ReturnType<typeof usePresetFilters>;
 
 /**
- * Not registered in `setupTests.ts`: install it per test file with
- * `vi.mock('@application/units/Filtering/FilterPresets/usePresetFilters', async () => {
- *   const { mockUsePresetFilters } = await import(
- *     '@application/units/Filtering/FilterPresets/usePresetFilters.mock'
- *   );
- *   return { usePresetFilters: () => mockUsePresetFilters };
- * });`
+ * Not registered in `setupTests.ts`. In a test file, mock the hook's module with an
+ * async factory that imports this file and returns
+ * `{ usePresetFilters: () => mockUsePresetFilters }` (see `useCombinedFilters.test.ts`).
  */
 const defaultMockResult: UsePresetFiltersReturnType = {
   setFilterPreset: vi.fn<(preset: PreSetQuizPreset) => void>(),

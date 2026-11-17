@@ -3,15 +3,9 @@ import { defaultMockUseCombinedFiltersResult as defaultCombinedFiltersResult } f
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 /**
- * Not registered in `setupTests.ts`: install it per test file with
- * `vi.mock('@application/units/Filtering/useCombinedFiltersWithVocabulary', async () => {
- *   const { mockUseCombinedFiltersWithVocabulary } = await import(
- *     '@application/units/Filtering/useCombinedFiltersWithVocabulary.mock'
- *   );
- *   return {
- *     useCombinedFiltersWithVocabulary: () => mockUseCombinedFiltersWithVocabulary,
- *   };
- * });`
+ * Not registered in `setupTests.ts`. In a test file, mock the hook's module with an
+ * async factory that imports this file and returns
+ * `{ useCombinedFiltersWithVocabulary: () => mockUseCombinedFiltersWithVocabulary }` (see `useCombinedFilters.test.ts`).
  */
 const defaultMockResult: UseCombinedFiltersWithVocabularyReturnType = {
   ...defaultCombinedFiltersResult,
