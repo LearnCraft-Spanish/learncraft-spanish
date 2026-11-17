@@ -7,6 +7,7 @@ const defaultMockUseStudentFlashcardUpdates: UseStudentFlashcardUpdatesReturn =
     handleReviewExample: () => {},
     hasExampleBeenReviewed: () => null,
     flushBatch: async () => Promise.resolve(),
+    isProgressTracked: true,
   };
 
 export const {

@@ -10,7 +10,10 @@ import {
 import { act, renderHook } from '@testing-library/react';
 import { createMockFlashcard } from '@testing/factories/flashcardFactory';
 import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
-import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
+import {
+  getAppUserFromEmail,
+  getAuthUserFromEmail,
+} from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { vi } from 'vitest';
 
@@ -749,6 +752,142 @@ describe('useStudentFlashcardUpdates', () => {
       // Verify state only has one entry for this example
       expect(result.current.examplesReviewedResults).toHaveLength(1);
       expect(result.current.examplesReviewedResults[0].difficulty).toBe('easy');
+    });
+  });
+
+  describe('isProgressTracked', () => {
+    it('is true when the logged-in user is the active student', () => {
+      const { result } = renderHook(() => useStudentFlashcardUpdates(), {
+        wrapper: MockAllProviders,
+      });
+
+      expect(result.current.isProgressTracked).toBe(true);
+    });
+
+    it('is false when a coach/admin is using the app as another student', () => {
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
+          isAdmin: true,
+        },
+        {
+          appUser: getAppUserFromEmail('student-lcsp@fake.not'),
+          isOwnUser: false,
+        },
+      );
+
+      const { result } = renderHook(() => useStudentFlashcardUpdates(), {
+        wrapper: MockAllProviders,
+      });
+
+      expect(result.current.isProgressTracked).toBe(false);
+    });
+  });
+
+  describe('when progress is not tracked (coach/admin using the app as another student)', () => {
+    beforeEach(() => {
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
+          isAdmin: true,
+        },
+        {
+          appUser: getAppUserFromEmail('student-lcsp@fake.not'),
+          isOwnUser: false,
+        },
+      );
+    });
+
+    it('still records reviews for this session so the quiz gives feedback', () => {
+      const { result } = renderHook(() => useStudentFlashcardUpdates(), {
+        wrapper: MockAllProviders,
+      });
+
+      act(() => {
+        result.current.handleReviewExample(123, 'easy');
+        result.current.handleReviewExample(456, 'hard');
+      });
+
+      expect(result.current.examplesReviewedResults).toEqual([
+        {
+          exampleId: 123,
+          difficulty: 'easy',
+          lastReviewedDate: new Date().toISOString().slice(0, 10),
+        },
+        {
+          exampleId: 456,
+          difficulty: 'hard',
+          lastReviewedDate: new Date().toISOString().slice(0, 10),
+        },
+      ]);
+      expect(result.current.hasExampleBeenReviewed(123)).toBe('easy');
+      expect(result.current.hasExampleBeenReviewed(456)).toBe('hard');
+    });
+
+    it('replaces an earlier review of the same example', () => {
+      const { result } = renderHook(() => useStudentFlashcardUpdates(), {
+        wrapper: MockAllProviders,
+      });
+
+      act(() => {
+        result.current.handleReviewExample(123, 'viewed');
+        result.current.handleReviewExample(123, 'hard');
+      });
+
+      expect(result.current.examplesReviewedResults).toHaveLength(1);
+      expect(result.current.hasExampleBeenReviewed(123)).toBe('hard');
+    });
+
+    it('never writes reviews to localStorage', () => {
+      const { result } = renderHook(() => useStudentFlashcardUpdates(), {
+        wrapper: MockAllProviders,
+      });
+
+      act(() => {
+        result.current.handleReviewExample(123, 'easy');
+      });
+
+      expect(mockLocalStorageAdapter.setItem).not.toHaveBeenCalled();
+    });
+
+    it('never sends reviews to the backend', async () => {
+      const mockUpdateFlashcards = vi.fn().mockResolvedValue([]);
+      overrideMockUseStudentFlashcards({
+        updateFlashcards: mockUpdateFlashcards,
+        getFlashcardByExampleId: () =>
+          createMockFlashcard({ interval: 1, lastReviewed: undefined }),
+      });
+
+      const { result } = renderHook(() => useStudentFlashcardUpdates(), {
+        wrapper: MockAllProviders,
+      });
+
+      act(() => {
+        result.current.handleReviewExample(123, 'easy');
+      });
+      await act(async () => {
+        await result.current.flushBatch();
+      });
+
+      expect(mockUpdateFlashcards).not.toHaveBeenCalled();
+    });
+
+    it('ignores pending reviews already saved in localStorage', () => {
+      mockLocalStorageAdapter.setItem('srs-pending-updates', [
+        {
+          exampleId: 123,
+          difficulty: 'easy',
+          lastReviewedDate: new Date().toISOString().slice(0, 10),
+        },
+      ]);
+      mockLocalStorageAdapter.setItem.mockClear();
+
+      const { result } = renderHook(() => useStudentFlashcardUpdates(), {
+        wrapper: MockAllProviders,
+      });
+
+      expect(result.current.hasExampleBeenReviewed(123)).toBeNull();
+      expect(result.current.examplesReviewedResults).toEqual([]);
     });
   });
 });
