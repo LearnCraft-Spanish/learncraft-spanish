@@ -187,6 +187,18 @@ describe('typeConversions', () => {
       expect(formatBooleanForTable(false, 'true-false')).toBe('false');
     });
 
+    it('should round-trip a boolean through every concrete format', () => {
+      const formats = ['true-false', 'yes-no', '1-0', 'y-n'] as const;
+
+      for (const format of formats) {
+        for (const value of [true, false]) {
+          expect(
+            parseBoolean(formatBooleanForTable(value, format), format),
+          ).toBe(value);
+        }
+      }
+    });
+
     it('should stringify an unrecognized format', () => {
       expect(formatBooleanForTable(true, 'nope' as 'yes-no')).toBe('true');
       expect(formatBooleanForTable(false, 'nope' as 'yes-no')).toBe('false');
@@ -289,6 +301,15 @@ describe('typeConversions', () => {
       expect(convertCellValue('02/31/2024', column)).toBe('2024-02-31');
     });
 
+    it('should return multi-select and textarea values unchanged', () => {
+      expect(
+        convertCellValue(' a, b ', { id: 'tags', type: 'multi-select' }),
+      ).toBe(' a, b ');
+      expect(
+        convertCellValue('  long text ', { id: 'notes', type: 'textarea' }),
+      ).toBe('  long text ');
+    });
+
     it('should return select, custom, and read-only values unchanged', () => {
       expect(convertCellValue('Hello', { id: 'status', type: 'select' })).toBe(
         'Hello',
@@ -372,6 +393,11 @@ describe('typeConversions', () => {
       expect(normalizeDate('not-a-date')).toBe('not-a-date');
       expect(normalizeDate('x2024-02-31')).toBe('x2024-02-31');
       expect(normalizeDate('2024-02-31x')).toBe('2024-02-31x');
+    });
+
+    it('should not parse a blank date and should trim before matching a strict date', () => {
+      expect(normalizeDate('  01/15/2024  ')).toBe('2024-01-15');
+      expect(normalizeDate('\t')).toBe('');
     });
   });
 });
