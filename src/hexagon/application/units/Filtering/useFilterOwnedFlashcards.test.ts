@@ -205,6 +205,7 @@ describe('useFilterOwnedFlashcards', () => {
     expect(result.current.filteredFlashcardsLoading).toBe(true);
     expect(result.current.error).toBe(error);
   });
+
   describe('when filtering is on', () => {
     const owned = (flashcards: Flashcard[]) =>
       overrideMockUseStudentFlashcards({

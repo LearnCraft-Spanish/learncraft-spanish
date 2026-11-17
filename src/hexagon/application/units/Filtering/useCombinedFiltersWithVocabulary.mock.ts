@@ -10,9 +10,7 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 const defaultMockResult: UseCombinedFiltersWithVocabularyReturnType = {
   ...defaultCombinedFiltersResult,
   filterStateWithVocabulary: {
-    excludeSpanglish: false,
-    audioOnly: false,
-    skillTags: [],
+    ...defaultCombinedFiltersResult.filterState,
     requiredVocabulary: undefined,
     allowedVocabulary: [],
   },

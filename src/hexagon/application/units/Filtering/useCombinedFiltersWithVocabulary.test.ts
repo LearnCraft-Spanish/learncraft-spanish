@@ -99,6 +99,14 @@ describe('useCombinedFiltersWithVocabulary', () => {
       });
     });
 
+    it('allows no vocabulary until the known vocabulary has loaded', () => {
+      const { result } = renderCombined();
+
+      expect(
+        result.current.filterStateWithVocabulary.allowedVocabulary,
+      ).toEqual([]);
+    });
+
     it('requires no vocabulary when no from lesson is selected', () => {
       setVocabRequired({ lessonRangeVocabRequired: [7, 8] });
 
