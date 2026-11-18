@@ -7,7 +7,7 @@ import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock'
 import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
 import { useIncludeUnpublished } from '@application/coordinators/hooks/useIncludeUnpublished';
 import { act, renderHook } from '@testing-library/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 // The global setup mocks this hook for consumers; this suite tests the real one
@@ -24,10 +24,10 @@ const initialFilters: ExampleFilterStateWithoutLesson = {
 function StatefulFilters({ children }: { children: ReactNode }) {
   const [exampleFilters, updateExampleFilters] =
     useState<ExampleFilterStateWithoutLesson>(initialFilters);
-  const value: ExampleFilterContextType = {
-    exampleFilters,
-    updateExampleFilters,
-  };
+  const value = useMemo<ExampleFilterContextType>(
+    () => ({ exampleFilters, updateExampleFilters }),
+    [exampleFilters],
+  );
   return <ExampleFilterContext value={value}>{children}</ExampleFilterContext>;
 }
 
