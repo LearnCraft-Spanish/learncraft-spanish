@@ -414,5 +414,34 @@ describe('dateConversions', () => {
         'Invalid date format. Expected: YYYY-MM-DD',
       );
     });
+
+    it('should accept every default input format when no formats are configured', () => {
+      const column: ColumnDefinition = { id: 'date', type: 'date' };
+
+      expect(validateDate('2024-01-15', column)).toBeNull();
+      expect(validateDate('01/15/2024', column)).toBeNull();
+      expect(validateDate('15-01-2024', column)).toBeNull();
+      expect(validateDate('2024/01/15', column)).toBeNull();
+    });
+
+    it('should reject a month that does not exist', () => {
+      const column: ColumnDefinition = { id: 'date', type: 'date' };
+
+      expect(validateDate('2024-13-01', column)).toBe(
+        'Invalid date format. Expected: YYYY-MM-DD',
+      );
+    });
+  });
+
+  describe('parse and display round trip', () => {
+    it.each([
+      ['2024-01-15', 'YYYY-MM-DD'],
+      ['01/15/2024', 'MM/DD/YYYY'],
+      ['15-01-2024', 'DD-MM-YYYY'],
+    ])('should show %s again when displayed as %s', (input, displayFormat) => {
+      const stored = parseDateFromTable(input);
+
+      expect(formatDateForTable(stored, { displayFormat })).toBe(input);
+    });
   });
 });

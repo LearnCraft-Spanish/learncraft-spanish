@@ -187,6 +187,18 @@ describe('typeConversions', () => {
       expect(formatBooleanForTable(false, 'true-false')).toBe('false');
     });
 
+    it('should round-trip a boolean through every concrete format', () => {
+      const formats = ['true-false', 'yes-no', '1-0', 'y-n'] as const;
+
+      for (const format of formats) {
+        for (const value of [true, false]) {
+          expect(
+            parseBoolean(formatBooleanForTable(value, format), format),
+          ).toBe(value);
+        }
+      }
+    });
+
     it('should stringify an unrecognized format', () => {
       expect(formatBooleanForTable(true, 'nope' as 'yes-no')).toBe('true');
       expect(formatBooleanForTable(false, 'nope' as 'yes-no')).toBe('false');
@@ -372,6 +384,14 @@ describe('typeConversions', () => {
       expect(normalizeDate('not-a-date')).toBe('not-a-date');
       expect(normalizeDate('x2024-02-31')).toBe('x2024-02-31');
       expect(normalizeDate('2024-02-31x')).toBe('2024-02-31x');
+    });
+
+    it('should return an empty string for tab-only input', () => {
+      expect(normalizeDate('\t')).toBe('');
+    });
+
+    it('should trim before matching a strict DD-MM-YYYY date', () => {
+      expect(normalizeDate('  15-01-2024  ')).toBe('2024-01-15');
     });
   });
 });

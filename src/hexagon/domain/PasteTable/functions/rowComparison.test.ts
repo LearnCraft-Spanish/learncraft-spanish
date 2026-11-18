@@ -33,6 +33,38 @@ describe('rowComparison', () => {
     it('should return true for empty cells', () => {
       expect(cellsEqual({}, {})).toBe(true);
     });
+
+    it('should not depend on key order', () => {
+      expect(
+        cellsEqual({ name: 'John', age: '30' }, { age: '30', name: 'John' }),
+      ).toBe(true);
+    });
+
+    it('should return false when the keys differ even if the key count matches', () => {
+      expect(cellsEqual({ name: 'John' }, { nickname: 'John' })).toBe(false);
+    });
+
+    it('should return false when the second cells have extra keys', () => {
+      expect(cellsEqual({ name: 'John' }, { name: 'John', age: '30' })).toBe(
+        false,
+      );
+    });
+
+    describe('with columnIds', () => {
+      it('should compare only the listed columns', () => {
+        const cells1 = { name: 'John', age: '30' };
+        const cells2 = { name: 'John', age: '99', city: 'NYC' };
+
+        expect(cellsEqual(cells1, cells2, ['name'])).toBe(true);
+      });
+
+      it('should return false when a listed column differs', () => {
+        const cells1 = { name: 'John', age: '30' };
+        const cells2 = { name: 'John', age: '99' };
+
+        expect(cellsEqual(cells1, cells2, ['name', 'age'])).toBe(false);
+      });
+    });
   });
 
   describe('rowsEqual', () => {
@@ -74,6 +106,14 @@ describe('rowComparison', () => {
 
       expect(rowsEqual(row1, row2)).toBe(false);
     });
+
+    it('should return false for the same cells under different IDs', () => {
+      const cells = { name: 'John' };
+
+      expect(
+        rowsEqual({ id: 'row-1', cells }, { id: 'row-2', cells: { ...cells } }),
+      ).toBe(false);
+    });
   });
 
   describe('hasRowChanged', () => {
@@ -107,6 +147,32 @@ describe('rowComparison', () => {
       const current: TableRow = {
         id: 'row-1',
         cells: { name: 'John', age: '30', city: 'NYC' },
+      };
+      const original: TableRow = {
+        id: 'row-1',
+        cells: { name: 'John', age: '30' },
+      };
+
+      expect(hasRowChanged(current, original)).toBe(true);
+    });
+
+    it('should return true when a cell has been removed', () => {
+      const current: TableRow = {
+        id: 'row-1',
+        cells: { name: 'John' },
+      };
+      const original: TableRow = {
+        id: 'row-1',
+        cells: { name: 'John', age: '30' },
+      };
+
+      expect(hasRowChanged(current, original)).toBe(true);
+    });
+
+    it('should return true when a cell is cleared to an empty string', () => {
+      const current: TableRow = {
+        id: 'row-1',
+        cells: { name: '', age: '30' },
       };
       const original: TableRow = {
         id: 'row-1',
@@ -172,6 +238,25 @@ describe('rowComparison', () => {
 
       const dirty = findDirtyRows(current, original);
       expect(dirty.size).toBe(0);
+    });
+
+    it('should match rows by id rather than by position', () => {
+      const current: TableRow[] = [
+        { id: 'row-2', cells: { name: 'Jane' } },
+        { id: 'row-1', cells: { name: 'John Updated' } },
+      ];
+      const original: TableRow[] = [
+        { id: 'row-1', cells: { name: 'John' } },
+        { id: 'row-2', cells: { name: 'Jane' } },
+      ];
+
+      const dirty = findDirtyRows(current, original);
+      expect([...dirty]).toEqual(['row-1']);
+    });
+
+    it('should return an empty set when there are no rows', () => {
+      expect(findDirtyRows([], []).size).toBe(0);
+      expect(findDirtyRows([], [{ id: 'row-1', cells: {} }]).size).toBe(0);
     });
   });
 });
