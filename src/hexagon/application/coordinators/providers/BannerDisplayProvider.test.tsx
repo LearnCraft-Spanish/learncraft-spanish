@@ -72,7 +72,8 @@ describe('bannerDisplayProvider', () => {
     });
 
     it('keeps the banner hidden until midnight on the day after next', () => {
-      // Seen Tuesday 8am: expires Thursday midnight (see the doc comment on
+      // Seen Tuesday 8am: expires at the midnight starting Thursday, i.e. 2 days
+      // from now at 00:00 (see the doc comment on
       // getCoachingBannerCookieExpiration)
       vi.useFakeTimers({ toFake: ['Date'] });
       vi.setSystemTime(new Date(2026, 0, 6, 8, 0, 0));

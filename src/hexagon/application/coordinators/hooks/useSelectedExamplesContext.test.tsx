@@ -8,6 +8,11 @@ function wrapper({ children }: { children: ReactNode }) {
   return <SelectedExamplesProvider>{children}</SelectedExamplesProvider>;
 }
 
+// Selection order is not part of the contract, so compare order-insensitively
+function sorted(ids: number[]): number[] {
+  return [...ids].sort((a, b) => a - b);
+}
+
 describe('useSelectedExamplesContext', () => {
   it('starts with no examples selected', () => {
     const { result } = renderHook(() => useSelectedExamplesContext(), {
@@ -25,7 +30,7 @@ describe('useSelectedExamplesContext', () => {
 
     act(() => result.current.updateSelectedExamples([7, 8]));
 
-    expect(result.current.selectedExampleIds).toEqual([7, 8]);
+    expect(sorted(result.current.selectedExampleIds)).toEqual([7, 8]);
   });
 
   it('adds an example to the selection', () => {
@@ -36,7 +41,7 @@ describe('useSelectedExamplesContext', () => {
 
     act(() => result.current.addSelectedExample(2));
 
-    expect(result.current.selectedExampleIds).toEqual([1, 2]);
+    expect(sorted(result.current.selectedExampleIds)).toEqual([1, 2]);
   });
 
   it('does not select the same example twice', () => {
@@ -58,7 +63,7 @@ describe('useSelectedExamplesContext', () => {
 
     act(() => result.current.removeSelectedExample(2));
 
-    expect(result.current.selectedExampleIds).toEqual([1, 3]);
+    expect(sorted(result.current.selectedExampleIds)).toEqual([1, 3]);
   });
 
   it('leaves the selection alone when removing an example that is not selected', () => {
@@ -69,7 +74,7 @@ describe('useSelectedExamplesContext', () => {
 
     act(() => result.current.removeSelectedExample(99));
 
-    expect(result.current.selectedExampleIds).toEqual([1, 2]);
+    expect(sorted(result.current.selectedExampleIds)).toEqual([1, 2]);
   });
 
   it('clears the whole selection', () => {

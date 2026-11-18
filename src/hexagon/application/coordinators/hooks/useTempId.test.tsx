@@ -12,11 +12,9 @@ describe('useTempId', () => {
   it('hands out negative ids, so they cannot collide with real record ids', () => {
     const { result } = renderHook(() => useTempId(), { wrapper });
 
-    const ids = [
+    const ids = Array.from({ length: 10 }, () =>
       result.current.getNextTempId(),
-      result.current.getNextTempId(),
-      result.current.getNextTempId(),
-    ];
+    );
 
     ids.forEach((id) => expect(id).toBeLessThan(0));
   });
