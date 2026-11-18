@@ -64,4 +64,7 @@ export const {
   reset: resetMockUseCombinedFilters,
 } = createOverrideableMock<UseCombinedFiltersReturnType>(defaultMockResult);
 
+/** The default return value, for mocks of hooks that extend `useCombinedFilters`. */
+export { defaultMockResult as defaultMockUseCombinedFiltersResult };
+
 export default mockUseCombinedFilters;
