@@ -2,7 +2,11 @@ import type { UseExampleEditorResult } from '@application/useCases/useExampleEdi
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import { createOverrideableMockHook } from '@testing/utils/createOverrideableMockHook';
 
-/** The columns the real hook exposes, so interface tests render the same table. */
+/**
+ * The columns the real hook exposes, so interface tests render the same table.
+ * This is a copy of `exampleEditColumns` in `useExampleEditor.ts` (which is not
+ * exported); update both together if the real columns change.
+ */
 export const mockExampleEditorColumns: ColumnDefinition[] = [
   { id: 'id', type: 'read-only', editable: false },
   { id: 'spanish', type: 'textarea', required: true },

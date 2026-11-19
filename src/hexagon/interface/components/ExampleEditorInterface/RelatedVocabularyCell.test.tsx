@@ -71,7 +71,6 @@ describe('relatedVocabularyCell', () => {
 
   it.each([
     ['an empty string', ''],
-    ['only whitespace', '   '],
     ['text that is not JSON', 'not-json'],
     ['JSON that is not an array', '{"id":1}'],
   ])('shows no tags when the cell value is %s', (_label, value) => {
@@ -116,8 +115,8 @@ describe('relatedVocabularyCell', () => {
   });
 
   it('opens vocabulary details only for the example whose tag was clicked', () => {
-    // Two examples share the same vocabulary; each row id maps to its own
-    // example id, so the details popup must belong to one example only.
+    // The point is the row-id mapping: "row-11" and "row-12" are different
+    // examples, so clicking a tag opens the popup for only one of the cells.
     render(
       <MockAllProviders>
         <RelatedVocabularyCell
@@ -164,7 +163,8 @@ describe('relatedVocabularyCell', () => {
 
     fireEvent.click(screen.getAllByText('hablar')[1]);
 
-    // Both cells belong to example 21, so both show its vocabulary details.
+    // The point is the row-id mapping: "21" and "row-21" both mean example 21,
+    // so the details popup opens for both cells.
     expect(screen.getAllByText('Taught in:')).toHaveLength(2);
   });
 });

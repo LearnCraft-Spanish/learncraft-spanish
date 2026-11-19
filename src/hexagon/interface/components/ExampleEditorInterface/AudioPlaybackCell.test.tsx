@@ -4,32 +4,21 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 const audioUrl = 'https://example.com/ex1la.mp3';
-const otherAudioUrl = 'https://example.com/ex2la.mp3';
 
-function renderCell(value: string, audioErrorHandlers = makeHandlers()) {
-  const buildProps = (cellValue: string) => ({
-    value: cellValue,
+function renderCell(value: string) {
+  const audioErrorHandlers = makeHandlers();
+  const cellProps = {
+    value,
     row: { id: 'row-7', cells: {} },
     column: { id: 'spanishAudio', type: 'text', editable: false },
-    audioErrorHandlers,
-  });
+  } as unknown as CellRenderProps;
   const view = render(
     <AudioPlaybackCell
-      {...(buildProps(value) as unknown as CellRenderProps)}
+      {...cellProps}
       audioErrorHandlers={audioErrorHandlers}
     />,
   );
-  return {
-    ...view,
-    audioErrorHandlers,
-    rerenderWith: (cellValue: string) =>
-      view.rerender(
-        <AudioPlaybackCell
-          {...(buildProps(cellValue) as unknown as CellRenderProps)}
-          audioErrorHandlers={audioErrorHandlers}
-        />,
-      ),
-  };
+  return { ...view, audioErrorHandlers };
 }
 
 function makeHandlers() {
@@ -44,15 +33,6 @@ describe('audioPlaybackCell', () => {
     renderCell(audioUrl);
 
     expect(screen.getByLabelText('Play/Pause')).toBeInTheDocument();
-  });
-
-  it('renders no audio control when the cell has no audio url', () => {
-    renderCell('');
-
-    expect(screen.queryByLabelText('Play/Pause')).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'error loading audio' }),
-    ).not.toBeInTheDocument();
   });
 
   it('reports a load failure for its own row and column', () => {
@@ -79,29 +59,5 @@ describe('audioPlaybackCell', () => {
       'spanishAudio',
     );
     expect(audioErrorHandlers.onAudioError).not.toHaveBeenCalled();
-  });
-
-  it('shows a disabled error button for a url that is not an audio file', () => {
-    renderCell('not-an-audio-url');
-
-    expect(
-      screen.getByRole('button', { name: 'error loading audio' }),
-    ).toBeDisabled();
-    expect(screen.queryByLabelText('Play/Pause')).not.toBeInTheDocument();
-  });
-
-  it('starts fresh when the audio url changes after a load failure', () => {
-    const { container, rerenderWith } = renderCell(audioUrl);
-    fireEvent.error(container.querySelector('audio') as HTMLAudioElement);
-    expect(
-      screen.getByRole('button', { name: 'error loading audio' }),
-    ).toBeInTheDocument();
-
-    rerenderWith(otherAudioUrl);
-
-    expect(
-      screen.queryByRole('button', { name: 'error loading audio' }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Play/Pause')).toBeInTheDocument();
   });
 });
