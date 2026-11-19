@@ -1,5 +1,10 @@
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
-import { convertDataToRows } from '@application/units/pasteTable/utils/rowCreation';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
+import {
+  convertDataToRows,
+  createEmptyRow,
+  createGhostRow,
+} from '@application/units/pasteTable/utils/rowCreation';
 import { describe, expect, it } from 'vitest';
 
 const testColumns: ColumnDefinition[] = [
@@ -90,6 +95,34 @@ describe('convertDataToRows', () => {
     });
   });
 
+  describe('falsy values', () => {
+    it('should keep 0, false and empty string as visible cell text', () => {
+      // Given: A row whose values are falsy but real data
+      const data = [{ name: '', age: 0, city: false }];
+
+      // When: convertDataToRows is called
+      const result: TableRow[] = convertDataToRows(data, testColumns);
+
+      // Then: Only undefined and null become blank; 0 and false are kept
+      expect(result[0].cells).toEqual({ name: '', age: '0', city: 'false' });
+    });
+
+    it('should only read the given columns from each item', () => {
+      // Given: An item with a property that has no column
+      const data = [{ name: 'Alice', age: 30, city: 'NYC', extra: 'ignored' }];
+
+      // When: convertDataToRows is called
+      const result: TableRow[] = convertDataToRows(data, testColumns);
+
+      // Then: The extra property does not become a cell
+      expect(Object.keys(result[0].cells)).toEqual(['name', 'age', 'city']);
+    });
+
+    it('should return no rows for no data', () => {
+      expect(convertDataToRows([], testColumns)).toEqual([]);
+    });
+  });
+
   describe('edge cases', () => {
     it('should handle undefined and null values by converting to strings', () => {
       const data = [
@@ -112,6 +145,38 @@ describe('convertDataToRows', () => {
         age: '',
         city: '',
       });
+    });
+  });
+});
+
+describe('createEmptyRow', () => {
+  it('should create a row with every column blank', () => {
+    // When: createEmptyRow is called
+    const row = createEmptyRow(testColumns);
+
+    // Then: Each column has an empty cell
+    expect(row.cells).toEqual({ name: '', age: '', city: '' });
+  });
+
+  it('should give each new row its own id, never the ghost row id', () => {
+    const first = createEmptyRow(testColumns);
+    const second = createEmptyRow(testColumns);
+
+    expect(first.id).toMatch(/^row-/);
+    expect(first.id).not.toBe(second.id);
+    expect(first.id).not.toBe(GHOST_ROW_ID);
+  });
+});
+
+describe('createGhostRow', () => {
+  it('should create the ghost row with every column blank', () => {
+    // When: createGhostRow is called
+    const row = createGhostRow(testColumns);
+
+    // Then: It carries the reserved ghost id and blank cells
+    expect(row).toEqual({
+      id: GHOST_ROW_ID,
+      cells: { name: '', age: '', city: '' },
     });
   });
 });
