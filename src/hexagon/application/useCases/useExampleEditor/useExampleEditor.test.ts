@@ -1165,4 +1165,193 @@ describe('useExampleEditor', () => {
       ).not.toBe('All vocabulary IDs must be valid numbers');
     });
   });
+
+  describe('related vocabulary alongside other validation', () => {
+    async function editRow(
+      rowIndex: number,
+      edits: Record<string, string>,
+      examples = createExamplesWithAudio([
+        { hasAudio: false, id: 9 },
+        { hasAudio: false, id: 10 },
+      ]),
+    ) {
+      overrideExamplesToEdit({ examples, isLoading: false, error: null });
+      const view = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+      const rowId = view.result.current.tableProps.rows[rowIndex].id;
+      for (const [columnId, value] of Object.entries(edits)) {
+        act(() => {
+          view.result.current.tableProps.onCellChange(rowId, columnId, value);
+        });
+        await waitFor(() => {
+          expect(
+            view.result.current.tableProps.rows[rowIndex].cells[columnId],
+          ).toBe(value);
+        });
+      }
+      return { view, rowId };
+    }
+
+    it.each([
+      ['is not an array', '{"id":1}', 'Related vocabulary must be an array'],
+      [
+        'has ids that are not numbers',
+        '[1,"x"]',
+        'All vocabulary IDs must be valid numbers',
+      ],
+      [
+        'is not valid JSON',
+        'not-json',
+        'Invalid format: must be a valid array',
+      ],
+    ])(
+      'keeps a missing-text error when the related vocabulary %s',
+      async (_label, value, message) => {
+        const { view, rowId } = await editRow(0, {
+          english: '',
+          relatedVocabulary: value,
+        });
+
+        const errors = view.result.current.tableProps.validationErrors[rowId];
+        expect(errors.english).toBe('Required');
+        expect(errors.relatedVocabulary).toBe(message);
+        expect(view.result.current.tableProps.isValid).toBe(false);
+      },
+    );
+
+    it.each([
+      ['is not an array', '{"id":1}'],
+      ['has ids that are not numbers', '[1,"x"]'],
+      ['has an empty id', '[1,null]'],
+      ['is not valid JSON', 'not-json'],
+    ])(
+      'is invalid, and cannot be saved, when the related vocabulary %s',
+      async (_label, value) => {
+        const updateExamples = vi.fn(async () => []);
+        overrideExampleMutations({ updateExamples });
+        const { view } = await editRow(0, { relatedVocabulary: value });
+
+        expect(view.result.current.tableProps.isValid).toBe(false);
+        await expect(
+          act(async () => {
+            await view.result.current.tableProps.onSave?.();
+          }),
+        ).rejects.toThrow('validation failed');
+        expect(updateExamples).not.toHaveBeenCalled();
+      },
+    );
+
+    it('only flags the row whose related vocabulary is invalid, and recovers once it is fixed', async () => {
+      const { view, rowId } = await editRow(1, { relatedVocabulary: 'oops' });
+      const otherRowId = view.result.current.tableProps.rows[0].id;
+
+      expect(
+        view.result.current.tableProps.validationErrors[rowId]
+          .relatedVocabulary,
+      ).toBeDefined();
+      expect(
+        view.result.current.tableProps.validationErrors[otherRowId],
+      ).toBeUndefined();
+
+      act(() => {
+        view.result.current.tableProps.onCellChange(
+          rowId,
+          'relatedVocabulary',
+          '[4]',
+        );
+      });
+      await waitFor(() => {
+        expect(view.result.current.tableProps.isValid).toBe(true);
+      });
+      expect(view.result.current.tableProps.validationErrors).toEqual({});
+    });
+
+    it('saves a changed related vocabulary list and a toggled vocabularyComplete flag', async () => {
+      const updateExamples = vi.fn(async () => []);
+      overrideExampleMutations({ updateExamples });
+      const examples = createMockExampleTechnicalList(1, {
+        id: 31,
+        vocabularyComplete: false,
+      });
+      const { view } = await editRow(
+        0,
+        { relatedVocabulary: '[7,8]', vocabularyComplete: 'true' },
+        examples,
+      );
+      expect(view.result.current.tableProps.hasUnsavedChanges).toBe(true);
+
+      await act(async () => {
+        await view.result.current.tableProps.onSave?.();
+      });
+
+      expect(updateExamples).toHaveBeenCalledTimes(1);
+      expect(updateExamples).toHaveBeenCalledWith([
+        expect.objectContaining({
+          exampleId: 31,
+          relatedVocabulary: [7, 8],
+          vocabularyComplete: true,
+        }),
+      ]);
+    });
+  });
+
+  describe('audio errors across rows', () => {
+    it('clearing one row’s audio error leaves another row’s error in place', async () => {
+      overrideExamplesToEdit({
+        examples: createExamplesWithAudio([
+          { hasAudio: true, id: 1 },
+          { hasAudio: true, id: 2 },
+        ]),
+        isLoading: false,
+        error: null,
+      });
+      const { result } = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+      const [first, second] = result.current.tableProps.rows.map((r) => r.id);
+
+      act(() => {
+        result.current.audioErrorHandlers.onAudioError(first, 'spanishAudio');
+        result.current.audioErrorHandlers.onAudioError(second, 'spanishAudio');
+      });
+      await waitFor(() => {
+        expect(result.current.tableProps.isValid).toBe(false);
+      });
+
+      act(() => {
+        result.current.audioErrorHandlers.onAudioSuccess(first, 'spanishAudio');
+      });
+
+      await waitFor(() => {
+        expect(
+          result.current.tableProps.validationErrors[first],
+        ).toBeUndefined();
+      });
+      expect(result.current.tableProps.validationErrors[second]).toEqual({
+        spanishAudio: 'Audio failed to load',
+      });
+      expect(result.current.tableProps.isValid).toBe(false);
+    });
+
+    it('ignores an audio success for a cell that never failed', async () => {
+      overrideExamplesToEdit({
+        examples: createExamplesWithAudio([{ hasAudio: true, id: 1 }]),
+        isLoading: false,
+        error: null,
+      });
+      const { result } = renderHook(() => useExampleEditor(), {
+        wrapper: MockAllProviders,
+      });
+      const rowId = result.current.tableProps.rows[0].id;
+
+      act(() => {
+        result.current.audioErrorHandlers.onAudioSuccess(rowId, 'spanishAudio');
+        result.current.audioErrorHandlers.onAudioSuccess('row-unknown', 'x');
+      });
+
+      expect(result.current.tableProps.isValid).toBe(true);
+      expect(result.current.tableProps.validationErrors).toEqual({});
+    });
+  });
 });
