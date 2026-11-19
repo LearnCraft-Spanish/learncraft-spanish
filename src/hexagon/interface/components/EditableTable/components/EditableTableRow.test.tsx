@@ -320,8 +320,7 @@ describe('editableTableRow', () => {
         activeCell: { rowId: 'row-1', columnId: 'name' },
       });
 
-      // Focus already moved to another column; the old cell's late blur must
-      // not clear the new active cell.
+      // Only the active cell's blur is reported to the table.
       propsFor(renderCell, 'active').onBlur();
 
       expect(props.onBlur).not.toHaveBeenCalled();

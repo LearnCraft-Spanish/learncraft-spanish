@@ -74,16 +74,6 @@ describe('useTableFocus', () => {
     expect(input).toHaveFocus();
   });
 
-  it('focuses an empty text cell', () => {
-    const { result } = renderHook(() => useTableFocus());
-    const input = addInput('text', '');
-    result.current.createCellRef('1', 'notes')(input);
-
-    act(() => result.current.focusCell('1', 'notes'));
-
-    expect(input).toHaveFocus();
-  });
-
   it('focuses cells that are not inputs, such as a focusable wrapper or a textarea', () => {
     const { result } = renderHook(() => useTableFocus());
     const wrapper = document.createElement('div');

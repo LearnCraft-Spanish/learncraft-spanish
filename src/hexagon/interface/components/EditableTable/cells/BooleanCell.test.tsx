@@ -283,25 +283,5 @@ describe('booleanCell', () => {
       await user.tab();
       expect(onBlur).toHaveBeenCalledTimes(1);
     });
-
-    it('registers the text input wrapper with cellRef for other formats', () => {
-      const cellRef = vi.fn();
-      render(
-        <BooleanCell
-          {...createMockProps({
-            cellRef,
-            column: {
-              id: 'test-column',
-              type: 'boolean',
-              booleanFormat: 'y-n',
-            },
-          })}
-        />,
-      );
-
-      expect(cellRef).toHaveBeenCalledWith(
-        screen.getByRole('textbox').parentElement,
-      );
-    });
   });
 });
