@@ -2,6 +2,7 @@ import type { TableRow } from '@domain/PasteTable';
 import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
 import { useTableValidation } from '@application/units/pasteTable/hooks/useTableValidation';
 import { renderHook } from '@testing-library/react';
+import { vi } from 'vitest';
 
 // Helper to create test rows
 const createTestRow = (
@@ -205,6 +206,86 @@ describe('useTableValidation', () => {
       expect(result.current.validationState.errors['row-1']).toEqual({
         name: 'Name is required',
         value: 'Value is required',
+      });
+    });
+  });
+
+  describe('error reporting', () => {
+    const requireName = (row: TableRow): Record<string, string> =>
+      row.cells.name ? {} : { name: 'Name is required' };
+
+    it('should report only the invalid rows in errors', () => {
+      const rows: TableRow[] = [
+        createTestRow('row-1', { name: 'Item 1', value: '10' }),
+        createTestRow('row-2', { name: '', value: '20' }),
+        createTestRow('row-3', { name: 'Item 3', value: '30' }),
+      ];
+
+      const { result } = renderHook(() =>
+        useTableValidation({ rows, validateRow: requireName }),
+      );
+
+      expect(result.current.validationState).toEqual({
+        isValid: false,
+        errors: { 'row-2': { name: 'Name is required' } },
+      });
+    });
+
+    it('should treat a table with no rows as valid', () => {
+      const { result } = renderHook(() =>
+        useTableValidation({ rows: [], validateRow: requireName }),
+      );
+
+      expect(result.current.validationState).toEqual({
+        isValid: true,
+        errors: {},
+      });
+    });
+
+    it('should treat a table with only the ghost row as valid', () => {
+      const { result } = renderHook(() =>
+        useTableValidation({
+          rows: [createGhostRow()],
+          validateRow: requireName,
+        }),
+      );
+
+      expect(result.current.validationState.isValid).toBe(true);
+    });
+
+    it('should hand each real row to the validator and never the ghost row', () => {
+      const rows: TableRow[] = [
+        createTestRow('row-1', { name: 'Item 1', value: '10' }),
+        createGhostRow(),
+      ];
+      const validateRow = vi.fn(() => ({}));
+
+      renderHook(() => useTableValidation({ rows, validateRow }));
+
+      expect(validateRow).toHaveBeenCalledWith(rows[0]);
+      expect(validateRow).not.toHaveBeenCalledWith(rows[1]);
+    });
+
+    it('should re-validate when the validator itself changes', () => {
+      const rows: TableRow[] = [
+        createTestRow('row-1', { name: 'Item 1', value: '10' }),
+      ];
+
+      const { result, rerender } = renderHook(
+        ({ validateRow }) => useTableValidation({ rows, validateRow }),
+        {
+          initialProps: {
+            validateRow: (): Record<string, string> => ({}),
+          },
+        },
+      );
+      expect(result.current.validationState.isValid).toBe(true);
+
+      rerender({ validateRow: () => ({ value: 'Too small' }) });
+
+      expect(result.current.validationState).toEqual({
+        isValid: false,
+        errors: { 'row-1': { value: 'Too small' } },
       });
     });
   });

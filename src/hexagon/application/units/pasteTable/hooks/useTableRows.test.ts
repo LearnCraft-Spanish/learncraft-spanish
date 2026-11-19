@@ -349,4 +349,256 @@ describe('useTableRows', () => {
       expect(id1).not.toBe(id3);
     });
   });
+
+  describe('initial data conversion', () => {
+    it('should show a blank cell for a missing property', () => {
+      const { result } = renderHook(() =>
+        useTableRows<{ name: string; value?: number }>({
+          columns: testColumns,
+          initialData: [{ name: 'Only name' }],
+        }),
+      );
+
+      expect(result.current.rows[0].cells).toEqual({
+        name: 'Only name',
+        value: '',
+      });
+    });
+
+    it('should keep 0 as text rather than blanking it', () => {
+      const { result } = renderHook(() =>
+        useTableRows({
+          columns: testColumns,
+          initialData: [{ name: 'Zero', value: 0 }],
+        }),
+      );
+
+      expect(result.current.rows[0].cells.value).toBe('0');
+    });
+  });
+
+  describe('updateCell edge cases', () => {
+    it('should leave every row unchanged when the row id does not exist', () => {
+      const { result } = renderHook(() =>
+        useTableRows({ columns: testColumns, initialData: testInitialData }),
+      );
+      const before = result.current.rows.map((row) => ({
+        id: row.id,
+        cells: { ...row.cells },
+      }));
+
+      act(() => {
+        result.current.updateCell('no-such-row', 'name', 'Changed');
+      });
+
+      expect(result.current.rows).toEqual(before);
+    });
+  });
+
+  describe('convertGhostRow results', () => {
+    it('should fill only the edited column and keep earlier rows in order', () => {
+      const { result } = renderHook(() =>
+        useTableRows({ columns: testColumns, initialData: testInitialData }),
+      );
+      const [first, second] = result.current.rows;
+
+      act(() => {
+        result.current.convertGhostRow(GHOST_ROW_ID, 'value', '99');
+      });
+
+      expect(result.current.rows).toHaveLength(4);
+      expect(result.current.rows[0]).toEqual(first);
+      expect(result.current.rows[1]).toEqual(second);
+      expect(result.current.rows[2].cells).toEqual({ name: '', value: '99' });
+      expect(result.current.rows[2].id).not.toBe(GHOST_ROW_ID);
+      expect(result.current.rows[3]).toEqual({
+        id: GHOST_ROW_ID,
+        cells: { name: '', value: '' },
+      });
+    });
+  });
+
+  describe('setRows with an updater', () => {
+    it('should pass the current rows to the updater and keep what it returns', () => {
+      const { result } = renderHook(() =>
+        useTableRows({ columns: testColumns, initialData: testInitialData }),
+      );
+      const seenRows: string[][] = [];
+
+      act(() => {
+        result.current.setRows((currentRows) => {
+          seenRows.push(currentRows.map((row) => row.cells.name));
+          return [
+            ...currentRows,
+            { id: 'extra', cells: { name: 'Extra', value: '1' } },
+          ];
+        });
+      });
+
+      expect(seenRows[0]).toEqual(['Item 1', 'Item 2', '']);
+      expect(result.current.rows.map((row) => row.cells.name)).toEqual([
+        'Item 1',
+        'Item 2',
+        '',
+        'Extra',
+      ]);
+    });
+  });
+
+  describe('addRow placement', () => {
+    const newRow = { id: 'new-row', cells: { name: 'New', value: '50' } };
+
+    it('should keep the ghost row last when adding at the start', () => {
+      const { result } = renderHook(() =>
+        useTableRows({ columns: testColumns, initialData: testInitialData }),
+      );
+
+      act(() => {
+        result.current.addRow(newRow, 'start');
+      });
+
+      expect(result.current.rows).toHaveLength(4);
+      expect(result.current.rows[3].id).toBe(GHOST_ROW_ID);
+    });
+
+    it('should keep the ghost row last when adding at an index', () => {
+      const { result } = renderHook(() =>
+        useTableRows({ columns: testColumns, initialData: testInitialData }),
+      );
+
+      act(() => {
+        result.current.addRow(newRow, 1);
+      });
+
+      expect(result.current.rows.map((row) => row.cells.name)).toEqual([
+        'Item 1',
+        'New',
+        'Item 2',
+        '',
+      ]);
+      expect(result.current.rows[3].id).toBe(GHOST_ROW_ID);
+    });
+
+    it.each([-1, 3])(
+      'should add before the ghost row when the index %i is out of range',
+      (position) => {
+        const { result } = renderHook(() =>
+          useTableRows({ columns: testColumns, initialData: testInitialData }),
+        );
+
+        act(() => {
+          result.current.addRow(newRow, position);
+        });
+
+        expect(result.current.rows.map((row) => row.cells.name)).toEqual([
+          'Item 1',
+          'Item 2',
+          'New',
+          '',
+        ]);
+        expect(result.current.rows[3].id).toBe(GHOST_ROW_ID);
+      },
+    );
+  });
+
+  describe('without a ghost row', () => {
+    it('should start with only the initial data', () => {
+      const { result } = renderHook(() =>
+        useTableRows({
+          columns: testColumns,
+          initialData: testInitialData,
+          includeGhostRow: false,
+        }),
+      );
+
+      expect(result.current.rows.map((row) => row.cells.name)).toEqual([
+        'Item 1',
+        'Item 2',
+      ]);
+    });
+
+    it('should start empty when there is no initial data', () => {
+      const { result } = renderHook(() =>
+        useTableRows({ columns: testColumns, includeGhostRow: false }),
+      );
+
+      expect(result.current.rows).toEqual([]);
+    });
+
+    it('should not add a ghost row when rows are replaced', () => {
+      const { result } = renderHook(() =>
+        useTableRows({ columns: testColumns, includeGhostRow: false }),
+      );
+
+      act(() => {
+        result.current.setRows([
+          { id: 'new-row-1', cells: { name: 'New 1', value: '100' } },
+        ]);
+      });
+
+      expect(result.current.rows.map((row) => row.id)).toEqual(['new-row-1']);
+    });
+
+    it('should not add a ghost row when rows are updated with a function', () => {
+      const { result } = renderHook(() =>
+        useTableRows({
+          columns: testColumns,
+          initialData: testInitialData,
+          includeGhostRow: false,
+        }),
+      );
+
+      act(() => {
+        result.current.setRows((rows) => rows.slice(0, 1));
+      });
+
+      expect(result.current.rows).toHaveLength(1);
+      expect(result.current.rows[0].cells.name).toBe('Item 1');
+    });
+
+    it('should reset to no rows', () => {
+      const { result } = renderHook(() =>
+        useTableRows({
+          columns: testColumns,
+          initialData: testInitialData,
+          includeGhostRow: false,
+        }),
+      );
+
+      act(() => {
+        result.current.resetRows();
+      });
+
+      expect(result.current.rows).toEqual([]);
+    });
+
+    it('should add rows without introducing a ghost row', () => {
+      const { result } = renderHook(() =>
+        useTableRows({
+          columns: testColumns,
+          initialData: testInitialData,
+          includeGhostRow: false,
+        }),
+      );
+      const newRow = { id: 'new-row', cells: { name: 'New', value: '50' } };
+
+      act(() => {
+        result.current.addRow(newRow, 'start');
+      });
+      act(() => {
+        result.current.addRow({ ...newRow, id: 'end-row' });
+      });
+      act(() => {
+        result.current.addRow({ ...newRow, id: 'index-row' }, 1);
+      });
+
+      expect(result.current.rows.map((row) => row.id)).toEqual([
+        'new-row',
+        'index-row',
+        expect.stringMatching(/^row-/),
+        expect.stringMatching(/^row-/),
+        'end-row',
+      ]);
+    });
+  });
 });

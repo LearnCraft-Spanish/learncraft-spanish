@@ -55,6 +55,10 @@ describe('pasteFormatting', () => {
     });
 
     describe('edge cases', () => {
+      it('should return tsv when a tab is present even if quotes are present', () => {
+        expect(detectDelimiter('"a"\t"b"')).toBe('tsv');
+      });
+
       it('should return tsv for plain text with no tabs, commas, or quotes', () => {
         // Given: Plain text with no delimiters
         const text = 'hello';
@@ -144,6 +148,13 @@ describe('pasteFormatting', () => {
     });
 
     describe('edge cases', () => {
+      it('should keep empty cells in the middle and at the start of a row', () => {
+        expect(parseCsv('a,,c\n,b,c')).toEqual([
+          ['a', '', 'c'],
+          ['', 'b', 'c'],
+        ]);
+      });
+
       it('should normalize \\r\\n line endings', () => {
         // Given: CSV text using Windows line endings
         const text = 'a,b\r\nc,d';
@@ -231,6 +242,10 @@ describe('pasteFormatting', () => {
     });
 
     describe('edge cases', () => {
+      it('should keep a leading empty cell so columns stay aligned', () => {
+        expect(parseTsv('\tb\tc')).toEqual([['', 'b', 'c']]);
+      });
+
       it('should filter rows where every cell is empty', () => {
         // Given: TSV text with empty and whitespace-only rows
         const text = 'a\tb\n\n\t\t\n  \t  \nc\td';
@@ -494,6 +509,64 @@ describe('pasteFormatting', () => {
           expect(row.id).toBeTruthy();
           expect(row.id).toMatch(ROW_ID_PATTERN);
         });
+      });
+    });
+
+    describe('value normalization', () => {
+      const typedColumns: ColumnDefinition[] = [
+        { id: 'count', type: 'number' },
+        { id: 'active', type: 'boolean', booleanFormat: 'yes-no' },
+        {
+          id: 'level',
+          type: 'select',
+          options: [
+            { value: 'Beginner', label: 'Beginner' },
+            { value: 'Advanced', label: 'Advanced' },
+          ],
+        },
+        { id: 'start', type: 'date' },
+        { id: 'note', type: 'text' },
+      ];
+
+      it('should convert pasted cells to each column type canonical format', () => {
+        // Given: Raw pasted values that differ from canonical formatting
+        const parsedRows = [
+          ['007', 'YES', 'advanced', '03/15/2024', '  hello  '],
+          ['1.50', 'no', 'unknown', '2024-01-02', ''],
+        ];
+
+        // When: convertTsvToRows is called by position
+        const result = convertTsvToRows(parsedRows, typedColumns, false, {});
+
+        // Then: Values are canonical; unrecognized select text is kept for validation
+        expect(result[0].cells).toEqual({
+          count: '7',
+          active: 'yes',
+          level: 'Advanced',
+          start: '2024-03-15',
+          note: 'hello',
+        });
+        expect(result[1].cells).toEqual({
+          count: '1.5',
+          active: 'no',
+          level: 'unknown',
+          start: '2024-01-02',
+          note: '',
+        });
+      });
+
+      it('should normalize header-mapped cells the same way', () => {
+        const parsedRows = [
+          ['active', 'count'],
+          ['yes', '010'],
+        ];
+
+        const result = convertTsvToRows(parsedRows, typedColumns, true, {
+          0: 'active',
+          1: 'count',
+        });
+
+        expect(result[0].cells).toMatchObject({ active: 'yes', count: '10' });
       });
     });
 

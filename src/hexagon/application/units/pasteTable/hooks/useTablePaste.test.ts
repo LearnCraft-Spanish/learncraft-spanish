@@ -1065,4 +1065,45 @@ describe('useTablePaste', () => {
       ]);
     });
   });
+
+  describe('table paste normalization', () => {
+    const typedColumns: ColumnDefinition[] = [
+      { id: 'id', type: 'number' },
+      { id: 'name', type: 'text' },
+      { id: 'active', type: 'boolean', booleanFormat: 'yes-no' },
+    ];
+
+    it('should store pasted table values in each column canonical format', () => {
+      const { setRows, paste } = setupPaste({
+        columns: typedColumns,
+        rows: [createGhostRow()],
+      });
+
+      paste('007\t  Ana  \tYES');
+
+      expect(setRows.mock.calls[0][0]).toEqual([
+        expect.objectContaining({
+          cells: { id: '7', name: 'Ana', active: 'yes' },
+        }),
+      ]);
+    });
+
+    it('should not mark a row updated when the paste only differs in formatting', () => {
+      const onRowUpdated = vi.fn();
+      const rows = [
+        createTestRow('row-1', { id: '1', name: 'Ana', active: 'yes' }),
+      ];
+      const { setRows, paste } = setupPaste({
+        columns: typedColumns,
+        rows,
+        mode: 'edit',
+        onRowUpdated,
+      });
+
+      paste('1\tAna\tYES');
+
+      expect(setRows.mock.calls[0][0]).toEqual(rows);
+      expect(onRowUpdated).not.toHaveBeenCalled();
+    });
+  });
 });
