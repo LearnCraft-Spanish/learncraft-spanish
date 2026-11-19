@@ -297,6 +297,24 @@ describe('useExampleCreator', () => {
     expect(result.current.tableProps.validationErrors.third).toBeUndefined();
   });
 
+  it('does not call blank spanish cells duplicates of each other', () => {
+    seededRows = [
+      dataRow('blank-one', '', 'hello'),
+      dataRow('blank-two', '   ', 'hi'),
+    ];
+    const { result } = renderCreator();
+
+    expect(result.current.tableProps.isValid).toBe(false);
+    for (const rowId of ['blank-one', 'blank-two']) {
+      const spanishError =
+        result.current.tableProps.validationErrors[rowId].spanish;
+      expect(spanishError).toBeDefined();
+      expect(spanishError).not.toBe(
+        'This spanish text is already in the table',
+      );
+    }
+  });
+
   it('accepts one row when the only matching spanish text is on the ghost row', () => {
     seededRows = [
       dataRow('only', 'hola', 'hello'),
