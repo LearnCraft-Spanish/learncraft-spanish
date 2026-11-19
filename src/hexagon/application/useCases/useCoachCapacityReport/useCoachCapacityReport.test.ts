@@ -425,6 +425,17 @@ describe('useCoachCapacityReport', () => {
       ]);
     });
 
+    it('starts valid, with nothing edited, saving or in error', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      expect(result.current.tableProps.validationErrors).toEqual({});
+      expect(result.current.tableProps.isValid).toBe(true);
+      expect(result.current.tableProps.hasUnsavedChanges).toBe(false);
+      expect(result.current.tableProps.dirtyRowIds).toEqual(new Set());
+      expect(result.current.tableProps.isSaving).toBe(false);
+      expect(result.current.saveError).toBeNull();
+    });
+
     it('has no Save or Discard', () => {
       const { result } = renderHook(() => useCoachCapacityReport());
 
@@ -510,6 +521,17 @@ describe('useCoachCapacityReport', () => {
       typeInto(result, '2', 'projectsHours', '3.25');
       expect(totalsOf(result, '2')).toEqual(['3.50', '9.25', '46%']);
       expect(result.current.tableProps.isValid).toBe(true);
+    });
+
+    it('make the table invalid while a cell is invalid and valid again once it is fixed', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      typeInto(result, '2', 'projectsHours', '3.1');
+      expect(result.current.tableProps.isValid).toBe(false);
+
+      typeInto(result, '2', 'projectsHours', '3');
+      expect(result.current.tableProps.isValid).toBe(true);
+      expect(result.current.tableProps.validationErrors).toEqual({});
     });
 
     it('stay at the saved value when the first value typed is invalid', () => {
@@ -934,6 +956,108 @@ describe('useCoachCapacityReport', () => {
       );
       expect(result.current.notesPanel.isSaving).toBe(false);
       expect(result.current.saveError).toBeNull();
+    });
+
+    it('starts closed with an empty draft, not saving and without an error', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      expect(result.current.notesPanel).toMatchObject({
+        coachName: null,
+        draft: '',
+        isSaving: false,
+        error: null,
+      });
+    });
+
+    it('is saving while the notes are on their way', async () => {
+      let finishSave = (): void => {};
+      mockUpdateSettings(
+        ({ changes }) =>
+          new Promise((resolve) => {
+            finishSave = () =>
+              resolve({ ...mostlyBooked.settings, ...changes });
+          }),
+      );
+      const { result } = renderHook(() => useCoachCapacityReport());
+      act(() => result.current.openNotes('1'));
+
+      let saving: Promise<void> = Promise.resolve();
+      act(() => {
+        saving = result.current.notesPanel.save();
+      });
+      expect(result.current.notesPanel.isSaving).toBe(true);
+
+      await act(async () => {
+        finishSave();
+        await saving;
+      });
+      expect(result.current.notesPanel.isSaving).toBe(false);
+      expect(result.current.notesPanel.coachName).toBeNull();
+    });
+
+    it('clears a failed save’s error when the panel is closed, and does not bring it back on reopening', async () => {
+      saveFails();
+      const { result } = renderHook(() => useCoachCapacityReport());
+      act(() => result.current.openNotes('1'));
+      await act(() => result.current.notesPanel.save());
+      expect(result.current.notesPanel.error).not.toBeNull();
+
+      act(() => result.current.notesPanel.close());
+      expect(result.current.notesPanel.error).toBeNull();
+
+      act(() => result.current.openNotes('1'));
+      expect(result.current.notesPanel.error).toBeNull();
+    });
+
+    it('does not carry a failed save’s error over to another coach’s notes', async () => {
+      saveFails();
+      const { result } = renderHook(() => useCoachCapacityReport());
+      act(() => result.current.openNotes('1'));
+      await act(() => result.current.notesPanel.save());
+      expect(result.current.notesPanel.error).not.toBeNull();
+
+      act(() => result.current.openNotes('2'));
+
+      expect(result.current.notesPanel.coachName).toBe('Lightly Booked');
+      expect(result.current.notesPanel.error).toBeNull();
+    });
+
+    it('clears the error and closes when a retry saves', async () => {
+      let attempts = 0;
+      mockUpdateSettings(async ({ changes }) => {
+        attempts += 1;
+        if (attempts === 1) throw new Error('Failed to save');
+        return { ...mostlyBooked.settings, ...changes };
+      });
+      const { result } = renderHook(() => useCoachCapacityReport());
+      act(() => result.current.openNotes('1'));
+      await act(() => result.current.notesPanel.save());
+      expect(result.current.notesPanel.error).not.toBeNull();
+
+      await act(() => result.current.notesPanel.save());
+
+      expect(result.current.notesPanel.error).toBeNull();
+      expect(result.current.notesPanel.coachName).toBeNull();
+    });
+
+    it('starts each coach’s draft from that coach’s saved notes, not the last draft', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      act(() => result.current.openNotes('1'));
+      act(() => result.current.notesPanel.setDraft('Unsaved note'));
+      act(() => result.current.notesPanel.close());
+      act(() => result.current.openNotes('2'));
+
+      expect(result.current.notesPanel.coachName).toBe('Lightly Booked');
+      expect(result.current.notesPanel.draft).toBe('Lightly Booked notes');
+    });
+
+    it('ignores a coach who is not in the report', () => {
+      const { result } = renderHook(() => useCoachCapacityReport());
+
+      act(() => result.current.openNotes('99'));
+
+      expect(result.current.notesPanel.coachName).toBeNull();
     });
 
     it('closes without saving', () => {

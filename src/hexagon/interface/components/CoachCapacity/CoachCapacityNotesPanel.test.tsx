@@ -81,4 +81,28 @@ describe('coach capacity notes panel', () => {
       'Notes could not be saved. Try again.',
     );
   });
+
+  it('shows no error while there is none', () => {
+    render(<CoachCapacityNotesPanel {...panelState()} />);
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('closes on no other key than Escape', () => {
+    const state = panelState();
+    render(<CoachCapacityNotesPanel {...state} />);
+
+    fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Enter' });
+    fireEvent.keyDown(screen.getByRole('textbox'), { key: 'a' });
+
+    expect(state.close).not.toHaveBeenCalled();
+  });
+
+  it('can be saved and cancelled while not saving', () => {
+    render(<CoachCapacityNotesPanel {...panelState()} />);
+
+    expect(screen.getByRole('textbox')).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Save notes' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+  });
 });
