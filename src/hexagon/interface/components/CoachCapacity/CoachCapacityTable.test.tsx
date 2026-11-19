@@ -275,4 +275,68 @@ describe('coach capacity table', () => {
     );
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
+
+  it('shows no save error while there is none', () => {
+    renderTable();
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('does not commit a settings cell on keys other than Enter', () => {
+    const onCommitCell = vi.fn();
+    renderTable({ onCommitCell });
+
+    const [anaProjects] = screen.getAllByRole('spinbutton', {
+      name: 'Projects',
+    });
+    fireEvent.keyDown(anaProjects, { key: 'a' });
+    fireEvent.keyDown(anaProjects, { key: 'Tab' });
+
+    expect(onCommitCell).not.toHaveBeenCalled();
+  });
+
+  it('commits the settings cell of the row and column that was left', () => {
+    const onCommitCell = vi.fn();
+    renderTable({ onCommitCell });
+
+    const [, betoProjects] = screen.getAllByRole('spinbutton', {
+      name: 'Projects',
+    });
+    fireEvent.blur(betoProjects);
+
+    expect(onCommitCell).toHaveBeenCalledExactlyOnceWith('8', 'projectsHours');
+  });
+
+  it('does not commit when read-only cells are left or opened', () => {
+    const onCommitCell = vi.fn();
+    renderTable({ onCommitCell });
+
+    const coachButton = screen.getByRole('button', { name: 'Coach Ana' });
+    act(() => coachButton.focus());
+    act(() => coachButton.blur());
+    fireEvent.click(screen.getByRole('button', { name: 'Mornings' }));
+
+    expect(onCommitCell).not.toHaveBeenCalled();
+  });
+
+  it('shows the error rather than a save error or the empty state when the report fails', () => {
+    renderTable({
+      isError: true,
+      saveError: 'Could not save settings for Coach Ana.',
+      tableProps: tableProps({ rows: [] }),
+    });
+
+    expect(screen.getAllByRole('alert')).toHaveLength(1);
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Coach Capacity could not be loaded.',
+    );
+    expect(screen.queryByText('No coaches found')).not.toBeInTheDocument();
+  });
+
+  it('shows neither the drilldown nor the notes panel while both are closed', () => {
+    renderTable();
+
+    expect(screen.queryByRole('region')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
 });

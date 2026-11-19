@@ -132,4 +132,85 @@ describe('createTableFooter component', () => {
     ).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument();
   });
+
+  it('shows neither the error hint nor the add-data hint when valid with data', () => {
+    render(
+      <CreateTableFooter hasData isValid isSaving={false} onSave={vi.fn()} />,
+    );
+
+    expect(
+      screen.queryByText('Please fix validation errors before saving'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Add data to the table to save'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not say ready to save when the data is invalid', () => {
+    render(
+      <CreateTableFooter
+        hasData
+        isValid={false}
+        isSaving={false}
+        onSave={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText('Ready to save')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Add data to the table to save'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not say ready to save when there is no data', () => {
+    render(
+      <CreateTableFooter
+        hasData={false}
+        isValid
+        isSaving={false}
+        onSave={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText('Ready to save')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Please fix validation errors before saving'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('lets the admin reset invalid data but not save it', () => {
+    render(
+      <CreateTableFooter
+        hasData
+        isValid={false}
+        isSaving={false}
+        onSave={vi.fn()}
+        onReset={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Reset' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+
+  it('does not call onSave or onReset from disabled buttons', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    const onReset = vi.fn();
+    render(
+      <CreateTableFooter
+        hasData={false}
+        isValid
+        isSaving={false}
+        onSave={onSave}
+        onReset={onReset}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(screen.getByRole('button', { name: 'Reset' }));
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(onReset).not.toHaveBeenCalled();
+  });
 });

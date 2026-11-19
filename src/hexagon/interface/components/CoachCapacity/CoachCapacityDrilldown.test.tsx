@@ -89,6 +89,16 @@ describe('coach capacity drilldown', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
+  it('explains, naming the coach, why a coach has no counted memberships', () => {
+    render(<CoachCapacityDrilldown {...drilldownState({ memberships: [] })} />);
+
+    expect(
+      screen.getByText(
+        "None of Coach Ana's memberships count toward their Coaching Hours in this report.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('stays open on the coach and shows loading while their memberships load', () => {
     render(
       <CoachCapacityDrilldown
