@@ -219,4 +219,69 @@ describe('booleanCell', () => {
       expect(input.placeholder).toBe('Enter y or n');
     });
   });
+
+  describe('state and focus', () => {
+    it.each(['false', ''])(
+      'reports an auto toggle with value "%s" as unchecked',
+      (value) => {
+        render(<BooleanCell {...createMockProps({ value })} />);
+
+        expect(
+          screen.getAllByRole('checkbox', { name: 'Test Boolean Field' })[0],
+        ).toHaveAttribute('aria-checked', 'false');
+        expect(screen.getAllByRole('checkbox')[1]).not.toBeChecked();
+      },
+    );
+
+    it('reports focus and blur of the auto toggle, which can take keyboard focus', async () => {
+      const user = userEvent.setup();
+      const onFocus = vi.fn();
+      const onBlur = vi.fn();
+      render(<BooleanCell {...createMockProps({ onFocus, onBlur })} />);
+      const wrapper = screen.getAllByRole('checkbox', {
+        name: 'Test Boolean Field',
+      })[0];
+
+      await user.tab();
+      expect(wrapper).toHaveFocus();
+      expect(onFocus).toHaveBeenCalledTimes(1);
+
+      wrapper.blur();
+      expect(onBlur).toHaveBeenCalledTimes(1);
+    });
+
+    it('registers the auto toggle with cellRef so the table can focus it', () => {
+      const cellRef = vi.fn();
+      render(<BooleanCell {...createMockProps({ cellRef })} />);
+
+      expect(cellRef).toHaveBeenCalledWith(
+        screen.getAllByRole('checkbox', { name: 'Test Boolean Field' })[0],
+      );
+    });
+
+    it('reports focus and blur of the text input for other formats', async () => {
+      const user = userEvent.setup();
+      const onFocus = vi.fn();
+      const onBlur = vi.fn();
+      render(
+        <BooleanCell
+          {...createMockProps({
+            onFocus,
+            onBlur,
+            column: {
+              id: 'test-column',
+              type: 'boolean',
+              booleanFormat: 'y-n',
+            },
+          })}
+        />,
+      );
+
+      await user.click(screen.getByRole('textbox'));
+      expect(onFocus).toHaveBeenCalledTimes(1);
+
+      await user.tab();
+      expect(onBlur).toHaveBeenCalledTimes(1);
+    });
+  });
 });

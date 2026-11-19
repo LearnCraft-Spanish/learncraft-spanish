@@ -96,4 +96,70 @@ describe('getPinnedColumnLayout', () => {
     expect(layout.pinnedColumns.name.style.width).toBe('0px');
     expect(layout.pinnedColumns.id.style.left).toBe('0px');
   });
+
+  it('fixes the width of right-pinned columns too', () => {
+    const layout = layoutFor([
+      { id: 'scrolls', label: 'Scrolls', width: '20rem' },
+      { id: 'total', label: 'Total', width: '6rem', pinned: 'right' },
+    ]);
+
+    expect(layout.pinnedColumns.total.style).toMatchObject({
+      width: '6rem',
+      minWidth: '6rem',
+      maxWidth: '6rem',
+    });
+  });
+
+  it('scrolls when only right columns are pinned', () => {
+    const layout = layoutFor([
+      { id: 'scrolls', label: 'Scrolls', width: '20rem' },
+      { id: 'total', label: 'Total', width: '6rem', pinned: 'right' },
+    ]);
+
+    expect(layout.isScrollable).toBe(true);
+    expect(layout.pinnedColumns.total).toMatchObject({
+      side: 'right',
+      isInnerEdge: true,
+    });
+    expect(layout.pinnedColumns.scrolls).toBeUndefined();
+  });
+
+  it("treats a lone pinned column on a side as that side's inner edge", () => {
+    const layout = layoutFor([
+      { id: 'name', label: 'Name', width: '10rem', pinned: 'left' },
+      { id: 'scrolls', label: 'Scrolls', width: '20rem' },
+    ]);
+
+    expect(layout.pinnedColumns.name).toMatchObject({
+      side: 'left',
+      isInnerEdge: true,
+    });
+    expect(layout.pinnedColumns.name.style.left).toBe('0px');
+  });
+
+  it('stacks pinned columns in the order the columns appear, not the order of the display config', () => {
+    const columns: ColumnDefinition[] = [
+      { id: 'second', type: 'read-only' },
+      { id: 'first', type: 'read-only' },
+    ];
+    const displays: Record<string, ColumnDisplayConfig> = {
+      first: { id: 'first', label: 'First', width: '3rem', pinned: 'left' },
+      second: { id: 'second', label: 'Second', width: '5rem', pinned: 'left' },
+    };
+
+    const layout = getPinnedColumnLayout(columns, (id) => displays[id]);
+
+    expect(layout.pinnedColumns.second.style.left).toBe('0px');
+    expect(layout.pinnedColumns.first.style.left).toBe('5rem');
+  });
+
+  it('sizes the table to the sum of every column, pinned or not', () => {
+    const layout = layoutFor([
+      { id: 'name', label: 'Name', width: '10rem', pinned: 'left' },
+      { id: 'scrolls', label: 'Scrolls', width: '20rem' },
+      { id: 'total', label: 'Total', width: '6rem', pinned: 'right' },
+    ]);
+
+    expect(layout.tableStyle.width).toBe('calc(10rem + 20rem + 6rem)');
+  });
 });
