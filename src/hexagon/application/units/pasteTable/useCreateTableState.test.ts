@@ -166,8 +166,12 @@ describe('useCreateTableState', () => {
         result.current.setRows(newRows);
       });
 
-      // Should have 3 rows: 2 set rows + ghost (preserved by setRows)
-      expect(result.current.data.rows.length).toBeGreaterThanOrEqual(2);
+      // The set rows plus a ghost row at the end
+      expect(result.current.data.rows.map((r) => r.id)).toEqual([
+        'row-1',
+        'row-2',
+        GHOST_ROW_ID,
+      ]);
     });
 
     it('should allow setting rows via updater function', () => {
@@ -200,7 +204,12 @@ describe('useCreateTableState', () => {
         });
       });
 
-      expect(result.current.data.rows.length).toBeGreaterThanOrEqual(2);
+      expect(result.current.data.rows.map((r) => r.id)).toEqual([
+        'row-1',
+        'row-2',
+        GHOST_ROW_ID,
+      ]);
+      expect(result.current.data.rows[1].cells.name).toBe('Added Row');
     });
   });
 
@@ -241,21 +250,399 @@ describe('useCreateTableState', () => {
         result.current.handlePaste(event);
       });
 
-      // Should have pasted rows + ghost
-      expect(result.current.data.rows.length).toBeGreaterThan(1);
+      // Pasted rows + ghost
+      expect(result.current.data.rows).toHaveLength(3);
+      expect(result.current.data.rows[0].cells).toEqual({
+        name: 'Item 1',
+        value: '10',
+      });
+      expect(result.current.data.rows[1].cells).toEqual({
+        name: 'Item 2',
+        value: '20',
+      });
+      expect(result.current.data.rows[2].id).toBe(GHOST_ROW_ID);
     });
   });
 
-  describe('setActiveCellInfo / clearActiveCellInfo', () => {
-    it('should expose cell info management functions', () => {
+  describe('empty row cleanup', () => {
+    it('leaves out rows whose cells are all empty or blank', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      act(() => {
+        result.current.setRows([
+          { id: 'keep-1', cells: { name: 'Item 1', value: '10' } },
+          { id: 'empty', cells: { name: '', value: '' } },
+          { id: 'blank', cells: { name: '   ', value: ' ' } },
+          { id: 'keep-2', cells: { name: 'Item 2', value: '20' } },
+        ]);
+      });
+
+      expect(result.current.data.rows.map((r) => r.id)).toEqual([
+        'keep-1',
+        'keep-2',
+        GHOST_ROW_ID,
+      ]);
+    });
+
+    it('treats missing cells as empty', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      act(() => {
+        result.current.setRows([
+          { id: 'no-cells', cells: {} },
+          { id: 'keep', cells: { name: 'Item', value: '1' } },
+        ]);
+      });
+
+      expect(result.current.data.rows.map((r) => r.id)).toEqual([
+        'keep',
+        GHOST_ROW_ID,
+      ]);
+    });
+
+    it('keeps a row that has a value in only one column', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      act(() => {
+        result.current.setRows([
+          { id: 'name-only', cells: { name: 'Item', value: '' } },
+          { id: 'value-only', cells: { name: '', value: '5' } },
+        ]);
+      });
+
+      expect(result.current.data.rows.map((r) => r.id)).toEqual([
+        'name-only',
+        'value-only',
+        GHOST_ROW_ID,
+      ]);
+    });
+
+    it('keeps the ghost row even though it is empty', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      act(() => {
+        result.current.setRows([
+          { id: 'empty', cells: { name: '', value: '' } },
+        ]);
+      });
+
+      expect(result.current.data.rows.map((r) => r.id)).toEqual([GHOST_ROW_ID]);
+    });
+
+    it('keeps the ghost row last after empty rows are removed', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      act(() => {
+        result.current.setRows([
+          { id: 'keep', cells: { name: 'Item', value: '1' } },
+          { id: 'empty', cells: { name: '', value: '' } },
+          {
+            id: GHOST_ROW_ID,
+            cells: { name: '', value: '' },
+          },
+          { id: 'keep-after-ghost', cells: { name: 'Late', value: '2' } },
+        ]);
+      });
+
+      expect(result.current.data.rows.map((r) => r.id)).toEqual([
+        'keep',
+        'keep-after-ghost',
+        GHOST_ROW_ID,
+      ]);
+    });
+
+    it('leaves out empty rows from getRows as well as the ghost row', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      act(() => {
+        result.current.setRows([
+          { id: 'keep', cells: { name: 'Item', value: '1' } },
+          { id: 'empty', cells: { name: '', value: '' } },
+        ]);
+      });
+
+      expect(result.current.getRows().map((r) => r.id)).toEqual(['keep']);
+    });
+  });
+
+  describe('getRows on an empty table', () => {
+    it('returns no rows when the table has only the ghost row', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      expect(result.current.getRows()).toEqual([]);
+    });
+  });
+
+  describe('updateCell on the ghost row', () => {
+    it('returns the id of the new row it creates', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      let newRowId: string | null = null;
+      act(() => {
+        newRowId = result.current.updateCell(GHOST_ROW_ID, 'value', '42');
+      });
+
+      expect(newRowId).not.toBeNull();
+      expect(newRowId).not.toBe(GHOST_ROW_ID);
+      expect(result.current.data.rows[0].id).toBe(newRowId);
+      expect(result.current.data.rows[0].cells).toEqual({
+        name: '',
+        value: '42',
+      });
+    });
+
+    it('moves the active cell to the new row in the edited column', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      let newRowId: string | null = null;
+      act(() => {
+        newRowId = result.current.updateCell(GHOST_ROW_ID, 'value', '42');
+      });
+
+      expect(result.current.activeCell).toEqual({
+        rowId: newRowId,
+        columnId: 'value',
+      });
+    });
+
+    it('directs the next paste to the new row', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      act(() => {
+        result.current.updateCell(GHOST_ROW_ID, 'name', 'Typed');
+      });
+      act(() => {
+        result.current.handlePaste(createMockClipboardEvent('Pasted\t5'));
+      });
+
+      expect(result.current.getRows().map((r) => r.cells)).toEqual([
+        { name: 'Pasted', value: '5' },
+      ]);
+    });
+
+    it('does not create a row when the value is blank', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      let returned: string | null = 'unset';
+      act(() => {
+        returned = result.current.updateCell(GHOST_ROW_ID, 'name', '   ');
+      });
+
+      expect(returned).toBeNull();
+      expect(result.current.data.rows.map((r) => r.id)).toEqual([GHOST_ROW_ID]);
+      expect(result.current.activeCell).toBeNull();
+    });
+
+    it('keeps a ghost row at the end after converting', () => {
       const { result } = renderHook(() =>
         useCreateTableState({
           columns: testColumns,
+          initialRows: [{ id: 'row-1', cells: { name: 'A', value: '1' } }],
         }),
       );
 
-      expect(typeof result.current.setActiveCellInfo).toBe('function');
-      expect(typeof result.current.clearActiveCellInfo).toBe('function');
+      act(() => {
+        result.current.updateCell(GHOST_ROW_ID, 'name', 'B');
+      });
+
+      expect(result.current.data.rows).toHaveLength(3);
+      expect(result.current.data.rows[0].id).toBe('row-1');
+      expect(result.current.data.rows[1].cells.name).toBe('B');
+      expect(result.current.data.rows[2].id).toBe(GHOST_ROW_ID);
+      expect(result.current.data.rows[2].cells).toEqual({
+        name: '',
+        value: '',
+      });
+    });
+  });
+
+  describe('updateCell on an existing row', () => {
+    it('returns null and leaves the active cell alone', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({
+          columns: testColumns,
+          initialRows: [{ id: 'row-1', cells: { name: 'A', value: '1' } }],
+        }),
+      );
+
+      let returned: string | null = 'unset';
+      act(() => {
+        returned = result.current.updateCell('row-1', 'value', '2');
+      });
+
+      expect(returned).toBeNull();
+      expect(result.current.data.rows[0].cells.value).toBe('2');
+      expect(result.current.data.rows[0].cells.name).toBe('A');
+      expect(result.current.activeCell).toBeNull();
+    });
+  });
+
+  describe('activeCell', () => {
+    it('starts empty and can be set and cleared', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({ columns: testColumns }),
+      );
+
+      expect(result.current.activeCell).toBeNull();
+
+      act(() => {
+        result.current.setActiveCell({ rowId: 'row-1', columnId: 'name' });
+      });
+      expect(result.current.activeCell).toEqual({
+        rowId: 'row-1',
+        columnId: 'name',
+      });
+
+      act(() => {
+        result.current.setActiveCell(null);
+      });
+      expect(result.current.activeCell).toBeNull();
+    });
+  });
+
+  describe('resetTable and focus', () => {
+    it('clears the active cell', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({
+          columns: testColumns,
+          initialRows: [{ id: 'row-1', cells: { name: 'A', value: '1' } }],
+        }),
+      );
+
+      act(() => {
+        result.current.setActiveCell({ rowId: 'row-1', columnId: 'name' });
+      });
+      act(() => {
+        result.current.resetTable();
+      });
+
+      expect(result.current.activeCell).toBeNull();
+    });
+
+    it('pastes into the table as a whole again afterwards', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({
+          columns: testColumns,
+          initialRows: [{ id: 'row-1', cells: { name: 'A', value: '1' } }],
+        }),
+      );
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'name');
+      });
+      act(() => {
+        result.current.resetTable();
+      });
+      act(() => {
+        result.current.handlePaste(createMockClipboardEvent('X\t9'));
+      });
+
+      expect(result.current.getRows().map((r) => r.cells)).toEqual([
+        { name: 'X', value: '9' },
+      ]);
+    });
+  });
+
+  describe('handlePaste into a populated table', () => {
+    it('adds pasted rows after the rows already in the table', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({
+          columns: testColumns,
+          initialRows: [{ id: 'row-1', cells: { name: 'A', value: '1' } }],
+        }),
+      );
+
+      act(() => {
+        result.current.handlePaste(createMockClipboardEvent('B\t2\nC\t3'));
+      });
+
+      expect(result.current.getRows().map((r) => r.cells.name)).toEqual([
+        'A',
+        'B',
+        'C',
+      ]);
+      expect(result.current.data.rows[3].id).toBe(GHOST_ROW_ID);
+    });
+
+    it('pastes nothing when the clipboard is empty', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({
+          columns: testColumns,
+          initialRows: [{ id: 'row-1', cells: { name: 'A', value: '1' } }],
+        }),
+      );
+
+      act(() => {
+        result.current.handlePaste(createMockClipboardEvent(''));
+      });
+
+      expect(result.current.getRows().map((r) => r.id)).toEqual(['row-1']);
+    });
+
+    it('fills from the active cell onward and adds the rows that do not fit', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({
+          columns: testColumns,
+          initialRows: [{ id: 'row-1', cells: { name: 'A', value: '1' } }],
+        }),
+      );
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'name');
+      });
+      act(() => {
+        result.current.handlePaste(createMockClipboardEvent('X\t8\nY\t9'));
+      });
+
+      expect(result.current.getRows().map((r) => r.cells)).toEqual([
+        { name: 'X', value: '8' },
+        { name: 'Y', value: '9' },
+      ]);
+      expect(result.current.getRows()[0].id).toBe('row-1');
+      expect(result.current.data.rows[2].id).toBe(GHOST_ROW_ID);
+    });
+
+    it('pastes a single value into the active cell of an existing row', () => {
+      const { result } = renderHook(() =>
+        useCreateTableState({
+          columns: testColumns,
+          initialRows: [{ id: 'row-1', cells: { name: 'A', value: '1' } }],
+        }),
+      );
+
+      act(() => {
+        result.current.setActiveCellInfo('row-1', 'value');
+      });
+      act(() => {
+        result.current.handlePaste(createMockClipboardEvent('77'));
+      });
+
+      expect(result.current.getRows()[0].cells).toEqual({
+        name: 'A',
+        value: '77',
+      });
     });
   });
 });
