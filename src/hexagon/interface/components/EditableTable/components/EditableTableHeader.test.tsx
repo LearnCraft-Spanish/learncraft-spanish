@@ -199,4 +199,91 @@ describe('editableTableHeader', () => {
       expect(arrowOf(descriptionHeader)).toBeNull();
     });
   });
+
+  it('leaves a column without a configured width unsized', () => {
+    const { container } = render(
+      <table>
+        <thead>
+          <EditableTableHeader
+            columns={columns}
+            getDisplay={(id) => ({ id, label: id })}
+          />
+        </thead>
+      </table>,
+    );
+
+    container.querySelectorAll('th').forEach((header) => {
+      expect(header.style.width).toBe('');
+    });
+  });
+
+  it('gives a pinned column header its pinned width rather than its configured one', () => {
+    render(
+      <table>
+        <thead>
+          <EditableTableHeader
+            columns={columns}
+            getDisplay={getDisplay}
+            getPinnedCell={(id) =>
+              id === 'name'
+                ? { className: 'pinnedLeft', style: { width: '15rem' } }
+                : undefined
+            }
+          />
+        </thead>
+      </table>,
+    );
+
+    expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveStyle({
+      width: '15rem',
+    });
+  });
+
+  it('shows every sortable header as unsorted when no sort is given', () => {
+    const sortable: Record<string, ColumnDisplayConfig> = {
+      ...displayConfig,
+      name: { ...displayConfig.name, sortable: true },
+      active: { ...displayConfig.active, sortable: true },
+    };
+    render(
+      <table>
+        <thead>
+          <EditableTableHeader
+            columns={columns}
+            getDisplay={(id) => sortable[id]}
+            sort={null}
+          />
+        </thead>
+      </table>,
+    );
+
+    expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveAttribute(
+      'aria-sort',
+      'none',
+    );
+    expect(
+      screen.getByRole('columnheader', { name: 'Is Active' }),
+    ).toHaveAttribute('aria-sort', 'none');
+  });
+
+  it('ignores a click on a sortable header when no sort handler is given', () => {
+    render(
+      <table>
+        <thead>
+          <EditableTableHeader
+            columns={columns}
+            getDisplay={(id) =>
+              id === 'name'
+                ? { ...displayConfig.name, sortable: true }
+                : displayConfig[id]
+            }
+          />
+        </thead>
+      </table>,
+    );
+
+    expect(() =>
+      fireEvent.click(screen.getByRole('button', { name: 'Name' })),
+    ).not.toThrow();
+  });
 });

@@ -1,9 +1,9 @@
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { CellRenderProps } from '@interface/components/EditableTable/types';
 import { TextAreaCell } from '@interface/components/EditableTable/cells/TextAreaCell';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // Helper function to create mock props
 function createMockProps(
@@ -124,5 +124,106 @@ describe('textAreaCell', () => {
 
     // Height should be updated
     expect(textarea.style.height).not.toBe(initialHeight);
+  });
+
+  describe('auto-resize', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    // jsdom has no layout, so scrollHeight is simulated the way a browser
+    // reports it: never less than the box's current height, otherwise the
+    // height of the content (here, 2px per character).
+    function simulateBrowserScrollHeight() {
+      return vi
+        .spyOn(HTMLTextAreaElement.prototype, 'scrollHeight', 'get')
+        .mockImplementation(function (this: HTMLTextAreaElement) {
+          const currentHeight = Number.parseFloat(this.style.height) || 0;
+          return Math.max(currentHeight, this.value.length * 2);
+        });
+    }
+
+    it('sizes the textarea to fit its content when first shown', () => {
+      simulateBrowserScrollHeight();
+      render(<TextAreaCell {...createMockProps({ value: 'x'.repeat(50) })} />);
+
+      expect(screen.getByLabelText('Test TextArea Field')).toHaveStyle({
+        height: '100px',
+      });
+    });
+
+    it('grows when the value gets longer and shrinks when it gets shorter', () => {
+      simulateBrowserScrollHeight();
+      const { rerender } = render(
+        <TextAreaCell {...createMockProps({ value: 'x'.repeat(50) })} />,
+      );
+      const textarea = screen.getByLabelText('Test TextArea Field');
+
+      rerender(
+        <TextAreaCell {...createMockProps({ value: 'x'.repeat(80) })} />,
+      );
+      expect(textarea).toHaveStyle({ height: '160px' });
+
+      rerender(
+        <TextAreaCell {...createMockProps({ value: 'x'.repeat(10) })} />,
+      );
+      expect(textarea).toHaveStyle({ height: '20px' });
+    });
+  });
+
+  it('shows the column placeholder', () => {
+    render(
+      <TextAreaCell
+        {...createMockProps({
+          value: '',
+          display: {
+            id: 'test-column',
+            label: 'Notes',
+            placeholder: 'Add notes',
+          },
+        })}
+      />,
+    );
+
+    expect(screen.getByLabelText('Notes')).toHaveAttribute(
+      'placeholder',
+      'Add notes',
+    );
+  });
+
+  it('reports the whole new text when it changes', () => {
+    const onChange = vi.fn();
+    render(<TextAreaCell {...createMockProps({ value: '', onChange })} />);
+
+    fireEvent.change(screen.getByLabelText('Test TextArea Field'), {
+      target: { value: 'Pasted line one\nPasted line two' },
+    });
+
+    expect(onChange).toHaveBeenCalledExactlyOnceWith(
+      'Pasted line one\nPasted line two',
+    );
+  });
+
+  it('reports focus and blur of the textarea', async () => {
+    const user = userEvent.setup();
+    const onFocus = vi.fn();
+    const onBlur = vi.fn();
+    render(<TextAreaCell {...createMockProps({ onFocus, onBlur })} />);
+
+    await user.click(screen.getByLabelText('Test TextArea Field'));
+    expect(onFocus).toHaveBeenCalledTimes(1);
+    expect(onBlur).not.toHaveBeenCalled();
+
+    await user.tab();
+    expect(onBlur).toHaveBeenCalledTimes(1);
+  });
+
+  it('registers the textarea with cellRef so the table can focus it', () => {
+    const cellRef = vi.fn();
+    render(<TextAreaCell {...createMockProps({ cellRef })} />);
+
+    expect(cellRef).toHaveBeenCalledWith(
+      screen.getByLabelText('Test TextArea Field'),
+    );
   });
 });
