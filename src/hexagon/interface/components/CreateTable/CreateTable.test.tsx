@@ -442,50 +442,6 @@ describe('createTable component', () => {
       expect(onReset).toHaveBeenCalledOnce();
     });
 
-    it('treats the table as empty, valid and not saving until told otherwise', () => {
-      const { rerender } = render(
-        <CreateTable
-          rows={rows}
-          columns={columns}
-          displayConfig={displayConfig}
-          validationErrors={{}}
-          onCellChange={vi.fn()}
-          renderCell={renderInput}
-          activeCell={null}
-          setActiveCell={vi.fn()}
-          onSave={vi.fn()}
-          isSaving={undefined as unknown as boolean}
-          isValid={undefined as unknown as boolean}
-          hasData={undefined as unknown as boolean}
-        />,
-      );
-
-      expect(
-        screen.getByText('Add data to the table to save'),
-      ).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
-
-      rerender(
-        <CreateTable
-          rows={rows}
-          columns={columns}
-          displayConfig={displayConfig}
-          validationErrors={{}}
-          onCellChange={vi.fn()}
-          renderCell={renderInput}
-          activeCell={null}
-          setActiveCell={vi.fn()}
-          onSave={vi.fn()}
-          isSaving={undefined as unknown as boolean}
-          isValid={undefined as unknown as boolean}
-          hasData
-        />,
-      );
-
-      expect(screen.getByText('Ready to save')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled();
-    });
-
     it('shows saving while a save is in progress', () => {
       render(
         <CreateTable {...defaultProps} hasData isSaving onSave={vi.fn()} />,

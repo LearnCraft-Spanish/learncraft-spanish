@@ -133,7 +133,7 @@ describe('createTableFooter component', () => {
     expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument();
   });
 
-  it('shows only the hint that applies: ready to save when valid with data', () => {
+  it('shows neither the error hint nor the add-data hint when valid with data', () => {
     render(
       <CreateTableFooter hasData isValid isSaving={false} onSave={vi.fn()} />,
     );
