@@ -62,3 +62,6 @@ src/mocks/data/serverlike/actualServerData.json
 
 # Accidental local pnpm store
 .pnpm-store/
+
+# Claude Code cloud install stamp
+.cloud-install-stamp
