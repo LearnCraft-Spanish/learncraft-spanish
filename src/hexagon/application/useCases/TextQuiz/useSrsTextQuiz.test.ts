@@ -14,6 +14,14 @@ import { act, renderHook } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+const { mockToastInfo } = vi.hoisted(() => ({
+  mockToastInfo: vi.fn<(message: string) => void>(),
+}));
+
+vi.mock('react-toastify', () => ({
+  toast: { info: mockToastInfo },
+}));
+
 // Mock dependencies
 vi.mock('@application/units/studentFlashcardUpdates', () => ({
   useStudentFlashcardUpdates: () => mockUseStudentFlashcardUpdates,
@@ -38,6 +46,7 @@ describe('useSrsTextQuiz', () => {
   beforeEach(() => {
     mockCleanupFunction.mockClear();
     mockNextExample.mockClear();
+    mockToastInfo.mockClear();
     resetMockUseStudentFlashcardUpdates();
     resetMockUseTextQuiz();
 
@@ -146,6 +155,48 @@ describe('useSrsTextQuiz', () => {
       rerender();
 
       expect(mockFlushBatch).toHaveBeenCalled();
+    });
+  });
+
+  describe('untracked progress notice', () => {
+    const UNTRACKED_MESSAGE =
+      "SRS review progress isn't saved when using the app as another student.";
+
+    it('shows an info toast when the quiz starts and progress is not tracked', () => {
+      overrideMockUseStudentFlashcardUpdates({ isProgressTracked: false });
+
+      renderHook(() => useSrsTextQuiz(defaultProps));
+
+      expect(mockToastInfo).toHaveBeenCalledTimes(1);
+      expect(mockToastInfo).toHaveBeenCalledWith(UNTRACKED_MESSAGE);
+    });
+
+    it('does not repeat the toast on re-render within the same quiz', () => {
+      overrideMockUseStudentFlashcardUpdates({ isProgressTracked: false });
+
+      const { rerender } = renderHook(() => useSrsTextQuiz(defaultProps));
+      rerender();
+      rerender();
+
+      expect(mockToastInfo).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows the toast again when a new quiz starts', () => {
+      overrideMockUseStudentFlashcardUpdates({ isProgressTracked: false });
+
+      const first = renderHook(() => useSrsTextQuiz(defaultProps));
+      first.unmount();
+      renderHook(() => useSrsTextQuiz(defaultProps));
+
+      expect(mockToastInfo).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not show the toast when progress is tracked', () => {
+      overrideMockUseStudentFlashcardUpdates({ isProgressTracked: true });
+
+      renderHook(() => useSrsTextQuiz(defaultProps));
+
+      expect(mockToastInfo).not.toHaveBeenCalled();
     });
   });
 });

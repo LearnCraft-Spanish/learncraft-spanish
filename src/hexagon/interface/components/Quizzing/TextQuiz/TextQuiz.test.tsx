@@ -139,6 +139,7 @@ function renderQuizYesSrs({
           handleReviewExample: () => {},
           hasExampleBeenReviewed: () => null,
           flushBatch: vi.fn(),
+          isProgressTracked: true,
         }}
       />
     </MockAllProviders>,
@@ -352,6 +353,7 @@ describe('component TextQuiz', () => {
               handleReviewExample: () => {},
               hasExampleBeenReviewed: () => null,
               flushBatch: mockFlushBatch,
+              isProgressTracked: true,
             }}
           />
         </MockAllProviders>,
@@ -381,6 +383,7 @@ describe('component TextQuiz', () => {
               handleReviewExample: mockHandleReviewExample,
               hasExampleBeenReviewed: mockHasExampleBeenReviewed,
               flushBatch: vi.fn(),
+              isProgressTracked: true,
             }}
           />
         </MockAllProviders>,

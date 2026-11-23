@@ -658,4 +658,62 @@ describe('mappers', () => {
       ).toThrow(z.ZodError);
     });
   });
+
+  describe('round trip between domain entity and TableRow', () => {
+    const roundTripColumns: ColumnDefinition[] = [
+      { id: 'name', type: 'text' },
+      { id: 'age', type: 'number' },
+      { id: 'active', type: 'boolean', booleanFormat: 'yes-no' },
+      {
+        id: 'status',
+        type: 'select',
+        options: [{ value: 'Open', label: 'Open' }],
+      },
+      { id: 'tags', type: 'multi-select', separator: ';' },
+      { id: 'payload', type: 'custom' },
+    ];
+
+    it('should give back the same values after entity -> row -> entity', () => {
+      const entity = {
+        name: 'Ada',
+        age: 36,
+        active: false,
+        status: 'Open',
+        tags: ['red', 'blue'],
+        payload: [1, 2],
+      };
+
+      const row = mapDomainToTableRow(entity, roundTripColumns);
+
+      expect(mapTableRowToDomain(row, roundTripColumns)).toEqual(entity);
+    });
+
+    it('should give back the same cells after row -> entity -> row', () => {
+      const row: TableRow = {
+        id: 'row-1',
+        cells: {
+          name: 'Ada',
+          age: '36',
+          active: 'no',
+          status: 'Open',
+          tags: 'red;blue',
+          payload: '[1,2]',
+        },
+      };
+
+      const entity = mapTableRowToDomain(row, roundTripColumns);
+
+      expect(mapDomainToTableRow(entity, roundTripColumns).cells).toEqual(
+        row.cells,
+      );
+    });
+  });
+
+  describe('mapDomainToTableRows with no entities', () => {
+    it('should return an empty list for no entities', () => {
+      expect(mapDomainToTableRows([], [{ id: 'name', type: 'text' }])).toEqual(
+        [],
+      );
+    });
+  });
 });

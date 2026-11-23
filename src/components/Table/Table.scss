@@ -81,6 +81,21 @@
         // background-color: #e6e6e6;
       }
     }
+
+    tfoot {
+      td {
+        color: white;
+        background-color: grey;
+        font-weight: 600;
+      }
+
+      // first cell in tfoot is sticky
+      td:first-child {
+        position: sticky;
+        left: 0px;
+        z-index: 1;
+      }
+    }
   }
 }
 .edit-icon {

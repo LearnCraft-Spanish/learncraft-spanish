@@ -85,9 +85,17 @@ describe('membershipsByCoachReports', () => {
       courseName: 'Current Course',
       weeklyPrivateCalls: 2,
     });
+    const secondCurrentReport = createCoachReport({
+      coachId: 102,
+      coachName: 'Coach Current Two',
+      studentName: 'Current Student Two',
+      courseName: 'Current Course Two',
+      weeklyPrivateCalls: 1.5,
+    });
     overrideMockUseMembershipsByCoachCurrentReport({
       membershipsByCoachCurrentReportQuery: successfulQueryResult([
         currentReport,
+        secondCurrentReport,
       ]),
     });
 
@@ -97,6 +105,9 @@ describe('membershipsByCoachReports', () => {
 
     expect(screen.getByText('Coach Current')).toBeInTheDocument();
     expect(screen.getByText('2')).toBeInTheDocument();
+    expect(screen.getByText('1.5')).toBeInTheDocument();
+    const totalRow = screen.getByText('Total').closest('tr');
+    expect(totalRow).toHaveTextContent('Total3.5');
 
     fireEvent.click(screen.getByText('Coach Current'));
 
@@ -112,9 +123,17 @@ describe('membershipsByCoachReports', () => {
       courseName: 'Future Course',
       weeklyPrivateCalls: 4,
     });
+    const secondTwoWeeksOutReport = createCoachReport({
+      coachId: 203,
+      coachName: 'Coach Future Two',
+      studentName: 'Future Student Two',
+      courseName: 'Future Course Two',
+      weeklyPrivateCalls: 1.5,
+    });
     overrideMockUseMembershipsByCoachTwoWeeksOutReport({
       membershipsByCoachTwoWeeksOutReportQuery: successfulQueryResult([
         twoWeeksOutReport,
+        secondTwoWeeksOutReport,
       ]),
     });
 
@@ -126,6 +145,9 @@ describe('membershipsByCoachReports', () => {
 
     expect(screen.getByText('Coach Future')).toBeInTheDocument();
     expect(screen.getByText('4')).toBeInTheDocument();
+    expect(screen.getByText('1.5')).toBeInTheDocument();
+    const totalRow = screen.getByText('Total').closest('tr');
+    expect(totalRow).toHaveTextContent('Total5.5');
 
     fireEvent.click(screen.getByText('Coach Future'));
 

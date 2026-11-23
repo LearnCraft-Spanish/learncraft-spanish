@@ -1,4 +1,5 @@
 import type { MembershipsByCoach } from '@learncraft-spanish/shared';
+import CoachHoursTotalRow from 'src/components/AdminDashboard/CoachHoursTotalRow';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useMembershipsBySalariedCoachCurrentReport from 'src/hooks/AdminData/useMembershipsBySalariedCoachCurrentReport';
@@ -35,6 +36,7 @@ export default function CurrentStudentsBySalariedCoach({
   const { membershipsBySalariedCoachCurrentReportQuery } =
     useMembershipsBySalariedCoachCurrentReport();
   const headers = ['Coach Name', 'Total Weekly Private Calls'];
+  const reportData = membershipsBySalariedCoachCurrentReportQuery.data ?? [];
 
   return (
     <div>
@@ -46,9 +48,14 @@ export default function CurrentStudentsBySalariedCoach({
       {isOpen && (
         <DisplayOnlyTable
           headers={headers}
-          data={membershipsBySalariedCoachCurrentReportQuery.data ?? []}
+          data={reportData}
           renderRow={renderRow}
           onClickFunc={setSelectedReport}
+          footerRow={
+            reportData.length > 0 ? (
+              <CoachHoursTotalRow data={reportData} />
+            ) : undefined
+          }
         />
       )}
     </div>

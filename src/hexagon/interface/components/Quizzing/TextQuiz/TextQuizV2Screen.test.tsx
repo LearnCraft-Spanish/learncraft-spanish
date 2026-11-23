@@ -23,6 +23,7 @@ function createSrsQuizProps(
     handleReviewExample: vi.fn(),
     hasExampleBeenReviewed: () => null,
     flushBatch: vi.fn(async () => Promise.resolve()),
+    isProgressTracked: true,
     ...overrides,
   };
 }
